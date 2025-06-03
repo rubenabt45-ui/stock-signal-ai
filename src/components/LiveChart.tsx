@@ -11,15 +11,26 @@ interface LiveChartProps {
 }
 
 export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
-  const { prices, isConnected, subscribe } = useRealTimePriceContext();
+  const { prices, isConnected, subscribe, error } = useRealTimePriceContext();
   
   useEffect(() => {
+    console.log(`🎯 LiveChart subscribing to ${asset}`);
     subscribe([asset]);
   }, [asset, subscribe]);
 
   const currentPriceData = prices[asset];
   const isPositive = currentPriceData?.change && currentPriceData.change > 0;
   const isNegative = currentPriceData?.change && currentPriceData.change < 0;
+
+  // Connection status display
+  const getConnectionStatus = () => {
+    if (error) return { text: 'Error', color: 'text-red-500' };
+    if (!isConnected) return { text: 'Connecting...', color: 'text-yellow-500' };
+    if (isConnected && !currentPriceData) return { text: 'Waiting for data...', color: 'text-yellow-500' };
+    return { text: 'Live Feed', color: 'text-green-500' };
+  };
+
+  const connectionStatus = getConnectionStatus();
 
   return (
     <Card className="tradeiq-card p-6 rounded-2xl">
@@ -48,16 +59,23 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
               )}
             </div>
             <p className="text-sm text-gray-400">{timeframe} • Real-time Data</p>
+            {error && (
+              <p className="text-xs text-red-500 mt-1">⚠️ {error}</p>
+            )}
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          {isConnected ? (
+          {isConnected && currentPriceData ? (
             <Wifi className="h-5 w-5 text-green-500" />
           ) : (
             <WifiOff className="h-5 w-5 text-red-500" />
           )}
-          <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
-          <span className="text-sm text-gray-400">{isConnected ? 'Live Feed' : 'Connecting...'}</span>
+          <div className={`w-2 h-2 rounded-full ${
+            isConnected && currentPriceData ? 'bg-green-500 animate-pulse' : 'bg-red-500'
+          }`}></div>
+          <span className={`text-sm ${connectionStatus.color}`}>
+            {connectionStatus.text}
+          </span>
         </div>
       </div>
       

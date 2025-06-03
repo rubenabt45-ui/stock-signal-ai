@@ -1,5 +1,4 @@
-
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
 import { useEffect, useState } from 'react';
 import { useRealTimePriceContext } from '@/components/RealTimePriceProvider';
 
@@ -22,6 +21,7 @@ const generateHistoricalData = (currentPrice?: number) => {
     
     data.push({
       date: date.toISOString().split('T')[0],
+      time: date.getTime(),
       price: parseFloat(price.toFixed(2)),
       volume: Math.floor(Math.random() * 10000000)
     });
@@ -31,52 +31,53 @@ const generateHistoricalData = (currentPrice?: number) => {
 };
 
 export const StockChart = ({ symbol }: StockChartProps) => {
-  const { prices, isConnected, subscribe } = useRealTimePriceContext();
+  const { prices, isConnected } = useRealTimePriceContext();
   const [chartData, setChartData] = useState(() => generateHistoricalData());
-
-  useEffect(() => {
-    // Subscribe to real-time updates for this symbol
-    subscribe([symbol]);
-  }, [symbol, subscribe]);
+  const [realTimePrice, setRealTimePrice] = useState<number | null>(null);
 
   useEffect(() => {
     // Update chart data when new price data comes in
     const currentPriceData = prices[symbol];
     if (currentPriceData) {
+      setRealTimePrice(currentPriceData.currentPrice);
+      
       setChartData(prevData => {
         const newData = [...prevData];
         
-        // Add today's real-time price as the current data point
-        const today = new Date().toISOString().split('T')[0];
-        const todayIndex = newData.findIndex(item => item.date === today);
+        // Add real-time data points as they come in
+        const now = new Date();
+        const timeKey = now.getTime();
         
-        if (todayIndex >= 0) {
-          // Update today's price
-          newData[todayIndex] = {
-            ...newData[todayIndex],
-            price: currentPriceData.currentPrice,
-            volume: Math.floor(Math.random() * 10000000)
-          };
-        } else {
-          // Add today's data point
-          newData.push({
-            date: today,
-            price: currentPriceData.currentPrice,
-            volume: Math.floor(Math.random() * 10000000)
-          });
-        }
+        // Add current real-time price as the latest data point
+        newData.push({
+          date: now.toISOString().split('T')[0],
+          time: timeKey,
+          price: currentPriceData.currentPrice,
+          volume: Math.floor(Math.random() * 10000000),
+          isRealTime: true
+        });
         
-        return newData;
+        // Keep only the last 50 data points for performance
+        return newData.slice(-50);
       });
     }
   }, [prices, symbol]);
   
   return (
     <div className="h-80 relative">
-      {/* Real-time connection indicator */}
-      <div className="absolute top-2 right-2 z-10 flex items-center space-x-2">
-        <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
-        <span className="text-xs text-gray-400">{isConnected ? 'Live' : 'Offline'}</span>
+      {/* Real-time connection and price indicator */}
+      <div className="absolute top-2 right-2 z-10 flex items-center space-x-3">
+        {realTimePrice && (
+          <div className="bg-black/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-gray-700">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-bold text-white">${realTimePrice.toFixed(2)}</span>
+              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+            </div>
+          </div>
+        )}
+        <div className="bg-black/80 backdrop-blur-sm rounded-lg px-2 py-1">
+          <span className="text-xs text-gray-300">{isConnected ? 'Live' : 'Offline'}</span>
+        </div>
       </div>
       
       <ResponsiveContainer width="100%" height="100%">
@@ -89,17 +90,21 @@ export const StockChart = ({ symbol }: StockChartProps) => {
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(37, 99, 235, 0.1)" />
           <XAxis 
-            dataKey="date" 
+            dataKey="time" 
             stroke="#64748B"
             fontSize={12}
             fontFamily="Inter"
-            tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            tickFormatter={(value) => {
+              const date = new Date(value);
+              return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }}
           />
           <YAxis 
             stroke="#64748B"
             fontSize={12}
             fontFamily="Inter"
-            tickFormatter={(value) => `$${value}`}
+            tickFormatter={(value) => `$${value.toFixed(2)}`}
+            domain={['dataMin - 5', 'dataMax + 5']}
           />
           <Tooltip 
             contentStyle={{ 
@@ -110,8 +115,14 @@ export const StockChart = ({ symbol }: StockChartProps) => {
               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
               backdropFilter: 'blur(10px)'
             }}
-            labelFormatter={(value) => `Date: ${new Date(value).toLocaleDateString()}`}
-            formatter={(value: any) => [`$${value}`, 'Price']}
+            labelFormatter={(value) => {
+              const date = new Date(value);
+              return `Time: ${date.toLocaleString()}`;
+            }}
+            formatter={(value: any, name: string, props: any) => [
+              `$${value.toFixed(2)}`,
+              props.payload.isRealTime ? 'Live Price' : 'Price'
+            ]}
           />
           <Area
             type="monotone"
@@ -120,7 +131,31 @@ export const StockChart = ({ symbol }: StockChartProps) => {
             strokeWidth={3}
             fillOpacity={1}
             fill="url(#colorPrice)"
+            dot={(props: any) => {
+              // Highlight real-time data points
+              if (props.payload.isRealTime) {
+                return (
+                  <circle
+                    cx={props.cx}
+                    cy={props.cy}
+                    r={4}
+                    fill="#10B981"
+                    stroke="#ffffff"
+                    strokeWidth={2}
+                  />
+                );
+              }
+              return null;
+            }}
           />
+          {realTimePrice && (
+            <ReferenceLine 
+              y={realTimePrice} 
+              stroke="#10B981" 
+              strokeDasharray="2 2"
+              strokeWidth={2}
+            />
+          )}
         </AreaChart>
       </ResponsiveContainer>
     </div>
