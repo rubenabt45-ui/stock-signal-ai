@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { AssetSelection } from "@/components/AssetSelection";
 import { TimeframeSelector } from "@/components/TimeframeSelector";
 import { LiveChart } from "@/components/LiveChart";
@@ -7,7 +8,8 @@ import { PatternDetection } from "@/components/PatternDetection";
 import { TrendAnalysis } from "@/components/TrendAnalysis";
 import { VolatilityAnalysis } from "@/components/VolatilityAnalysis";
 import { AISuggestions } from "@/components/AISuggestions";
-import { ChartCandlestick, Brain } from "lucide-react";
+import { ChartCandlestick, Brain, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export type Timeframe = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y";
 
@@ -28,9 +30,17 @@ const Index = () => {
                 <p className="text-sm text-gray-400 font-medium">Chart IA</p>
               </div>
             </div>
-            <div className="flex items-center space-x-2 text-gray-400">
-              <Brain className="h-5 w-5 text-tradeiq-blue" />
-              <span className="text-sm font-medium hidden sm:block">AI Analysis</span>
+            <div className="flex items-center space-x-4">
+              <Link to="/favorites">
+                <Button variant="outline" className="border-gray-700 hover:bg-gray-800 text-gray-300">
+                  <Star className="h-4 w-4 mr-2" />
+                  Favorites
+                </Button>
+              </Link>
+              <div className="flex items-center space-x-2 text-gray-400">
+                <Brain className="h-5 w-5 text-tradeiq-blue" />
+                <span className="text-sm font-medium hidden sm:block">AI Analysis</span>
+              </div>
             </div>
           </div>
         </div>
