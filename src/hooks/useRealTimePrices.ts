@@ -32,17 +32,18 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
   const reconnectAttemptsRef = useRef(0);
   const maxReconnectAttempts = 10;
   const baseReconnectDelay = 1000; // 1 second
+  const isUnmountedRef = useRef(false);
 
   // Calculate exponential backoff delay
-  const getReconnectDelay = () => {
+  const getReconnectDelay = useCallback(() => {
     const delay = Math.min(baseReconnectDelay * Math.pow(2, reconnectAttemptsRef.current), 30000); // Max 30 seconds
     console.log(`🕐 Reconnect attempt ${reconnectAttemptsRef.current + 1}, delay: ${delay}ms`);
     return delay;
-  };
+  }, []);
 
   // Send keep-alive ping to prevent timeouts
   const sendKeepAlive = useCallback(() => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && !isUnmountedRef.current) {
       console.log('💓 Sending keep-alive ping to Edge Function');
       try {
         wsRef.current.send(JSON.stringify({ type: 'ping', timestamp: Date.now() }));
@@ -57,8 +58,10 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
     if (keepAliveIntervalRef.current) {
       clearInterval(keepAliveIntervalRef.current);
     }
-    console.log('💓 Starting keep-alive interval (20 seconds)');
-    keepAliveIntervalRef.current = setInterval(sendKeepAlive, 20000); // 20 seconds
+    if (!isUnmountedRef.current) {
+      console.log('💓 Starting keep-alive interval (15 seconds)');
+      keepAliveIntervalRef.current = setInterval(sendKeepAlive, 15000); // 15 seconds
+    }
   }, [sendKeepAlive]);
 
   // Stop keep-alive interval
@@ -70,8 +73,13 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
     }
   }, []);
 
-  // Connection function with exponential backoff
+  // Connection function with exponential backoff and enhanced error handling
   const connect = useCallback(() => {
+    if (isUnmountedRef.current) {
+      console.log('🛑 Component unmounted, skipping connection');
+      return;
+    }
+
     if (isConnectingRef.current || (wsRef.current && wsRef.current.readyState === WebSocket.OPEN)) {
       console.log('⏭️ Connection already in progress or open, skipping');
       return;
@@ -93,6 +101,12 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {
+        if (isUnmountedRef.current) {
+          console.log('🛑 Component unmounted after connection, closing');
+          wsRef.current?.close();
+          return;
+        }
+
         console.log('✅ Connected to Supabase Edge Function WebSocket');
         setIsConnected(true);
         setError(null);
@@ -114,6 +128,8 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
       };
 
       wsRef.current.onmessage = (event) => {
+        if (isUnmountedRef.current) return;
+
         try {
           const message = JSON.parse(event.data);
           console.log('📨 Received message from Edge Function:', message);
@@ -143,17 +159,42 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
         isConnectingRef.current = false;
         stopKeepAlive();
         
-        if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
+        if (isUnmountedRef.current) {
+          console.log('🛑 Component unmounted, not reconnecting');
+          return;
+        }
+        
+        // Enhanced error code handling
+        if (event.code === 1000) {
+          console.log('✅ Normal closure, not reconnecting');
+          return;
+        }
+
+        if (event.code === 1006) {
+          console.log('⚠️ Abnormal closure detected, will attempt reconnection');
+          setError('Connection lost unexpectedly, reconnecting...');
+        } else if (event.code === 1011) {
+          console.error('❌ Server error, will attempt reconnection');
+          setError('Server error detected, reconnecting...');
+        } else if (event.code === 4001) {
+          console.error('❌ Authentication failure, not reconnecting');
+          setError('Authentication failed. Please check your configuration.');
+          return;
+        }
+        
+        if (reconnectAttemptsRef.current < maxReconnectAttempts) {
           reconnectAttemptsRef.current++;
           const delay = getReconnectDelay();
           console.log(`🔄 Scheduling reconnection in ${delay}ms...`);
           setError(`Connection lost, reconnecting... (attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
           
           reconnectTimeoutRef.current = setTimeout(() => {
-            console.log('🔄 Attempting to reconnect...');
-            connect();
+            if (!isUnmountedRef.current) {
+              console.log('🔄 Attempting to reconnect...');
+              connect();
+            }
           }, delay);
-        } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+        } else {
           console.error('❌ Max reconnection attempts reached');
           setError('Connection failed after multiple attempts. Please refresh the page.');
         }
@@ -171,15 +212,18 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
       setError('Failed to initialize WebSocket connection');
       isConnectingRef.current = false;
     }
-  }, [startKeepAlive, stopKeepAlive]);
+  }, [startKeepAlive, stopKeepAlive, getReconnectDelay]);
 
   // Initialize connection only once
   useEffect(() => {
     console.log('🚀 Initializing useRealTimePrices hook (mount only)');
+    isUnmountedRef.current = false;
     connect();
 
     return () => {
       console.log('🧹 Cleaning up useRealTimePrices hook');
+      isUnmountedRef.current = true;
+      
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
       }
@@ -190,7 +234,7 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
       isConnectingRef.current = false;
       reconnectAttemptsRef.current = 0;
     };
-  }, []); // Empty dependency array - only run once on mount
+  }, [connect, stopKeepAlive]); // Added dependencies to fix hook order
 
   const subscribe = useCallback((symbols: string[]) => {
     console.log('📡 Subscribe request for symbols:', symbols);
@@ -211,6 +255,7 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
   const unsubscribe = useCallback(() => {
     console.log('🛑 Unsubscribing from all symbols');
     subscribedSymbolsRef.current = [];
+    isUnmountedRef.current = true;
     stopKeepAlive();
     if (wsRef.current) {
       wsRef.current.close(1000, 'User initiated disconnect');
