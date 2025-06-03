@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -13,14 +12,14 @@ serve(async (req) => {
   }
 
   try {
-    console.log('🚀 Edge function started - checking environment variables...');
+    console.log('🚀 Edge function started - initializing...');
     
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
     )
 
-    // Get Finnhub API key from environment with enhanced debugging
+    // Get Finnhub API key from environment
     const finnhubApiKey = Deno.env.get('FINNHUB_API_KEY')
     console.log('🔑 Environment check - Finnhub API key exists:', !!finnhubApiKey)
     
@@ -42,6 +41,10 @@ serve(async (req) => {
     let symbols: string[] = []
     let finnhubWs: WebSocket | null = null
     let priceCache: Record<string, any> = {}
+    let keepAliveInterval: number | null = null
+    let reconnectTimeout: number | null = null
+    let reconnectAttempts = 0
+    const maxReconnectAttempts = 5
 
     const sendDebugMessage = (message: string) => {
       console.log('🔍 DEBUG:', message);
@@ -56,18 +59,50 @@ serve(async (req) => {
       }
     };
 
+    // Keep-alive for Finnhub connection
+    const startFinnhubKeepAlive = () => {
+      if (keepAliveInterval) {
+        clearInterval(keepAliveInterval);
+      }
+      console.log('💓 Starting Finnhub keep-alive interval (30 seconds)');
+      keepAliveInterval = setInterval(() => {
+        if (finnhubWs && finnhubWs.readyState === WebSocket.OPEN) {
+          console.log('💓 Sending ping to Finnhub');
+          finnhubWs.send(JSON.stringify({ type: 'ping' }));
+        }
+      }, 30000); // 30 seconds
+    };
+
+    const stopFinnhubKeepAlive = () => {
+      if (keepAliveInterval) {
+        console.log('🛑 Stopping Finnhub keep-alive interval');
+        clearInterval(keepAliveInterval);
+        keepAliveInterval = null;
+      }
+    };
+
     const connectToFinnhub = () => {
+      if (reconnectAttempts >= maxReconnectAttempts) {
+        console.error('❌ Max Finnhub reconnection attempts reached');
+        sendDebugMessage('❌ Max Finnhub reconnection attempts reached');
+        return;
+      }
+
       const finnhubWsUrl = `wss://ws.finnhub.io?token=${finnhubApiKey}`;
       console.log('🔌 Connecting to Finnhub WebSocket...');
       console.log('🌐 Finnhub WS URL structure: wss://ws.finnhub.io?token=', finnhubApiKey?.substring(0, 6) + '...');
       
-      sendDebugMessage(`Connecting to Finnhub with API key: ${finnhubApiKey?.substring(0, 6)}...`);
+      sendDebugMessage(`Connecting to Finnhub (attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`);
       
       finnhubWs = new WebSocket(finnhubWsUrl);
       
       finnhubWs.onopen = () => {
         console.log('✅ Successfully connected to Finnhub WebSocket!');
         sendDebugMessage('✅ Connected to Finnhub WebSocket successfully');
+        reconnectAttempts = 0; // Reset on successful connection
+        
+        // Start keep-alive
+        startFinnhubKeepAlive();
         
         // Subscribe to symbols when connection opens
         symbols.forEach(symbol => {
@@ -82,7 +117,6 @@ serve(async (req) => {
         try {
           const data = JSON.parse(event.data);
           console.log('📨 Raw message from Finnhub:', data);
-          sendDebugMessage(`📨 Finnhub message type: ${data.type}`);
           
           if (data.type === 'trade' && data.data && data.data.length > 0) {
             console.log(`📈 Processing ${data.data.length} trade(s) from Finnhub`);
@@ -170,26 +204,34 @@ serve(async (req) => {
       finnhubWs.onclose = (event) => {
         console.log('🔌 Finnhub WebSocket closed:', event.code, event.reason, 'Clean:', event.wasClean);
         sendDebugMessage(`🔌 Finnhub connection closed: ${event.code} - ${event.reason}`);
+        stopFinnhubKeepAlive();
         
-        // Send error to client about Finnhub disconnection
-        socket.send(JSON.stringify({
-          type: 'error',
-          error: `Finnhub WebSocket closed: ${event.code} - ${event.reason}`
-        }));
-        
-        // Reconnect after delay if not a normal closure
-        if (event.code !== 1000) {
-          setTimeout(() => {
+        // Reconnect with exponential backoff if not a normal closure
+        if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
+          reconnectAttempts++;
+          const delay = Math.min(1000 * Math.pow(2, reconnectAttempts - 1), 30000); // Exponential backoff, max 30s
+          console.log(`🔄 Scheduling Finnhub reconnection in ${delay}ms (attempt ${reconnectAttempts}/${maxReconnectAttempts})`);
+          sendDebugMessage(`🔄 Reconnecting to Finnhub in ${delay}ms...`);
+          
+          reconnectTimeout = setTimeout(() => {
             console.log('🔄 Reconnecting to Finnhub...');
-            sendDebugMessage('🔄 Reconnecting to Finnhub...');
             connectToFinnhub();
-          }, 5000);
+          }, delay);
+        } else {
+          console.error('❌ Finnhub connection failed permanently');
+          sendDebugMessage('❌ Finnhub connection failed permanently');
+          
+          socket.send(JSON.stringify({
+            type: 'error',
+            error: `Finnhub WebSocket connection failed: ${event.code} - ${event.reason}`
+          }));
         }
       };
 
       finnhubWs.onerror = (error) => {
         console.error('❌ Finnhub WebSocket error:', error);
         sendDebugMessage(`❌ Finnhub WebSocket error: ${error}`);
+        stopFinnhubKeepAlive();
         
         socket.send(JSON.stringify({
           type: 'error',
@@ -282,6 +324,9 @@ serve(async (req) => {
             console.log('⏳ Finnhub WebSocket not ready, will subscribe when connected');
             sendDebugMessage('⏳ Finnhub WebSocket not ready, will subscribe when connected');
           }
+        } else if (data.type === 'ping') {
+          console.log('🏓 Received ping from client, sending pong');
+          socket.send(JSON.stringify({ type: 'pong', timestamp: Date.now() }));
         }
       } catch (error) {
         console.error('❌ Error processing client message:', error);
@@ -291,6 +336,10 @@ serve(async (req) => {
 
     socket.onclose = () => {
       console.log("🔌 Client WebSocket connection closed");
+      stopFinnhubKeepAlive();
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+      }
       if (finnhubWs) {
         symbols.forEach(symbol => {
           finnhubWs?.send(JSON.stringify({'type':'unsubscribe','symbol': symbol}));
