@@ -43,10 +43,12 @@ serve(async (req) => {
         
         if (data.type === 'subscribe') {
           symbols = data.symbols || []
+          console.log('Subscribing to symbols:', symbols)
           
-          // Start polling for price updates every 5 seconds
+          // Clear existing interval
           if (intervalId) clearInterval(intervalId)
           
+          // Start polling for price updates every 2 seconds for demo
           intervalId = setInterval(async () => {
             for (const symbol of symbols) {
               try {
@@ -62,6 +64,7 @@ serve(async (req) => {
                     type: 'price_update',
                     symbol,
                     data: {
+                      symbol,
                       currentPrice: priceData.c,
                       change: priceData.d,
                       changePercent: priceData.dp,
@@ -92,7 +95,7 @@ serve(async (req) => {
                 console.error(`Error fetching data for ${symbol}:`, error)
               }
             }
-          }, 5000) // Update every 5 seconds
+          }, 2000) // Update every 2 seconds
         }
       } catch (error) {
         console.error('WebSocket message error:', error)

@@ -1,11 +1,5 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface PriceData {
   symbol: string;
@@ -36,11 +30,11 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
 
   const connect = () => {
     try {
-      const wsUrl = `${import.meta.env.VITE_SUPABASE_URL.replace('https://', 'wss://')}/functions/v1/stream-prices`;
+      const wsUrl = `${import.meta.env.VITE_SUPABASE_URL.replace('https://', 'wss://')}/functions/v1/finnhub-websocket`;
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {
-        console.log('Connected to real-time price stream');
+        console.log('Connected to Finnhub real-time price stream');
         setIsConnected(true);
         setError(null);
       };
@@ -50,6 +44,7 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
           const message = JSON.parse(event.data);
           
           if (message.type === 'price_update') {
+            console.log('Received price update:', message);
             setPrices(prev => ({
               ...prev,
               [message.symbol]: message.data
@@ -81,6 +76,7 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
   };
 
   const subscribe = (symbols: string[]) => {
+    console.log('Subscribing to symbols:', symbols);
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         type: 'subscribe',
