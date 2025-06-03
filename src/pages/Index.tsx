@@ -2,29 +2,33 @@
 import { useState } from "react";
 import { StockSearch } from "@/components/StockSearch";
 import { AnalysisDashboard } from "@/components/AnalysisDashboard";
-import { TrendingUp, BarChart3, Brain } from "lucide-react";
+import { TrendingUp, BarChart3, Brain, ChartCandlestick } from "lucide-react";
 
 const Index = () => {
   const [selectedStock, setSelectedStock] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-tradeiq-navy">
       {/* Header */}
-      <header className="border-b border-slate-700 bg-slate-900/50 backdrop-blur-sm">
-        <div className="container mx-auto px-6 py-4">
+      <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-2">
-              <Brain className="h-8 w-8 text-emerald-400" />
-              <h1 className="text-2xl font-bold text-white">StockAI Analyzer</h1>
+            <div className="flex items-center space-x-3">
+              <ChartCandlestick className="h-8 w-8 text-tradeiq-blue" />
+              <h1 className="text-2xl font-bold text-white tracking-tight">TradeIQ</h1>
             </div>
-            <div className="hidden md:flex items-center space-x-4 ml-8">
-              <div className="flex items-center space-x-1 text-slate-300">
+            <div className="hidden md:flex items-center space-x-6 ml-8">
+              <div className="flex items-center space-x-2 text-gray-400">
                 <TrendingUp className="h-4 w-4" />
-                <span className="text-sm">Technical Analysis</span>
+                <span className="text-sm font-medium">Technical Analysis</span>
               </div>
-              <div className="flex items-center space-x-1 text-slate-300">
+              <div className="flex items-center space-x-2 text-gray-400">
                 <BarChart3 className="h-4 w-4" />
-                <span className="text-sm">AI Insights</span>
+                <span className="text-sm font-medium">Real-time Data</span>
+              </div>
+              <div className="flex items-center space-x-2 text-gray-400">
+                <Brain className="h-4 w-4" />
+                <span className="text-sm font-medium">AI Insights</span>
               </div>
             </div>
           </div>
@@ -32,19 +36,19 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 py-8">
         {!selectedStock ? (
           /* Welcome Screen */
-          <div className="text-center space-y-8">
-            <div className="space-y-4">
-              <h2 className="text-4xl md:text-6xl font-bold text-white">
-                AI-Powered
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400">
-                  {" "}Stock Analysis
+          <div className="text-center space-y-8 animate-fade-in">
+            <div className="space-y-6">
+              <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight">
+                Smart Trading
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-tradeiq-blue to-blue-400">
+                  Made Simple
                 </span>
               </h2>
-              <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-                Get instant technical analysis and trading recommendations powered by advanced AI algorithms
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                Professional-grade stock analysis powered by AI. Get instant technical insights and trading signals.
               </p>
             </div>
 
@@ -52,26 +56,26 @@ const Index = () => {
               <StockSearch onStockSelect={setSelectedStock} />
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-16">
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 text-center">
-                <TrendingUp className="h-12 w-12 text-emerald-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">Trend Analysis</h3>
-                <p className="text-slate-300 text-sm">
-                  Identify market trends and momentum indicators with precision
+            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-16">
+              <div className="tradeiq-card rounded-2xl p-8 text-center hover:scale-105 transition-all duration-300">
+                <TrendingUp className="h-12 w-12 text-tradeiq-success mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-3">Trend Analysis</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Advanced algorithms detect market trends and momentum with institutional-grade accuracy
                 </p>
               </div>
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 text-center">
-                <BarChart3 className="h-12 w-12 text-blue-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">Pattern Detection</h3>
-                <p className="text-slate-300 text-sm">
-                  Spot key chart patterns and support/resistance levels
+              <div className="tradeiq-card rounded-2xl p-8 text-center hover:scale-105 transition-all duration-300">
+                <BarChart3 className="h-12 w-12 text-tradeiq-blue mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-3">Pattern Recognition</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Identify key chart patterns, support/resistance levels, and breakout opportunities
                 </p>
               </div>
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 text-center">
+              <div className="tradeiq-card rounded-2xl p-8 text-center hover:scale-105 transition-all duration-300">
                 <Brain className="h-12 w-12 text-purple-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">AI Recommendations</h3>
-                <p className="text-slate-300 text-sm">
-                  Get clear buy, hold, or sell signals with confidence scores
+                <h3 className="text-xl font-semibold text-white mb-3">AI Recommendations</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Clear buy, hold, or sell signals with confidence scores and risk assessment
                 </p>
               </div>
             </div>

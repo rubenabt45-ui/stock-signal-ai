@@ -47,12 +47,17 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center space-y-4">
-          <div className="animate-spin h-12 w-12 border-4 border-emerald-400 border-t-transparent rounded-full mx-auto"></div>
-          <div className="text-white">
-            <p className="text-lg font-semibold">Analyzing {stockSymbol}</p>
-            <p className="text-slate-400">Fetching data and running AI analysis...</p>
+      <div className="flex items-center justify-center min-h-[500px]">
+        <div className="text-center space-y-6">
+          <div className="relative">
+            <div className="animate-spin h-16 w-16 border-4 border-tradeiq-blue/20 border-t-tradeiq-blue rounded-full mx-auto"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Brain className="h-6 w-6 text-tradeiq-blue" />
+            </div>
+          </div>
+          <div className="text-white space-y-2">
+            <p className="text-xl font-semibold">Analyzing {stockSymbol}</p>
+            <p className="text-gray-400">Processing market data and running AI analysis...</p>
           </div>
         </div>
       </div>
@@ -63,13 +68,13 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
   const isNegative = parseFloat(stockData.change) < 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button
           variant="outline"
           onClick={onBackToSearch}
-          className="border-slate-600 text-slate-300 hover:bg-slate-700"
+          className="border-gray-700/50 text-gray-300 hover:bg-black/30 hover:border-tradeiq-blue/50 rounded-xl"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Search
@@ -77,23 +82,23 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
       </div>
 
       {/* Stock Info Header */}
-      <Card className="bg-slate-800/50 border-slate-700 p-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0">
-          <div className="space-y-2">
-            <div className="flex items-center space-x-3">
-              <h2 className="text-3xl font-bold text-white">{stockData.symbol}</h2>
-              <Badge variant="outline" className="border-slate-600 text-slate-300">
+      <Card className="tradeiq-card p-6 rounded-2xl">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-6 lg:space-y-0">
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <h2 className="text-4xl font-bold text-white">{stockData.symbol}</h2>
+              <Badge variant="outline" className="border-tradeiq-blue/30 text-tradeiq-blue bg-tradeiq-blue/10">
                 NASDAQ
               </Badge>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-4xl font-bold text-white">${stockData.price}</span>
-              <div className="flex items-center space-x-2">
-                {isPositive && <TrendingUp className="h-5 w-5 text-emerald-400" />}
-                {isNegative && <TrendingDown className="h-5 w-5 text-red-400" />}
-                {!isPositive && !isNegative && <Minus className="h-5 w-5 text-slate-400" />}
-                <span className={`text-lg font-semibold ${
-                  isPositive ? 'text-emerald-400' : isNegative ? 'text-red-400' : 'text-slate-400'
+            <div className="flex items-center space-x-6">
+              <span className="text-5xl font-bold text-white">${stockData.price}</span>
+              <div className="flex items-center space-x-3">
+                {isPositive && <TrendingUp className="h-6 w-6 text-tradeiq-success" />}
+                {isNegative && <TrendingDown className="h-6 w-6 text-tradeiq-danger" />}
+                {!isPositive && !isNegative && <Minus className="h-6 w-6 text-gray-400" />}
+                <span className={`text-xl font-bold ${
+                  isPositive ? 'text-tradeiq-success' : isNegative ? 'text-tradeiq-danger' : 'text-gray-400'
                 }`}>
                   {stockData.change} ({stockData.changePercent}%)
                 </span>
@@ -101,22 +106,22 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
             </div>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div>
-              <p className="text-slate-400 text-sm">Volume</p>
-              <p className="text-white font-semibold">{parseInt(stockData.volume).toLocaleString()}</p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+            <div className="space-y-1">
+              <p className="text-gray-400 text-sm font-medium">Volume</p>
+              <p className="text-white font-bold text-lg">{parseInt(stockData.volume).toLocaleString()}</p>
             </div>
-            <div>
-              <p className="text-slate-400 text-sm">Market Cap</p>
-              <p className="text-white font-semibold">${stockData.marketCap}</p>
+            <div className="space-y-1">
+              <p className="text-gray-400 text-sm font-medium">Market Cap</p>
+              <p className="text-white font-bold text-lg">${stockData.marketCap}</p>
             </div>
-            <div>
-              <p className="text-slate-400 text-sm">52W High</p>
-              <p className="text-white font-semibold">${stockData.high52w}</p>
+            <div className="space-y-1">
+              <p className="text-gray-400 text-sm font-medium">52W High</p>
+              <p className="text-white font-bold text-lg">${stockData.high52w}</p>
             </div>
-            <div>
-              <p className="text-slate-400 text-sm">52W Low</p>
-              <p className="text-white font-semibold">${stockData.low52w}</p>
+            <div className="space-y-1">
+              <p className="text-gray-400 text-sm font-medium">52W Low</p>
+              <p className="text-white font-bold text-lg">${stockData.low52w}</p>
             </div>
           </div>
         </div>
@@ -126,10 +131,10 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Chart Section */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="bg-slate-800/50 border-slate-700 p-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <BarChart3 className="h-5 w-5 text-blue-400" />
-              <h3 className="text-lg font-semibold text-white">Price Chart</h3>
+          <Card className="tradeiq-card p-6 rounded-2xl">
+            <div className="flex items-center space-x-3 mb-6">
+              <BarChart3 className="h-6 w-6 text-tradeiq-blue" />
+              <h3 className="text-xl font-bold text-white">Price Chart</h3>
             </div>
             <StockChart symbol={stockSymbol} />
           </Card>
@@ -139,10 +144,10 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
 
         {/* AI Analysis Sidebar */}
         <div className="space-y-6">
-          <Card className="bg-slate-800/50 border-slate-700 p-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <Brain className="h-5 w-5 text-purple-400" />
-              <h3 className="text-lg font-semibold text-white">AI Analysis</h3>
+          <Card className="tradeiq-card p-6 rounded-2xl">
+            <div className="flex items-center space-x-3 mb-6">
+              <Brain className="h-6 w-6 text-purple-400" />
+              <h3 className="text-xl font-bold text-white">AI Analysis</h3>
             </div>
             <AIAnalysis symbol={stockSymbol} stockData={stockData} />
           </Card>
