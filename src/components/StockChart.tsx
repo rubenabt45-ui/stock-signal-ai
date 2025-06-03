@@ -1,14 +1,16 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { useEffect, useState } from 'react';
+import { useRealTimePriceContext } from '@/components/RealTimePriceProvider';
 
 interface StockChartProps {
   symbol: string;
 }
 
-// Generate mock chart data
-const generateChartData = () => {
+// Generate initial historical data
+const generateHistoricalData = (currentPrice?: number) => {
   const data = [];
-  let price = 150 + Math.random() * 50;
+  let price = currentPrice || (150 + Math.random() * 50);
   
   for (let i = 30; i >= 0; i--) {
     const date = new Date();
@@ -29,12 +31,43 @@ const generateChartData = () => {
 };
 
 export const StockChart = ({ symbol }: StockChartProps) => {
-  const data = generateChartData();
+  const { prices, isConnected, subscribe } = useRealTimePriceContext();
+  const [chartData, setChartData] = useState(() => generateHistoricalData());
+
+  useEffect(() => {
+    // Subscribe to real-time updates for this symbol
+    subscribe([symbol]);
+  }, [symbol, subscribe]);
+
+  useEffect(() => {
+    // Update chart data when new price data comes in
+    const currentPriceData = prices[symbol];
+    if (currentPriceData) {
+      setChartData(prevData => {
+        const newData = [...prevData];
+        const lastDataPoint = newData[newData.length - 1];
+        
+        // Update the last data point with real-time price
+        if (lastDataPoint) {
+          lastDataPoint.price = currentPriceData.currentPrice;
+          lastDataPoint.volume = Math.floor(Math.random() * 10000000); // Mock volume
+        }
+        
+        return newData;
+      });
+    }
+  }, [prices, symbol]);
   
   return (
-    <div className="h-80">
+    <div className="h-80 relative">
+      {/* Real-time connection indicator */}
+      <div className="absolute top-2 right-2 z-10 flex items-center space-x-2">
+        <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+        <span className="text-xs text-gray-400">{isConnected ? 'Live' : 'Offline'}</span>
+      </div>
+      
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data}>
+        <AreaChart data={chartData}>
           <defs>
             <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#2563EB" stopOpacity={0.3}/>
