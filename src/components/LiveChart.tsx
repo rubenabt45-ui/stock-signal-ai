@@ -1,6 +1,6 @@
 
 import { Card } from "@/components/ui/card";
-import { BarChart3, TrendingUp, TrendingDown, Wifi, WifiOff } from "lucide-react";
+import { BarChart3, TrendingUp, TrendingDown, Wifi, WifiOff, Activity } from "lucide-react";
 import { StockChart } from "@/components/StockChart";
 import { useRealTimePriceContext } from "@/components/RealTimePriceProvider";
 import { useEffect } from "react";
@@ -22,27 +22,27 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
   const isPositive = currentPriceData?.change && currentPriceData.change > 0;
   const isNegative = currentPriceData?.change && currentPriceData.change < 0;
 
-  // Enhanced connection status display
   const getConnectionStatus = () => {
-    if (error && error.includes('Failed to connect')) {
-      return { text: 'Connection Failed', color: 'text-red-500' };
+    if (error && error.includes('Maximum reconnection')) {
+      return { text: 'Connection Failed', color: 'text-red-500', icon: WifiOff };
     }
     if (error && error.includes('reconnecting')) {
-      return { text: 'Reconnecting...', color: 'text-yellow-500' };
+      return { text: 'Reconnecting...', color: 'text-yellow-500', icon: Activity };
     }
     if (error) {
-      return { text: 'Error', color: 'text-red-500' };
+      return { text: 'Error', color: 'text-red-500', icon: WifiOff };
     }
     if (!isConnected) {
-      return { text: 'Connecting...', color: 'text-yellow-500' };
+      return { text: 'Connecting...', color: 'text-yellow-500', icon: Activity };
     }
     if (isConnected && !currentPriceData) {
-      return { text: 'Waiting for data...', color: 'text-yellow-500' };
+      return { text: 'Waiting for data...', color: 'text-blue-500', icon: Activity };
     }
-    return { text: 'Live Feed', color: 'text-green-500' };
+    return { text: 'Live Feed', color: 'text-green-500', icon: Wifi };
   };
 
   const connectionStatus = getConnectionStatus();
+  const StatusIcon = connectionStatus.icon;
 
   return (
     <Card className="tradeiq-card p-6 rounded-2xl">
@@ -70,22 +70,26 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
                 </div>
               )}
             </div>
-            <p className="text-sm text-gray-400">{timeframe} • Real-time Data</p>
+            <div className="flex items-center space-x-2 mt-1">
+              <p className="text-sm text-gray-400">{timeframe} • Real-time Data</p>
+              {currentPriceData && (
+                <span className="text-xs text-gray-500">
+                  Last update: {new Date(currentPriceData.timestamp).toLocaleTimeString()}
+                </span>
+              )}
+            </div>
             {error && (
               <p className="text-xs text-red-500 mt-1">⚠️ {error}</p>
             )}
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          {isConnected && currentPriceData ? (
-            <Wifi className="h-5 w-5 text-green-500" />
-          ) : (
-            <WifiOff className="h-5 w-5 text-red-500" />
-          )}
+          <StatusIcon className={`h-5 w-5 ${connectionStatus.color}`} />
           <div className={`w-2 h-2 rounded-full ${
-            isConnected && currentPriceData ? 'bg-green-500 animate-pulse' : 'bg-red-500'
+            isConnected && currentPriceData ? 'bg-green-500 animate-pulse' : 
+            isConnected ? 'bg-blue-500 animate-pulse' : 'bg-red-500'
           }`}></div>
-          <span className={`text-sm ${connectionStatus.color}`}>
+          <span className={`text-sm font-medium ${connectionStatus.color}`}>
             {connectionStatus.text}
           </span>
         </div>
