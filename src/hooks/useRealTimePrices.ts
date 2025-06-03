@@ -30,86 +30,104 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
   const subscribedSymbolsRef = useRef<string[]>([]);
   const isConnectingRef = useRef(false);
 
-  const connect = useCallback(() => {
-    if (isConnectingRef.current || (wsRef.current && wsRef.current.readyState === WebSocket.OPEN)) {
-      console.log('⏭️ Connection already in progress or open, skipping');
-      return;
-    }
+  // Move connect function inside useEffect to fix React hook error
+  useEffect(() => {
+    const connect = () => {
+      if (isConnectingRef.current || (wsRef.current && wsRef.current.readyState === WebSocket.OPEN)) {
+        console.log('⏭️ Connection already in progress or open, skipping');
+        return;
+      }
 
-    try {
-      isConnectingRef.current = true;
-      console.log('🔄 Starting WebSocket connection process...');
-      
-      const wsUrl = `wss://xnrvqfclyroagzknedhs.supabase.co/functions/v1/finnhub-websocket`;
-      console.log('🌐 Connecting to Supabase Edge Function:', wsUrl);
-      
-      wsRef.current = new WebSocket(wsUrl);
-
-      wsRef.current.onopen = () => {
-        console.log('✅ Connected to Supabase Edge Function WebSocket');
-        setIsConnected(true);
-        setError(null);
-        isConnectingRef.current = false;
+      try {
+        isConnectingRef.current = true;
+        console.log('🔄 Starting WebSocket connection process...');
         
-        if (subscribedSymbolsRef.current.length > 0) {
-          console.log('📡 Re-subscribing to symbols on reconnect:', subscribedSymbolsRef.current);
-          const subscribeMessage = {
-            type: 'subscribe',
-            symbols: subscribedSymbolsRef.current
-          };
-          console.log('📤 Sending subscription message:', JSON.stringify(subscribeMessage));
-          wsRef.current?.send(JSON.stringify(subscribeMessage));
-        }
-      };
+        const wsUrl = `wss://xnrvqfclyroagzknedhs.supabase.co/functions/v1/finnhub-websocket`;
+        console.log('🌐 Connecting to Supabase Edge Function:', wsUrl);
+        
+        wsRef.current = new WebSocket(wsUrl);
 
-      wsRef.current.onmessage = (event) => {
-        try {
-          const message = JSON.parse(event.data);
-          console.log('📨 Received message from Edge Function:', message);
+        wsRef.current.onopen = () => {
+          console.log('✅ Connected to Supabase Edge Function WebSocket');
+          setIsConnected(true);
+          setError(null);
+          isConnectingRef.current = false;
           
-          if (message.type === 'price_update') {
-            console.log('💰 Processing price update for', message.symbol, ':', message.data);
-            setPrices(prev => ({
-              ...prev,
-              [message.symbol]: message.data
-            }));
-          } else if (message.type === 'error') {
-            console.error('❌ Error from Edge Function:', message.error);
-            setError(`Server error: ${message.error}`);
-          } else if (message.type === 'debug') {
-            console.log('🔍 Debug info from Edge Function:', message.message);
+          if (subscribedSymbolsRef.current.length > 0) {
+            console.log('📡 Re-subscribing to symbols on reconnect:', subscribedSymbolsRef.current);
+            const subscribeMessage = {
+              type: 'subscribe',
+              symbols: subscribedSymbolsRef.current
+            };
+            console.log('📤 Sending subscription message:', JSON.stringify(subscribeMessage));
+            wsRef.current?.send(JSON.stringify(subscribeMessage));
           }
-        } catch (err) {
-          console.error('❌ Error parsing message from Edge Function:', err, 'Raw data:', event.data);
-        }
-      };
+        };
 
-      wsRef.current.onclose = (event) => {
-        console.log('🔌 WebSocket connection closed. Code:', event.code, 'Reason:', event.reason, 'Clean:', event.wasClean);
-        setIsConnected(false);
-        isConnectingRef.current = false;
-        
-        if (event.code !== 1000) { // Not a normal closure
-          console.log('🔄 Scheduling reconnection in 3 seconds...');
-          reconnectTimeoutRef.current = setTimeout(() => {
-            console.log('🔄 Attempting to reconnect...');
-            connect();
-          }, 3000);
-        }
-      };
+        wsRef.current.onmessage = (event) => {
+          try {
+            const message = JSON.parse(event.data);
+            console.log('📨 Received message from Edge Function:', message);
+            
+            if (message.type === 'price_update') {
+              console.log('💰 Processing price update for', message.symbol, ':', message.data);
+              setPrices(prev => ({
+                ...prev,
+                [message.symbol]: message.data
+              }));
+            } else if (message.type === 'error') {
+              console.error('❌ Error from Edge Function:', message.error);
+              setError(`Server error: ${message.error}`);
+            } else if (message.type === 'debug') {
+              console.log('🔍 Debug info from Edge Function:', message.message);
+            }
+          } catch (err) {
+            console.error('❌ Error parsing message from Edge Function:', err, 'Raw data:', event.data);
+          }
+        };
 
-      wsRef.current.onerror = (err) => {
-        console.error('❌ WebSocket error occurred:', err);
-        setError('Failed to connect to real-time data stream');
-        setIsConnected(false);
+        wsRef.current.onclose = (event) => {
+          console.log('🔌 WebSocket connection closed. Code:', event.code, 'Reason:', event.reason, 'Clean:', event.wasClean);
+          setIsConnected(false);
+          isConnectingRef.current = false;
+          
+          if (event.code !== 1000) { // Not a normal closure
+            console.log('🔄 Scheduling reconnection in 5 seconds...');
+            setError('Connection lost, reconnecting...');
+            reconnectTimeoutRef.current = setTimeout(() => {
+              console.log('🔄 Attempting to reconnect...');
+              connect();
+            }, 5000);
+          }
+        };
+
+        wsRef.current.onerror = (err) => {
+          console.error('❌ WebSocket error occurred:', err);
+          setError('Failed to connect to real-time data stream');
+          setIsConnected(false);
+          isConnectingRef.current = false;
+        };
+      } catch (err) {
+        console.error('❌ Failed to create WebSocket connection:', err);
+        setError('Failed to initialize WebSocket connection');
         isConnectingRef.current = false;
-      };
-    } catch (err) {
-      console.error('❌ Failed to create WebSocket connection:', err);
-      setError('Failed to initialize WebSocket connection');
+      }
+    };
+
+    console.log('🚀 Initializing useRealTimePrices hook');
+    connect();
+
+    return () => {
+      console.log('🧹 Cleaning up useRealTimePrices hook');
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      if (wsRef.current) {
+        wsRef.current.close(1000, 'Component unmounting');
+      }
       isConnectingRef.current = false;
-    }
-  }, []);
+    };
+  }, []); // Empty dependency array
 
   const subscribe = useCallback((symbols: string[]) => {
     console.log('📡 Subscribe request for symbols:', symbols);
@@ -124,11 +142,8 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
       wsRef.current.send(JSON.stringify(message));
     } else {
       console.log('⏳ WebSocket not ready for subscription, will subscribe when connected');
-      if (!isConnectingRef.current) {
-        connect();
-      }
     }
-  }, [connect]);
+  }, []);
 
   const unsubscribe = useCallback(() => {
     console.log('🛑 Unsubscribing from all symbols');
@@ -141,22 +156,6 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
     }
     isConnectingRef.current = false;
   }, []);
-
-  useEffect(() => {
-    console.log('🚀 Initializing useRealTimePrices hook');
-    connect();
-
-    return () => {
-      console.log('🧹 Cleaning up useRealTimePrices hook');
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-      if (wsRef.current) {
-        wsRef.current.close(1000, 'Component unmounting');
-      }
-      isConnectingRef.current = false;
-    };
-  }, [connect]);
 
   return {
     prices,

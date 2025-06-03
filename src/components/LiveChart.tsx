@@ -22,11 +22,23 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
   const isPositive = currentPriceData?.change && currentPriceData.change > 0;
   const isNegative = currentPriceData?.change && currentPriceData.change < 0;
 
-  // Connection status display
+  // Enhanced connection status display
   const getConnectionStatus = () => {
-    if (error) return { text: 'Error', color: 'text-red-500' };
-    if (!isConnected) return { text: 'Connecting...', color: 'text-yellow-500' };
-    if (isConnected && !currentPriceData) return { text: 'Waiting for data...', color: 'text-yellow-500' };
+    if (error && error.includes('Failed to connect')) {
+      return { text: 'Connection Failed', color: 'text-red-500' };
+    }
+    if (error && error.includes('reconnecting')) {
+      return { text: 'Reconnecting...', color: 'text-yellow-500' };
+    }
+    if (error) {
+      return { text: 'Error', color: 'text-red-500' };
+    }
+    if (!isConnected) {
+      return { text: 'Connecting...', color: 'text-yellow-500' };
+    }
+    if (isConnected && !currentPriceData) {
+      return { text: 'Waiting for data...', color: 'text-yellow-500' };
+    }
     return { text: 'Live Feed', color: 'text-green-500' };
   };
 

@@ -20,12 +20,15 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
     )
 
-    // Get Finnhub API key from environment
+    // Get Finnhub API key from environment with enhanced debugging
     const finnhubApiKey = Deno.env.get('FINNHUB_API_KEY')
-    console.log('🔑 Finnhub API key status:', finnhubApiKey ? `Found (${finnhubApiKey.substring(0, 8)}...)` : 'NOT FOUND')
+    console.log('🔑 Environment check - Finnhub API key exists:', !!finnhubApiKey)
     
-    if (!finnhubApiKey) {
-      console.error('❌ CRITICAL: Finnhub API key not found in Supabase Vault')
+    if (finnhubApiKey) {
+      console.log('🔑 Finnhub API key preview:', finnhubApiKey.substring(0, 6) + '...')
+      console.log('🔑 Finnhub API key length:', finnhubApiKey.length)
+    } else {
+      console.error('❌ CRITICAL: FINNHUB_API_KEY not found in environment')
       throw new Error('Finnhub API key not configured in Supabase Vault')
     }
 
@@ -53,65 +56,25 @@ serve(async (req) => {
       }
     };
 
-    const getInitialQuote = async (symbol: string) => {
-      try {
-        console.log(`📊 Fetching initial quote for ${symbol} from Finnhub REST API...`);
-        const quoteUrl = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubApiKey}`;
-        console.log('🌐 Quote URL:', quoteUrl.replace(finnhubApiKey, 'HIDDEN_TOKEN'));
-        
-        const response = await fetch(quoteUrl);
-        console.log(`📈 Quote API response status for ${symbol}:`, response.status);
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log(`💰 Quote data for ${symbol}:`, data);
-          
-          if (data.c === 0 && data.d === 0) {
-            console.warn(`⚠️ Warning: ${symbol} returned zero values - may be invalid symbol or market closed`);
-          }
-          
-          return {
-            symbol,
-            currentPrice: data.c || 0,
-            change: data.d || 0,
-            changePercent: data.dp || 0,
-            high: data.h || 0,
-            low: data.l || 0,
-            open: data.o || 0,
-            previousClose: data.pc || 0,
-            timestamp: Date.now()
-          };
-        } else {
-          const errorText = await response.text();
-          console.error(`❌ Quote API failed for ${symbol}:`, response.status, errorText);
-          sendDebugMessage(`Quote API failed for ${symbol}: ${response.status} - ${errorText}`);
-        }
-      } catch (error) {
-        console.error(`❌ Exception fetching quote for ${symbol}:`, error);
-        sendDebugMessage(`Exception fetching quote for ${symbol}: ${error.message}`);
-      }
-      return null;
-    };
-
     const connectToFinnhub = () => {
       const finnhubWsUrl = `wss://ws.finnhub.io?token=${finnhubApiKey}`;
       console.log('🔌 Connecting to Finnhub WebSocket...');
-      console.log('🌐 Finnhub WS URL:', finnhubWsUrl.replace(finnhubApiKey, 'HIDDEN_TOKEN'));
+      console.log('🌐 Finnhub WS URL structure: wss://ws.finnhub.io?token=', finnhubApiKey?.substring(0, 6) + '...');
       
-      sendDebugMessage(`Connecting to Finnhub with API key: ${finnhubApiKey.substring(0, 8)}...`);
+      sendDebugMessage(`Connecting to Finnhub with API key: ${finnhubApiKey?.substring(0, 6)}...`);
       
       finnhubWs = new WebSocket(finnhubWsUrl);
       
       finnhubWs.onopen = () => {
         console.log('✅ Successfully connected to Finnhub WebSocket!');
-        sendDebugMessage('Connected to Finnhub WebSocket successfully');
+        sendDebugMessage('✅ Connected to Finnhub WebSocket successfully');
         
         // Subscribe to symbols when connection opens
         symbols.forEach(symbol => {
           const subscribeMsg = JSON.stringify({'type':'subscribe','symbol': symbol});
           console.log(`📡 Subscribing to Finnhub trades for ${symbol}:`, subscribeMsg);
           finnhubWs?.send(subscribeMsg);
-          sendDebugMessage(`Subscribed to ${symbol} trades on Finnhub`);
+          sendDebugMessage(`📡 Subscribed to ${symbol} trades on Finnhub`);
         });
       };
 
@@ -119,10 +82,11 @@ serve(async (req) => {
         try {
           const data = JSON.parse(event.data);
           console.log('📨 Raw message from Finnhub:', data);
+          sendDebugMessage(`📨 Finnhub message type: ${data.type}`);
           
           if (data.type === 'trade' && data.data && data.data.length > 0) {
             console.log(`📈 Processing ${data.data.length} trade(s) from Finnhub`);
-            sendDebugMessage(`Received ${data.data.length} trades from Finnhub`);
+            sendDebugMessage(`📈 Received ${data.data.length} trades from Finnhub`);
             
             for (const trade of data.data) {
               const symbol = trade.s;
@@ -131,6 +95,7 @@ serve(async (req) => {
               const timestamp = trade.t;
 
               console.log(`💹 Trade received: ${symbol} @ $${price} (vol: ${volume}, time: ${timestamp})`);
+              sendDebugMessage(`💹 Live trade: ${symbol} = $${price}`);
 
               // Get or create price cache entry
               if (!priceCache[symbol]) {
@@ -161,7 +126,6 @@ serve(async (req) => {
                 priceCache[symbol] = priceData;
 
                 console.log(`📤 Sending live price update to client:`, priceData);
-                sendDebugMessage(`Live price: ${symbol} = $${price}`);
 
                 // Send to client
                 socket.send(JSON.stringify({
@@ -192,30 +156,40 @@ serve(async (req) => {
             }
           } else if (data.type === 'ping') {
             console.log('🏓 Received ping from Finnhub');
+            sendDebugMessage('🏓 Finnhub ping received');
           } else {
             console.log('📨 Other message type from Finnhub:', data.type, data);
+            sendDebugMessage(`📨 Finnhub message: ${data.type}`);
           }
         } catch (error) {
           console.error('❌ Error processing Finnhub message:', error, 'Raw event:', event.data);
-          sendDebugMessage(`Error processing Finnhub message: ${error.message}`);
+          sendDebugMessage(`❌ Error processing Finnhub message: ${error.message}`);
         }
       };
 
       finnhubWs.onclose = (event) => {
         console.log('🔌 Finnhub WebSocket closed:', event.code, event.reason, 'Clean:', event.wasClean);
-        sendDebugMessage(`Finnhub connection closed: ${event.code} - ${event.reason}`);
+        sendDebugMessage(`🔌 Finnhub connection closed: ${event.code} - ${event.reason}`);
         
-        // Reconnect after delay
-        setTimeout(() => {
-          console.log('🔄 Reconnecting to Finnhub...');
-          sendDebugMessage('Reconnecting to Finnhub...');
-          connectToFinnhub();
-        }, 5000);
+        // Send error to client about Finnhub disconnection
+        socket.send(JSON.stringify({
+          type: 'error',
+          error: `Finnhub WebSocket closed: ${event.code} - ${event.reason}`
+        }));
+        
+        // Reconnect after delay if not a normal closure
+        if (event.code !== 1000) {
+          setTimeout(() => {
+            console.log('🔄 Reconnecting to Finnhub...');
+            sendDebugMessage('🔄 Reconnecting to Finnhub...');
+            connectToFinnhub();
+          }, 5000);
+        }
       };
 
       finnhubWs.onerror = (error) => {
         console.error('❌ Finnhub WebSocket error:', error);
-        sendDebugMessage(`Finnhub WebSocket error: ${error}`);
+        sendDebugMessage(`❌ Finnhub WebSocket error: ${error}`);
         
         socket.send(JSON.stringify({
           type: 'error',
@@ -224,9 +198,49 @@ serve(async (req) => {
       };
     };
 
+    const getInitialQuote = async (symbol: string) => {
+      try {
+        console.log(`📊 Fetching initial quote for ${symbol} from Finnhub REST API...`);
+        const quoteUrl = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubApiKey}`;
+        console.log('🌐 Quote URL structure: https://finnhub.io/api/v1/quote?symbol=SYMBOL&token=', finnhubApiKey?.substring(0, 6) + '...');
+        
+        const response = await fetch(quoteUrl);
+        console.log(`📈 Quote API response status for ${symbol}:`, response.status);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`💰 Quote data for ${symbol}:`, data);
+          
+          if (data.c === 0 && data.d === 0) {
+            console.warn(`⚠️ Warning: ${symbol} returned zero values - may be invalid symbol or market closed`);
+          }
+          
+          return {
+            symbol,
+            currentPrice: data.c || 0,
+            change: data.d || 0,
+            changePercent: data.dp || 0,
+            high: data.h || 0,
+            low: data.l || 0,
+            open: data.o || 0,
+            previousClose: data.pc || 0,
+            timestamp: Date.now()
+          };
+        } else {
+          const errorText = await response.text();
+          console.error(`❌ Quote API failed for ${symbol}:`, response.status, errorText);
+          sendDebugMessage(`❌ Quote API failed for ${symbol}: ${response.status} - ${errorText}`);
+        }
+      } catch (error) {
+        console.error(`❌ Exception fetching quote for ${symbol}:`, error);
+        sendDebugMessage(`❌ Exception fetching quote for ${symbol}: ${error.message}`);
+      }
+      return null;
+    };
+
     socket.onopen = () => {
       console.log("✅ Client WebSocket connection established");
-      sendDebugMessage('Edge function WebSocket connection established');
+      sendDebugMessage('✅ Edge function WebSocket connection established');
       connectToFinnhub();
     };
 
@@ -238,7 +252,7 @@ serve(async (req) => {
         if (data.type === 'subscribe') {
           symbols = data.symbols || [];
           console.log('📡 Client subscribing to symbols:', symbols);
-          sendDebugMessage(`Subscribing to symbols: ${symbols.join(', ')}`);
+          sendDebugMessage(`📡 Subscribing to symbols: ${symbols.join(', ')}`);
           
           // Get initial quotes and send to client
           for (const symbol of symbols) {
@@ -262,15 +276,16 @@ serve(async (req) => {
               const subscribeMsg = JSON.stringify({'type':'subscribe','symbol': symbol});
               console.log(`📡 Subscribing to real-time trades for ${symbol}:`, subscribeMsg);
               finnhubWs?.send(subscribeMsg);
+              sendDebugMessage(`📡 Subscribed to ${symbol} on Finnhub`);
             });
           } else {
             console.log('⏳ Finnhub WebSocket not ready, will subscribe when connected');
-            sendDebugMessage('Finnhub WebSocket not ready, will subscribe when connected');
+            sendDebugMessage('⏳ Finnhub WebSocket not ready, will subscribe when connected');
           }
         }
       } catch (error) {
         console.error('❌ Error processing client message:', error);
-        sendDebugMessage(`Error processing client message: ${error.message}`);
+        sendDebugMessage(`❌ Error processing client message: ${error.message}`);
       }
     };
 
