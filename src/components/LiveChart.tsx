@@ -2,6 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { BarChart3, TrendingUp, TrendingDown, Wifi, WifiOff, Activity } from "lucide-react";
 import { StockChart } from "@/components/StockChart";
+import { LivePriceBadge } from "@/components/LivePriceBadge";
 import { useRealTimePriceContext } from "@/components/RealTimePriceProvider";
 import { useEffect } from "react";
 
@@ -52,11 +53,9 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
           <div>
             <div className="flex items-center space-x-3">
               <h3 className="text-xl font-bold text-white">{asset} Chart</h3>
+              <LivePriceBadge symbol={asset} />
               {currentPriceData && (
                 <div className="flex items-center space-x-2">
-                  <span className="text-2xl font-bold text-white">
-                    ${currentPriceData.currentPrice.toFixed(2)}
-                  </span>
                   <div className="flex items-center space-x-1">
                     {isPositive && <TrendingUp className="h-4 w-4 text-green-500" />}
                     {isNegative && <TrendingDown className="h-4 w-4 text-red-500" />}
