@@ -32,8 +32,36 @@ serve(async (req) => {
     
     let symbols: string[] = []
     let finnhubWs: WebSocket | null = null
+    let priceCache: Record<string, any> = {}
 
-    // Connect to Finnhub WebSocket
+    // Get initial quote data for subscribed symbols
+    const getInitialQuote = async (symbol: string) => {
+      try {
+        const response = await fetch(
+          `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubApiKey}`
+        )
+        
+        if (response.ok) {
+          const data = await response.json()
+          return {
+            symbol,
+            currentPrice: data.c || 0,
+            change: data.d || 0,
+            changePercent: data.dp || 0,
+            high: data.h || 0,
+            low: data.l || 0,
+            open: data.o || 0,
+            previousClose: data.pc || 0,
+            timestamp: Date.now()
+          }
+        }
+      } catch (error) {
+        console.error(`Error fetching initial quote for ${symbol}:`, error)
+      }
+      return null
+    }
+
+    // Connect to Finnhub WebSocket for real-time trades
     const connectToFinnhub = () => {
       finnhubWs = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`)
       
@@ -42,6 +70,7 @@ serve(async (req) => {
         // Subscribe to symbols when connection opens
         symbols.forEach(symbol => {
           finnhubWs?.send(JSON.stringify({'type':'subscribe','symbol': symbol}))
+          console.log(`Subscribed to ${symbol} on Finnhub`)
         })
       }
 
@@ -49,42 +78,66 @@ serve(async (req) => {
         try {
           const data = JSON.parse(event.data)
           
-          if (data.type === 'trade' && data.data) {
-            // Process trade data from Finnhub
+          if (data.type === 'trade' && data.data && data.data.length > 0) {
+            // Process real-time trade data from Finnhub
             for (const trade of data.data) {
-              const priceData = {
-                symbol: trade.s,
-                currentPrice: trade.p,
-                change: 0, // We'll calculate this from previous close
-                changePercent: 0,
-                high: trade.p,
-                low: trade.p,
-                open: trade.p,
-                previousClose: trade.p,
-                timestamp: Date.now()
+              const symbol = trade.s
+              const price = trade.p
+              const volume = trade.v
+              const timestamp = trade.t
+
+              // Update price cache with latest trade
+              if (!priceCache[symbol]) {
+                // Get initial quote data if we don't have it
+                const initialQuote = await getInitialQuote(symbol)
+                if (initialQuote) {
+                  priceCache[symbol] = initialQuote
+                }
               }
 
-              // Send to client
-              socket.send(JSON.stringify({
-                type: 'price_update',
-                symbol: trade.s,
-                data: priceData
-              }))
+              // Update with real-time trade price
+              if (priceCache[symbol]) {
+                const cachedPrice = priceCache[symbol]
+                const change = price - cachedPrice.previousClose
+                const changePercent = cachedPrice.previousClose ? (change / cachedPrice.previousClose) * 100 : 0
 
-              // Store in database
-              await supabaseClient
-                .from('price_updates')
-                .upsert({
-                  symbol: trade.s,
-                  current_price: trade.p,
-                  change: 0,
-                  change_percent: 0,
-                  high: trade.p,
-                  low: trade.p,
-                  open: trade.p,
-                  previous_close: trade.p,
-                  timestamp: new Date().toISOString()
-                })
+                const priceData = {
+                  symbol,
+                  currentPrice: price,
+                  change,
+                  changePercent,
+                  high: Math.max(cachedPrice.high, price),
+                  low: Math.min(cachedPrice.low, price),
+                  open: cachedPrice.open,
+                  previousClose: cachedPrice.previousClose,
+                  timestamp: Date.now()
+                }
+
+                // Update cache
+                priceCache[symbol] = priceData
+
+                // Send to client
+                socket.send(JSON.stringify({
+                  type: 'price_update',
+                  symbol,
+                  data: priceData
+                }))
+
+                // Store in database
+                await supabaseClient
+                  .from('price_updates')
+                  .upsert({
+                    symbol,
+                    current_price: price,
+                    change,
+                    change_percent: changePercent,
+                    high: priceData.high,
+                    low: priceData.low,
+                    open: priceData.open,
+                    previous_close: priceData.previousClose,
+                    timestamp: new Date().toISOString()
+                  })
+              }
             }
           }
         } catch (error) {
@@ -115,10 +168,26 @@ serve(async (req) => {
           symbols = data.symbols || []
           console.log('Subscribing to symbols:', symbols)
           
-          // Subscribe to Finnhub for each symbol
+          // Get initial quotes for all symbols
+          for (const symbol of symbols) {
+            const initialQuote = await getInitialQuote(symbol)
+            if (initialQuote) {
+              priceCache[symbol] = initialQuote
+              
+              // Send initial quote to client
+              socket.send(JSON.stringify({
+                type: 'price_update',
+                symbol,
+                data: initialQuote
+              }))
+            }
+          }
+          
+          // Subscribe to Finnhub for real-time trades
           if (finnhubWs && finnhubWs.readyState === WebSocket.OPEN) {
             symbols.forEach(symbol => {
               finnhubWs?.send(JSON.stringify({'type':'subscribe','symbol': symbol}))
+              console.log(`Subscribed to real-time trades for ${symbol}`)
             })
           }
         }

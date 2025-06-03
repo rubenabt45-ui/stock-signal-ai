@@ -12,7 +12,7 @@ const generateHistoricalData = (currentPrice?: number) => {
   const data = [];
   let price = currentPrice || (150 + Math.random() * 50);
   
-  for (let i = 30; i >= 0; i--) {
+  for (let i = 30; i >= 1; i--) {
     const date = new Date();
     date.setDate(date.getDate() - i);
     
@@ -45,12 +45,25 @@ export const StockChart = ({ symbol }: StockChartProps) => {
     if (currentPriceData) {
       setChartData(prevData => {
         const newData = [...prevData];
-        const lastDataPoint = newData[newData.length - 1];
         
-        // Update the last data point with real-time price
-        if (lastDataPoint) {
-          lastDataPoint.price = currentPriceData.currentPrice;
-          lastDataPoint.volume = Math.floor(Math.random() * 10000000); // Mock volume
+        // Add today's real-time price as the current data point
+        const today = new Date().toISOString().split('T')[0];
+        const todayIndex = newData.findIndex(item => item.date === today);
+        
+        if (todayIndex >= 0) {
+          // Update today's price
+          newData[todayIndex] = {
+            ...newData[todayIndex],
+            price: currentPriceData.currentPrice,
+            volume: Math.floor(Math.random() * 10000000)
+          };
+        } else {
+          // Add today's data point
+          newData.push({
+            date: today,
+            price: currentPriceData.currentPrice,
+            volume: Math.floor(Math.random() * 10000000)
+          });
         }
         
         return newData;

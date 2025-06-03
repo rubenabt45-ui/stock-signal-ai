@@ -1,6 +1,6 @@
 
 import { Card } from "@/components/ui/card";
-import { BarChart3, TrendingUp, TrendingDown } from "lucide-react";
+import { BarChart3, TrendingUp, TrendingDown, Wifi, WifiOff } from "lucide-react";
 import { StockChart } from "@/components/StockChart";
 import { useRealTimePriceContext } from "@/components/RealTimePriceProvider";
 import { useEffect } from "react";
@@ -31,7 +31,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
               <h3 className="text-xl font-bold text-white">{asset} Chart</h3>
               {currentPriceData && (
                 <div className="flex items-center space-x-2">
-                  <span className="text-xl font-bold text-white">
+                  <span className="text-2xl font-bold text-white">
                     ${currentPriceData.currentPrice.toFixed(2)}
                   </span>
                   <div className="flex items-center space-x-1">
@@ -47,12 +47,17 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
                 </div>
               )}
             </div>
-            <p className="text-sm text-gray-400">{timeframe} • Live Data</p>
+            <p className="text-sm text-gray-400">{timeframe} • Real-time Data</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-tradeiq-success animate-pulse' : 'bg-red-500'}`}></div>
-          <span className="text-sm text-gray-400">{isConnected ? 'Live' : 'Offline'}</span>
+          {isConnected ? (
+            <Wifi className="h-5 w-5 text-green-500" />
+          ) : (
+            <WifiOff className="h-5 w-5 text-red-500" />
+          )}
+          <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+          <span className="text-sm text-gray-400">{isConnected ? 'Live Feed' : 'Connecting...'}</span>
         </div>
       </div>
       

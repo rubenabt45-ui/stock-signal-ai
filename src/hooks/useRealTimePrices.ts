@@ -30,7 +30,8 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
 
   const connect = () => {
     try {
-      const wsUrl = `${import.meta.env.VITE_SUPABASE_URL.replace('https://', 'wss://')}/functions/v1/finnhub-websocket`;
+      // Connect to our Supabase edge function that handles Finnhub WebSocket
+      const wsUrl = `wss://xnrvqfclyroagzknedhs.supabase.co/functions/v1/finnhub-websocket`;
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {
@@ -44,7 +45,7 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
           const message = JSON.parse(event.data);
           
           if (message.type === 'price_update') {
-            console.log('Received price update:', message);
+            console.log('Received real-time price update:', message);
             setPrices(prev => ({
               ...prev,
               [message.symbol]: message.data
