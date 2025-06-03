@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { RealTimePriceProvider } from "@/components/RealTimePriceProvider";
-import { BottomNavigation } from "@/components/BottomNavigation";
+import BottomNavigation from "@/components/BottomNavigation";
 import Index from "./pages/Index";
 import Favorites from "./pages/Favorites";
 import TradingChat from "./pages/TradingChat";
