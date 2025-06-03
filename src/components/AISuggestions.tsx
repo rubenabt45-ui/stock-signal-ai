@@ -1,7 +1,6 @@
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Brain, TrendingUp, TrendingDown, Minus, Target, Clock, AlertTriangle } from "lucide-react";
 
 interface AISuggestionsProps {
@@ -158,11 +157,6 @@ export const AISuggestions = ({ asset, timeframe }: AISuggestionsProps) => {
             </div>
           </div>
         </div>
-
-        {/* Action Button */}
-        <Button className="w-full tradeiq-button-primary h-12 text-lg font-semibold rounded-xl">
-          Get Full Analysis Report
-        </Button>
       </div>
     </Card>
   );
