@@ -15,6 +15,7 @@ import TradingChat from "./pages/TradingChat";
 import Learn from "./pages/Learn";
 import NewsAI from "./pages/NewsAI";
 import Settings from "./pages/Settings";
+import Success from "./pages/Success";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
@@ -40,6 +41,11 @@ const App = () => (
                   <PublicRoute>
                     <Signup />
                   </PublicRoute>
+                } />
+                <Route path="/success" element={
+                  <ProtectedRoute>
+                    <Success />
+                  </ProtectedRoute>
                 } />
                 <Route path="/" element={
                   <ProtectedRoute>
@@ -77,6 +83,7 @@ const App = () => (
               <Routes>
                 <Route path="/login" element={null} />
                 <Route path="/signup" element={null} />
+                <Route path="/success" element={null} />
                 <Route path="*" element={<BottomNavigation />} />
               </Routes>
             </div>

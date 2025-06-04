@@ -16,10 +16,23 @@ interface PlanModalProps {
 
 const PlanModal: React.FC<PlanModalProps> = ({ isOpen, onClose }) => {
   const startCheckout = () => {
-    // Placeholder for Stripe checkout integration
-    console.log('Starting Stripe checkout flow...');
-    // TODO: Implement actual Stripe checkout
-    alert('Stripe checkout would be initiated here (sandbox mode)');
+    // Stripe Checkout integration with test Price ID
+    const stripe = (window as any).Stripe('pk_test_51234567890abcdefghijklmnopqrstuvwxyz'); // Test publishable key
+    
+    stripe.redirectToCheckout({
+      lineItems: [{
+        price: 'price_1OxxxxxxTestProTier', // Test Price ID for Pro tier
+        quantity: 1,
+      }],
+      mode: 'subscription',
+      successUrl: `${window.location.origin}/success`,
+      cancelUrl: `${window.location.origin}/settings`,
+    }).then((result: any) => {
+      if (result.error) {
+        console.error('Stripe checkout error:', result.error);
+        alert('There was an error processing your payment. Please try again.');
+      }
+    });
   };
 
   return (
