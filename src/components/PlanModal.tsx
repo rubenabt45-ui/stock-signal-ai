@@ -8,6 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface PlanModalProps {
   isOpen: boolean;
@@ -15,24 +18,54 @@ interface PlanModalProps {
 }
 
 const PlanModal: React.FC<PlanModalProps> = ({ isOpen, onClose }) => {
-  const startCheckout = () => {
-    // Stripe Checkout integration with test Price ID
-    const stripe = (window as any).Stripe('pk_test_51234567890abcdefghijklmnopqrstuvwxyz'); // Test publishable key
-    
-    stripe.redirectToCheckout({
-      lineItems: [{
-        price: 'price_1OxxxxxxTestProTier', // Test Price ID for Pro tier
-        quantity: 1,
-      }],
-      mode: 'subscription',
-      successUrl: `${window.location.origin}/success`,
-      cancelUrl: `${window.location.origin}/settings`,
-    }).then((result: any) => {
-      if (result.error) {
-        console.error('Stripe checkout error:', result.error);
-        alert('There was an error processing your payment. Please try again.');
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const startCheckout = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to upgrade to Pro.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      console.log('Starting checkout process for user:', user.id);
+      
+      // Call the Edge Function to create checkout session
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Failed to create checkout session');
       }
-    });
+
+      if (!data?.url) {
+        console.error('No checkout URL returned:', data);
+        throw new Error('No checkout URL received');
+      }
+
+      console.log('Checkout session created successfully:', data.sessionId);
+      
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
+      
+    } catch (error) {
+      console.error('Checkout error:', error);
+      
+      toast({
+        title: "Checkout failed",
+        description: error instanceof Error ? error.message : "There was an error processing your payment. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -140,8 +173,9 @@ const PlanModal: React.FC<PlanModalProps> = ({ isOpen, onClose }) => {
             <Button 
               onClick={startCheckout}
               className="w-full bg-tradeiq-blue hover:bg-blue-600 text-white font-medium"
+              disabled={!user}
             >
-              Upgrade to Pro
+              {user ? 'Upgrade to Pro' : 'Sign In Required'}
             </Button>
           </div>
         </div>
