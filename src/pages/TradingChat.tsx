@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Send, Bot, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -109,7 +110,7 @@ const TradingChat = () => {
       </header>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 pb-40">
+      <div className="flex-1 overflow-y-auto px-4 py-6 pb-48">
         <div className="max-w-4xl mx-auto space-y-4">
           {messages.map((message) => (
             <div
@@ -163,48 +164,51 @@ const TradingChat = () => {
         </div>
       </div>
 
-      {/* Quick Suggestions */}
-      <div className="fixed bottom-28 left-0 right-0 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-wrap gap-2 mb-4">
-            {quickSuggestions.map((suggestion) => (
-              <Button
-                key={suggestion}
-                variant="outline"
-                size="sm"
-                onClick={() => handleQuickSuggestion(suggestion)}
-                className="border-gray-700 hover:bg-gray-800 text-gray-300 text-xs"
-              >
-                {suggestion}
-              </Button>
-            ))}
+      {/* Input Area with Quick Suggestions */}
+      <div className="fixed bottom-16 left-0 right-0 bg-tradeiq-navy border-t border-gray-800/50">
+        {/* Quick Suggestions */}
+        <div className="px-4 pt-3 pb-2">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+              {quickSuggestions.map((suggestion) => (
+                <Button
+                  key={suggestion}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleQuickSuggestion(suggestion)}
+                  className="border-gray-700 hover:bg-gray-800 hover:border-tradeiq-blue text-gray-300 hover:text-white text-xs px-3 py-2 transition-all duration-200 animate-fade-in"
+                >
+                  {suggestion}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Input Area */}
-      <div className="fixed bottom-16 left-0 right-0 bg-tradeiq-navy border-t border-gray-800/50 p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex space-x-3">
-            <Textarea
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ask about trading strategies, technical analysis, market insights..."
-              className="flex-1 min-h-[44px] max-h-32 resize-none bg-gray-800/50 border-gray-700 text-white placeholder-gray-400"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-            />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!inputValue.trim() || isLoading}
-              className="tradeiq-button-primary px-6"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
+        
+        {/* Input Field */}
+        <div className="px-4 pb-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex space-x-3">
+              <Textarea
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="Ask about trading strategies, technical analysis, market insights..."
+                className="flex-1 min-h-[44px] max-h-32 resize-none bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-tradeiq-blue transition-colors"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={!inputValue.trim() || isLoading}
+                className="tradeiq-button-primary px-6"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
