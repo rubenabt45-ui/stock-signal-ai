@@ -58,10 +58,14 @@ const Signup = () => {
       });
     } else {
       toast({
-        title: "Account Created!",
-        description: "Please check your email to verify your account.",
+        title: "Account Created Successfully!",
+        description: "Please check your email and click the confirmation link to verify your account before logging in.",
+        duration: 8000,
       });
-      navigate("/login");
+      // Don't navigate immediately - let user confirm email first
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
     }
 
     setLoading(false);

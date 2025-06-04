@@ -30,10 +30,21 @@ const Login = () => {
     const { error } = await signIn(email, password);
 
     if (error) {
+      let errorMessage = error.message;
+      let errorTitle = "Login Failed";
+      
+      if (error.message.includes("Email not confirmed")) {
+        errorTitle = "Email Not Confirmed";
+        errorMessage = "Please check your email and click the confirmation link before logging in. Check your spam folder if you don't see the email.";
+      } else if (error.message.includes("Invalid login credentials")) {
+        errorMessage = "Invalid email or password. Please check your credentials and try again.";
+      }
+      
       toast({
-        title: "Login Failed",
-        description: error.message,
+        title: errorTitle,
+        description: errorMessage,
         variant: "destructive",
+        duration: 8000,
       });
     } else {
       toast({
