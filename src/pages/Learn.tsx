@@ -17,7 +17,7 @@ const Learn = () => {
       difficulty: "Beginner",
       duration: "10 min read",
       color: "text-green-400",
-      pdfName: "TradeIQ - Pre-Trade Checklist",
+      pdfUrl: "https://xnrvqfclyroagzknedhs.supabase.co/storage/v1/object/public/learn-modules//TradeIQ%20-%20Pre-Trade%20Checklist%20(1).pdf",
       category: "Preparation"
     },
     {
@@ -28,26 +28,28 @@ const Learn = () => {
       difficulty: "Beginner",
       duration: "15 min read",
       color: "text-blue-400",
-      pdfName: "TradeIQ - Visual Dictionary",
+      pdfUrl: "https://xnrvqfclyroagzknedhs.supabase.co/storage/v1/object/public/learn-modules//TradeIQ%20-%20Visual%20Dictionary%20(1).pdf",
       category: "Fundamentals"
     },
     {
       id: "trading-mistakes",
-      title: "Avoid Costly Mistakes",
-      description: "Discover the 5 most common beginner mistakes and how to avoid them with clear, practical guidance.",
+      title: "5 Trading Mistakes to Avoid",
+      description: "Discover the most common pitfalls new traders make and how to avoid them for a smarter trading journey.",
       icon: AlertTriangle,
       difficulty: "Beginner",
-      duration: "12 min read",
+      duration: "8 min read",
       color: "text-yellow-400",
-      pdfName: "TradeIQ - 5 Trading Mistakes",
-      category: "Risk Management"
+      pdfUrl: "https://xnrvqfclyroagzknedhs.supabase.co/storage/v1/object/public/learn-modules//TradeIQ-5-Trading-Mistakes.pdf",
+      category: "Strategy"
     }
   ];
 
-  const handleModuleClick = (moduleId: string, pdfName: string) => {
-    console.log(`Opening PDF: ${pdfName}`);
-    // In a real app, this would open the PDF or navigate to a PDF viewer
-    // For now, we'll mark it as completed for demo purposes
+  const handleModuleClick = (moduleId: string, pdfUrl: string) => {
+    console.log(`Opening PDF: ${pdfUrl}`);
+    // Open PDF in new tab
+    window.open(pdfUrl, '_blank', 'noopener,noreferrer');
+    
+    // Mark module as completed
     if (!completedModules.includes(moduleId)) {
       setCompletedModules([...completedModules, moduleId]);
     }
@@ -97,7 +99,7 @@ const Learn = () => {
                 <Card 
                   key={module.id} 
                   className="tradeiq-card hover:border-tradeiq-blue/50 transition-all duration-200 cursor-pointer hover-scale relative overflow-hidden"
-                  onClick={() => handleModuleClick(module.id, module.pdfName)}
+                  onClick={() => handleModuleClick(module.id, module.pdfUrl)}
                 >
                   {/* Completion Badge */}
                   {isCompleted(module.id) && (
@@ -139,7 +141,7 @@ const Learn = () => {
                       className="w-full tradeiq-button-primary"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleModuleClick(module.id, module.pdfName);
+                        handleModuleClick(module.id, module.pdfUrl);
                       }}
                     >
                       {isCompleted(module.id) ? "Review" : "Read Now"}
