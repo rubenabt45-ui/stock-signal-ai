@@ -1,7 +1,8 @@
 
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { ChartCandlestick } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,17 +11,32 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (!loading && !user) {
-      navigate('/login');
+    if (!loading) {
+      // If user is authenticated and tries to visit login/signup, redirect to home
+      if (user && (location.pathname === '/login' || location.pathname === '/signup')) {
+        navigate('/');
+        return;
+      }
+      
+      // If user is not authenticated and tries to access protected route, redirect to login
+      if (!user && location.pathname !== '/login' && location.pathname !== '/signup') {
+        navigate('/login');
+        return;
+      }
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, location.pathname]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+        <div className="flex flex-col items-center space-y-4">
+          <ChartCandlestick className="h-12 w-12 text-tradeiq-blue animate-pulse" />
+          <div className="text-white text-lg font-medium">Loading...</div>
+          <div className="text-gray-400 text-sm">TradeIQ</div>
+        </div>
       </div>
     );
   }

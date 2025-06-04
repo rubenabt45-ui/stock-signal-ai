@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { RealTimePriceProvider } from "@/components/RealTimePriceProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import PublicRoute from "@/components/PublicRoute";
 import BottomNavigation from "@/components/BottomNavigation";
 import Index from "./pages/Index";
 import Favorites from "./pages/Favorites";
@@ -30,8 +31,16 @@ const App = () => (
           <BrowserRouter>
             <div className="min-h-screen bg-tradeiq-navy">
               <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
+                <Route path="/login" element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                } />
+                <Route path="/signup" element={
+                  <PublicRoute>
+                    <Signup />
+                  </PublicRoute>
+                } />
                 <Route path="/" element={
                   <ProtectedRoute>
                     <Index />
