@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { ChartCandlestick, MessageSquare, Book, Settings } from "lucide-react";
+import { ChartCandlestick, MessageSquare, Book, Settings, Newspaper } from "lucide-react";
 
 const BottomNavigation = () => {
   const location = useLocation();
@@ -20,6 +20,11 @@ const BottomNavigation = () => {
       path: "/learn",
       icon: Book,
       label: "Learn",
+    },
+    {
+      path: "/news-ai",
+      icon: Newspaper,
+      label: "NewsAI",
     },
     {
       path: "/config",

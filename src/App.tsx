@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Favorites from "./pages/Favorites";
 import TradingChat from "./pages/TradingChat";
 import Learn from "./pages/Learn";
+import NewsAI from "./pages/NewsAI";
 import Configuration from "./pages/Configuration";
 import NotFound from "./pages/NotFound";
 
@@ -28,6 +29,7 @@ const App = () => (
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/trading-chat" element={<TradingChat />} />
               <Route path="/learn" element={<Learn />} />
+              <Route path="/news-ai" element={<NewsAI />} />
               <Route path="/config" element={<Configuration />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
