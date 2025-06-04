@@ -13,7 +13,7 @@ import Favorites from "./pages/Favorites";
 import TradingChat from "./pages/TradingChat";
 import Learn from "./pages/Learn";
 import NewsAI from "./pages/NewsAI";
-import Configuration from "./pages/Configuration";
+import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
@@ -57,9 +57,9 @@ const App = () => (
                     <NewsAI />
                   </ProtectedRoute>
                 } />
-                <Route path="/config" element={
+                <Route path="/settings" element={
                   <ProtectedRoute>
-                    <Configuration />
+                    <Settings />
                   </ProtectedRoute>
                 } />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

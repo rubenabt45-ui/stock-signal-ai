@@ -27,9 +27,9 @@ const BottomNavigation = () => {
       label: "NewsAI",
     },
     {
-      path: "/config",
+      path: "/settings",
       icon: Settings,
-      label: "Config",
+      label: "Settings",
     },
   ];
 
