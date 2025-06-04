@@ -1,16 +1,18 @@
-
-import { Settings as SettingsIcon, User, Bell, Palette, Info, LogOut } from "lucide-react";
+import { Settings as SettingsIcon, User, Bell, Palette, Info, LogOut, Crown } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import PlanModal from "@/components/PlanModal";
 
 const Settings = () => {
   const { signOut, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -44,12 +46,21 @@ const Settings = () => {
       {/* Header */}
       <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <SettingsIcon className="h-8 w-8 text-tradeiq-blue" />
-            <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">Settings</h1>
-              <p className="text-sm text-gray-400 font-medium">Manage your preferences and account</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <SettingsIcon className="h-8 w-8 text-tradeiq-blue" />
+              <div>
+                <h1 className="text-2xl font-bold text-white tracking-tight">Settings</h1>
+                <p className="text-sm text-gray-400 font-medium">Manage your preferences and account</p>
+              </div>
             </div>
+            <Button
+              onClick={() => setIsPlanModalOpen(true)}
+              className="bg-tradeiq-blue hover:bg-blue-600 text-white font-medium"
+            >
+              <Crown className="h-4 w-4 mr-2" />
+              Upgrade
+            </Button>
           </div>
         </div>
       </header>
@@ -168,6 +179,12 @@ const Settings = () => {
           </CardContent>
         </Card>
       </main>
+
+      {/* Plan Modal */}
+      <PlanModal
+        isOpen={isPlanModalOpen}
+        onClose={() => setIsPlanModalOpen(false)}
+      />
     </div>
   );
 };
