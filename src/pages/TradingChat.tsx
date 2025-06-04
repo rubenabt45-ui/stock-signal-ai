@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Send, Bot, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -110,7 +109,7 @@ const TradingChat = () => {
       </header>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 pb-32">
+      <div className="flex-1 overflow-y-auto px-4 py-6 pb-40">
         <div className="max-w-4xl mx-auto space-y-4">
           {messages.map((message) => (
             <div
@@ -165,7 +164,7 @@ const TradingChat = () => {
       </div>
 
       {/* Quick Suggestions */}
-      <div className="fixed bottom-20 left-0 right-0 px-4">
+      <div className="fixed bottom-28 left-0 right-0 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-wrap gap-2 mb-4">
             {quickSuggestions.map((suggestion) => (
@@ -184,7 +183,7 @@ const TradingChat = () => {
       </div>
 
       {/* Input Area */}
-      <div className="fixed bottom-0 left-0 right-0 bg-tradeiq-navy border-t border-gray-800/50 p-4">
+      <div className="fixed bottom-16 left-0 right-0 bg-tradeiq-navy border-t border-gray-800/50 p-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex space-x-3">
             <Textarea
