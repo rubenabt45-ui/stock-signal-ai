@@ -1,10 +1,33 @@
-
-import { Settings, Bell, Palette, Shield, Download } from "lucide-react";
+import { Settings, Bell, Palette, Shield, Download, LogOut } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Configuration = () => {
+  const { signOut, user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account.",
+      });
+      navigate("/login");
+    } catch (error) {
+      toast({
+        title: "Logout failed",
+        description: "There was an error logging out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-tradeiq-navy">
       {/* Header */}
@@ -22,6 +45,33 @@ const Configuration = () => {
 
       {/* Content */}
       <main className="container mx-auto px-4 py-6 pb-24 space-y-6">
+        {/* Account */}
+        <Card className="tradeiq-card">
+          <CardHeader>
+            <div className="flex items-center space-x-3">
+              <LogOut className="h-5 w-5 text-tradeiq-blue" />
+              <CardTitle className="text-white">Account</CardTitle>
+            </div>
+            <CardDescription>Manage your TradeIQ account</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white font-medium">Signed in as</p>
+                <p className="text-gray-400 text-sm">{user?.email}</p>
+              </div>
+            </div>
+            <Button
+              onClick={handleLogout}
+              variant="destructive"
+              className="w-full"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Log Out
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Notifications */}
         <Card className="tradeiq-card">
           <CardHeader>

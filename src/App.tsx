@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { RealTimePriceProvider } from "@/components/RealTimePriceProvider";
+import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import BottomNavigation from "@/components/BottomNavigation";
 import Index from "./pages/Index";
 import Favorites from "./pages/Favorites";
@@ -12,33 +14,67 @@ import TradingChat from "./pages/TradingChat";
 import Learn from "./pages/Learn";
 import NewsAI from "./pages/NewsAI";
 import Configuration from "./pages/Configuration";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <RealTimePriceProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <div className="min-h-screen bg-tradeiq-navy">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/favorites" element={<Favorites />} />
-              <Route path="/trading-chat" element={<TradingChat />} />
-              <Route path="/learn" element={<Learn />} />
-              <Route path="/news-ai" element={<NewsAI />} />
-              <Route path="/config" element={<Configuration />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <BottomNavigation />
-          </div>
-        </BrowserRouter>
-      </TooltipProvider>
-    </RealTimePriceProvider>
+    <AuthProvider>
+      <RealTimePriceProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <div className="min-h-screen bg-tradeiq-navy">
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/" element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                } />
+                <Route path="/favorites" element={
+                  <ProtectedRoute>
+                    <Favorites />
+                  </ProtectedRoute>
+                } />
+                <Route path="/trading-chat" element={
+                  <ProtectedRoute>
+                    <TradingChat />
+                  </ProtectedRoute>
+                } />
+                <Route path="/learn" element={
+                  <ProtectedRoute>
+                    <Learn />
+                  </ProtectedRoute>
+                } />
+                <Route path="/news-ai" element={
+                  <ProtectedRoute>
+                    <NewsAI />
+                  </ProtectedRoute>
+                } />
+                <Route path="/config" element={
+                  <ProtectedRoute>
+                    <Configuration />
+                  </ProtectedRoute>
+                } />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <Routes>
+                <Route path="/login" element={null} />
+                <Route path="/signup" element={null} />
+                <Route path="*" element={<BottomNavigation />} />
+              </Routes>
+            </div>
+          </BrowserRouter>
+        </TooltipProvider>
+      </RealTimePriceProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
