@@ -1,4 +1,3 @@
-
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
 import { useEffect, useState } from 'react';
 import { useRealTimePriceContext } from '@/components/RealTimePriceProvider';
@@ -34,63 +33,84 @@ const generateHistoricalData = (currentPrice?: number) => {
 
 export const StockChart = ({ symbol }: StockChartProps) => {
   const { prices, isConnected } = useRealTimePriceContext();
-  const { price: marketPrice, isLoading, error } = useMarketData(symbol);
+  const { price: marketPrice, change, isLoading, error, lastUpdated } = useMarketData(symbol);
   const [chartData, setChartData] = useState(() => generateHistoricalData());
-  const [realTimePrice, setRealTimePrice] = useState<number | null>(null);
+  const [lastDataUpdate, setLastDataUpdate] = useState<number | null>(null);
 
+  // Update chart data when market data changes
   useEffect(() => {
-    // Update chart data when market data changes
-    if (marketPrice && !isLoading) {
-      setRealTimePrice(marketPrice);
+    if (marketPrice && lastUpdated && (!lastDataUpdate || lastUpdated > lastDataUpdate)) {
+      console.log(`📊 Updating chart data for ${symbol}:`, { price: marketPrice, timestamp: new Date(lastUpdated).toLocaleTimeString() });
       
       setChartData(prevData => {
         const newData = [...prevData];
         
         // Add market data as the latest data point
-        const now = new Date();
-        const timeKey = now.getTime();
-        
         newData.push({
-          date: now.toISOString().split('T')[0],
-          time: timeKey,
+          date: new Date(lastUpdated).toISOString().split('T')[0],
+          time: lastUpdated,
           price: marketPrice,
           volume: Math.floor(Math.random() * 10000000),
-          isRealTime: true
+          isRealTime: true,
+          isLatest: true
         });
         
         // Keep only the last 50 data points for performance
         return newData.slice(-50);
       });
+      
+      setLastDataUpdate(lastUpdated);
     }
-  }, [marketPrice, isLoading]);
+  }, [marketPrice, lastUpdated, symbol, lastDataUpdate]);
 
+  // Also handle WebSocket price updates from RealTimePriceProvider as fallback
   useEffect(() => {
-    // Also handle WebSocket price updates from RealTimePriceProvider
     const currentPriceData = prices[symbol];
-    if (currentPriceData && currentPriceData.currentPrice !== realTimePrice) {
-      setRealTimePrice(currentPriceData.currentPrice);
+    if (currentPriceData && currentPriceData.timestamp && (!lastDataUpdate || currentPriceData.timestamp > lastDataUpdate)) {
+      console.log(`🔄 WebSocket update for ${symbol}:`, { price: currentPriceData.currentPrice, timestamp: new Date(currentPriceData.timestamp).toLocaleTimeString() });
       
       setChartData(prevData => {
         const newData = [...prevData];
         
-        const now = new Date();
-        const timeKey = now.getTime();
-        
         newData.push({
-          date: now.toISOString().split('T')[0],
-          time: timeKey,
+          date: new Date(currentPriceData.timestamp).toISOString().split('T')[0],
+          time: currentPriceData.timestamp,
           price: currentPriceData.currentPrice,
           volume: Math.floor(Math.random() * 10000000),
-          isRealTime: true
+          isRealTime: true,
+          isWebSocket: true
         });
         
         return newData.slice(-50);
       });
+      
+      setLastDataUpdate(currentPriceData.timestamp);
     }
-  }, [prices, symbol, realTimePrice]);
+  }, [prices, symbol, lastDataUpdate]);
 
-  // Show error state if market data fails
-  if (error && !isConnected) {
+  // Determine connection status based on data freshness
+  const getConnectionStatus = () => {
+    const hasRecentData = lastDataUpdate && (Date.now() - lastDataUpdate) < 120000; // 2 minutes
+    const hasMarketData = marketPrice && !isLoading && !error;
+    const hasWebSocketData = isConnected && prices[symbol];
+    
+    if (hasRecentData && (hasMarketData || hasWebSocketData)) {
+      return { status: 'Live', color: 'text-green-500', bgColor: 'bg-green-500' };
+    }
+    if (isLoading) {
+      return { status: 'Loading...', color: 'text-blue-500', bgColor: 'bg-blue-500' };
+    }
+    if (error) {
+      return { status: 'Error', color: 'text-red-500', bgColor: 'bg-red-500' };
+    }
+    return { status: 'Connecting...', color: 'text-yellow-500', bgColor: 'bg-yellow-500' };
+  };
+
+  const connectionStatus = getConnectionStatus();
+  const displayPrice = marketPrice || (prices[symbol]?.currentPrice);
+
+  // Show error state if no data available
+  if (error && !displayPrice && !isConnected) {
     return (
       <div className="h-80 flex items-center justify-center">
         <div className="text-center">
@@ -101,8 +121,8 @@ export const StockChart = ({ symbol }: StockChartProps) => {
     );
   }
 
-  // Show loading state
-  if (isLoading && !realTimePrice) {
+  // Show loading state only if no data at all
+  if (isLoading && !displayPrice && chartData.length <= 30) {
     return (
       <div className="h-80 flex items-center justify-center">
         <div className="text-center">
@@ -117,21 +137,28 @@ export const StockChart = ({ symbol }: StockChartProps) => {
     <div className="h-80 relative">
       {/* Real-time connection and price indicator */}
       <div className="absolute top-2 right-2 z-10 flex items-center space-x-3">
-        {realTimePrice && (
+        {displayPrice && (
           <div className="bg-black/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-gray-700">
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-bold text-white">${realTimePrice.toFixed(2)}</span>
-              <div className={`w-2 h-2 rounded-full ${
-                (isConnected || !isLoading) ? 'bg-green-500 animate-pulse' : 'bg-red-500'
+              <span className="text-sm font-bold text-white">${displayPrice.toFixed(2)}</span>
+              <div className={`w-2 h-2 rounded-full ${connectionStatus.bgColor} ${
+                connectionStatus.status === 'Live' ? 'animate-pulse' : ''
               }`}></div>
             </div>
           </div>
         )}
         <div className="bg-black/80 backdrop-blur-sm rounded-lg px-2 py-1">
-          <span className="text-xs text-gray-300">
-            {error ? 'Offline' : isLoading ? 'Loading...' : 'Live'}
+          <span className={`text-xs ${connectionStatus.color}`}>
+            {connectionStatus.status}
           </span>
         </div>
+        {lastDataUpdate && (
+          <div className="bg-black/80 backdrop-blur-sm rounded-lg px-2 py-1">
+            <span className="text-xs text-gray-300">
+              {new Date(lastDataUpdate).toLocaleTimeString()}
+            </span>
+          </div>
+        )}
       </div>
       
       <ResponsiveContainer width="100%" height="100%">
@@ -173,10 +200,18 @@ export const StockChart = ({ symbol }: StockChartProps) => {
               const date = new Date(value);
               return `Time: ${date.toLocaleString()}`;
             }}
-            formatter={(value: any, name: string, props: any) => [
-              `$${value.toFixed(2)}`,
-              props.payload.isRealTime ? 'Live Price' : 'Price'
-            ]}
+            formatter={(value: any, name: string, props: any) => {
+              const isRealTime = props.payload.isRealTime;
+              const isWebSocket = props.payload.isWebSocket;
+              const isLatest = props.payload.isLatest;
+              
+              let label = 'Price';
+              if (isLatest) label = 'Latest Price';
+              else if (isWebSocket) label = 'WebSocket Price';
+              else if (isRealTime) label = 'Live Price';
+              
+              return [`$${value.toFixed(2)}`, label];
+            }}
           />
           <Area
             type="monotone"
@@ -188,12 +223,13 @@ export const StockChart = ({ symbol }: StockChartProps) => {
             dot={(props: any) => {
               // Highlight real-time data points
               if (props.payload.isRealTime) {
+                const color = props.payload.isLatest ? "#10B981" : props.payload.isWebSocket ? "#8B5CF6" : "#F59E0B";
                 return (
                   <circle
                     cx={props.cx}
                     cy={props.cy}
-                    r={4}
-                    fill="#10B981"
+                    r={props.payload.isLatest ? 5 : 3}
+                    fill={color}
                     stroke="#ffffff"
                     strokeWidth={2}
                   />
@@ -202,9 +238,9 @@ export const StockChart = ({ symbol }: StockChartProps) => {
               return null;
             }}
           />
-          {realTimePrice && (
+          {displayPrice && (
             <ReferenceLine 
-              y={realTimePrice} 
+              y={displayPrice} 
               stroke="#10B981" 
               strokeDasharray="2 2"
               strokeWidth={2}
