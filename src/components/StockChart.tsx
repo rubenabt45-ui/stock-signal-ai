@@ -1,6 +1,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
 import { useEffect, useState } from 'react';
 import { useRealTimePriceContext } from '@/components/RealTimePriceProvider';
+import { useMarketData } from '@/hooks/useMarketData';
 
 interface StockChartProps {
   symbol: string;
@@ -32,27 +33,26 @@ const generateHistoricalData = (currentPrice?: number) => {
 
 export const StockChart = ({ symbol }: StockChartProps) => {
   const { prices, isConnected } = useRealTimePriceContext();
+  const { price: marketPrice, isLoading, error } = useMarketData(symbol);
   const [chartData, setChartData] = useState(() => generateHistoricalData());
   const [realTimePrice, setRealTimePrice] = useState<number | null>(null);
 
   useEffect(() => {
-    // Update chart data when new price data comes in
-    const currentPriceData = prices[symbol];
-    if (currentPriceData) {
-      setRealTimePrice(currentPriceData.currentPrice);
+    // Update chart data when market data changes
+    if (marketPrice && !isLoading) {
+      setRealTimePrice(marketPrice);
       
       setChartData(prevData => {
         const newData = [...prevData];
         
-        // Add real-time data points as they come in
+        // Add market data as the latest data point
         const now = new Date();
         const timeKey = now.getTime();
         
-        // Add current real-time price as the latest data point
         newData.push({
           date: now.toISOString().split('T')[0],
           time: timeKey,
-          price: currentPriceData.currentPrice,
+          price: marketPrice,
           volume: Math.floor(Math.random() * 10000000),
           isRealTime: true
         });
@@ -61,7 +61,56 @@ export const StockChart = ({ symbol }: StockChartProps) => {
         return newData.slice(-50);
       });
     }
-  }, [prices, symbol]);
+  }, [marketPrice, isLoading]);
+
+  useEffect() => {
+    // Also handle WebSocket price updates from RealTimePriceProvider
+    const currentPriceData = prices[symbol];
+    if (currentPriceData && currentPriceData.currentPrice !== realTimePrice) {
+      setRealTimePrice(currentPriceData.currentPrice);
+      
+      setChartData(prevData => {
+        const newData = [...prevData];
+        
+        const now = new Date();
+        const timeKey = now.getTime();
+        
+        newData.push({
+          date: now.toISOString().split('T')[0],
+          time: timeKey,
+          price: currentPriceData.currentPrice,
+          volume: Math.floor(Math.random() * 10000000),
+          isRealTime: true
+        });
+        
+        return newData.slice(-50);
+      });
+    }
+  }, [prices, symbol, realTimePrice]);
+
+  // Show error state if market data fails
+  if (error && !isConnected) {
+    return (
+      <div className="h-80 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-400 text-lg mb-2">Data unavailable</p>
+          <p className="text-gray-500 text-sm">Unable to fetch market data</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state
+  if (isLoading && !realTimePrice) {
+    return (
+      <div className="h-80 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tradeiq-blue mx-auto mb-2"></div>
+          <p className="text-gray-400 text-sm">Loading market data...</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="h-80 relative">
@@ -71,12 +120,16 @@ export const StockChart = ({ symbol }: StockChartProps) => {
           <div className="bg-black/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-gray-700">
             <div className="flex items-center space-x-2">
               <span className="text-sm font-bold text-white">${realTimePrice.toFixed(2)}</span>
-              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+              <div className={`w-2 h-2 rounded-full ${
+                (isConnected || !isLoading) ? 'bg-green-500 animate-pulse' : 'bg-red-500'
+              }`}></div>
             </div>
           </div>
         )}
         <div className="bg-black/80 backdrop-blur-sm rounded-lg px-2 py-1">
-          <span className="text-xs text-gray-300">{isConnected ? 'Live' : 'Offline'}</span>
+          <span className="text-xs text-gray-300">
+            {error ? 'Offline' : isLoading ? 'Loading...' : 'Live'}
+          </span>
         </div>
       </div>
       
