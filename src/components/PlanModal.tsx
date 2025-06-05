@@ -34,10 +34,21 @@ const PlanModal: React.FC<PlanModalProps> = ({ isOpen, onClose }) => {
     try {
       console.log('Starting checkout process for user:', user.id);
       
-      // Call the Edge Function to create checkout session
+      // Get the current session token
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session?.access_token) {
+        console.error('Session error:', sessionError);
+        throw new Error('Failed to get authentication session');
+      }
+
+      console.log('Retrieved session token, calling Edge Function');
+      
+      // Call the Edge Function to create checkout session with Authorization header
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
       });
 
