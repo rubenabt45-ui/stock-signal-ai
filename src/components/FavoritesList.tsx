@@ -1,8 +1,10 @@
 
 import { useState } from "react";
-import { Trash2, GripVertical, TrendingUp, TrendingDown } from "lucide-react";
+import { Trash2, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LivePriceBadge } from "@/components/LivePriceBadge";
+import { MarketPrice } from "@/components/MarketPrice";
+import { useMultipleMarketData } from "@/hooks/useMarketData";
 
 interface FavoriteItem {
   symbol: string;
@@ -26,6 +28,10 @@ export const FavoritesList = ({
   onSymbolClick
 }: FavoritesListProps) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  
+  // Get real-time market data for all favorite symbols
+  const symbols = favorites.map(fav => fav.symbol);
+  const marketDataMap = useMultipleMarketData(symbols);
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDraggedIndex(index);
@@ -45,27 +51,10 @@ export const FavoritesList = ({
     setDraggedIndex(null);
   };
 
-  // Mock price data for demo - in real app this would come from real-time data
-  const getMockPriceData = (symbol: string) => {
-    const prices: Record<string, { price: number; change: number; changePercent: number }> = {
-      'AAPL': { price: 175.43, change: 2.10, changePercent: 1.21 },
-      'MSFT': { price: 378.85, change: -1.45, changePercent: -0.38 },
-      'GOOGL': { price: 138.21, change: 0.95, changePercent: 0.69 },
-      'TSLA': { price: 248.50, change: 8.20, changePercent: 3.42 },
-      'NVDA': { price: 875.28, change: -12.45, changePercent: -1.40 },
-      'BTCUSD': { price: 43256, change: 1025, changePercent: 2.43 },
-      'ETHUSD': { price: 2543, change: -45, changePercent: -1.74 },
-      'EURUSD': { price: 1.0875, change: 0.0012, changePercent: 0.11 },
-      'SPX': { price: 4567.80, change: 29.45, changePercent: 0.65 },
-    };
-    return prices[symbol] || { price: 100, change: 0, changePercent: 0 };
-  };
-
   return (
     <div className="space-y-2">
       {favorites.map((favorite, index) => {
-        const priceData = getMockPriceData(favorite.symbol);
-        const isPositive = priceData.change >= 0;
+        const marketData = marketDataMap[favorite.symbol];
         
         return (
           <div
@@ -98,25 +87,20 @@ export const FavoritesList = ({
             </div>
 
             <div className="flex items-center space-x-3">
+              {/* Use the new MarketPrice component */}
               <div className="text-right">
-                <div className="text-white font-semibold text-lg">
-                  ${priceData.price.toLocaleString(undefined, { 
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2 
-                  })}
-                </div>
-                <div className={`text-sm font-bold flex items-center space-x-1 ${
-                  isPositive ? 'text-green-400' : 'text-red-400'
-                }`}>
-                  {isPositive ? (
-                    <TrendingUp className="h-3 w-3" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3" />
-                  )}
-                  <span>
-                    {isPositive ? '+' : ''}${priceData.change.toFixed(2)} ({isPositive ? '+' : ''}{priceData.changePercent.toFixed(2)}%)
-                  </span>
-                </div>
+                {marketData && !marketData.error ? (
+                  <MarketPrice 
+                    symbol={favorite.symbol} 
+                    size="sm"
+                    className="text-right"
+                  />
+                ) : (
+                  <div className="animate-pulse">
+                    <div className="h-5 bg-gray-700 rounded w-20 mb-1"></div>
+                    <div className="h-4 bg-gray-800 rounded w-16"></div>
+                  </div>
+                )}
               </div>
 
               {isEditMode && (

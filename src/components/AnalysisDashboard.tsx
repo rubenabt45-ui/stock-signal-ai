@@ -1,51 +1,47 @@
 
 import { useState, useEffect } from "react";
-import { ArrowLeft, TrendingUp, TrendingDown, Minus, Brain, BarChart3 } from "lucide-react";
+import { ArrowLeft, Brain, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StockChart } from "@/components/StockChart";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AIAnalysis } from "@/components/AIAnalysis";
+import { MarketPrice } from "@/components/MarketPrice";
+import { useMarketData } from "@/hooks/useMarketData";
 
 interface AnalysisDashboardProps {
   stockSymbol: string;
   onBackToSearch: () => void;
 }
 
-// Mock stock data - in a real app, this would come from an API
-const generateMockStockData = (symbol: string) => {
-  const basePrice = Math.random() * 200 + 50;
-  const trend = Math.random() > 0.5 ? 1 : -1;
-  const change = (Math.random() * 10 - 5) * trend;
-  const changePercent = (change / basePrice) * 100;
-
+// Mock additional stock data - in a real app, this would come from an API
+const generateMockStockInfo = (symbol: string) => {
   return {
-    symbol,
-    price: basePrice.toFixed(2),
-    change: change.toFixed(2),
-    changePercent: changePercent.toFixed(2),
     volume: (Math.random() * 10000000).toFixed(0),
     marketCap: (Math.random() * 1000).toFixed(1) + "B",
-    high52w: (basePrice * 1.3).toFixed(2),
-    low52w: (basePrice * 0.7).toFixed(2),
+    high52w: (Math.random() * 200 + 200).toFixed(2),
+    low52w: (Math.random() * 100 + 50).toFixed(2),
   };
 };
 
 export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashboardProps) => {
-  const [stockData, setStockData] = useState<any>(null);
+  const [stockInfo, setStockInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Use the real-time market data hook
+  const { price, change, isLoading: priceLoading, error } = useMarketData(stockSymbol);
 
   useEffect(() => {
-    // Simulate API call
+    // Simulate API call for additional stock info
     setLoading(true);
     setTimeout(() => {
-      setStockData(generateMockStockData(stockSymbol));
+      setStockInfo(generateMockStockInfo(stockSymbol));
       setLoading(false);
-    }, 1500);
+    }, 1000);
   }, [stockSymbol]);
 
-  if (loading) {
+  if (loading || priceLoading) {
     return (
       <div className="flex items-center justify-center min-h-[500px]">
         <div className="text-center space-y-6">
@@ -64,8 +60,19 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
     );
   }
 
-  const isPositive = parseFloat(stockData.change) > 0;
-  const isNegative = parseFloat(stockData.change) < 0;
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[500px]">
+        <div className="text-center space-y-4">
+          <p className="text-red-400 text-lg">Error loading market data</p>
+          <p className="text-gray-400">{error}</p>
+          <Button onClick={() => window.location.reload()} className="tradeiq-button-primary">
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -86,42 +93,32 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
         <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-6 lg:space-y-0">
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
-              <h2 className="text-4xl font-bold text-white">{stockData.symbol}</h2>
+              <h2 className="text-4xl font-bold text-white">{stockSymbol}</h2>
               <Badge variant="outline" className="border-tradeiq-blue/30 text-tradeiq-blue bg-tradeiq-blue/10">
                 NASDAQ
               </Badge>
             </div>
-            <div className="flex items-center space-x-6">
-              <span className="text-5xl font-bold text-white">${stockData.price}</span>
-              <div className="flex items-center space-x-3">
-                {isPositive && <TrendingUp className="h-6 w-6 text-tradeiq-success" />}
-                {isNegative && <TrendingDown className="h-6 w-6 text-tradeiq-danger" />}
-                {!isPositive && !isNegative && <Minus className="h-6 w-6 text-gray-400" />}
-                <span className={`text-xl font-bold ${
-                  isPositive ? 'text-tradeiq-success' : isNegative ? 'text-tradeiq-danger' : 'text-gray-400'
-                }`}>
-                  {stockData.change} ({stockData.changePercent}%)
-                </span>
-              </div>
-            </div>
+            
+            {/* Real-time price using MarketPrice component */}
+            <MarketPrice symbol={stockSymbol} size="lg" />
           </div>
           
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
             <div className="space-y-1">
               <p className="text-gray-400 text-sm font-medium">Volume</p>
-              <p className="text-white font-bold text-lg">{parseInt(stockData.volume).toLocaleString()}</p>
+              <p className="text-white font-bold text-lg">{parseInt(stockInfo.volume).toLocaleString()}</p>
             </div>
             <div className="space-y-1">
               <p className="text-gray-400 text-sm font-medium">Market Cap</p>
-              <p className="text-white font-bold text-lg">${stockData.marketCap}</p>
+              <p className="text-white font-bold text-lg">${stockInfo.marketCap}</p>
             </div>
             <div className="space-y-1">
               <p className="text-gray-400 text-sm font-medium">52W High</p>
-              <p className="text-white font-bold text-lg">${stockData.high52w}</p>
+              <p className="text-white font-bold text-lg">${stockInfo.high52w}</p>
             </div>
             <div className="space-y-1">
               <p className="text-gray-400 text-sm font-medium">52W Low</p>
-              <p className="text-white font-bold text-lg">${stockData.low52w}</p>
+              <p className="text-white font-bold text-lg">${stockInfo.low52w}</p>
             </div>
           </div>
         </div>
@@ -149,7 +146,7 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
               <Brain className="h-6 w-6 text-purple-400" />
               <h3 className="text-xl font-bold text-white">AI Analysis</h3>
             </div>
-            <AIAnalysis symbol={stockSymbol} stockData={stockData} />
+            <AIAnalysis symbol={stockSymbol} stockData={{ price, change }} />
           </Card>
         </div>
       </div>
