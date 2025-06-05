@@ -1,3 +1,4 @@
+
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
 import { useEffect, useState } from 'react';
 import { useRealTimePriceContext } from '@/components/RealTimePriceProvider';
@@ -63,7 +64,7 @@ export const StockChart = ({ symbol }: StockChartProps) => {
     }
   }, [marketPrice, isLoading]);
 
-  useEffect() => {
+  useEffect(() => {
     // Also handle WebSocket price updates from RealTimePriceProvider
     const currentPriceData = prices[symbol];
     if (currentPriceData && currentPriceData.currentPrice !== realTimePrice) {
