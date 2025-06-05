@@ -36,7 +36,6 @@ const PlanModal: React.FC<PlanModalProps> = ({ isOpen, onClose }) => {
       
       // Call the Edge Function to create checkout session
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
