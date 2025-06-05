@@ -93,6 +93,7 @@ serve(async (req) => {
 
     // Get the origin for redirect URLs
     const origin = req.headers.get('origin') || 'http://localhost:3000';
+    logStep('Detected origin', { origin });
 
     // Create checkout session
     const session = await stripe.checkout.sessions.create({

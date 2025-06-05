@@ -64,8 +64,8 @@ const PlanModal: React.FC<PlanModalProps> = ({ isOpen, onClose }) => {
 
       console.log('Checkout session created successfully:', data.sessionId);
       
-      // Redirect to Stripe Checkout
-      window.location.href = data.url;
+      // Open Stripe checkout in a new tab
+      window.open(data.url, '_blank');
       
     } catch (error) {
       console.error('Checkout error:', error);
