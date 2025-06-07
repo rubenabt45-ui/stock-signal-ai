@@ -1,21 +1,99 @@
 
 import React, { useEffect, useState } from 'react';
-import { CheckCircle, Sparkles, ArrowRight } from 'lucide-react';
+import { CheckCircle, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+interface SessionDetails {
+  sessionId: string;
+  status: string;
+  customerEmail: string;
+  amountTotal: number;
+  currency: string;
+  paymentStatus: string;
+  metadata: any;
+}
 
 const Success = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [showConfetti, setShowConfetti] = useState(false);
+  const [sessionDetails, setSessionDetails] = useState<SessionDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Trigger confetti animation on mount
-    setShowConfetti(true);
+    const sessionId = searchParams.get('session_id');
     
-    // Optional: Auto-redirect after 10 seconds
+    if (!sessionId) {
+      setError('No session ID found in URL');
+      setLoading(false);
+      return;
+    }
+
+    if (!user) {
+      setError('User not authenticated');
+      setLoading(false);
+      return;
+    }
+
+    const fetchSessionDetails = async () => {
+      try {
+        console.log('Fetching session details for:', sessionId);
+        
+        // Get the current session token
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session?.access_token) {
+          throw new Error('Failed to get authentication session');
+        }
+
+        // Call the edge function to get session details
+        const { data, error } = await supabase.functions.invoke('get-checkout-session', {
+          body: { sessionId },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (error) {
+          throw new Error(error.message || 'Failed to retrieve session details');
+        }
+
+        console.log('Session details retrieved:', data);
+        setSessionDetails(data);
+        
+        // Trigger confetti animation on successful retrieval
+        setShowConfetti(true);
+        
+      } catch (error) {
+        console.error('Error fetching session details:', error);
+        setError(error instanceof Error ? error.message : 'Unknown error occurred');
+        
+        toast({
+          title: "Error retrieving session",
+          description: "Could not verify your payment. Please contact support if you were charged.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSessionDetails();
+  }, [searchParams, user, toast]);
+
+  useEffect(() => {
+    // Optional: Auto-redirect after 15 seconds
     const timer = setTimeout(() => {
       navigate('/');
-    }, 10000);
+    }, 15000);
 
     return () => clearTimeout(timer);
   }, [navigate]);
@@ -23,6 +101,52 @@ const Success = () => {
   const handleReturnToDashboard = () => {
     navigate('/');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center space-y-8">
+          <Loader2 className="h-12 w-12 text-tradeiq-blue animate-spin mx-auto" />
+          <h1 className="text-2xl font-bold text-white">
+            Verifying your payment...
+          </h1>
+          <p className="text-gray-400">
+            Please wait while we confirm your subscription.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center space-y-8">
+          <div className="flex justify-center">
+            <CheckCircle className="h-24 w-24 text-yellow-500" />
+          </div>
+          <div className="space-y-4">
+            <h1 className="text-3xl font-bold text-white">
+              Payment Processing
+            </h1>
+            <p className="text-xl text-yellow-400 font-medium">
+              We're confirming your payment
+            </p>
+            <p className="text-gray-400 leading-relaxed">
+              Your payment is being processed. You should receive access to Pro features shortly.
+              If you continue to see this message, please contact support.
+            </p>
+          </div>
+          <Button 
+            onClick={handleReturnToDashboard}
+            className="w-full bg-tradeiq-blue hover:bg-blue-600 text-white font-medium h-12 text-lg"
+          >
+            Return to Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center p-4 relative overflow-hidden">
@@ -53,12 +177,23 @@ const Success = () => {
             Welcome to TradeIQ Pro! 🎉
           </h1>
           <p className="text-xl text-tradeiq-blue font-medium">
-            You're now a Pro user
+            Payment Successful
           </p>
-          <p className="text-gray-400 leading-relaxed">
-            Your subscription has been activated successfully. You now have access to unlimited ChartIA analyses, 
-            advanced TradingChat features, and priority support.
-          </p>
+          {sessionDetails && (
+            <div className="text-gray-400 leading-relaxed space-y-2">
+              <p>
+                Your subscription has been activated successfully. You now have access to unlimited ChartIA analyses, 
+                advanced TradingChat features, and priority support.
+              </p>
+              <div className="text-sm">
+                <p>Payment Status: <span className="text-green-400 font-medium">{sessionDetails.paymentStatus}</span></p>
+                <p>Amount: <span className="text-white font-medium">
+                  ${(sessionDetails.amountTotal / 100).toFixed(2)} {sessionDetails.currency.toUpperCase()}
+                </span></p>
+                <p>Session ID: <span className="text-gray-500 font-mono text-xs">{sessionDetails.sessionId}</span></p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Pro Features Summary */}
@@ -95,7 +230,7 @@ const Success = () => {
           </Button>
           
           <p className="text-gray-500 text-sm">
-            You'll be automatically redirected in 10 seconds
+            You'll be automatically redirected in 15 seconds
           </p>
         </div>
       </div>

@@ -68,6 +68,37 @@ async function verifyStripeSignature(
   }
 }
 
+// Function to update user profile
+async function updateUserProfile(supabase: any, userId: string, isPro: boolean, eventType: string) {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .update({ 
+      is_pro: isPro,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', userId)
+    .select();
+
+  if (error) {
+    logStep('ERROR: Failed to update user profile', { error: error.message, userId, isPro, eventType });
+    throw new Error('Database update failed');
+  }
+
+  if (!data || data.length === 0) {
+    logStep('WARNING: No user profile found for update', { userId, eventType });
+    throw new Error('User profile not found');
+  }
+
+  logStep('Successfully updated user profile', { 
+    userId, 
+    isPro,
+    eventType,
+    updatedProfile: data[0] 
+  });
+
+  return data[0];
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -124,10 +155,22 @@ serve(async (req) => {
     const event = JSON.parse(payload);
     logStep('Parsed Stripe event', { type: event.type, id: event.id });
 
+    // Initialize Supabase client with service role for admin access
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    );
+
     // Handle checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      logStep('Processing checkout session', { sessionId: session.id });
+      logStep('Processing checkout session completed', { sessionId: session.id });
 
       // Extract user ID from metadata
       const userId = session.metadata?.user_id;
@@ -139,52 +182,50 @@ serve(async (req) => {
         });
       }
 
-      logStep('Found user ID in metadata', { userId });
+      await updateUserProfile(supabase, userId, true, 'checkout.session.completed');
 
-      // Initialize Supabase client with service role for admin access
-      const supabase = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-        {
-          auth: {
-            autoRefreshToken: false,
-            persistSession: false
-          }
-        }
-      );
-
-      // Update user profile to set is_pro = true
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .update({ 
-          is_pro: true,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', userId)
-        .select();
-
-      if (error) {
-        logStep('ERROR: Failed to update user profile', { error: error.message, userId });
-        return new Response('Database update failed', { 
-          status: 500, 
-          headers: corsHeaders 
-        });
-      }
-
-      if (!data || data.length === 0) {
-        logStep('WARNING: No user profile found for update', { userId });
-        return new Response('User profile not found', { 
-          status: 404, 
-          headers: corsHeaders 
-        });
-      }
-
-      logStep('Successfully updated user to Pro', { 
-        userId, 
-        updatedProfile: data[0] 
+      return new Response('Checkout session processed successfully', { 
+        status: 200, 
+        headers: corsHeaders 
       });
+    }
 
-      return new Response('Webhook processed successfully', { 
+    // Handle invoice.paid event (recurring payments)
+    if (event.type === 'invoice.paid') {
+      const invoice = event.data.object;
+      logStep('Processing invoice paid', { invoiceId: invoice.id });
+
+      // Get the subscription to access metadata
+      if (invoice.subscription) {
+        // We'll need to get the subscription object to access metadata
+        // For now, we'll just log this event
+        logStep('Invoice paid for subscription', { subscriptionId: invoice.subscription });
+      }
+
+      return new Response('Invoice paid processed successfully', { 
+        status: 200, 
+        headers: corsHeaders 
+      });
+    }
+
+    // Handle customer.subscription.deleted event
+    if (event.type === 'customer.subscription.deleted') {
+      const subscription = event.data.object;
+      logStep('Processing subscription deleted', { subscriptionId: subscription.id });
+
+      // Extract user ID from metadata
+      const userId = subscription.metadata?.user_id;
+      if (!userId) {
+        logStep('ERROR: No user_id found in subscription metadata', { metadata: subscription.metadata });
+        return new Response('No user ID in metadata', { 
+          status: 400, 
+          headers: corsHeaders 
+        });
+      }
+
+      await updateUserProfile(supabase, userId, false, 'customer.subscription.deleted');
+
+      return new Response('Subscription deletion processed successfully', { 
         status: 200, 
         headers: corsHeaders 
       });

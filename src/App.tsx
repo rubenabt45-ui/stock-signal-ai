@@ -16,6 +16,7 @@ import Learn from "./pages/Learn";
 import NewsAI from "./pages/NewsAI";
 import Settings from "./pages/Settings";
 import Success from "./pages/Success";
+import Cancel from "./pages/Cancel";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";

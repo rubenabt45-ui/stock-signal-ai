@@ -11,7 +11,7 @@ const corsHeaders = {
 // Helper logging function for enhanced debugging
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
-  console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
+  console.log(`[GET-CHECKOUT-SESSION] ${step}${detailsStr}`);
 };
 
 serve(async (req) => {
@@ -30,7 +30,7 @@ serve(async (req) => {
   }
 
   try {
-    logStep('Checkout session creation started');
+    logStep('Get checkout session started');
 
     // Get Stripe secret key from environment
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
@@ -72,61 +72,50 @@ serve(async (req) => {
     const user = userData.user;
     logStep('User authenticated', { userId: user.id, email: user.email });
 
+    // Get session ID from request body
+    const { sessionId } = await req.json();
+    if (!sessionId) {
+      logStep('ERROR: No session ID provided');
+      return new Response('Session ID required', { 
+        status: 400, 
+        headers: corsHeaders 
+      });
+    }
+
     // Initialize Stripe
     const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2023-10-16',
     });
 
-    // Check if customer exists
-    const customers = await stripe.customers.list({
-      email: user.email,
-      limit: 1,
+    // Retrieve the checkout session
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    logStep('Retrieved checkout session', { 
+      sessionId: session.id, 
+      status: session.status,
+      customerEmail: session.customer_email 
     });
 
-    let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-      logStep('Found existing customer', { customerId });
-    } else {
-      logStep('No existing customer found, will create during checkout');
+    // Verify the session belongs to the current user
+    if (session.metadata?.user_id !== user.id) {
+      logStep('ERROR: Session does not belong to current user', { 
+        sessionUserId: session.metadata?.user_id, 
+        currentUserId: user.id 
+      });
+      return new Response('Unauthorized access to session', { 
+        status: 403, 
+        headers: corsHeaders 
+      });
     }
 
-    // Create checkout session with exact specifications
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      customer_email: customerId ? undefined : user.email,
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'TradeIQ Pro Plan',
-              description: 'Unlimited ChartIA access, advanced TradingChat, and priority support',
-            },
-            unit_amount: 999, // $9.99 in cents
-            recurring: {
-              interval: 'month',
-            },
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: `https://stock-signal-ai.lovable.dev/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://stock-signal-ai.lovable.dev/cancel`,
-      metadata: {
-        user_id: user.id, // This will be used by the webhook
-      },
-    });
-
-    logStep('Checkout session created successfully', { 
-      sessionId: session.id, 
-      url: session.url 
-    });
-
+    // Return session details
     return new Response(JSON.stringify({ 
-      url: session.url,
-      sessionId: session.id 
+      sessionId: session.id,
+      status: session.status,
+      customerEmail: session.customer_email,
+      amountTotal: session.amount_total,
+      currency: session.currency,
+      paymentStatus: session.payment_status,
+      metadata: session.metadata
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
@@ -134,10 +123,10 @@ serve(async (req) => {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep('ERROR: Checkout session creation failed', { error: errorMessage });
+    logStep('ERROR: Get checkout session failed', { error: errorMessage });
     
     return new Response(JSON.stringify({ 
-      error: 'Failed to create checkout session',
+      error: 'Failed to retrieve checkout session',
       details: errorMessage 
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
