@@ -91,7 +91,7 @@ serve(async (req) => {
       logStep('No existing customer found, will create during checkout');
     }
 
-    // Create checkout session with exact specifications
+    // Create checkout session with hardcoded redirect URLs
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
@@ -112,8 +112,8 @@ serve(async (req) => {
         },
       ],
       mode: 'subscription',
-      success_url: `https://stock-signal-ai.lovable.dev/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://stock-signal-ai.lovable.dev/cancel`,
+      success_url: `https://lovable.dev/projects/351714c7-a4c6-4f25-bf5f-a3c37bdee2ed/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `https://lovable.dev/projects/351714c7-a4c6-4f25-bf5f-a3c37bdee2ed/settings`,
       metadata: {
         user_id: user.id, // This is critical for the webhook
       },
