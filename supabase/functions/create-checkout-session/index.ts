@@ -115,13 +115,19 @@ serve(async (req) => {
       success_url: `https://stock-signal-ai.lovable.dev/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `https://stock-signal-ai.lovable.dev/cancel`,
       metadata: {
-        user_id: user.id, // This will be used by the webhook
+        user_id: user.id, // This is critical for the webhook
+      },
+      subscription_data: {
+        metadata: {
+          user_id: user.id, // Also add to subscription metadata for future events
+        },
       },
     });
 
     logStep('Checkout session created successfully', { 
       sessionId: session.id, 
-      url: session.url 
+      url: session.url,
+      metadata: session.metadata
     });
 
     return new Response(JSON.stringify({ 

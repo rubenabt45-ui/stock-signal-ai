@@ -68,35 +68,77 @@ async function verifyStripeSignature(
   }
 }
 
-// Function to update user profile
-async function updateUserProfile(supabase: any, userId: string, isPro: boolean, eventType: string) {
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .update({ 
+// Function to create or update user profile
+async function upsertUserProfile(supabase: any, userId: string, isPro: boolean, eventType: string) {
+  logStep('Starting user profile upsert', { userId, isPro, eventType });
+
+  try {
+    // First, check if user exists in auth.users
+    const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(userId);
+    
+    if (authError) {
+      logStep('ERROR: Failed to fetch auth user', { error: authError.message, userId });
+      throw new Error(`Auth user not found: ${authError.message}`);
+    }
+
+    if (!authUser.user) {
+      logStep('ERROR: Auth user not found', { userId });
+      throw new Error('Auth user not found');
+    }
+
+    logStep('Auth user found', { userId, email: authUser.user.email });
+
+    // Upsert user profile with comprehensive data
+    const profileData = {
+      id: userId,
       is_pro: isPro,
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', userId)
-    .select();
+      full_name: authUser.user.user_metadata?.full_name || authUser.user.email?.split('@')[0] || '',
+      username: authUser.user.user_metadata?.username || null,
+      avatar_url: authUser.user.user_metadata?.avatar_url || null,
+      updated_at: new Date().toISOString(),
+      created_at: new Date().toISOString()
+    };
 
-  if (error) {
-    logStep('ERROR: Failed to update user profile', { error: error.message, userId, isPro, eventType });
-    throw new Error('Database update failed');
+    logStep('Attempting upsert with data', profileData);
+
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .upsert(profileData, { 
+        onConflict: 'id',
+        ignoreDuplicates: false 
+      })
+      .select();
+
+    if (error) {
+      logStep('ERROR: Failed to upsert user profile', { 
+        error: error.message, 
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+        userId, 
+        isPro, 
+        eventType 
+      });
+      throw new Error(`Database upsert failed: ${error.message}`);
+    }
+
+    logStep('Successfully upserted user profile', { 
+      userId, 
+      isPro,
+      eventType,
+      upsertedProfile: data?.[0] || 'No data returned'
+    });
+
+    return data?.[0];
+  } catch (error) {
+    logStep('ERROR: User profile upsert failed', { 
+      error: error.message, 
+      userId, 
+      isPro, 
+      eventType 
+    });
+    throw error;
   }
-
-  if (!data || data.length === 0) {
-    logStep('WARNING: No user profile found for update', { userId, eventType });
-    throw new Error('User profile not found');
-  }
-
-  logStep('Successfully updated user profile', { 
-    userId, 
-    isPro,
-    eventType,
-    updatedProfile: data[0] 
-  });
-
-  return data[0];
 }
 
 serve(async (req) => {
@@ -170,19 +212,27 @@ serve(async (req) => {
     // Handle checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      logStep('Processing checkout session completed', { sessionId: session.id });
+      logStep('Processing checkout session completed', { 
+        sessionId: session.id,
+        metadata: session.metadata,
+        customerId: session.customer,
+        subscriptionId: session.subscription 
+      });
 
       // Extract user ID from metadata
       const userId = session.metadata?.user_id;
       if (!userId) {
-        logStep('ERROR: No user_id found in session metadata', { metadata: session.metadata });
+        logStep('ERROR: No user_id found in session metadata', { 
+          metadata: session.metadata,
+          sessionId: session.id 
+        });
         return new Response('No user ID in metadata', { 
           status: 400, 
           headers: corsHeaders 
         });
       }
 
-      await updateUserProfile(supabase, userId, true, 'checkout.session.completed');
+      await upsertUserProfile(supabase, userId, true, 'checkout.session.completed');
 
       return new Response('Checkout session processed successfully', { 
         status: 200, 
@@ -193,14 +243,15 @@ serve(async (req) => {
     // Handle invoice.paid event (recurring payments)
     if (event.type === 'invoice.paid') {
       const invoice = event.data.object;
-      logStep('Processing invoice paid', { invoiceId: invoice.id });
+      logStep('Processing invoice paid', { 
+        invoiceId: invoice.id,
+        subscriptionId: invoice.subscription,
+        customerId: invoice.customer 
+      });
 
-      // Get the subscription to access metadata
-      if (invoice.subscription) {
-        // We'll need to get the subscription object to access metadata
-        // For now, we'll just log this event
-        logStep('Invoice paid for subscription', { subscriptionId: invoice.subscription });
-      }
+      // For invoice.paid, we need to get the subscription to access metadata
+      // Since we can't access Stripe API directly, we'll just log this for now
+      logStep('Invoice paid event processed (no user update without subscription metadata)');
 
       return new Response('Invoice paid processed successfully', { 
         status: 200, 
@@ -211,19 +262,26 @@ serve(async (req) => {
     // Handle customer.subscription.deleted event
     if (event.type === 'customer.subscription.deleted') {
       const subscription = event.data.object;
-      logStep('Processing subscription deleted', { subscriptionId: subscription.id });
+      logStep('Processing subscription deleted', { 
+        subscriptionId: subscription.id,
+        metadata: subscription.metadata,
+        customerId: subscription.customer 
+      });
 
       // Extract user ID from metadata
       const userId = subscription.metadata?.user_id;
       if (!userId) {
-        logStep('ERROR: No user_id found in subscription metadata', { metadata: subscription.metadata });
+        logStep('ERROR: No user_id found in subscription metadata', { 
+          metadata: subscription.metadata,
+          subscriptionId: subscription.id 
+        });
         return new Response('No user ID in metadata', { 
           status: 400, 
           headers: corsHeaders 
         });
       }
 
-      await updateUserProfile(supabase, userId, false, 'customer.subscription.deleted');
+      await upsertUserProfile(supabase, userId, false, 'customer.subscription.deleted');
 
       return new Response('Subscription deletion processed successfully', { 
         status: 200, 
@@ -240,7 +298,7 @@ serve(async (req) => {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep('ERROR: Webhook processing failed', { error: errorMessage });
+    logStep('ERROR: Webhook processing failed', { error: errorMessage, stack: error instanceof Error ? error.stack : undefined });
     
     return new Response('Internal server error', { 
       status: 500, 
