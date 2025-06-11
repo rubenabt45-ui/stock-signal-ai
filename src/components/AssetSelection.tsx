@@ -1,9 +1,11 @@
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Search, TrendingUp, Globe, Coins, BarChart3, Zap, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { FavoriteButton } from "@/components/FavoriteButton";
+import { CategoryFilter } from "@/pages/Favorites";
 
 interface AssetSelectionProps {
   selectedAsset: string;
@@ -235,14 +237,14 @@ export const AssetSelection = ({ selectedAsset, onAssetSelect }: AssetSelectionP
                         selectedAsset === asset.symbol ? 'ring-2 ring-tradeiq-blue bg-tradeiq-blue/10' : ''
                       }`}
                     >
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-3 flex-1">
                         <div className="flex items-center space-x-2">
                           <CategoryIcon className={`h-4 w-4 ${categoryInfo.color}`} />
                           <Badge variant="outline" className={`text-xs border-gray-600/50 ${categoryInfo.color} border-opacity-30`}>
                             {categoryInfo.label}
                           </Badge>
                         </div>
-                        <div className="text-left">
+                        <div className="text-left flex-1">
                           <div className="font-bold text-white group-hover:text-tradeiq-blue transition-colors">
                             {asset.symbol}
                           </div>
@@ -251,13 +253,22 @@ export const AssetSelection = ({ selectedAsset, onAssetSelect }: AssetSelectionP
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-white font-semibold text-sm">{asset.price}</div>
-                        <div className={`text-xs font-bold ${
-                          asset.change.startsWith('+') ? 'text-tradeiq-success' : 'text-tradeiq-danger'
-                        }`}>
-                          {asset.change}
+                      <div className="flex items-center space-x-2">
+                        <div className="text-right">
+                          <div className="text-white font-semibold text-sm">{asset.price}</div>
+                          <div className={`text-xs font-bold ${
+                            asset.change.startsWith('+') ? 'text-tradeiq-success' : 'text-tradeiq-danger'
+                          }`}>
+                            {asset.change}
+                          </div>
                         </div>
+                        <FavoriteButton
+                          symbol={asset.symbol}
+                          name={asset.name}
+                          category={asset.category as CategoryFilter}
+                          variant="ghost"
+                          size="sm"
+                        />
                       </div>
                     </button>
                   );
