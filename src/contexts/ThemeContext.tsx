@@ -23,7 +23,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Load theme from user_profiles on mount
   useEffect(() => {
     const loadUserTheme = async () => {
-      if (!user?.id) return;
+      if (!user?.id) {
+        // If no user, check localStorage for fallback
+        const savedTheme = localStorage.getItem('theme') as Theme;
+        if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
+          setThemeState(savedTheme);
+        }
+        return;
+      }
 
       try {
         const { data, error } = await supabase
@@ -39,6 +46,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
         if (data?.theme && ['light', 'dark', 'system'].includes(data.theme)) {
           setThemeState(data.theme as Theme);
+          localStorage.setItem('theme', data.theme);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -48,7 +56,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     loadUserTheme();
   }, [user?.id]);
 
-  // Apply theme changes
+  // Apply theme changes to document
   useEffect(() => {
     const applyTheme = () => {
       let resolvedTheme: 'light' | 'dark' = 'dark';
@@ -61,11 +69,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
       setActualTheme(resolvedTheme);
 
+      // Apply theme class to document
+      const root = document.documentElement;
       if (resolvedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
+        root.classList.add('dark');
+        root.classList.remove('light');
       } else {
-        document.documentElement.classList.remove('dark');
+        root.classList.add('light');
+        root.classList.remove('dark');
       }
+
+      // Save to localStorage for persistence
+      localStorage.setItem('theme', theme);
     };
 
     applyTheme();
@@ -73,13 +88,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Listen for system theme changes if theme is 'system'
     if (theme === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      mediaQuery.addEventListener('change', applyTheme);
-      return () => mediaQuery.removeEventListener('change', applyTheme);
+      const handleChange = () => applyTheme();
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
     }
   }, [theme]);
 
   const setTheme = async (newTheme: Theme) => {
     setThemeState(newTheme);
+
+    // Save to localStorage immediately
+    localStorage.setItem('theme', newTheme);
 
     if (user?.id) {
       try {

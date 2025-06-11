@@ -63,15 +63,15 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// TradeIQ custom colors
+				// TradeIQ custom colors using CSS variables
 				tradeiq: {
-					'navy': '#0B1120',
-					'blue': '#2563EB',
-					'blue-light': '#3B82F6',
-					'success': '#10B981',
-					'danger': '#EF4444',
-					'warning': '#F59E0B',
-					'muted': '#64748B'
+					'navy': 'hsl(var(--tradeiq-navy))',
+					'blue': 'hsl(var(--tradeiq-blue))',
+					'blue-light': 'hsl(var(--tradeiq-blue-light))',
+					'success': 'hsl(var(--tradeiq-success))',
+					'danger': 'hsl(var(--tradeiq-danger))',
+					'warning': 'hsl(var(--tradeiq-warning))',
+					'muted': 'hsl(var(--tradeiq-muted))'
 				}
 			},
 			borderRadius: {
