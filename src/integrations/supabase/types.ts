@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      user_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          symbol: string
+          threshold: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          symbol: string
+          threshold: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          symbol?: string
+          threshold?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           category: string
@@ -44,37 +77,46 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          alerts_enabled: boolean | null
           avatar_url: string | null
           created_at: string
+          email_alerts_enabled: boolean | null
           full_name: string | null
           id: string
           is_pro: boolean
           language: string | null
           refresh_interval: string | null
+          sound_enabled: boolean | null
           theme: string | null
           updated_at: string
           username: string | null
         }
         Insert: {
+          alerts_enabled?: boolean | null
           avatar_url?: string | null
           created_at?: string
+          email_alerts_enabled?: boolean | null
           full_name?: string | null
           id: string
           is_pro?: boolean
           language?: string | null
           refresh_interval?: string | null
+          sound_enabled?: boolean | null
           theme?: string | null
           updated_at?: string
           username?: string | null
         }
         Update: {
+          alerts_enabled?: boolean | null
           avatar_url?: string | null
           created_at?: string
+          email_alerts_enabled?: boolean | null
           full_name?: string | null
           id?: string
           is_pro?: boolean
           language?: string | null
           refresh_interval?: string | null
+          sound_enabled?: boolean | null
           theme?: string | null
           updated_at?: string
           username?: string | null

@@ -1,12 +1,14 @@
 
 import { useState } from "react";
-import { Trash2, GripVertical, LogIn } from "lucide-react";
+import { Trash2, GripVertical, LogIn, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LivePriceBadge } from "@/components/LivePriceBadge";
 import { MarketPrice } from "@/components/MarketPrice";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { useMultipleMarketData } from "@/hooks/useMarketData";
 import { useAuth } from "@/contexts/AuthContext";
+import { AddAlertModal } from "@/components/AddAlertModal";
+import { useUserAlerts } from "@/hooks/useUserAlerts";
 
 interface FavoriteItem {
   symbol: string;
@@ -32,7 +34,10 @@ export const FavoritesList = ({
   onSymbolClick
 }: FavoritesListProps) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+  const [selectedSymbol, setSelectedSymbol] = useState<string>('');
   const { user } = useAuth();
+  const { addAlert } = useUserAlerts();
   
   // Get real-time market data for all favorite symbols
   const symbols = favorites.map(fav => fav.symbol);
@@ -67,6 +72,12 @@ export const FavoritesList = ({
   const handleSymbolClick = (symbol: string) => {
     if (!user) return;
     onSymbolClick?.(symbol);
+  };
+
+  const handleAddAlert = (symbol: string) => {
+    if (!user) return;
+    setSelectedSymbol(symbol);
+    setIsAlertModalOpen(true);
   };
 
   // Loading skeleton
@@ -158,6 +169,28 @@ export const FavoritesList = ({
                   )}
                 </div>
 
+                {/* Alert button */}
+                {!isEditMode && user && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddAlert(favorite.symbol);
+                        }}
+                        className="border-gray-600 hover:bg-tradeiq-blue/20 hover:border-tradeiq-blue"
+                      >
+                        <Bell className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Add price alert</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+
                 {/* Remove button */}
                 {isEditMode && (
                   user ? (
@@ -195,6 +228,14 @@ export const FavoritesList = ({
           );
         })}
       </div>
+
+      {/* Add Alert Modal */}
+      <AddAlertModal
+        isOpen={isAlertModalOpen}
+        onClose={() => setIsAlertModalOpen(false)}
+        onAddAlert={addAlert}
+        prefilledSymbol={selectedSymbol}
+      />
     </TooltipProvider>
   );
 };
