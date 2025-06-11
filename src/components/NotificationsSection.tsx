@@ -332,7 +332,6 @@ export const NotificationsSection = () => {
                                 <Switch
                                   checked={alert.is_active}
                                   onCheckedChange={() => handleToggleAlert(alert)}
-                                  size="sm"
                                 />
                                 <Button
                                   size="sm"

@@ -40,7 +40,8 @@ export const useUserAlerts = () => {
         console.error('Error fetching alerts:', error);
         setError(error.message);
       } else {
-        setAlerts(data || []);
+        // Type assertion to ensure proper typing
+        setAlerts((data || []) as UserAlert[]);
       }
     } catch (err) {
       console.error('Error:', err);
@@ -73,7 +74,8 @@ export const useUserAlerts = () => {
         return false;
       }
 
-      setAlerts(prev => [data, ...prev]);
+      // Type assertion for the new alert
+      setAlerts(prev => [data as UserAlert, ...prev]);
       toast({
         title: "Alert Created",
         description: `Alert for ${alertData.symbol} has been created`,
@@ -113,7 +115,7 @@ export const useUserAlerts = () => {
       }
 
       setAlerts(prev => prev.map(alert => 
-        alert.id === id ? { ...alert, ...data } : alert
+        alert.id === id ? { ...alert, ...(data as UserAlert) } : alert
       ));
       
       toast({
