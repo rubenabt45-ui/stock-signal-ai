@@ -6,6 +6,10 @@ import PlanModal from "@/components/PlanModal";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileSection } from "@/components/ProfileSection";
 import { PreferencesSection } from "@/components/PreferencesSection";
+import { SecuritySection } from "@/components/SecuritySection";
+import { IntegrationsSection } from "@/components/IntegrationsSection";
+import { SupportSection } from "@/components/SupportSection";
+import { LegalSection } from "@/components/LegalSection";
 import { LogoutSection } from "@/components/LogoutSection";
 
 const Settings = () => {
@@ -105,6 +109,9 @@ const Settings = () => {
         {/* Preferences Section */}
         <PreferencesSection />
 
+        {/* Security Section */}
+        <SecuritySection />
+
         {/* Pro Subscription Management */}
         {isPro && (
           <div className="tradeiq-card border-green-500/20 bg-black/20 rounded-xl p-6">
@@ -132,6 +139,15 @@ const Settings = () => {
             </div>
           </div>
         )}
+
+        {/* Integrations Section */}
+        <IntegrationsSection />
+
+        {/* Support Section */}
+        <SupportSection />
+
+        {/* Legal Section */}
+        <LegalSection />
 
         {/* Logout Section */}
         <LogoutSection />
