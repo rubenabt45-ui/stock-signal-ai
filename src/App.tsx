@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PublicRoute from "@/components/PublicRoute";
+import BottomNavigation from "@/components/BottomNavigation";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -32,20 +33,23 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <Routes>
-                <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-                <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
-                <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
-                <Route path="/trading-chat" element={<ProtectedRoute><TradingChat /></ProtectedRoute>} />
-                <Route path="/news-ai" element={<ProtectedRoute><NewsAI /></ProtectedRoute>} />
-                <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
-                <Route path="/configuration" element={<ProtectedRoute><Configuration /></ProtectedRoute>} />
-                <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
-                <Route path="/cancel" element={<ProtectedRoute><Cancel /></ProtectedRoute>} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <div className="min-h-screen bg-tradeiq-navy">
+                <Routes>
+                  <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+                  <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+                  <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                  <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                  <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+                  <Route path="/trading-chat" element={<ProtectedRoute><TradingChat /></ProtectedRoute>} />
+                  <Route path="/news-ai" element={<ProtectedRoute><NewsAI /></ProtectedRoute>} />
+                  <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
+                  <Route path="/configuration" element={<ProtectedRoute><Configuration /></ProtectedRoute>} />
+                  <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
+                  <Route path="/cancel" element={<ProtectedRoute><Cancel /></ProtectedRoute>} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <BottomNavigation />
+              </div>
             </BrowserRouter>
           </TooltipProvider>
         </ThemeProvider>

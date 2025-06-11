@@ -6,6 +6,7 @@ import PlanModal from "@/components/PlanModal";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileSection } from "@/components/ProfileSection";
 import { PreferencesSection } from "@/components/PreferencesSection";
+import { NotificationsSection } from "@/components/NotificationsSection";
 import { SecuritySection } from "@/components/SecuritySection";
 import { IntegrationsSection } from "@/components/IntegrationsSection";
 import { SupportSection } from "@/components/SupportSection";
@@ -108,6 +109,9 @@ const Settings = () => {
 
         {/* Preferences Section */}
         <PreferencesSection />
+
+        {/* Notifications Section */}
+        <NotificationsSection />
 
         {/* Security Section */}
         <SecuritySection />
