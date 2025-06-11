@@ -129,7 +129,7 @@ const Settings = () => {
               <div>
                 <p className="text-white font-medium">{t('settings.pro.benefits')}</p>
                 <ul className="text-gray-400 text-sm space-y-1">
-                  {t('settings.pro.benefitsList', { returnObjects: true }).map((benefit: string, index: number) => (
+                  {(t('settings.pro.benefitsList', { returnObjects: true }) as string[]).map((benefit: string, index: number) => (
                     <li key={index}>• {benefit}</li>
                   ))}
                 </ul>
