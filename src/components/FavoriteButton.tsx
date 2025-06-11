@@ -12,7 +12,7 @@ interface FavoriteButtonProps {
   name: string;
   category: CategoryFilter;
   variant?: 'default' | 'ghost' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'lg';
   showText?: boolean;
   className?: string;
 }

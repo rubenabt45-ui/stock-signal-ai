@@ -117,7 +117,7 @@ export const FavoritesList = ({
               className={`flex items-center justify-between p-4 bg-black/20 hover:bg-black/30 border border-gray-800/50 rounded-xl transition-all duration-200 ${
                 isEditMode ? 'cursor-move' : 'cursor-pointer hover:border-tradeiq-blue/50'
               } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
-              draggable={isEditMode && user}
+              draggable={isEditMode && !!user}
               onDragStart={(e) => handleDragStart(e, index)}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, index)}
