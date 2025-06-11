@@ -1,19 +1,15 @@
 
-import { Settings as SettingsIcon, User, Bell, Palette, Info, LogOut, Crown, CheckCircle } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { Settings as SettingsIcon, Crown, CheckCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import PlanModal from "@/components/PlanModal";
 import { supabase } from "@/integrations/supabase/client";
+import { ProfileSection } from "@/components/ProfileSection";
+import { PreferencesSection } from "@/components/PreferencesSection";
+import { LogoutSection } from "@/components/LogoutSection";
 
 const Settings = () => {
-  const { signOut, user } = useAuth();
-  const { toast } = useToast();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -48,34 +44,19 @@ const Settings = () => {
     fetchUserProfile();
   }, [user]);
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      toast({
-        title: "Logged out successfully",
-        description: "You have been logged out of your account.",
-      });
-      navigate("/login");
-    } catch (error) {
-      toast({
-        title: "Logout failed",
-        description: "There was an error logging out. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Format registration date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+  const handleProfileUpdate = (updatedProfile: any) => {
+    setUserProfile(updatedProfile);
   };
 
   const isPro = userProfile?.is_pro || false;
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-tradeiq-navy">
@@ -91,14 +72,22 @@ const Settings = () => {
               </div>
             </div>
             {!isPro && (
-              <Button
-                onClick={() => setIsPlanModalOpen(true)}
-                className="bg-tradeiq-blue hover:bg-blue-600 text-white font-medium"
-                disabled={loading}
-              >
-                <Crown className="h-4 w-4 mr-2" />
-                Upgrade to Pro
-              </Button>
+              <div className="flex items-center space-x-4">
+                {isPro && (
+                  <div className="flex items-center space-x-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <span className="text-green-400 text-sm font-medium">Pro Plan Active</span>
+                  </div>
+                )}
+                <button
+                  onClick={() => setIsPlanModalOpen(true)}
+                  className="bg-tradeiq-blue hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+                  disabled={loading}
+                >
+                  <Crown className="h-4 w-4" />
+                  <span>Upgrade to Pro</span>
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -106,71 +95,29 @@ const Settings = () => {
 
       {/* Content */}
       <main className="container mx-auto px-4 py-6 pb-24 space-y-6">
-        {/* Account Section */}
-        <Card className="tradeiq-card">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <User className="h-5 w-5 text-tradeiq-blue" />
-                <CardTitle className="text-white">Account</CardTitle>
-              </div>
-              {isPro && (
-                <div className="flex items-center space-x-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-green-400 text-sm font-medium">Pro Plan Active</span>
-                </div>
-              )}
-            </div>
-            <CardDescription>Your TradeIQ profile</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <p className="text-white font-medium">Email</p>
-              <p className="text-gray-400 text-sm">{user?.email}</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-white font-medium">User ID</p>
-              <p className="text-gray-400 text-sm font-mono">{user?.id}</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-white font-medium">Plan Status</p>
-              <p className="text-gray-400 text-sm">
-                {loading ? 'Loading...' : (isPro ? 'Pro Plan - $9.99/month' : 'Free Plan')}
-              </p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-white font-medium">Member since</p>
-              <p className="text-gray-400 text-sm">
-                {user?.created_at ? formatDate(user.created_at) : 'Unknown'}
-              </p>
-            </div>
-            <Button
-              onClick={handleLogout}
-              variant="destructive"
-              className="w-full"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Log Out
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Profile Section */}
+        <ProfileSection 
+          user={user} 
+          userProfile={userProfile} 
+          onProfileUpdate={handleProfileUpdate}
+        />
 
-        {/* Subscription Management Card */}
+        {/* Preferences Section */}
+        <PreferencesSection />
+
+        {/* Pro Subscription Management */}
         {isPro && (
-          <Card className="tradeiq-card border-green-500/20">
-            <CardHeader>
-              <div className="flex items-center space-x-3">
-                <Crown className="h-5 w-5 text-green-500" />
-                <CardTitle className="text-white">Pro Subscription</CardTitle>
-              </div>
-              <CardDescription>Manage your Pro subscription</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
+          <div className="tradeiq-card border-green-500/20 bg-black/20 rounded-xl p-6">
+            <div className="flex items-center space-x-3 mb-4">
+              <Crown className="h-5 w-5 text-green-500" />
+              <h3 className="text-white text-lg font-semibold">Pro Subscription</h3>
+            </div>
+            <div className="space-y-3">
+              <div>
                 <p className="text-white font-medium">Current Plan</p>
                 <p className="text-green-400 text-sm">TradeIQ Pro - $9.99/month</p>
               </div>
-              <div className="space-y-2">
+              <div>
                 <p className="text-white font-medium">Benefits</p>
                 <ul className="text-gray-400 text-sm space-y-1">
                   <li>• Unlimited ChartIA access</li>
@@ -182,86 +129,12 @@ const Settings = () => {
               <div className="text-gray-500 text-xs">
                 <p>Subscription managed through Stripe. Contact support for assistance.</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
-        {/* Notifications */}
-        <Card className="tradeiq-card">
-          <CardHeader>
-            <div className="flex items-center space-x-3">
-              <Bell className="h-5 w-5 text-tradeiq-blue" />
-              <CardTitle className="text-white">Notifications</CardTitle>
-            </div>
-            <CardDescription>Choose which types of alerts you want to receive</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-medium">Price Alerts</p>
-                <p className="text-gray-400 text-sm">Get notified when assets hit target prices</p>
-              </div>
-              <Switch defaultChecked disabled={!isPro} />
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-medium">Pattern Alerts</p>
-                <p className="text-gray-400 text-sm">AI-detected pattern notifications {!isPro && '(Pro only)'}</p>
-              </div>
-              <Switch defaultChecked={isPro} disabled={!isPro} />
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-medium">Market News</p>
-                <p className="text-gray-400 text-sm">Breaking market news and updates</p>
-              </div>
-              <Switch />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* App Appearance */}
-        <Card className="tradeiq-card">
-          <CardHeader>
-            <div className="flex items-center space-x-3">
-              <Palette className="h-5 w-5 text-tradeiq-blue" />
-              <CardTitle className="text-white">Appearance</CardTitle>
-            </div>
-            <CardDescription>Customize your app appearance</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-medium">Dark Mode</p>
-                <p className="text-gray-400 text-sm">Currently enabled</p>
-              </div>
-              <Switch defaultChecked disabled />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* App Info */}
-        <Card className="tradeiq-card">
-          <CardHeader>
-            <div className="flex items-center space-x-3">
-              <Info className="h-5 w-5 text-tradeiq-blue" />
-              <CardTitle className="text-white">App Info</CardTitle>
-            </div>
-            <CardDescription>Version 1.0.0</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <p className="text-white font-medium">TradeIQ</p>
-              <p className="text-gray-400 text-sm">AI-powered trading insights and analysis</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-white font-medium">What's New</p>
-              <p className="text-gray-400 text-sm">• Pro subscription with Stripe integration</p>
-              <p className="text-gray-400 text-sm">• Real-time chart analysis</p>
-              <p className="text-gray-400 text-sm">• AI trading assistant</p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Logout Section */}
+        <LogoutSection />
       </main>
 
       {/* Plan Modal */}
