@@ -1,75 +1,77 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Palette, Clock, Globe } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useRefreshInterval } from '@/hooks/useRefreshInterval';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-type Theme = 'light' | 'dark' | 'system';
-type RefreshInterval = '30s' | '1min' | '5min';
-
 export const PreferencesSection = () => {
-  const [theme, setTheme] = useState<Theme>('dark');
-  const [refreshInterval, setRefreshInterval] = useState<RefreshInterval>('1min');
-  const [language, setLanguage] = useState('en');
+  const { theme, setTheme } = useTheme();
+  const { refreshInterval, setRefreshInterval } = useRefreshInterval();
+  const [language, setLanguageState] = useState('en');
+  const { user } = useAuth();
   const { toast } = useToast();
 
+  // Load language from user_profiles
   useEffect(() => {
-    // Load preferences from localStorage
-    const savedTheme = localStorage.getItem('tradeiq-theme') as Theme;
-    const savedInterval = localStorage.getItem('tradeiq-refresh-interval') as RefreshInterval;
-    const savedLanguage = localStorage.getItem('tradeiq-language');
+    const loadLanguage = async () => {
+      if (!user?.id) return;
 
-    if (savedTheme) setTheme(savedTheme);
-    if (savedInterval) setRefreshInterval(savedInterval);
-    if (savedLanguage) setLanguage(savedLanguage);
-  }, []);
+      try {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('language')
+          .eq('id', user.id)
+          .single();
 
-  const handleThemeChange = (newTheme: Theme) => {
-    setTheme(newTheme);
-    localStorage.setItem('tradeiq-theme', newTheme);
-    
-    // Apply theme immediately (basic implementation)
-    if (newTheme === 'light') {
-      document.documentElement.classList.remove('dark');
-    } else if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      // System theme - check system preference
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (systemPrefersDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
+        if (error) {
+          console.error('Error loading language:', error);
+          return;
+        }
+
+        if (data?.language) {
+          setLanguageState(data.language);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    loadLanguage();
+  }, [user?.id]);
+
+  const handleLanguageChange = async (newLanguage: string) => {
+    setLanguageState(newLanguage);
+
+    if (user?.id) {
+      try {
+        const { error } = await supabase
+          .from('user_profiles')
+          .update({ language: newLanguage })
+          .eq('id', user.id);
+
+        if (error) {
+          console.error('Error updating language:', error);
+          toast({
+            title: "Failed to save language",
+            description: "Language preference couldn't be saved.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Language preference saved",
+            description: "Language support coming soon",
+          });
+        }
+      } catch (error) {
+        console.error('Error:', error);
       }
     }
-
-    toast({
-      title: "Theme updated",
-      description: `Theme changed to ${newTheme}`,
-    });
-  };
-
-  const handleRefreshIntervalChange = (newInterval: RefreshInterval) => {
-    setRefreshInterval(newInterval);
-    localStorage.setItem('tradeiq-refresh-interval', newInterval);
-    
-    toast({
-      title: "Refresh interval updated",
-      description: `Market data will refresh every ${newInterval}`,
-    });
-  };
-
-  const handleLanguageChange = (newLanguage: string) => {
-    setLanguage(newLanguage);
-    localStorage.setItem('tradeiq-language', newLanguage);
-    
-    toast({
-      title: "Language preference saved",
-      description: "Language support coming soon",
-    });
   };
 
   return (
@@ -87,7 +89,7 @@ export const PreferencesSection = () => {
             <Palette className="h-4 w-4" />
             <span>Theme</span>
           </Label>
-          <Select value={theme} onValueChange={handleThemeChange}>
+          <Select value={theme} onValueChange={setTheme}>
             <SelectTrigger className="bg-black/20 border-gray-700 text-white">
               <SelectValue />
             </SelectTrigger>
@@ -105,7 +107,7 @@ export const PreferencesSection = () => {
             <Clock className="h-4 w-4" />
             <span>Data Refresh Interval</span>
           </Label>
-          <Select value={refreshInterval} onValueChange={handleRefreshIntervalChange}>
+          <Select value={refreshInterval} onValueChange={setRefreshInterval}>
             <SelectTrigger className="bg-black/20 border-gray-700 text-white">
               <SelectValue />
             </SelectTrigger>
