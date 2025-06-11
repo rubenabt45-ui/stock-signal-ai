@@ -91,7 +91,11 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
             .single();
 
           if (data && !error) {
-            setThemeState(data.theme || 'dark');
+            // Type guard to ensure the theme value is valid
+            const fetchedTheme = data.theme;
+            if (fetchedTheme === 'light' || fetchedTheme === 'dark' || fetchedTheme === 'system') {
+              setThemeState(fetchedTheme);
+            }
           }
         } catch (error) {
           console.error('Error fetching user theme:', error);
