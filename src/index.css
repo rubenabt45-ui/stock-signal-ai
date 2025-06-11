@@ -6,25 +6,25 @@
 @layer base {
   :root {
     --background: 210 20% 98%;
-    --foreground: 210 50% 7%;
+    --foreground: 222 84% 5%;
 
     --card: 210 20% 98%;
-    --card-foreground: 210 50% 7%;
+    --card-foreground: 222 84% 5%;
 
     --popover: 210 20% 98%;
-    --popover-foreground: 210 50% 7%;
+    --popover-foreground: 222 84% 5%;
 
     --primary: 213 93% 58%;
     --primary-foreground: 210 20% 98%;
 
     --secondary: 210 10% 92%;
-    --secondary-foreground: 210 50% 7%;
+    --secondary-foreground: 222 84% 5%;
 
     --muted: 210 10% 92%;
-    --muted-foreground: 215 16% 47%;
+    --muted-foreground: 215 25% 27%;
 
     --accent: 210 10% 92%;
-    --accent-foreground: 210 50% 7%;
+    --accent-foreground: 222 84% 5%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 20% 98%;
@@ -36,11 +36,11 @@
     --radius: 0.5rem;
 
     --sidebar-background: 210 20% 98%;
-    --sidebar-foreground: 210 50% 7%;
+    --sidebar-foreground: 222 84% 5%;
     --sidebar-primary: 213 93% 58%;
     --sidebar-primary-foreground: 210 20% 98%;
     --sidebar-accent: 210 10% 92%;
-    --sidebar-accent-foreground: 210 50% 7%;
+    --sidebar-accent-foreground: 222 84% 5%;
     --sidebar-border: 210 20% 89%;
     --sidebar-ring: 213 93% 58%;
 
@@ -51,7 +51,13 @@
     --tradeiq-success: 142 71% 45%;
     --tradeiq-danger: 0 84% 60%;
     --tradeiq-warning: 38 92% 50%;
-    --tradeiq-muted: 215 16% 47%;
+    --tradeiq-muted: 215 25% 27%;
+
+    /* Light Theme Typography Colors */
+    --text-primary: 222 84% 5%;
+    --text-secondary: 215 25% 27%;
+    --text-tertiary: 215 20% 65%;
+    --text-placeholder: 215 16% 47%;
   }
 
   .dark {
@@ -100,6 +106,12 @@
     --tradeiq-danger: 0 84% 60%;
     --tradeiq-warning: 38 92% 50%;
     --tradeiq-muted: 215 16% 47%;
+
+    /* Dark Theme Typography Colors */
+    --text-primary: 210 20% 98%;
+    --text-secondary: 215 16% 47%;
+    --text-tertiary: 215 16% 65%;
+    --text-placeholder: 215 16% 47%;
   }
 }
 
@@ -164,4 +176,70 @@
   background: hsl(var(--card) / 0.95);
   border: 1px solid hsl(var(--border));
   box-shadow: 0 2px 8px hsl(var(--foreground) / 0.08);
+}
+
+/* Typography utilities for semantic color usage */
+.text-primary {
+  color: hsl(var(--text-primary));
+}
+
+.text-secondary {
+  color: hsl(var(--text-secondary));
+}
+
+.text-tertiary {
+  color: hsl(var(--text-tertiary));
+}
+
+.text-placeholder {
+  color: hsl(var(--text-placeholder));
+}
+
+/* Light theme background override for main content areas */
+.light .bg-tradeiq-navy {
+  background: hsl(var(--background));
+}
+
+/* Enhanced light theme specific styles */
+.light {
+  /* Override card backgrounds for better contrast */
+  --card: 255 255 255;
+  --card-foreground: 222 84% 5%;
+  
+  /* Input styling for light theme */
+  --input: 255 255 255;
+  
+  /* Border colors for light theme */
+  --border: 220 13% 91%;
+}
+
+.light .tradeiq-card {
+  background: white;
+  border: 1px solid hsl(220 13% 91%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure proper text colors in light theme */
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+  color: hsl(var(--text-primary));
+}
+
+.light p, .light span {
+  color: hsl(var(--text-secondary));
+}
+
+.light .text-white {
+  color: hsl(var(--text-primary)) !important;
+}
+
+.light .text-gray-400 {
+  color: hsl(var(--text-tertiary)) !important;
+}
+
+.light .text-gray-500 {
+  color: hsl(var(--text-placeholder)) !important;
+}
+
+.light .text-gray-600 {
+  color: hsl(var(--text-secondary)) !important;
 }

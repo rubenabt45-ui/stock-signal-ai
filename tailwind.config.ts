@@ -72,6 +72,13 @@ export default {
 					'danger': 'hsl(var(--tradeiq-danger))',
 					'warning': 'hsl(var(--tradeiq-warning))',
 					'muted': 'hsl(var(--tradeiq-muted))'
+				},
+				// Semantic typography colors
+				text: {
+					'primary': 'hsl(var(--text-primary))',
+					'secondary': 'hsl(var(--text-secondary))',
+					'tertiary': 'hsl(var(--text-tertiary))',
+					'placeholder': 'hsl(var(--text-placeholder))'
 				}
 			},
 			borderRadius: {
