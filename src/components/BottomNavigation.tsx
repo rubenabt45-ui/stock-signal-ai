@@ -1,35 +1,37 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { ChartCandlestick, MessageSquare, Book, Settings, Newspaper } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 const BottomNavigation = () => {
   const location = useLocation();
+  const { t } = useTranslation();
 
   const navItems = [
     {
       path: "/",
       icon: ChartCandlestick,
-      label: "ChartIA",
+      label: t('navigation.chartIA'),
     },
     {
       path: "/trading-chat",
       icon: MessageSquare,
-      label: "TradingChat",
+      label: t('navigation.tradingChat'),
     },
     {
       path: "/learn",
       icon: Book,
-      label: "Learn",
+      label: t('navigation.learn'),
     },
     {
       path: "/news-ai",
       icon: Newspaper,
-      label: "NewsAI",
+      label: t('navigation.newsAI'),
     },
     {
       path: "/settings",
       icon: Settings,
-      label: "Settings",
+      label: t('navigation.settings'),
     },
   ];
 

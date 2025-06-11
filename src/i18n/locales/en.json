@@ -1,0 +1,165 @@
+
+{
+  "navigation": {
+    "chartIA": "ChartIA",
+    "tradingChat": "TradingChat",
+    "learn": "Learn",
+    "newsAI": "NewsAI",
+    "settings": "Settings"
+  },
+  "auth": {
+    "login": "Log In",
+    "signup": "Sign Up",
+    "logout": "Log Out",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "fullName": "Full Name",
+    "signInToAccount": "Sign in to your account",
+    "createAccount": "Create your account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "signingIn": "Signing in...",
+    "creatingAccount": "Creating account...",
+    "forgotPassword": "Forgot your password?"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences and account",
+    "profile": {
+      "title": "Profile",
+      "subtitle": "Manage your personal information",
+      "fullName": "Full Name",
+      "username": "Username",
+      "email": "Email Address",
+      "avatar": "Profile Picture",
+      "uploadAvatar": "Upload Avatar",
+      "changeAvatar": "Change Avatar",
+      "saving": "Saving...",
+      "saved": "Profile updated successfully",
+      "error": "Failed to update profile"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "theme": "Theme",
+      "refreshInterval": "Data Refresh Interval",
+      "language": "Language",
+      "themes": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "intervals": {
+        "30s": "30 seconds",
+        "1min": "1 minute",
+        "5min": "5 minutes"
+      },
+      "languages": {
+        "en": "English",
+        "es": "Español"
+      },
+      "notes": {
+        "theme": "Theme changes apply immediately",
+        "refresh": "Data refresh settings affect market data updates",
+        "language": "Language changes apply immediately"
+      }
+    },
+    "security": {
+      "title": "Security & Privacy",
+      "subtitle": "Protect your trading data",
+      "changePassword": "Change Password",
+      "twoFactor": "Two-Factor Authentication",
+      "sessions": "Active Sessions",
+      "privacy": "Privacy Settings"
+    },
+    "integrations": {
+      "title": "Integrations",
+      "subtitle": "Connect your trading platforms",
+      "brokers": "Trading Brokers",
+      "apis": "API Connections",
+      "webhooks": "Webhooks"
+    },
+    "support": {
+      "title": "Support & Help",
+      "subtitle": "Get assistance and resources",
+      "helpCenter": "Help Center",
+      "contactSupport": "Contact Support",
+      "documentation": "Documentation",
+      "community": "Community Forum"
+    },
+    "legal": {
+      "title": "Legal & Compliance",
+      "subtitle": "Terms, privacy, and legal information",
+      "terms": "Terms and Conditions",
+      "privacy": "Privacy Policy",
+      "license": "License Agreement"
+    },
+    "account": {
+      "title": "Account",
+      "subtitle": "Manage your TradeIQ account",
+      "signedInAs": "Signed in as",
+      "logOut": "Log Out"
+    },
+    "pro": {
+      "title": "Pro Subscription",
+      "currentPlan": "Current Plan",
+      "proPlan": "TradeIQ Pro - $9.99/month",
+      "benefits": "Benefits",
+      "benefitsList": [
+        "Unlimited ChartIA access",
+        "Advanced TradingChat with memory",
+        "Real-time NewsAI + favorites",
+        "Priority support access"
+      ],
+      "managedBy": "Subscription managed through Stripe. Contact support for assistance.",
+      "upgrade": "Upgrade to Pro",
+      "active": "Pro Plan Active"
+    }
+  },
+  "legal": {
+    "terms": {
+      "title": "Terms and Conditions",
+      "content": "Welcome to TradeIQ. By using our service, you agree to these terms and conditions. Please read them carefully before using our platform."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "content": "Your privacy is important to us. This policy explains how we collect, use, and protect your personal information when you use TradeIQ."
+    },
+    "license": {
+      "title": "License Agreement",
+      "content": "This license agreement governs your use of the TradeIQ software and services. Please review the terms carefully."
+    },
+    "lastUpdated": "Last updated"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "retry": "Retry",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "refresh": "Refresh"
+  },
+  "toasts": {
+    "profileUpdated": "Profile updated successfully",
+    "profileUpdateFailed": "Failed to update profile",
+    "themeUpdated": "Theme updated",
+    "themeUpdateFailed": "Failed to save theme",
+    "languageUpdated": "Language updated",
+    "languageUpdateFailed": "Failed to save language preference",
+    "refreshIntervalUpdated": "Refresh interval updated",
+    "refreshIntervalUpdateFailed": "Failed to save refresh interval",
+    "logoutSuccess": "Logged out successfully",
+    "logoutFailed": "Logout failed"
+  }
+}

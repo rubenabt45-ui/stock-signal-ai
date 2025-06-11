@@ -1,0 +1,165 @@
+
+{
+  "navigation": {
+    "chartIA": "ChartIA",
+    "tradingChat": "TradingChat",
+    "learn": "Aprender",
+    "newsAI": "NoticiasAI",
+    "settings": "Configuración"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "fullName": "Nombre Completo",
+    "signInToAccount": "Inicia sesión en tu cuenta",
+    "createAccount": "Crea tu cuenta",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "dontHaveAccount": "¿No tienes una cuenta?",
+    "signingIn": "Iniciando sesión...",
+    "creatingAccount": "Creando cuenta...",
+    "forgotPassword": "¿Olvidaste tu contraseña?"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Gestiona tus preferencias y cuenta",
+    "profile": {
+      "title": "Perfil",
+      "subtitle": "Gestiona tu información personal",
+      "fullName": "Nombre Completo",
+      "username": "Nombre de Usuario",
+      "email": "Dirección de Correo",
+      "avatar": "Foto de Perfil",
+      "uploadAvatar": "Subir Avatar",
+      "changeAvatar": "Cambiar Avatar",
+      "saving": "Guardando...",
+      "saved": "Perfil actualizado exitosamente",
+      "error": "Error al actualizar el perfil"
+    },
+    "preferences": {
+      "title": "Preferencias",
+      "theme": "Tema",
+      "refreshInterval": "Intervalo de Actualización",
+      "language": "Idioma",
+      "themes": {
+        "light": "Claro",
+        "dark": "Oscuro",
+        "system": "Sistema"
+      },
+      "intervals": {
+        "30s": "30 segundos",
+        "1min": "1 minuto",
+        "5min": "5 minutos"
+      },
+      "languages": {
+        "en": "English",
+        "es": "Español"
+      },
+      "notes": {
+        "theme": "Los cambios de tema se aplican inmediatamente",
+        "refresh": "La configuración de actualización afecta las actualizaciones de datos del mercado",
+        "language": "Los cambios de idioma se aplican inmediatamente"
+      }
+    },
+    "security": {
+      "title": "Seguridad y Privacidad",
+      "subtitle": "Protege tus datos de trading",
+      "changePassword": "Cambiar Contraseña",
+      "twoFactor": "Autenticación de Dos Factores",
+      "sessions": "Sesiones Activas",
+      "privacy": "Configuración de Privacidad"
+    },
+    "integrations": {
+      "title": "Integraciones",
+      "subtitle": "Conecta tus plataformas de trading",
+      "brokers": "Brokers de Trading",
+      "apis": "Conexiones API",
+      "webhooks": "Webhooks"
+    },
+    "support": {
+      "title": "Soporte y Ayuda",
+      "subtitle": "Obtén asistencia y recursos",
+      "helpCenter": "Centro de Ayuda",
+      "contactSupport": "Contactar Soporte",
+      "documentation": "Documentación",
+      "community": "Foro de la Comunidad"
+    },
+    "legal": {
+      "title": "Legal y Cumplimiento",
+      "subtitle": "Términos, privacidad e información legal",
+      "terms": "Términos y Condiciones",
+      "privacy": "Política de Privacidad",
+      "license": "Acuerdo de Licencia"
+    },
+    "account": {
+      "title": "Cuenta",
+      "subtitle": "Gestiona tu cuenta de TradeIQ",
+      "signedInAs": "Conectado como",
+      "logOut": "Cerrar Sesión"
+    },
+    "pro": {
+      "title": "Suscripción Pro",
+      "currentPlan": "Plan Actual",
+      "proPlan": "TradeIQ Pro - $9.99/mes",
+      "benefits": "Beneficios",
+      "benefitsList": [
+        "Acceso ilimitado a ChartIA",
+        "TradingChat avanzado con memoria",
+        "NoticiasAI en tiempo real + favoritos",
+        "Acceso prioritario al soporte"
+      ],
+      "managedBy": "Suscripción gestionada a través de Stripe. Contacta al soporte para asistencia.",
+      "upgrade": "Actualizar a Pro",
+      "active": "Plan Pro Activo"
+    }
+  },
+  "legal": {
+    "terms": {
+      "title": "Términos y Condiciones",
+      "content": "Bienvenido a TradeIQ. Al usar nuestro servicio, aceptas estos términos y condiciones. Por favor, léelos cuidadosamente antes de usar nuestra plataforma."
+    },
+    "privacy": {
+      "title": "Política de Privacidad",
+      "content": "Tu privacidad es importante para nosotros. Esta política explica cómo recopilamos, usamos y protegemos tu información personal cuando usas TradeIQ."
+    },
+    "license": {
+      "title": "Acuerdo de Licencia",
+      "content": "Este acuerdo de licencia rige tu uso del software y servicios de TradeIQ. Por favor, revisa los términos cuidadosamente."
+    },
+    "lastUpdated": "Última actualización"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "retry": "Reintentar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "refresh": "Actualizar"
+  },
+  "toasts": {
+    "profileUpdated": "Perfil actualizado exitosamente",
+    "profileUpdateFailed": "Error al actualizar el perfil",
+    "themeUpdated": "Tema actualizado",
+    "themeUpdateFailed": "Error al guardar el tema",
+    "languageUpdated": "Idioma actualizado",
+    "languageUpdateFailed": "Error al guardar la preferencia de idioma",
+    "refreshIntervalUpdated": "Intervalo de actualización actualizado",
+    "refreshIntervalUpdateFailed": "Error al guardar el intervalo de actualización",
+    "logoutSuccess": "Sesión cerrada exitosamente",
+    "logoutFailed": "Error al cerrar sesión"
+  }
+}

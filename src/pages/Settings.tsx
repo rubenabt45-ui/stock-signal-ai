@@ -2,6 +2,7 @@
 import { Settings as SettingsIcon, Crown, CheckCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import PlanModal from "@/components/PlanModal";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileSection } from "@/components/ProfileSection";
@@ -14,6 +15,7 @@ import { LogoutSection } from "@/components/LogoutSection";
 
 const Settings = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -57,7 +59,7 @@ const Settings = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+        <div className="text-white">{t('common.loading')}</div>
       </div>
     );
   }
@@ -71,8 +73,8 @@ const Settings = () => {
             <div className="flex items-center space-x-3">
               <SettingsIcon className="h-8 w-8 text-tradeiq-blue" />
               <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">Settings</h1>
-                <p className="text-sm text-gray-400 font-medium">Manage your preferences and account</p>
+                <h1 className="text-2xl font-bold text-white tracking-tight">{t('settings.title')}</h1>
+                <p className="text-sm text-gray-400 font-medium">{t('settings.subtitle')}</p>
               </div>
             </div>
             {!isPro && (
@@ -80,7 +82,7 @@ const Settings = () => {
                 {isPro && (
                   <div className="flex items-center space-x-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-green-400 text-sm font-medium">Pro Plan Active</span>
+                    <span className="text-green-400 text-sm font-medium">{t('settings.pro.active')}</span>
                   </div>
                 )}
                 <button
@@ -89,7 +91,7 @@ const Settings = () => {
                   disabled={loading}
                 >
                   <Crown className="h-4 w-4" />
-                  <span>Upgrade to Pro</span>
+                  <span>{t('settings.pro.upgrade')}</span>
                 </button>
               </div>
             )}
@@ -117,24 +119,23 @@ const Settings = () => {
           <div className="tradeiq-card border-green-500/20 bg-black/20 rounded-xl p-6">
             <div className="flex items-center space-x-3 mb-4">
               <Crown className="h-5 w-5 text-green-500" />
-              <h3 className="text-white text-lg font-semibold">Pro Subscription</h3>
+              <h3 className="text-white text-lg font-semibold">{t('settings.pro.title')}</h3>
             </div>
             <div className="space-y-3">
               <div>
-                <p className="text-white font-medium">Current Plan</p>
-                <p className="text-green-400 text-sm">TradeIQ Pro - $9.99/month</p>
+                <p className="text-white font-medium">{t('settings.pro.currentPlan')}</p>
+                <p className="text-green-400 text-sm">{t('settings.pro.proPlan')}</p>
               </div>
               <div>
-                <p className="text-white font-medium">Benefits</p>
+                <p className="text-white font-medium">{t('settings.pro.benefits')}</p>
                 <ul className="text-gray-400 text-sm space-y-1">
-                  <li>• Unlimited ChartIA access</li>
-                  <li>• Advanced TradingChat with memory</li>
-                  <li>• Real-time NewsAI + favorites</li>
-                  <li>• Priority support access</li>
+                  {t('settings.pro.benefitsList', { returnObjects: true }).map((benefit: string, index: number) => (
+                    <li key={index}>• {benefit}</li>
+                  ))}
                 </ul>
               </div>
               <div className="text-gray-500 text-xs">
-                <p>Subscription managed through Stripe. Contact support for assistance.</p>
+                <p>{t('settings.pro.managedBy')}</p>
               </div>
             </div>
           </div>
