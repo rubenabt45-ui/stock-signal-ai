@@ -78,6 +78,12 @@ export const AddSymbolModal = ({
   const handleAddSymbol = (asset: typeof allAssets[0]) => {
     onAddSymbol(asset.symbol, asset.name, asset.category);
     setSearchTerm("");
+    // Don't close modal immediately - let user add multiple symbols
+  };
+
+  const handleClose = () => {
+    setSearchTerm("");
+    onClose();
   };
 
   const categoryColors = {
@@ -90,8 +96,8 @@ export const AddSymbolModal = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="tradeiq-card max-w-2xl max-h-[80vh] flex flex-col">
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="tradeiq-card max-w-2xl max-h-[80vh] flex flex-col bg-tradeiq-navy border-gray-700">
         <DialogHeader>
           <DialogTitle className="text-white text-xl flex items-center">
             <Plus className="h-5 w-5 mr-2 text-tradeiq-blue" />
@@ -159,6 +165,17 @@ export const AddSymbolModal = ({
                 </div>
               ))
             )}
+          </div>
+
+          {/* Close Button */}
+          <div className="flex justify-end pt-4 border-t border-gray-800">
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              className="text-gray-400 border-gray-700 hover:bg-gray-800"
+            >
+              Done
+            </Button>
           </div>
         </div>
       </DialogContent>

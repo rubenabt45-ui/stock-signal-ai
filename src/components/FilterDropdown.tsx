@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { CategoryFilter } from "@/pages/Favorites";
+import { useState } from "react";
 
 interface FilterDropdownProps {
   selectedCategory: CategoryFilter;
@@ -25,10 +26,16 @@ const categories = [
 ];
 
 export const FilterDropdown = ({ selectedCategory, onCategoryChange }: FilterDropdownProps) => {
+  const [isOpen, setIsOpen] = useState(false);
   const selectedCategoryData = categories.find(cat => cat.key === selectedCategory);
 
+  const handleCategorySelect = (category: CategoryFilter) => {
+    onCategoryChange(category);
+    // Don't close the dropdown immediately - let user continue selecting
+  };
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
@@ -40,13 +47,17 @@ export const FilterDropdown = ({ selectedCategory, onCategoryChange }: FilterDro
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
-        className="tradeiq-card border-gray-700"
+        className="tradeiq-card border-gray-700 bg-tradeiq-navy z-50"
         align="end"
+        onCloseAutoFocus={(e) => e.preventDefault()}
       >
         {categories.map((category) => (
           <DropdownMenuItem
             key={category.key}
-            onClick={() => onCategoryChange(category.key)}
+            onClick={(e) => {
+              e.preventDefault();
+              handleCategorySelect(category.key);
+            }}
             className={`cursor-pointer hover:bg-gray-800 text-gray-300 ${
               selectedCategory === category.key ? 'bg-tradeiq-blue/20 text-tradeiq-blue' : ''
             }`}
