@@ -1,13 +1,16 @@
 
 import { useState, useEffect } from "react";
-import { Newspaper, TrendingUp, ExternalLink, Clock, ChevronRight, X, AlertCircle, Loader2 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Newspaper, TrendingUp, X, AlertCircle } from "lucide-react";
+import { Card, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AssetSelection } from "@/components/AssetSelection";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNewsForAsset, NewsArticle } from "@/services/newsService";
 import { analyzeNewsArticle, AIAnalysis } from "@/services/aiAnalysisService";
+import { NewsCard } from "@/components/NewsAI/NewsCard";
+import { AIInsights } from "@/components/NewsAI/AIInsights";
+import { SourceButton } from "@/components/NewsAI/SourceButton";
 
 const NewsAI = () => {
   const [selectedAsset, setSelectedAsset] = useState("AAPL");
@@ -43,37 +46,8 @@ const NewsAI = () => {
     setAiAnalysis(null);
   };
 
-  const formatTimeAgo = (timestamp: number) => {
-    const now = Date.now();
-    const diff = now - timestamp;
-    const minutes = Math.floor(diff / (1000 * 60));
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    
-    if (days > 0) return `${days}d ago`;
-    if (hours > 0) return `${hours}h ago`;
-    if (minutes > 0) return `${minutes}m ago`;
-    return "Just now";
-  };
-
   const formatAbsoluteTime = (timestamp: number) => {
     return new Date(timestamp).toLocaleString();
-  };
-
-  const getSentimentColor = (sentiment: string) => {
-    switch (sentiment) {
-      case "Bullish": return "text-green-400 bg-green-500/20 border-green-500/30";
-      case "Bearish": return "text-red-400 bg-red-500/20 border-red-500/30";
-      default: return "text-gray-400 bg-gray-500/20 border-gray-500/30";
-    }
-  };
-
-  const handleViewSource = (url: string) => {
-    if (url && url.startsWith('http')) {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    } else {
-      alert('Original article not available.');
-    }
   };
 
   return (
@@ -154,41 +128,11 @@ const NewsAI = () => {
             ) : newsArticles && newsArticles.length > 0 ? (
               <div className="space-y-4">
                 {newsArticles.map((article) => (
-                  <Card 
+                  <NewsCard
                     key={article.id}
-                    className="tradeiq-card hover:border-tradeiq-blue/50 transition-all duration-200 cursor-pointer hover-scale"
-                    onClick={() => handleArticleClick(article)}
-                  >
-                    <CardHeader className="pb-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <CardTitle className="text-white text-lg leading-tight mb-3 pr-4">
-                            {article.headline}
-                          </CardTitle>
-                          <div className="flex items-center space-x-4 text-sm text-gray-400 mb-2">
-                            <span className="font-medium">{article.source}</span>
-                            <div className="flex items-center space-x-1">
-                              <Clock className="h-3 w-3" />
-                              <span>{formatTimeAgo(article.datetime)}</span>
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {article.relatedSymbols?.map(symbol => (
-                              <Badge key={symbol} variant="outline" className="text-xs text-tradeiq-blue border-tradeiq-blue/30">
-                                {symbol}
-                              </Badge>
-                            ))}
-                            {article.category && (
-                              <Badge variant="outline" className="text-xs text-gray-400 border-gray-600/50">
-                                {article.category}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                        <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
-                      </div>
-                    </CardHeader>
-                  </Card>
+                    article={article}
+                    onClick={handleArticleClick}
+                  />
                 ))}
               </div>
             ) : (
@@ -236,8 +180,7 @@ const NewsAI = () => {
                   </h4>
                   <div className="flex items-center space-x-4 text-sm text-gray-400 mb-2">
                     <span className="font-medium">{selectedArticle.source}</span>
-                    <span>{formatTimeAgo(selectedArticle.datetime)}</span>
-                    <span className="text-xs">({formatAbsoluteTime(selectedArticle.datetime)})</span>
+                    <span>{formatAbsoluteTime(selectedArticle.datetime)}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     {selectedArticle.relatedSymbols?.map(symbol => (
@@ -249,104 +192,17 @@ const NewsAI = () => {
                 </div>
 
                 {/* AI Analysis Content */}
-                {loadingAnalysis ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="flex items-center space-x-3 text-tradeiq-blue">
-                      <Loader2 className="h-6 w-6 animate-spin" />
-                      <span className="text-sm font-medium">Analyzing article with AI...</span>
-                    </div>
-                  </div>
-                ) : aiAnalysis ? (
-                  <div className="space-y-6">
-                    {/* Sentiment */}
-                    <div>
-                      <h5 className="text-white font-medium mb-3">Market Sentiment</h5>
-                      <Badge className={`${getSentimentColor(aiAnalysis.sentiment)} font-medium px-3 py-1`}>
-                        {aiAnalysis.sentiment}
-                      </Badge>
-                    </div>
-
-                    {/* Key Metrics */}
-                    {aiAnalysis.keyMetrics && (
-                      <div>
-                        <h5 className="text-white font-medium mb-3">Key Metrics</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {aiAnalysis.keyMetrics.eps && (
-                            <div className="bg-black/20 p-3 rounded-xl">
-                              <div className="text-xs text-gray-400 mb-1">EPS</div>
-                              <div className="text-sm font-medium text-white">{aiAnalysis.keyMetrics.eps}</div>
-                            </div>
-                          )}
-                          {aiAnalysis.keyMetrics.growth && (
-                            <div className="bg-black/20 p-3 rounded-xl">
-                              <div className="text-xs text-gray-400 mb-1">Growth</div>
-                              <div className="text-sm font-medium text-white">{aiAnalysis.keyMetrics.growth}</div>
-                            </div>
-                          )}
-                          {aiAnalysis.keyMetrics.forecast && (
-                            <div className="bg-black/20 p-3 rounded-xl">
-                              <div className="text-xs text-gray-400 mb-1">Forecast</div>
-                              <div className="text-sm font-medium text-white">{aiAnalysis.keyMetrics.forecast}</div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Summary */}
-                    <div>
-                      <h5 className="text-white font-medium mb-3">Key Points</h5>
-                      <ul className="space-y-2">
-                        {aiAnalysis.summary.map((point, index) => (
-                          <li key={index} className="flex items-start space-x-2 text-gray-300">
-                            <div className="w-1.5 h-1.5 bg-tradeiq-blue rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-sm leading-relaxed">{point}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Trading Insights */}
-                    <div>
-                      <h5 className="text-white font-medium mb-3">Trading Implications</h5>
-                      <div className="bg-black/20 p-4 rounded-xl space-y-3">
-                        <p className="text-gray-300 text-sm leading-relaxed mb-3">
-                          {aiAnalysis.insights}
-                        </p>
-                        <div className="grid grid-cols-1 gap-3">
-                          {aiAnalysis.tradingImplications.volatilityTrigger && (
-                            <div className="flex items-start space-x-2">
-                              <span className="text-xs text-gray-500 min-w-[80px]">Trigger:</span>
-                              <span className="text-sm text-gray-300">{aiAnalysis.tradingImplications.volatilityTrigger}</span>
-                            </div>
-                          )}
-                          {aiAnalysis.tradingImplications.supportResistance && (
-                            <div className="flex items-start space-x-2">
-                              <span className="text-xs text-gray-500 min-w-[80px]">Levels:</span>
-                              <span className="text-sm text-gray-300">{aiAnalysis.tradingImplications.supportResistance}</span>
-                            </div>
-                          )}
-                          {aiAnalysis.tradingImplications.sectorImpact && (
-                            <div className="flex items-start space-x-2">
-                              <span className="text-xs text-gray-500 min-w-[80px]">Impact:</span>
-                              <span className="text-sm text-gray-300">{aiAnalysis.tradingImplications.sectorImpact}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
+                <AIInsights 
+                  analysis={aiAnalysis}
+                  loading={loadingAnalysis}
+                />
 
                 {/* Actions */}
                 <div className="flex space-x-3 pt-4 border-t border-gray-800">
-                  <Button
-                    onClick={() => handleViewSource(selectedArticle.url)}
-                    className="tradeiq-button-primary flex-1"
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    View Source
-                  </Button>
+                  <SourceButton 
+                    url={selectedArticle.url}
+                    className="flex-1"
+                  />
                 </div>
               </div>
             </div>
