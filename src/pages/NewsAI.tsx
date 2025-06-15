@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Newspaper, TrendingUp, X, AlertCircle } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,12 +11,18 @@ import { analyzeNewsArticle, AIAnalysis } from "@/services/aiAnalysisService";
 import { NewsCard } from "@/components/NewsAI/NewsCard";
 import { AIInsights } from "@/components/NewsAI/AIInsights";
 import { SourceButton } from "@/components/NewsAI/SourceButton";
+import { NewsFilters, FilterState } from "@/components/NewsAI/NewsFilters";
 
 const NewsAI = () => {
   const [selectedAsset, setSelectedAsset] = useState("AAPL");
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({
+    categories: [],
+    sentiments: [],
+    newsTypes: []
+  });
 
   // Fetch news for selected asset
   const { data: newsArticles, isLoading, error, refetch } = useQuery({
@@ -25,6 +31,36 @@ const NewsAI = () => {
     enabled: !!selectedAsset,
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes for real-time updates
   });
+
+  // Filter news articles based on selected filters
+  const filteredNewsArticles = useMemo(() => {
+    if (!newsArticles) return [];
+
+    return newsArticles.filter(article => {
+      // Category filter
+      if (filters.categories.length > 0) {
+        const articleCategory = getArticleCategory(article.relatedSymbols?.[0] || selectedAsset);
+        if (!filters.categories.includes(articleCategory)) return false;
+      }
+
+      // News type filter
+      if (filters.newsTypes.length > 0) {
+        const articleType = article.category || 'market';
+        if (!filters.newsTypes.includes(articleType)) return false;
+      }
+
+      // Note: Sentiment filtering would require AI analysis for each article
+      // For now, we'll skip sentiment filtering during list view to avoid performance issues
+      
+      return true;
+    });
+  }, [newsArticles, filters, selectedAsset]);
+
+  const getArticleCategory = (symbol: string): string => {
+    if (symbol.includes('USD') || symbol.includes('BTC') || symbol.includes('ETH')) return 'crypto';
+    if (symbol.includes('EUR') || symbol.includes('JPY') || symbol.includes('GBP')) return 'forex';
+    return 'stocks'; // Default to stocks for most symbols
+  };
 
   const handleArticleClick = async (article: NewsArticle) => {
     setSelectedArticle(article);
@@ -89,6 +125,13 @@ const NewsAI = () => {
             onAssetSelect={setSelectedAsset}
           />
 
+          {/* News Filters */}
+          <NewsFilters
+            filters={filters}
+            onFilterChange={setFilters}
+            newsCount={filteredNewsArticles.length}
+          />
+
           {/* News Feed */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -125,9 +168,9 @@ const NewsAI = () => {
                   </Card>
                 ))}
               </div>
-            ) : newsArticles && newsArticles.length > 0 ? (
+            ) : filteredNewsArticles && filteredNewsArticles.length > 0 ? (
               <div className="space-y-4">
-                {newsArticles.map((article) => (
+                {filteredNewsArticles.map((article) => (
                   <NewsCard
                     key={article.id}
                     article={article}
@@ -139,9 +182,14 @@ const NewsAI = () => {
               <Card className="tradeiq-card">
                 <CardHeader className="text-center py-8">
                   <Newspaper className="h-12 w-12 mx-auto mb-4 text-gray-500" />
-                  <h3 className="text-lg font-semibold text-white mb-2">No News Found</h3>
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    {newsArticles && newsArticles.length > 0 ? "No Articles Match Filters" : "No News Found"}
+                  </h3>
                   <p className="text-gray-400">
-                    No recent news articles found for {selectedAsset}. Try selecting a different asset or check back later.
+                    {newsArticles && newsArticles.length > 0 
+                      ? "Try adjusting your filters to see more articles."
+                      : `No recent news articles found for ${selectedAsset}. Try selecting a different asset or check back later.`
+                    }
                   </p>
                 </CardHeader>
               </Card>
