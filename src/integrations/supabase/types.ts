@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      news_alert_settings: {
+        Row: {
+          alert_types: string[] | null
+          created_at: string
+          enabled: boolean | null
+          frequency: string | null
+          id: string
+          symbol: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_types?: string[] | null
+          created_at?: string
+          enabled?: boolean | null
+          frequency?: string | null
+          id?: string
+          symbol: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_types?: string[] | null
+          created_at?: string
+          enabled?: boolean | null
+          frequency?: string | null
+          id?: string
+          symbol?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_alerts: {
         Row: {
           alert_type: string

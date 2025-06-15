@@ -1,9 +1,11 @@
+
 import { useState, useEffect, useMemo } from "react";
 import { Newspaper, TrendingUp, X, AlertCircle } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AssetSelection } from "@/components/AssetSelection";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNewsForAsset, NewsArticle } from "@/services/newsService";
@@ -12,6 +14,8 @@ import { NewsCard } from "@/components/NewsAI/NewsCard";
 import { AIInsights } from "@/components/NewsAI/AIInsights";
 import { SourceButton } from "@/components/NewsAI/SourceButton";
 import { NewsFilters, FilterState } from "@/components/NewsAI/NewsFilters";
+import { NewsDigest } from "@/components/NewsAI/NewsDigest";
+import { DigestArticle } from "@/hooks/useNewsDigest";
 import { useFavorites } from "@/hooks/useFavorites";
 
 const NewsAI = () => {
@@ -20,6 +24,7 @@ const NewsAI = () => {
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+  const [activeTab, setActiveTab] = useState("live");
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
     sentiments: [],
@@ -33,7 +38,7 @@ const NewsAI = () => {
   const { data: newsArticles, isLoading, error, refetch } = useQuery({
     queryKey: ['news', selectedAsset],
     queryFn: () => fetchNewsForAsset(selectedAsset),
-    enabled: !!selectedAsset,
+    enabled: !!selectedAsset && activeTab === "live",
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes for real-time updates
   });
 
@@ -124,8 +129,20 @@ const NewsAI = () => {
 
   console.log('Filtered articles count:', filteredNewsArticles.length);
 
-  const handleArticleClick = async (article: NewsArticle) => {
-    setSelectedArticle(article);
+  const handleArticleClick = async (article: NewsArticle | DigestArticle) => {
+    // Convert DigestArticle to NewsArticle for compatibility
+    const newsArticle: NewsArticle = {
+      id: article.id,
+      headline: article.headline,
+      source: article.source,
+      datetime: article.datetime,
+      url: article.url,
+      summary: article.summary,
+      category: article.category,
+      relatedSymbols: article.relatedSymbols
+    };
+
+    setSelectedArticle(newsArticle);
     setLoadingAnalysis(true);
     setAiAnalysis(null);
     
@@ -158,22 +175,27 @@ const NewsAI = () => {
               <Newspaper className="h-8 w-8 text-tradeiq-blue" />
               <div>
                 <h1 className="text-2xl font-bold text-white tracking-tight">
-                  AI Market News for {selectedAsset}
+                  AI Market News{activeTab === "live" ? ` for ${selectedAsset}` : ""}
                 </h1>
                 <p className="text-sm text-gray-400 font-medium">
-                  Real-time news insights and sentiment powered by AI
+                  {activeTab === "live" 
+                    ? "Real-time news insights and sentiment powered by AI"
+                    : "Personalized news digest based on your alert preferences"
+                  }
                 </p>
               </div>
             </div>
-            <Button
-              onClick={() => refetch()}
-              variant="outline"
-              size="sm"
-              className="border-gray-700 hover:bg-gray-800 text-gray-300"
-            >
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
+            {activeTab === "live" && (
+              <Button
+                onClick={() => refetch()}
+                variant="outline"
+                size="sm"
+                className="border-gray-700 hover:bg-gray-800 text-gray-300"
+              >
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -181,116 +203,140 @@ const NewsAI = () => {
       {/* Content */}
       <main className="container mx-auto px-4 py-6 pb-24">
         <div className="space-y-6">
-          {/* Asset Selection */}
-          <AssetSelection 
-            selectedAsset={selectedAsset}
-            onAssetSelect={setSelectedAsset}
-          />
+          {/* Tab Navigation */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-black/20 border border-gray-800/50">
+              <TabsTrigger 
+                value="live" 
+                className="data-[state=active]:bg-tradeiq-blue data-[state=active]:text-white text-gray-400"
+              >
+                Live Feed
+              </TabsTrigger>
+              <TabsTrigger 
+                value="digest" 
+                className="data-[state=active]:bg-tradeiq-blue data-[state=active]:text-white text-gray-400"
+              >
+                Digest
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Favorites Toggle */}
-          <div className="bg-black/20 p-4 rounded-xl border border-gray-800/50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Switch
-                  id="favorites-toggle"
-                  checked={showOnlyFavorites}
-                  onCheckedChange={setShowOnlyFavorites}
-                  disabled={favoritesLoading}
-                />
-                <label htmlFor="favorites-toggle" className="text-white font-medium cursor-pointer">
-                  Show Only My Favorites
-                </label>
-                {showOnlyFavorites && (
-                  <Badge variant="outline" className="text-xs text-tradeiq-blue border-tradeiq-blue/30">
-                    {favorites?.length || 0} favorites
-                  </Badge>
-                )}
-              </div>
-              {showOnlyFavorites && (!favorites || favorites.length === 0) && (
-                <p className="text-sm text-gray-400">
-                  You haven't added any favorite assets yet. Add favorites to filter news more effectively.
-                </p>
-              )}
-            </div>
-          </div>
+            <TabsContent value="live" className="space-y-6">
+              {/* Asset Selection */}
+              <AssetSelection 
+                selectedAsset={selectedAsset}
+                onAssetSelect={setSelectedAsset}
+              />
 
-          {/* News Filters */}
-          <NewsFilters
-            filters={filters}
-            onFilterChange={setFilters}
-            newsCount={filteredNewsArticles.length}
-          />
-
-          {/* News Feed */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-white">Latest News</h2>
-              <div className="flex items-center space-x-2 text-sm text-gray-400">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span>Live Updates</span>
-              </div>
-            </div>
-
-            {error && (
-              <Card className="tradeiq-card border-red-500/50">
-                <CardHeader className="pb-4">
-                  <div className="flex items-center space-x-2 text-red-400">
-                    <AlertCircle className="h-5 w-5" />
-                    <span className="font-medium">Failed to load news</span>
+              {/* Favorites Toggle */}
+              <div className="bg-black/20 p-4 rounded-xl border border-gray-800/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Switch
+                      id="favorites-toggle"
+                      checked={showOnlyFavorites}
+                      onCheckedChange={setShowOnlyFavorites}
+                      disabled={favoritesLoading}
+                    />
+                    <label htmlFor="favorites-toggle" className="text-white font-medium cursor-pointer">
+                      Show Only My Favorites
+                    </label>
+                    {showOnlyFavorites && (
+                      <Badge variant="outline" className="text-xs text-tradeiq-blue border-tradeiq-blue/30">
+                        {favorites?.length || 0} favorites
+                      </Badge>
+                    )}
                   </div>
-                  <p className="text-sm text-gray-400">
-                    Unable to fetch latest news. Please check your connection and try again.
-                  </p>
-                </CardHeader>
-              </Card>
-            )}
+                  {showOnlyFavorites && (!favorites || favorites.length === 0) && (
+                    <p className="text-sm text-gray-400">
+                      You haven't added any favorite assets yet. Add favorites to filter news more effectively.
+                    </p>
+                  )}
+                </div>
+              </div>
 
-            {isLoading ? (
+              {/* News Filters */}
+              <NewsFilters
+                filters={filters}
+                onFilterChange={setFilters}
+                newsCount={filteredNewsArticles.length}
+              />
+
+              {/* News Feed */}
               <div className="space-y-4">
-                {[...Array(5)].map((_, i) => (
-                  <Card key={i} className="tradeiq-card animate-pulse">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-white">Latest News</h2>
+                  <div className="flex items-center space-x-2 text-sm text-gray-400">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span>Live Updates</span>
+                  </div>
+                </div>
+
+                {error && (
+                  <Card className="tradeiq-card border-red-500/50">
                     <CardHeader className="pb-4">
-                      <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
-                      <div className="h-3 bg-gray-800 rounded w-1/2 mb-2"></div>
-                      <div className="h-3 bg-gray-800 rounded w-1/3"></div>
+                      <div className="flex items-center space-x-2 text-red-400">
+                        <AlertCircle className="h-5 w-5" />
+                        <span className="font-medium">Failed to load news</span>
+                      </div>
+                      <p className="text-sm text-gray-400">
+                        Unable to fetch latest news. Please check your connection and try again.
+                      </p>
                     </CardHeader>
                   </Card>
-                ))}
+                )}
+
+                {isLoading ? (
+                  <div className="space-y-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Card key={i} className="tradeiq-card animate-pulse">
+                        <CardHeader className="pb-4">
+                          <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                          <div className="h-3 bg-gray-800 rounded w-1/2 mb-2"></div>
+                          <div className="h-3 bg-gray-800 rounded w-1/3"></div>
+                        </CardHeader>
+                      </Card>
+                    ))}
+                  </div>
+                ) : filteredNewsArticles && filteredNewsArticles.length > 0 ? (
+                  <div className="space-y-4">
+                    {filteredNewsArticles.map((article) => (
+                      <NewsCard
+                        key={article.id}
+                        article={article}
+                        onClick={handleArticleClick}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="tradeiq-card">
+                    <CardHeader className="text-center py-8">
+                      <Newspaper className="h-12 w-12 mx-auto mb-4 text-gray-500" />
+                      <h3 className="text-lg font-semibold text-white mb-2">
+                        {showOnlyFavorites && (!favorites || favorites.length === 0)
+                          ? "No Favorite Assets"
+                          : newsArticles && newsArticles.length > 0 
+                            ? "No Articles Match Filters" 
+                            : "No News Found"
+                        }
+                      </h3>
+                      <p className="text-gray-400">
+                        {showOnlyFavorites && (!favorites || favorites.length === 0)
+                          ? "Add some favorite assets to see personalized news updates."
+                          : newsArticles && newsArticles.length > 0 
+                            ? "Try adjusting your filters to see more articles."
+                            : `No recent news articles found for ${selectedAsset}. Try selecting a different asset or check back later.`
+                        }
+                      </p>
+                    </CardHeader>
+                  </Card>
+                )}
               </div>
-            ) : filteredNewsArticles && filteredNewsArticles.length > 0 ? (
-              <div className="space-y-4">
-                {filteredNewsArticles.map((article) => (
-                  <NewsCard
-                    key={article.id}
-                    article={article}
-                    onClick={handleArticleClick}
-                  />
-                ))}
-              </div>
-            ) : (
-              <Card className="tradeiq-card">
-                <CardHeader className="text-center py-8">
-                  <Newspaper className="h-12 w-12 mx-auto mb-4 text-gray-500" />
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    {showOnlyFavorites && (!favorites || favorites.length === 0)
-                      ? "No Favorite Assets"
-                      : newsArticles && newsArticles.length > 0 
-                        ? "No Articles Match Filters" 
-                        : "No News Found"
-                    }
-                  </h3>
-                  <p className="text-gray-400">
-                    {showOnlyFavorites && (!favorites || favorites.length === 0)
-                      ? "Add some favorite assets to see personalized news updates."
-                      : newsArticles && newsArticles.length > 0 
-                        ? "Try adjusting your filters to see more articles."
-                        : `No recent news articles found for ${selectedAsset}. Try selecting a different asset or check back later.`
-                    }
-                  </p>
-                </CardHeader>
-              </Card>
-            )}
-          </div>
+            </TabsContent>
+
+            <TabsContent value="digest">
+              <NewsDigest onArticleSelect={handleArticleClick} />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
 
