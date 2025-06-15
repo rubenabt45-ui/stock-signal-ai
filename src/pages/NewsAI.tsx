@@ -32,21 +32,34 @@ const NewsAI = () => {
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes for real-time updates
   });
 
+  // Helper function to determine article category
+  const getArticleCategory = (symbol: string): string => {
+    if (symbol.includes('USD') || symbol.includes('BTC') || symbol.includes('ETH')) return 'crypto';
+    if (symbol.includes('EUR') || symbol.includes('JPY') || symbol.includes('GBP')) return 'forex';
+    return 'stocks'; // Default to stocks for most symbols
+  };
+
   // Filter news articles based on selected filters
   const filteredNewsArticles = useMemo(() => {
-    if (!newsArticles) return [];
+    if (!newsArticles || newsArticles.length === 0) {
+      return [];
+    }
 
     return newsArticles.filter(article => {
       // Category filter
       if (filters.categories.length > 0) {
         const articleCategory = getArticleCategory(article.relatedSymbols?.[0] || selectedAsset);
-        if (!filters.categories.includes(articleCategory)) return false;
+        if (!filters.categories.includes(articleCategory)) {
+          return false;
+        }
       }
 
       // News type filter
       if (filters.newsTypes.length > 0) {
         const articleType = article.category || 'market';
-        if (!filters.newsTypes.includes(articleType)) return false;
+        if (!filters.newsTypes.includes(articleType)) {
+          return false;
+        }
       }
 
       // Note: Sentiment filtering would require AI analysis for each article
@@ -54,13 +67,7 @@ const NewsAI = () => {
       
       return true;
     });
-  }, [newsArticles, filters, selectedAsset]);
-
-  const getArticleCategory = (symbol: string): string => {
-    if (symbol.includes('USD') || symbol.includes('BTC') || symbol.includes('ETH')) return 'crypto';
-    if (symbol.includes('EUR') || symbol.includes('JPY') || symbol.includes('GBP')) return 'forex';
-    return 'stocks'; // Default to stocks for most symbols
-  };
+  }, [newsArticles, filters.categories, filters.newsTypes, selectedAsset]);
 
   const handleArticleClick = async (article: NewsArticle) => {
     setSelectedArticle(article);
