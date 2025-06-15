@@ -39,8 +39,27 @@ const NewsAI = () => {
     return 'stocks'; // Default to stocks for most symbols
   };
 
+  // Helper function to get sentiment from AI analysis (mock for now)
+  const getArticleSentiment = (article: NewsArticle): string => {
+    const text = `${article.headline} ${article.summary || ''}`.toLowerCase();
+    
+    // Simple keyword-based sentiment analysis
+    const bullishKeywords = ['beats', 'exceeds', 'growth', 'upgrade', 'partnership', 'expansion', 'strong', 'positive', 'rises', 'gains'];
+    const bearishKeywords = ['misses', 'declines', 'downgrade', 'concerns', 'falls', 'drops', 'weak', 'losses', 'challenges'];
+    
+    const bullishScore = bullishKeywords.filter(word => text.includes(word)).length;
+    const bearishScore = bearishKeywords.filter(word => text.includes(word)).length;
+    
+    if (bullishScore > bearishScore) return 'Bullish';
+    if (bearishScore > bullishScore) return 'Bearish';
+    return 'Neutral';
+  };
+
   // Filter news articles based on selected filters
   const filteredNewsArticles = useMemo(() => {
+    console.log('Filtering articles with filters:', filters);
+    console.log('Total articles:', newsArticles?.length || 0);
+
     if (!newsArticles || newsArticles.length === 0) {
       return [];
     }
@@ -49,7 +68,17 @@ const NewsAI = () => {
       // Category filter
       if (filters.categories.length > 0) {
         const articleCategory = getArticleCategory(article.relatedSymbols?.[0] || selectedAsset);
+        console.log('Article category:', articleCategory, 'Selected categories:', filters.categories);
         if (!filters.categories.includes(articleCategory)) {
+          return false;
+        }
+      }
+
+      // Sentiment filter
+      if (filters.sentiments.length > 0) {
+        const articleSentiment = getArticleSentiment(article);
+        console.log('Article sentiment:', articleSentiment, 'Selected sentiments:', filters.sentiments);
+        if (!filters.sentiments.includes(articleSentiment)) {
           return false;
         }
       }
@@ -57,17 +86,17 @@ const NewsAI = () => {
       // News type filter
       if (filters.newsTypes.length > 0) {
         const articleType = article.category || 'market';
+        console.log('Article type:', articleType, 'Selected types:', filters.newsTypes);
         if (!filters.newsTypes.includes(articleType)) {
           return false;
         }
       }
-
-      // Note: Sentiment filtering would require AI analysis for each article
-      // For now, we'll skip sentiment filtering during list view to avoid performance issues
       
       return true;
     });
-  }, [newsArticles, filters.categories, filters.newsTypes, selectedAsset]);
+  }, [newsArticles, filters.categories, filters.sentiments, filters.newsTypes, selectedAsset]);
+
+  console.log('Filtered articles count:', filteredNewsArticles.length);
 
   const handleArticleClick = async (article: NewsArticle) => {
     setSelectedArticle(article);
