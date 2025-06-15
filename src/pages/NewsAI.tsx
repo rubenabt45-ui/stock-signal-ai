@@ -1,9 +1,9 @@
-
 import { useState, useEffect, useMemo } from "react";
 import { Newspaper, TrendingUp, X, AlertCircle } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { AssetSelection } from "@/components/AssetSelection";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNewsForAsset, NewsArticle } from "@/services/newsService";
@@ -12,17 +12,22 @@ import { NewsCard } from "@/components/NewsAI/NewsCard";
 import { AIInsights } from "@/components/NewsAI/AIInsights";
 import { SourceButton } from "@/components/NewsAI/SourceButton";
 import { NewsFilters, FilterState } from "@/components/NewsAI/NewsFilters";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const NewsAI = () => {
   const [selectedAsset, setSelectedAsset] = useState("AAPL");
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
     sentiments: [],
     newsTypes: []
   });
+
+  // Get user's favorites
+  const { favorites, loading: favoritesLoading } = useFavorites();
 
   // Fetch news for selected asset
   const { data: newsArticles, isLoading, error, refetch } = useQuery({
@@ -55,9 +60,25 @@ const NewsAI = () => {
     return 'Neutral';
   };
 
-  // Filter news articles based on selected filters
+  // Check if article is related to user's favorites
+  const isArticleInFavorites = (article: NewsArticle): boolean => {
+    if (!favorites || favorites.length === 0) return false;
+    
+    const favoriteSymbols = favorites.map(fav => fav.symbol);
+    
+    // Check if any of the article's related symbols are in favorites
+    if (article.relatedSymbols && article.relatedSymbols.length > 0) {
+      return article.relatedSymbols.some(symbol => favoriteSymbols.includes(symbol));
+    }
+    
+    // Fallback: check if the selected asset is in favorites
+    return favoriteSymbols.includes(selectedAsset);
+  };
+
+  // Filter news articles based on selected filters and favorites toggle
   const filteredNewsArticles = useMemo(() => {
     console.log('Filtering articles with filters:', filters);
+    console.log('Show only favorites:', showOnlyFavorites);
     console.log('Total articles:', newsArticles?.length || 0);
 
     if (!newsArticles || newsArticles.length === 0) {
@@ -65,6 +86,11 @@ const NewsAI = () => {
     }
 
     return newsArticles.filter(article => {
+      // Favorites filter (applies first if enabled)
+      if (showOnlyFavorites && !isArticleInFavorites(article)) {
+        return false;
+      }
+
       // Category filter
       if (filters.categories.length > 0) {
         const articleCategory = getArticleCategory(article.relatedSymbols?.[0] || selectedAsset);
@@ -94,7 +120,7 @@ const NewsAI = () => {
       
       return true;
     });
-  }, [newsArticles, filters.categories, filters.sentiments, filters.newsTypes, selectedAsset]);
+  }, [newsArticles, filters.categories, filters.sentiments, filters.newsTypes, selectedAsset, showOnlyFavorites, favorites]);
 
   console.log('Filtered articles count:', filteredNewsArticles.length);
 
@@ -161,6 +187,33 @@ const NewsAI = () => {
             onAssetSelect={setSelectedAsset}
           />
 
+          {/* Favorites Toggle */}
+          <div className="bg-black/20 p-4 rounded-xl border border-gray-800/50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Switch
+                  id="favorites-toggle"
+                  checked={showOnlyFavorites}
+                  onCheckedChange={setShowOnlyFavorites}
+                  disabled={favoritesLoading}
+                />
+                <label htmlFor="favorites-toggle" className="text-white font-medium cursor-pointer">
+                  Show Only My Favorites
+                </label>
+                {showOnlyFavorites && (
+                  <Badge variant="outline" className="text-xs text-tradeiq-blue border-tradeiq-blue/30">
+                    {favorites?.length || 0} favorites
+                  </Badge>
+                )}
+              </div>
+              {showOnlyFavorites && (!favorites || favorites.length === 0) && (
+                <p className="text-sm text-gray-400">
+                  You haven't added any favorite assets yet. Add favorites to filter news more effectively.
+                </p>
+              )}
+            </div>
+          </div>
+
           {/* News Filters */}
           <NewsFilters
             filters={filters}
@@ -219,12 +272,19 @@ const NewsAI = () => {
                 <CardHeader className="text-center py-8">
                   <Newspaper className="h-12 w-12 mx-auto mb-4 text-gray-500" />
                   <h3 className="text-lg font-semibold text-white mb-2">
-                    {newsArticles && newsArticles.length > 0 ? "No Articles Match Filters" : "No News Found"}
+                    {showOnlyFavorites && (!favorites || favorites.length === 0)
+                      ? "No Favorite Assets"
+                      : newsArticles && newsArticles.length > 0 
+                        ? "No Articles Match Filters" 
+                        : "No News Found"
+                    }
                   </h3>
                   <p className="text-gray-400">
-                    {newsArticles && newsArticles.length > 0 
-                      ? "Try adjusting your filters to see more articles."
-                      : `No recent news articles found for ${selectedAsset}. Try selecting a different asset or check back later.`
+                    {showOnlyFavorites && (!favorites || favorites.length === 0)
+                      ? "Add some favorite assets to see personalized news updates."
+                      : newsArticles && newsArticles.length > 0 
+                        ? "Try adjusting your filters to see more articles."
+                        : `No recent news articles found for ${selectedAsset}. Try selecting a different asset or check back later.`
                     }
                   </p>
                 </CardHeader>
