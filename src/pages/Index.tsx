@@ -19,6 +19,11 @@ const Index = () => {
   const [selectedAsset, setSelectedAsset] = useState<string>("AAPL");
   const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>("1D");
 
+  const handleTimeframeSelect = (timeframe: string) => {
+    // Convert string to Timeframe type and update state
+    setSelectedTimeframe(timeframe as Timeframe);
+  };
+
   return (
     <div className="min-h-screen bg-tradeiq-navy">
       {/* Header */}
@@ -85,7 +90,7 @@ const Index = () => {
         {/* Timeframe Selector */}
         <TimeframeSelector 
           selectedTimeframe={selectedTimeframe} 
-          onTimeframeSelect={setSelectedTimeframe} 
+          onTimeframeSelect={handleTimeframeSelect} 
         />
 
         {/* Live Chart */}
