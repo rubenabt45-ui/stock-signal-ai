@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Send, Bot, User, TrendingUp, AlertCircle, Clock, BookOpen, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,7 +22,7 @@ const TradingChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm your **TradeIQ Assistant** 🤖\n\nI can help you with:\n📊 **Trading & Investing**: Strategies, technical analysis, market insights\n📱 **TradeIQ Features**: Chart AI, alerts, favorites, and app navigation\n\nWhat would you like to explore today?",
+      content: "Hello and welcome to the TradeIQ Assistant.\n\nI can help you with:\n\n- Trading and investment topics such as strategies, technical indicators, or market insights\n- Navigation and usage of TradeIQ features including Chart AI, alerts, favorites, and more\n\nHow can I assist you today?",
       isUser: false,
       timestamp: new Date(),
     }
