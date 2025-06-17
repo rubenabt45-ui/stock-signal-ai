@@ -5,42 +5,84 @@ import { useMarketData } from '@/hooks/useMarketData';
 
 interface StockChartProps {
   symbol: string;
+  timeframe?: string;
 }
 
-// Generate initial historical data
-const generateHistoricalData = (currentPrice?: number) => {
+// Generate initial historical data based on timeframe
+const generateHistoricalData = (currentPrice?: number, timeframe: string = '1D') => {
   const data = [];
   let price = currentPrice || (150 + Math.random() * 50);
   
-  for (let i = 30; i >= 1; i--) {
+  // Determine number of data points based on timeframe
+  const getDataPoints = (tf: string) => {
+    switch (tf) {
+      case '1D': return 24; // Hourly data for 1 day
+      case '1W': return 7;   // Daily data for 1 week
+      case '1M': return 30;  // Daily data for 1 month
+      case '3M': return 90;  // Daily data for 3 months
+      case '6M': return 180; // Daily data for 6 months
+      case '1Y': return 365; // Daily data for 1 year
+      default: return 30;
+    }
+  };
+
+  const points = getDataPoints(timeframe);
+  
+  for (let i = points; i >= 1; i--) {
     const date = new Date();
-    date.setDate(date.getDate() - i);
     
-    // Add some volatility
-    price += (Math.random() - 0.5) * 10;
+    // Set time intervals based on timeframe
+    if (timeframe === '1D') {
+      date.setHours(date.getHours() - i);
+    } else {
+      date.setDate(date.getDate() - i);
+    }
+    
+    // Add volatility based on timeframe (longer timeframes = more volatility)
+    const volatilityMultiplier = timeframe === '1D' ? 0.02 : 
+                                timeframe === '1W' ? 0.03 :
+                                timeframe === '1M' ? 0.04 :
+                                timeframe === '3M' ? 0.05 :
+                                timeframe === '6M' ? 0.06 : 0.08;
+    
+    const volatility = (Math.random() - 0.5) * volatilityMultiplier;
+    price *= (1 + volatility);
     price = Math.max(price, 50); // Minimum price
     
     data.push({
       date: date.toISOString().split('T')[0],
       time: date.getTime(),
       price: parseFloat(price.toFixed(2)),
-      volume: Math.floor(Math.random() * 10000000)
+      volume: Math.floor(Math.random() * 10000000),
+      timeframe: timeframe
     });
   }
   
   return data;
 };
 
-export const StockChart = ({ symbol }: StockChartProps) => {
+export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
   const { prices, isConnected } = useRealTimePriceContext();
   const { price: marketPrice, change, isLoading, error, lastUpdated } = useMarketData(symbol);
-  const [chartData, setChartData] = useState(() => generateHistoricalData());
+  const [chartData, setChartData] = useState(() => generateHistoricalData(undefined, timeframe));
   const [lastDataUpdate, setLastDataUpdate] = useState<number | null>(null);
+  const [currentTimeframe, setCurrentTimeframe] = useState(timeframe);
+
+  // Regenerate chart data when timeframe changes
+  useEffect(() => {
+    if (timeframe !== currentTimeframe) {
+      console.log(`📈 Chart timeframe changed from ${currentTimeframe} to ${timeframe} for ${symbol}`);
+      setCurrentTimeframe(timeframe);
+      const newData = generateHistoricalData(marketPrice, timeframe);
+      setChartData(newData);
+      setLastDataUpdate(null); // Reset to allow fresh data
+    }
+  }, [timeframe, currentTimeframe, symbol, marketPrice]);
 
   // Update chart data when market data changes
   useEffect(() => {
     if (marketPrice && lastUpdated && (!lastDataUpdate || lastUpdated > lastDataUpdate)) {
-      console.log(`📊 Updating chart data for ${symbol}:`, { price: marketPrice, timestamp: new Date(lastUpdated).toLocaleTimeString() });
+      console.log(`📊 Updating chart data for ${symbol}:`, { price: marketPrice, timeframe, timestamp: new Date(lastUpdated).toLocaleTimeString() });
       
       setChartData(prevData => {
         const newData = [...prevData];
@@ -52,22 +94,27 @@ export const StockChart = ({ symbol }: StockChartProps) => {
           price: marketPrice,
           volume: Math.floor(Math.random() * 10000000),
           isRealTime: true,
-          isLatest: true
+          isLatest: true,
+          timeframe: timeframe
         });
         
-        // Keep only the last 50 data points for performance
-        return newData.slice(-50);
+        // Keep appropriate number of data points based on timeframe
+        const maxPoints = timeframe === '1D' ? 50 : 
+                         timeframe === '1W' ? 40 :
+                         timeframe === '1M' ? 60 : 100;
+        
+        return newData.slice(-maxPoints);
       });
       
       setLastDataUpdate(lastUpdated);
     }
-  }, [marketPrice, lastUpdated, symbol, lastDataUpdate]);
+  }, [marketPrice, lastUpdated, symbol, lastDataUpdate, timeframe]);
 
   // Also handle WebSocket price updates from RealTimePriceProvider as fallback
   useEffect(() => {
     const currentPriceData = prices[symbol];
     if (currentPriceData && currentPriceData.timestamp && (!lastDataUpdate || currentPriceData.timestamp > lastDataUpdate)) {
-      console.log(`🔄 WebSocket update for ${symbol}:`, { price: currentPriceData.currentPrice, timestamp: new Date(currentPriceData.timestamp).toLocaleTimeString() });
+      console.log(`🔄 WebSocket update for ${symbol}:`, { price: currentPriceData.currentPrice, timeframe, timestamp: new Date(currentPriceData.timestamp).toLocaleTimeString() });
       
       setChartData(prevData => {
         const newData = [...prevData];
@@ -78,15 +125,20 @@ export const StockChart = ({ symbol }: StockChartProps) => {
           price: currentPriceData.currentPrice,
           volume: Math.floor(Math.random() * 10000000),
           isRealTime: true,
-          isWebSocket: true
+          isWebSocket: true,
+          timeframe: timeframe
         });
         
-        return newData.slice(-50);
+        const maxPoints = timeframe === '1D' ? 50 : 
+                         timeframe === '1W' ? 40 :
+                         timeframe === '1M' ? 60 : 100;
+        
+        return newData.slice(-maxPoints);
       });
       
       setLastDataUpdate(currentPriceData.timestamp);
     }
-  }, [prices, symbol, lastDataUpdate]);
+  }, [prices, symbol, lastDataUpdate, timeframe]);
 
   // Determine connection status based on data freshness
   const getConnectionStatus = () => {
@@ -152,6 +204,11 @@ export const StockChart = ({ symbol }: StockChartProps) => {
             {connectionStatus.status}
           </span>
         </div>
+        <div className="bg-black/80 backdrop-blur-sm rounded-lg px-2 py-1">
+          <span className="text-xs text-blue-400 font-medium">
+            {timeframe}
+          </span>
+        </div>
         {lastDataUpdate && (
           <div className="bg-black/80 backdrop-blur-sm rounded-lg px-2 py-1">
             <span className="text-xs text-gray-300">
@@ -177,6 +234,9 @@ export const StockChart = ({ symbol }: StockChartProps) => {
             fontFamily="Inter"
             tickFormatter={(value) => {
               const date = new Date(value);
+              if (timeframe === '1D') {
+                return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+              }
               return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             }}
           />

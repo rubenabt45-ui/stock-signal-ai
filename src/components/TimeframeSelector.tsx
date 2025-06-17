@@ -4,7 +4,7 @@ import { Clock } from "lucide-react";
 
 interface TimeframeSelectorProps {
   selectedTimeframe: string;
-  onTimeframeSelect: (timeframe: any) => void;
+  onTimeframeSelect: (timeframe: string) => void;
 }
 
 const timeframes = [
@@ -17,6 +17,11 @@ const timeframes = [
 ];
 
 export const TimeframeSelector = ({ selectedTimeframe, onTimeframeSelect }: TimeframeSelectorProps) => {
+  const handleTimeframeClick = (timeframeValue: string) => {
+    console.log(`🕒 Timeframe selected: ${timeframeValue}`);
+    onTimeframeSelect(timeframeValue);
+  };
+
   return (
     <Card className="tradeiq-card p-4 rounded-2xl">
       <div className="flex items-center space-x-3 mb-4">
@@ -28,8 +33,8 @@ export const TimeframeSelector = ({ selectedTimeframe, onTimeframeSelect }: Time
         {timeframes.map((timeframe) => (
           <button
             key={timeframe.value}
-            onClick={() => onTimeframeSelect(timeframe.value)}
-            className={`px-4 py-2 rounded-xl font-semibold min-w-[60px] transition-all duration-200 ${
+            onClick={() => handleTimeframeClick(timeframe.value)}
+            className={`px-4 py-2 rounded-xl font-semibold min-w-[60px] transition-all duration-200 cursor-pointer ${
               selectedTimeframe === timeframe.value
                 ? 'bg-tradeiq-blue text-white shadow-lg'
                 : 'bg-black/30 text-gray-400 hover:bg-black/50 hover:text-white'

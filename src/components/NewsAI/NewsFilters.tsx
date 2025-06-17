@@ -43,6 +43,7 @@ const NEWS_TYPE_OPTIONS = [
 
 export const NewsFilters = ({ filters, onFilterChange, newsCount }: NewsFiltersProps) => {
   const handleCategoryChange = (values: string[]) => {
+    console.log('📰 Category filters changed:', values);
     onFilterChange({
       ...filters,
       categories: values
@@ -50,6 +51,7 @@ export const NewsFilters = ({ filters, onFilterChange, newsCount }: NewsFiltersP
   };
 
   const handleSentimentChange = (values: string[]) => {
+    console.log('📊 Sentiment filters changed:', values);
     onFilterChange({
       ...filters,
       sentiments: values
@@ -57,6 +59,7 @@ export const NewsFilters = ({ filters, onFilterChange, newsCount }: NewsFiltersP
   };
 
   const handleNewsTypeChange = (values: string[]) => {
+    console.log('📑 News type filters changed:', values);
     onFilterChange({
       ...filters,
       newsTypes: values
@@ -64,6 +67,7 @@ export const NewsFilters = ({ filters, onFilterChange, newsCount }: NewsFiltersP
   };
 
   const clearAllFilters = () => {
+    console.log('🗑️ Clearing all news filters');
     onFilterChange({
       categories: [],
       sentiments: [],
@@ -88,7 +92,7 @@ export const NewsFilters = ({ filters, onFilterChange, newsCount }: NewsFiltersP
             onClick={clearAllFilters}
             variant="ghost"
             size="sm"
-            className="text-gray-400 hover:text-white"
+            className="text-gray-400 hover:text-white hover:bg-gray-700/50 cursor-pointer"
           >
             <X className="h-4 w-4 mr-1" />
             Clear All
@@ -111,7 +115,7 @@ export const NewsFilters = ({ filters, onFilterChange, newsCount }: NewsFiltersP
               value={option.value}
               variant="outline"
               size="sm"
-              className="data-[state=on]:bg-tradeiq-blue/20 data-[state=on]:text-tradeiq-blue data-[state=on]:border-tradeiq-blue/50 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+              className="data-[state=on]:bg-tradeiq-blue/20 data-[state=on]:text-tradeiq-blue data-[state=on]:border-tradeiq-blue/50 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white cursor-pointer transition-all"
             >
               {option.label}
             </ToggleGroupItem>
@@ -134,7 +138,7 @@ export const NewsFilters = ({ filters, onFilterChange, newsCount }: NewsFiltersP
               value={option.value}
               variant="outline"
               size="sm"
-              className={`border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white ${
+              className={`border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white cursor-pointer transition-all ${
                 filters.sentiments.includes(option.value) ? option.color : ''
               }`}
             >
@@ -159,7 +163,7 @@ export const NewsFilters = ({ filters, onFilterChange, newsCount }: NewsFiltersP
               value={option.value}
               variant="outline"
               size="sm"
-              className="data-[state=on]:bg-tradeiq-blue/20 data-[state=on]:text-tradeiq-blue data-[state=on]:border-tradeiq-blue/50 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+              className="data-[state=on]:bg-tradeiq-blue/20 data-[state=on]:text-tradeiq-blue data-[state=on]:border-tradeiq-blue/50 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white cursor-pointer transition-all"
             >
               {option.label}
             </ToggleGroupItem>

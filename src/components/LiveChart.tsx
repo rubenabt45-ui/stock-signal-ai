@@ -17,7 +17,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
   const { price, change, isLoading: marketDataLoading, error: marketDataError, lastUpdated } = useMarketData(asset);
   
   useEffect(() => {
-    console.log(`🎯 LiveChart subscribing to ${asset}`);
+    console.log(`🎯 LiveChart subscribing to ${asset} with timeframe ${timeframe}`);
     subscribe([asset]);
   }, [asset, subscribe]);
 
@@ -111,7 +111,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
       </div>
       
       <div className="h-80">
-        <StockChart symbol={asset} />
+        <StockChart symbol={asset} timeframe={timeframe} />
       </div>
     </Card>
   );
