@@ -8,17 +8,17 @@ interface TimeframeSelectorProps {
 }
 
 const timeframes = [
-  { value: "1D", label: "1D" },
-  { value: "1W", label: "1W" },
-  { value: "1M", label: "1M" },
-  { value: "3M", label: "3M" },
-  { value: "6M", label: "6M" },
-  { value: "1Y", label: "1Y" },
+  { value: "1D", label: "1D", interval: "5min" },
+  { value: "1W", label: "1W", interval: "daily" },
+  { value: "1M", label: "1M", interval: "daily" },
+  { value: "3M", label: "3M", interval: "weekly" },
+  { value: "6M", label: "6M", interval: "weekly" },
+  { value: "1Y", label: "1Y", interval: "monthly" },
 ];
 
 export const TimeframeSelector = ({ selectedTimeframe, onTimeframeSelect }: TimeframeSelectorProps) => {
   const handleTimeframeClick = (timeframeValue: string) => {
-    console.log(`🕒 Timeframe selected: ${timeframeValue}`);
+    console.log(`🕒 Timeframe selected: ${timeframeValue} (switching chart data)`);
     onTimeframeSelect(timeframeValue);
   };
 
@@ -34,11 +34,13 @@ export const TimeframeSelector = ({ selectedTimeframe, onTimeframeSelect }: Time
           <button
             key={timeframe.value}
             onClick={() => handleTimeframeClick(timeframe.value)}
-            className={`px-4 py-2 rounded-xl font-semibold min-w-[60px] transition-all duration-200 cursor-pointer ${
+            disabled={selectedTimeframe === timeframe.value}
+            className={`px-4 py-2 rounded-xl font-semibold min-w-[60px] transition-all duration-200 ${
               selectedTimeframe === timeframe.value
-                ? 'bg-tradeiq-blue text-white shadow-lg'
-                : 'bg-black/30 text-gray-400 hover:bg-black/50 hover:text-white'
+                ? 'bg-tradeiq-blue text-white shadow-lg cursor-default'
+                : 'bg-black/30 text-gray-400 hover:bg-black/50 hover:text-white cursor-pointer hover:scale-105'
             }`}
+            title={`Switch to ${timeframe.label} view (${timeframe.interval} intervals)`}
           >
             {timeframe.label}
           </button>

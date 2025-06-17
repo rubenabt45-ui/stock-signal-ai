@@ -1,6 +1,5 @@
-
 import { Card } from "@/components/ui/card";
-import { BarChart3, TrendingUp, TrendingDown, Wifi, WifiOff, Activity } from "lucide-react";
+import { BarChart3, TrendingUp, TrendingDown, Wifi, WifiOff, Activity, AlertCircle } from "lucide-react";
 import { StockChart } from "@/components/StockChart";
 import { LivePriceBadge } from "@/components/LivePriceBadge";
 import { useRealTimePriceContext } from "@/components/RealTimePriceProvider";
@@ -17,7 +16,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
   const { price, change, isLoading: marketDataLoading, error: marketDataError, lastUpdated } = useMarketData(asset);
   
   useEffect(() => {
-    console.log(`🎯 LiveChart subscribing to ${asset} with timeframe ${timeframe}`);
+    console.log(`🎯 LiveChart: Subscribing to ${asset} with timeframe ${timeframe}`);
     subscribe([asset]);
   }, [asset, subscribe]);
 
@@ -29,28 +28,82 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
   const isNegative = displayChange && displayChange < 0;
 
   const getConnectionStatus = () => {
-    if (marketDataError && !isConnected) {
-      return { text: 'Data unavailable', color: 'text-red-500', icon: WifiOff };
-    }
+    // Critical connection failures
     if (error && error.includes('Maximum reconnection')) {
-      return { text: 'Connection Failed', color: 'text-red-500', icon: WifiOff };
+      return { 
+        text: 'Connection Failed', 
+        color: 'text-red-500', 
+        icon: WifiOff,
+        description: 'Unable to establish real-time connection'
+      };
     }
+    
+    // Market data unavailable
+    if (marketDataError && !isConnected && !displayPrice) {
+      return { 
+        text: 'Data Unavailable', 
+        color: 'text-red-500', 
+        icon: AlertCircle,
+        description: 'Market data service unavailable'
+      };
+    }
+    
+    // Reconnection attempts
     if (error && error.includes('reconnecting')) {
-      return { text: 'Reconnecting...', color: 'text-yellow-500', icon: Activity };
+      return { 
+        text: 'Reconnecting...', 
+        color: 'text-yellow-500', 
+        icon: Activity,
+        description: 'Attempting to restore connection'
+      };
     }
-    if (error) {
-      return { text: 'Error', color: 'text-red-500', icon: WifiOff };
+    
+    // Other errors
+    if (error && !displayPrice) {
+      return { 
+        text: 'Connection Error', 
+        color: 'text-red-500', 
+        icon: WifiOff,
+        description: error
+      };
     }
+    
+    // Loading states
     if (marketDataLoading && !displayPrice) {
-      return { text: 'Loading...', color: 'text-blue-500', icon: Activity };
+      return { 
+        text: 'Loading Data...', 
+        color: 'text-blue-500', 
+        icon: Activity,
+        description: 'Fetching market data'
+      };
     }
+    
     if (!isConnected && !displayPrice) {
-      return { text: 'Connecting...', color: 'text-yellow-500', icon: Activity };
+      return { 
+        text: 'Connecting...', 
+        color: 'text-yellow-500', 
+        icon: Activity,
+        description: 'Establishing connection'
+      };
     }
+    
+    // Connected states
     if ((isConnected && currentPriceData) || (!isConnected && displayPrice)) {
-      return { text: 'Live Feed', color: 'text-green-500', icon: Wifi };
+      return { 
+        text: 'Live Feed', 
+        color: 'text-green-500', 
+        icon: Wifi,
+        description: 'Real-time data active'
+      };
     }
-    return { text: 'Waiting for data...', color: 'text-blue-500', icon: Activity };
+    
+    // Fallback
+    return { 
+      text: 'Demo Mode', 
+      color: 'text-gray-500', 
+      icon: Activity,
+      description: 'Using simulated data'
+    };
   };
 
   const connectionStatus = getConnectionStatus();
@@ -81,10 +134,10 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
               )}
             </div>
             <div className="flex items-center space-x-2 mt-1">
-              <p className="text-sm text-gray-400">{timeframe} • Real-time Data</p>
+              <p className="text-sm text-gray-400">{timeframe} • Chart Analysis</p>
               {(lastUpdated || currentPriceData) && (
                 <span className="text-xs text-gray-500">
-                  Last update: {lastUpdated ? 
+                  Updated: {lastUpdated ? 
                     new Date(lastUpdated).toLocaleTimeString() : 
                     currentPriceData ? new Date(currentPriceData.timestamp).toLocaleTimeString() : ''
                   }
@@ -92,21 +145,30 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
               )}
             </div>
             {(error || marketDataError) && (
-              <p className="text-xs text-red-500 mt-1">
-                ⚠️ {error || marketDataError}
+              <p className="text-xs text-red-400 mt-1 flex items-center space-x-1">
+                <AlertCircle className="h-3 w-3" />
+                <span>{error || marketDataError}</span>
               </p>
             )}
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        
+        <div className="flex items-center space-x-3">
           <StatusIcon className={`h-5 w-5 ${connectionStatus.color}`} />
-          <div className={`w-2 h-2 rounded-full ${
-            (isConnected && currentPriceData) || (!isConnected && displayPrice) ? 'bg-green-500 animate-pulse' : 
-            isConnected || displayPrice ? 'bg-blue-500 animate-pulse' : 'bg-red-500'
+          <div className={`w-3 h-3 rounded-full ${
+            connectionStatus.text === 'Live Feed' ? 'bg-green-500 animate-pulse' : 
+            connectionStatus.text.includes('Loading') || connectionStatus.text.includes('Connecting') ? 'bg-blue-500 animate-pulse' : 
+            connectionStatus.text.includes('Reconnecting') ? 'bg-yellow-500 animate-pulse' : 
+            connectionStatus.text.includes('Error') || connectionStatus.text.includes('Failed') ? 'bg-red-500' : 'bg-gray-500'
           }`}></div>
-          <span className={`text-sm font-medium ${connectionStatus.color}`}>
-            {connectionStatus.text}
-          </span>
+          <div className="text-right">
+            <span className={`text-sm font-medium ${connectionStatus.color}`}>
+              {connectionStatus.text}
+            </span>
+            <p className="text-xs text-gray-500">
+              {connectionStatus.description}
+            </p>
+          </div>
         </div>
       </div>
       
