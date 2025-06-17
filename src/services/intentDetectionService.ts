@@ -1,4 +1,3 @@
-
 export interface IntentAnalysis {
   type: 'trading' | 'product' | 'mixed';
   confidence: number;
@@ -64,15 +63,39 @@ const PRODUCT_FEATURES: ProductFeature[] = [
 const PRODUCT_KEYWORDS = [
   'how', 'where', 'use', 'feature', 'navigate', 'find', 'access', 'upgrade',
   'pro', 'subscription', 'alert', 'notification', 'favorite', 'watchlist',
-  'chart ai', 'news ai', 'pattern detection', 'app', 'tradeiq', 'interface'
+  'chart ai', 'news ai', 'pattern detection', 'app', 'tradeiq', 'interface',
+  'setting', 'settings', 'enable', 'disable', 'configure'
 ];
 
-// Trading-related keywords
+// Trading-related keywords with higher weights for strategy/education terms
 const TRADING_KEYWORDS = [
-  'strategy', 'invest', 'buy', 'sell', 'trade', 'analysis', 'technical',
-  'fundamental', 'risk', 'portfolio', 'diversification', 'asset allocation',
-  'bullish', 'bearish', 'trend', 'support', 'resistance', 'moving average',
-  'rsi', 'macd', 'fibonacci', 'candlestick', 'volume', 'momentum'
+  // Strategy keywords (high confidence)
+  'strategy', 'strategies', 'invest', 'investing', 'investment', 'trade', 'trading',
+  'buy', 'sell', 'portfolio', 'allocation', 'diversification', 'risk management',
+  
+  // Technical analysis (high confidence)
+  'technical', 'analysis', 'indicator', 'indicators', 'rsi', 'macd', 'moving average',
+  'support', 'resistance', 'trend', 'breakout', 'pattern', 'fibonacci',
+  'candlestick', 'volume', 'momentum', 'oscillator',
+  
+  // Market concepts (medium confidence)
+  'bullish', 'bearish', 'volatile', 'volatility', 'market', 'price', 'asset',
+  'stock', 'crypto', 'bitcoin', 'ethereum', 'forex', 'currency',
+  
+  // Educational terms (medium confidence)
+  'learn', 'explain', 'understand', 'concept', 'basics', 'beginner'
+];
+
+// High-confidence trading keywords that strongly indicate trading intent
+const HIGH_CONFIDENCE_TRADING = [
+  'strategy', 'strategies', 'invest', 'investing', 'rsi', 'macd', 'support', 'resistance',
+  'portfolio', 'allocation', 'risk management', 'technical analysis'
+];
+
+// High-confidence product keywords that strongly indicate product intent
+const HIGH_CONFIDENCE_PRODUCT = [
+  'chart ai', 'how to use', 'where to find', 'upgrade', 'pro', 'alert', 'notification',
+  'favorite', 'watchlist', 'feature', 'navigate'
 ];
 
 export const analyzeUserIntent = (message: string): IntentAnalysis => {
@@ -88,24 +111,52 @@ export const analyzeUserIntent = (message: string): IntentAnalysis => {
     lowerMessage.includes(keyword)
   );
   
+  // Check for high-confidence signals
+  const highConfidenceTrading = HIGH_CONFIDENCE_TRADING.filter(keyword =>
+    lowerMessage.includes(keyword)
+  );
+  
+  const highConfidenceProduct = HIGH_CONFIDENCE_PRODUCT.filter(keyword =>
+    lowerMessage.includes(keyword)
+  );
+  
   // Check for specific product features
   const featureMatches = PRODUCT_FEATURES.filter(feature =>
     feature.keywords.some(keyword => lowerMessage.includes(keyword))
   );
   
-  // Determine intent type
+  // Determine intent type with improved confidence scoring
   let type: 'trading' | 'product' | 'mixed';
   let confidence: number;
   
-  if (productMatches.length > tradingMatches.length || featureMatches.length > 0) {
+  // High confidence product intent
+  if (highConfidenceProduct.length > 0 || featureMatches.length > 0) {
     type = 'product';
-    confidence = Math.min(0.9, (productMatches.length + featureMatches.length * 2) / 5);
-  } else if (tradingMatches.length > productMatches.length) {
+    confidence = Math.min(0.95, 0.7 + (highConfidenceProduct.length + featureMatches.length) * 0.1);
+  }
+  // High confidence trading intent
+  else if (highConfidenceTrading.length > 0) {
     type = 'trading';
-    confidence = Math.min(0.9, tradingMatches.length / 5);
-  } else {
+    confidence = Math.min(0.95, 0.7 + highConfidenceTrading.length * 0.1);
+  }
+  // Medium confidence based on keyword counts
+  else if (productMatches.length > tradingMatches.length * 1.5) {
+    type = 'product';
+    confidence = Math.min(0.8, 0.5 + productMatches.length * 0.05);
+  }
+  else if (tradingMatches.length > productMatches.length * 1.5) {
+    type = 'trading';
+    confidence = Math.min(0.8, 0.5 + tradingMatches.length * 0.05);
+  }
+  // Mixed or low confidence
+  else if (tradingMatches.length > 0 || productMatches.length > 0) {
     type = 'mixed';
-    confidence = 0.5;
+    confidence = Math.min(0.6, 0.4 + (tradingMatches.length + productMatches.length) * 0.03);
+  }
+  // Very low confidence
+  else {
+    type = 'mixed';
+    confidence = 0.3;
   }
   
   return {

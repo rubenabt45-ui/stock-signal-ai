@@ -1,4 +1,3 @@
-
 import { IntentAnalysis, analyzeUserIntent, getProductFeatureInfo, searchProductFeatures } from './intentDetectionService';
 import { MessageContext } from './symbolDetectionService';
 import { UseMarketDataReturn } from '@/hooks/useMarketData';
@@ -25,13 +24,25 @@ export const generateDualModeResponse = async (request: DualModeAIRequest): Prom
   // Analyze user intent
   const intentAnalysis = analyzeUserIntent(userMessage);
   
-  // Route to appropriate response generator
+  // Only use mixed/clarify responses for very low confidence
+  if (intentAnalysis.confidence < 0.4) {
+    return generateDefaultResponse(userMessage);
+  }
+  
+  // Route to appropriate response generator based on primary intent
   switch (intentAnalysis.type) {
     case 'product':
       return generateProductResponse(userMessage, intentAnalysis);
     case 'trading':
       return generateTradingResponse(userMessage, intentAnalysis, context, marketData);
     case 'mixed':
+      // For mixed intent with reasonable confidence, choose the stronger signal
+      if (intentAnalysis.productFeatures && intentAnalysis.productFeatures.length > 0) {
+        return generateProductResponse(userMessage, intentAnalysis);
+      }
+      if (intentAnalysis.tradingTopics && intentAnalysis.tradingTopics.length > 0) {
+        return generateTradingResponse(userMessage, intentAnalysis, context, marketData);
+      }
       return generateMixedResponse(userMessage, intentAnalysis, context, marketData);
     default:
       return generateDefaultResponse(userMessage);
@@ -163,22 +174,19 @@ const generateTradingResponse = (
   let content = '';
   let needsRiskDisclaimer = false;
   
-  // Crypto strategy questions
-  if (lowerMessage.includes('crypto') && (lowerMessage.includes('strategy') || lowerMessage.includes('invest'))) {
+  // Strategy questions - provide immediate, actionable content
+  if (lowerMessage.includes('strategy') || lowerMessage.includes('strategies')) {
     needsRiskDisclaimer = true;
-    content = `Three common crypto trading strategies:\n\nDollar-cost averaging: Regular purchases regardless of price to reduce volatility impact\nMomentum trading: Focus on coins with strong upward price trends and high volume\nLong-term holding: Research-based investments in established projects like Bitcoin and Ethereum\n\nRisk management: Start with small positions, never invest more than you can afford to lose, and diversify across multiple assets.\n\nCrypto markets operate 24/7 with high volatility, making both opportunities and risks greater than traditional markets.`;
-  }
-  
-  // Stock strategy questions
-  else if (lowerMessage.includes('stock') && (lowerMessage.includes('strategy') || lowerMessage.includes('invest'))) {
-    needsRiskDisclaimer = true;
-    content = `Four stock investment approaches:\n\nGrowth investing: Focus on companies with strong earnings growth potential\nValue investing: Look for undervalued companies trading below intrinsic value\nDividend investing: Target companies with consistent dividend payments for income\nIndex investing: Diversify through ETFs like SPY, QQQ for broad market exposure\n\nTime horizon matters: Longer-term investments typically reduce volatility risk, while shorter-term trading requires more active management and technical analysis.`;
-  }
-  
-  // General strategy questions
-  else if (lowerMessage.includes('strategy') || lowerMessage.includes('invest')) {
-    needsRiskDisclaimer = true;
-    content = `Investment strategy framework by risk level:\n\nLow risk: Index funds, blue-chip stocks, government bonds for steady growth\nMedium risk: Growth stocks, sector ETFs, dividend aristocrats for balanced returns\nHigh risk: Small-cap stocks, crypto, options trading for potential higher returns\n\nPortfolio allocation guideline: Consider age-based approach where stock percentage equals 100 minus your age, with remainder in bonds and cash.\n\nAlways maintain an emergency fund covering 3-6 months of expenses before investing.`;
+    
+    if (lowerMessage.includes('beginner')) {
+      content = `Three beginner-friendly trading strategies:\n\nDollar-cost averaging: Regular purchases regardless of price to reduce timing risk and volatility impact\nTrend following: Identify and follow established price trends using moving averages and momentum indicators\nSwing trading: Hold positions for days to weeks to capture short-term price movements\n\nKey principle: Start with small position sizes and focus on risk management before increasing trade size.`;
+    } else if (lowerMessage.includes('crypto')) {
+      content = `Three effective crypto trading strategies:\n\nMomentum trading: Focus on coins with strong upward trends and high trading volume\nDollar-cost averaging: Regular purchases to smooth out crypto's high volatility\nLong-term holding: Research-based investments in established projects like Bitcoin and Ethereum\n\nCrypto markets operate 24/7 with extreme volatility, making both opportunities and risks significantly higher than traditional markets.`;
+    } else if (lowerMessage.includes('stock')) {
+      content = `Four stock investment approaches:\n\nGrowth investing: Target companies with strong earnings growth potential\nValue investing: Look for undervalued companies trading below intrinsic value\nDividend investing: Focus on companies with consistent dividend payments for income\nIndex investing: Diversify through ETFs like SPY or QQQ for broad market exposure\n\nTime horizon matters: Longer-term investments typically reduce volatility risk and transaction costs.`;
+    } else {
+      content = `Essential trading strategies by risk tolerance:\n\nConservative: Index funds, blue-chip stocks, and government bonds for steady growth\nModerate: Growth stocks, sector ETFs, and dividend aristocrats for balanced returns\nAggressive: Small-cap stocks, crypto, and options trading for higher potential returns\n\nCore principle: Never risk more than you can afford to lose, and always diversify across multiple assets.`;
+    }
   }
   
   // Technical analysis questions
@@ -186,14 +194,25 @@ const generateTradingResponse = (
     const topics = intent.tradingTopics.filter(topic => ['rsi', 'macd', 'moving average', 'support', 'resistance'].includes(topic));
     
     if (topics.includes('rsi')) {
-      content = `RSI (Relative Strength Index) measures momentum on a 0-100 scale:\n\nOverbought: Above 70 suggests potential selling pressure ahead\nOversold: Below 30 indicates possible buying opportunity\nNeutral zone: 30-70 range shows balanced momentum\n\nTrading application: Use RSI divergences with price action for stronger signals. In strong trends, RSI can remain overbought or oversold for extended periods.`;
+      content = `RSI (Relative Strength Index) measures momentum on a 0-100 scale:\n\nOverbought: Above 70 suggests potential selling pressure and price reversal\nOversold: Below 30 indicates possible buying opportunity and price bounce\nNeutral zone: 30-70 range shows balanced momentum\n\nTrading application: Look for RSI divergences with price action for stronger signals. In strong trends, RSI can remain overbought or oversold for extended periods.`;
     } else if (topics.includes('macd')) {
-      content = `MACD (Moving Average Convergence Divergence) tracks trend changes:\n\nBullish signal: MACD line crosses above signal line, indicating upward momentum\nBearish signal: MACD line crosses below signal line, suggesting downward momentum\nHistogram: Shows momentum strength and potential trend changes\n\nBest application: Combine with trend analysis and use on higher timeframes for more reliable signals.`;
+      content = `MACD (Moving Average Convergence Divergence) tracks trend changes and momentum:\n\nBullish crossover: MACD line crosses above signal line, indicating upward momentum\nBearish crossover: MACD line crosses below signal line, suggesting downward momentum\nHistogram: Shows momentum strength and potential trend changes\n\nBest practice: Combine MACD signals with trend analysis and use on higher timeframes for more reliable signals.`;
     } else if (topics.includes('support') || topics.includes('resistance')) {
-      content = `Support and resistance are key price levels for trading decisions:\n\nSupport: Price level where buying interest typically emerges, acting as a floor\nResistance: Price level where selling pressure appears, acting as a ceiling\nBreakouts: When price moves beyond these levels with volume, new trends often begin\n\nTrading approach: Look for bounces at support for long entries, or resistance for short entries. Confirmed breakouts often lead to strong moves.`;
+      content = `Support and resistance are key price levels for making trading decisions:\n\nSupport: Price level where buying interest typically emerges, acting as a floor\nResistance: Price level where selling pressure appears, acting as a ceiling\nBreakouts: When price moves beyond these levels with volume, new trends often begin\n\nTrading approach: Look for bounces at support for long entries, or resistance for short entries. Confirmed breakouts with volume often lead to strong directional moves.`;
     } else {
-      content = `Technical analysis combines multiple indicators for better trading decisions:\n\nMoving averages: Smooth price trends and identify direction\nVolume: Confirms price movements and breakouts\nMomentum indicators: RSI and MACD show overbought/oversold conditions\n\nKey principle: No single indicator is perfect. Combine multiple signals and always consider overall market context.`;
+      content = `Technical analysis combines multiple indicators for better trading decisions:\n\nMoving averages: Smooth price trends and identify overall direction\nVolume: Confirms price movements and validates breakouts\nMomentum indicators: RSI and MACD show overbought and oversold conditions\n\nKey principle: No single indicator is perfect. Combine multiple signals and always consider overall market context for best results.`;
     }
+  }
+  
+  // Investment and asset allocation questions
+  else if (lowerMessage.includes('invest') || lowerMessage.includes('allocation')) {
+    needsRiskDisclaimer = true;
+    content = `Investment allocation guidelines by age and risk tolerance:\n\nYoung investors (20s-30s): 80-90% stocks, 10-20% bonds for growth focus\nMiddle-aged (40s-50s): 60-70% stocks, 30-40% bonds for balanced approach\nNear retirement (60+): 40-50% stocks, 50-60% bonds for capital preservation\n\nDiversification strategy: Spread investments across different asset classes, sectors, and geographic regions to reduce risk.`;
+  }
+  
+  // Risk management questions
+  else if (lowerMessage.includes('risk')) {
+    content = `Essential risk management principles for trading:\n\nPosition sizing: Never risk more than 1-2% of portfolio on any single trade\nStop losses: Set predetermined exit points to limit downside exposure\nDiversification: Spread risk across different assets, sectors, and strategies\nRisk-reward ratio: Target at least 1:2 ratio (risk $1 to potentially gain $2)\n\nEmotional discipline: Stick to your plan regardless of fear or greed. Most trading losses come from abandoning risk management during volatile periods.`;
   }
   
   // Market data context analysis
@@ -211,14 +230,9 @@ const generateTradingResponse = (
     }
   }
   
-  // Risk management questions
-  else if (lowerMessage.includes('risk')) {
-    content = `Essential risk management principles:\n\nPosition sizing: Never risk more than 1-2% of portfolio on single trade\nStop losses: Set predetermined exit points to limit downside\nDiversification: Spread risk across different assets and sectors\nRisk-reward ratio: Target at least 1:2 ratio (risk $1 to potentially gain $2)\n\nEmotional discipline: Stick to your plan regardless of fear or greed. Most trading losses come from abandoning risk management during volatile periods.`;
-  }
-  
   // Default trading response for unclear questions
   else {
-    content = `I can provide guidance on trading and investment topics:\n\nStrategy development: Risk-appropriate approaches for different goals and timeframes\nTechnical analysis: Chart patterns, indicators, and market timing\nRisk management: Position sizing, diversification, and loss prevention\nAsset classes: Stocks, crypto, forex, and commodities analysis\n\nWhat specific trading topic would you like to explore?`;
+    content = `I can provide guidance on specific trading and investment topics:\n\nStrategy development: Risk-appropriate approaches for different goals and timeframes\nTechnical analysis: Chart patterns, indicators, and market timing techniques\nRisk management: Position sizing, diversification, and loss prevention\nAsset allocation: Portfolio construction for different risk tolerances\n\nWhat specific trading topic would you like to explore?`;
   }
   
   return {
@@ -238,8 +252,8 @@ const generateMixedResponse = (
 ): DualModeAIResponse => {
   const lowerMessage = userMessage.toLowerCase();
   
-  // Try to infer primary intent from context
-  if (lowerMessage.includes('how') || lowerMessage.includes('where') || lowerMessage.includes('use')) {
+  // Only use mixed response for truly ambiguous cases
+  if (lowerMessage.includes('help') && !lowerMessage.includes('strategy') && !lowerMessage.includes('chart')) {
     return {
       content: `Could you clarify if you're asking about trading strategies or how to use a specific feature in the TradeIQ app?\n\nFor trading: I can explain strategies, technical analysis, or market insights\nFor app features: I can guide you through Chart AI, alerts, favorites, or navigation`,
       mode: 'mixed',
@@ -252,16 +266,8 @@ const generateMixedResponse = (
     };
   }
   
-  return {
-    content: `I can assist with both trading knowledge and TradeIQ app guidance.\n\nTrading topics: Investment strategies, technical analysis, risk management, and market insights\nApp features: Chart AI usage, setting up alerts, managing favorites, and navigation help\n\nWhat would you like to focus on?`,
-    mode: 'mixed',
-    confidence: intent.confidence,
-    suggestedFollowUps: [
-      'Best trading strategies for beginners',
-      'How do I set up price alerts?',
-      'Explain RSI and MACD indicators'
-    ]
-  };
+  // Default to trading mode for most mixed cases
+  return generateTradingResponse(userMessage, intent, context, marketData);
 };
 
 const generateDefaultResponse = (userMessage: string): DualModeAIResponse => {
@@ -277,6 +283,7 @@ const generateDefaultResponse = (userMessage: string): DualModeAIResponse => {
   };
 };
 
+// ... keep existing code (generateTradingFollowUps function)
 const generateTradingFollowUps = (message: string, context?: MessageContext): string[] => {
   const suggestions: string[] = [];
   
