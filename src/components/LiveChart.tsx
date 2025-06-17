@@ -1,10 +1,11 @@
+
 import { Card } from "@/components/ui/card";
 import { BarChart3, TrendingUp, TrendingDown, Wifi, WifiOff, Activity, AlertCircle } from "lucide-react";
 import { StockChart } from "@/components/StockChart";
 import { LivePriceBadge } from "@/components/LivePriceBadge";
 import { useRealTimePriceContext } from "@/components/RealTimePriceProvider";
 import { useMarketData } from "@/hooks/useMarketData";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface LiveChartProps {
   asset: string;
@@ -14,7 +15,14 @@ interface LiveChartProps {
 export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
   const { prices, isConnected, subscribe, error } = useRealTimePriceContext();
   const { price, change, isLoading: marketDataLoading, error: marketDataError, lastUpdated } = useMarketData(asset);
+  const [chartKey, setChartKey] = useState(`${asset}-${timeframe}-${Date.now()}`);
   
+  // Force chart regeneration when timeframe changes
+  useEffect(() => {
+    console.log(`🎯 LiveChart: Asset ${asset} timeframe changed to ${timeframe} - forcing chart update`);
+    setChartKey(`${asset}-${timeframe}-${Date.now()}`);
+  }, [asset, timeframe]);
+
   useEffect(() => {
     console.log(`🎯 LiveChart: Subscribing to ${asset} with timeframe ${timeframe}`);
     subscribe([asset]);
@@ -117,6 +125,9 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
           <div>
             <div className="flex items-center space-x-3">
               <h3 className="text-xl font-bold text-white">{asset} Chart</h3>
+              <div className="bg-tradeiq-blue/20 px-2 py-1 rounded border border-tradeiq-blue/30">
+                <span className="text-xs font-bold text-tradeiq-blue">{timeframe}</span>
+              </div>
               <LivePriceBadge symbol={asset} />
               {displayPrice && displayChange !== undefined && (
                 <div className="flex items-center space-x-2">
@@ -173,7 +184,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
       </div>
       
       <div className="h-80">
-        <StockChart symbol={asset} timeframe={timeframe} />
+        <StockChart symbol={asset} timeframe={timeframe} key={chartKey} />
       </div>
     </Card>
   );

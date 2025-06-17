@@ -19,10 +19,11 @@ const Index = () => {
   const [selectedAsset, setSelectedAsset] = useState<string>("AAPL");
   const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>("1D");
 
-  const handleTimeframeSelect = (timeframe: string) => {
-    // Convert string to Timeframe type and update state
+  const handleTimeframeSelect = useCallback((timeframe: string) => {
+    console.log(`🎯 Index: Timeframe changed to ${timeframe} for asset ${selectedAsset}`);
+    // Cast string to Timeframe type and update state immediately
     setSelectedTimeframe(timeframe as Timeframe);
-  };
+  }, [selectedAsset]);
 
   return (
     <div className="min-h-screen bg-tradeiq-navy">
@@ -93,10 +94,11 @@ const Index = () => {
           onTimeframeSelect={handleTimeframeSelect} 
         />
 
-        {/* Live Chart */}
+        {/* Live Chart with key prop to force re-render on timeframe change */}
         <LiveChart 
           asset={selectedAsset} 
-          timeframe={selectedTimeframe} 
+          timeframe={selectedTimeframe}
+          key={`${selectedAsset}-${selectedTimeframe}`}
         />
 
         {/* Analysis Grid */}

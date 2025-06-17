@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 interface PriceData {
@@ -29,29 +28,42 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
   const subscribedSymbolsRef = useRef<string[]>([]);
   const reconnectAttemptsRef = useRef(0);
-  const maxReconnectAttempts = 10; // Increased from 5
+  const maxReconnectAttempts = 15; // Increased attempts
   const isUnmountedRef = useRef(false);
   const lastSuccessfulConnectionRef = useRef<number>(0);
+  const pingIntervalRef = useRef<NodeJS.Timeout>();
+
+  // Exponential backoff calculation
+  const getReconnectDelay = useCallback((attempt: number) => {
+    const baseDelay = 1000; // 1 second
+    const maxDelay = 60000; // 1 minute max
+    const exponentialDelay = baseDelay * Math.pow(2, Math.min(attempt - 1, 6)); // Cap at 2^6
+    return Math.min(exponentialDelay + Math.random() * 1000, maxDelay); // Add jitter
+  }, []);
 
   const connect = useCallback(() => {
     if (isUnmountedRef.current || wsRef.current?.readyState === WebSocket.OPEN) {
       return;
     }
 
-    // Reset reconnect attempts if it's been more than 2 minutes since last successful connection
+    // Reset reconnect attempts if it's been more than 5 minutes since last successful connection
     const now = Date.now();
-    if (now - lastSuccessfulConnectionRef.current > 120000) {
-      console.log('🔄 Resetting reconnect attempts due to time gap');
+    if (now - lastSuccessfulConnectionRef.current > 300000) {
+      console.log('🔄 Resetting reconnect attempts due to time gap (5+ minutes)');
       reconnectAttemptsRef.current = 0;
+      setError(null);
     }
 
     if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
-      setError('Maximum reconnection attempts reached. Please refresh the page.');
+      const finalError = 'Maximum reconnection attempts reached. Please refresh the page to restore connection.';
+      console.error('❌ ' + finalError);
+      setError(finalError);
       return;
     }
 
     try {
-      console.log(`🔄 Connecting to Edge Function (attempt ${reconnectAttemptsRef.current + 1}/${maxReconnectAttempts})`);
+      reconnectAttemptsRef.current++;
+      console.log(`🔄 Connecting to Edge Function (attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
       
       const wsUrl = `wss://xnrvqfclyroagzknedhs.supabase.co/functions/v1/finnhub-websocket`;
       wsRef.current = new WebSocket(wsUrl);
@@ -62,7 +74,7 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
           return;
         }
 
-        console.log('✅ Connected to Edge Function');
+        console.log('✅ Successfully connected to Edge Function');
         setIsConnected(true);
         setError(null);
         reconnectAttemptsRef.current = 0; // Reset on successful connection
@@ -77,12 +89,15 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
           }));
         }
 
-        // Send a ping to keep connection alive
-        const pingInterval = setInterval(() => {
+        // Set up keep-alive ping
+        if (pingIntervalRef.current) {
+          clearInterval(pingIntervalRef.current);
+        }
+        pingIntervalRef.current = setInterval(() => {
           if (wsRef.current?.readyState === WebSocket.OPEN) {
             wsRef.current.send(JSON.stringify({ type: 'ping' }));
           } else {
-            clearInterval(pingInterval);
+            clearInterval(pingIntervalRef.current!);
           }
         }, 30000); // Ping every 30 seconds
       };
@@ -102,51 +117,57 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
             }));
           } else if (message.type === 'error') {
             console.error('❌ Server error:', message.error);
-            setError(`Server error: ${message.error}`);
             
-            // If it's a token error, don't retry immediately
+            // Handle different types of server errors
             if (message.error.includes('token') || message.error.includes('401') || message.error.includes('403')) {
-              setError('Authentication error with Finnhub. Please check API key.');
-              reconnectAttemptsRef.current = maxReconnectAttempts; // Stop retrying
+              setError('Authentication error with market data provider. Please refresh and try again.');
+              reconnectAttemptsRef.current = maxReconnectAttempts; // Stop retrying for auth errors
+            } else if (message.error.includes('rate limit')) {
+              setError('Rate limit reached. Retrying with reduced frequency...');
+            } else {
+              setError(`Server error: ${message.error}`);
             }
           } else if (message.type === 'debug') {
             console.log('🔍 Debug:', message.message);
             
-            // Look for subscription confirmations
             if (message.message.includes('Subscribed to')) {
-              console.log('✅ Subscription confirmed by Finnhub');
+              console.log('✅ Subscription confirmed by market data provider');
             }
           } else if (message.type === 'pong') {
-            console.log('🏓 Received pong from server');
+            console.log('🏓 Received pong from server - connection healthy');
           }
         } catch (err) {
-          console.error('❌ Error parsing message:', err);
+          console.error('❌ Error parsing WebSocket message:', err);
         }
       };
 
       wsRef.current.onclose = (event) => {
-        console.log('🔌 Connection closed:', event.code, event.reason);
+        console.log('🔌 WebSocket connection closed:', event.code, event.reason);
         setIsConnected(false);
+        
+        // Clear ping interval
+        if (pingIntervalRef.current) {
+          clearInterval(pingIntervalRef.current);
+          pingIntervalRef.current = undefined;
+        }
         
         if (isUnmountedRef.current) return;
         
-        // Different handling based on close code
+        // Handle different close codes
         if (event.code === 1000) {
-          // Normal closure, don't reconnect
-          console.log('👋 Normal connection closure');
+          console.log('👋 Normal connection closure - not reconnecting');
           return;
         }
         
         if (event.code === 1006) {
-          // Abnormal closure, likely network issue
-          console.log('🔌 Abnormal closure detected (network issue)');
+          console.log('🔌 Abnormal closure detected (likely network issue)');
         }
         
+        // Attempt reconnection with exponential backoff
         if (reconnectAttemptsRef.current < maxReconnectAttempts) {
-          reconnectAttemptsRef.current++;
-          const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current - 1), 30000); // Cap at 30s
-          console.log(`🔄 Reconnecting in ${delay}ms... (${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
-          setError(`Connection lost, reconnecting... (${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
+          const delay = getReconnectDelay(reconnectAttemptsRef.current);
+          console.log(`🔄 Scheduling reconnection in ${delay}ms... (${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
+          setError(`Connection lost, reconnecting in ${Math.round(delay/1000)}s... (${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
           
           reconnectTimeoutRef.current = setTimeout(() => {
             if (!isUnmountedRef.current) {
@@ -154,23 +175,25 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
             }
           }, delay);
         } else {
-          setError('Maximum reconnection attempts reached. Please refresh the page.');
+          const finalError = 'Maximum reconnection attempts reached. Please refresh the page to restore connection.';
+          console.error('❌ ' + finalError);
+          setError(finalError);
         }
       };
 
       wsRef.current.onerror = (error) => {
-        console.error('❌ WebSocket error:', error);
-        setError('Connection failed');
+        console.error('❌ WebSocket error occurred:', error);
+        setError('Connection failed - attempting to reconnect...');
         setIsConnected(false);
       };
     } catch (err) {
-      console.error('❌ Failed to create WebSocket:', err);
-      setError('Failed to initialize connection');
+      console.error('❌ Failed to create WebSocket connection:', err);
+      setError('Failed to initialize connection - retrying...');
     }
-  }, []);
+  }, [getReconnectDelay]);
 
   useEffect(() => {
-    console.log('🚀 Initializing real-time prices hook');
+    console.log('🚀 Initializing real-time prices hook with enhanced connection management');
     isUnmountedRef.current = false;
     connect();
 
@@ -180,6 +203,9 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
       
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
+      }
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current);
       }
       if (wsRef.current) {
         wsRef.current.close(1000, 'Component unmounting');
@@ -199,7 +225,7 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
       }));
     } else {
       console.log('⏳ WebSocket not ready, will subscribe when connected');
-      // Force reconnection if not connected
+      // Force reconnection if not connected and not at max attempts
       if (!isConnected && reconnectAttemptsRef.current < maxReconnectAttempts) {
         console.log('🔄 Forcing reconnection due to subscription request');
         connect();
@@ -208,14 +234,18 @@ export const useRealTimePrices = (): UseRealTimePricesReturn => {
   }, [connect, isConnected]);
 
   const unsubscribe = useCallback(() => {
-    console.log('🛑 Unsubscribing');
+    console.log('🛑 Unsubscribing from all symbols');
     subscribedSymbolsRef.current = [];
     isUnmountedRef.current = true;
+    
     if (wsRef.current) {
       wsRef.current.close(1000, 'User initiated disconnect');
     }
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
+    }
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current);
     }
   }, []);
 

@@ -19,36 +19,43 @@ interface ChartDataPoint {
   timeframe: string;
 }
 
-// Generate realistic historical data based on timeframe with proper intervals
+// Enhanced data generation with proper timeframe-specific intervals
 const generateHistoricalData = (currentPrice: number, timeframe: string): ChartDataPoint[] => {
   const data: ChartDataPoint[] = [];
   let price = currentPrice || (150 + Math.random() * 50);
   
-  // Configure data points and intervals based on timeframe
+  // Comprehensive timeframe configuration
   const timeframeConfig = {
-    '1D': { points: 78, intervalMinutes: 5, volatility: 0.008 }, // 5-minute intervals for 6.5 hours
-    '1W': { points: 7, intervalMinutes: 1440, volatility: 0.015 }, // Daily intervals
-    '1M': { points: 30, intervalMinutes: 1440, volatility: 0.02 }, // Daily intervals
-    '3M': { points: 12, intervalMinutes: 10080, volatility: 0.03 }, // Weekly intervals
-    '6M': { points: 26, intervalMinutes: 10080, volatility: 0.035 }, // Weekly intervals
-    '1Y': { points: 12, intervalMinutes: 43200, volatility: 0.04 }, // Monthly intervals
+    '1D': { points: 48, intervalMinutes: 15, volatility: 0.008, label: 'Hourly' }, // 15-min intervals for day trading
+    '1W': { points: 7, intervalMinutes: 1440, volatility: 0.015, label: 'Daily' }, // Daily for week
+    '1M': { points: 22, intervalMinutes: 1440, volatility: 0.02, label: 'Daily' }, // Business days in month
+    '3M': { points: 13, intervalMinutes: 10080, volatility: 0.03, label: 'Weekly' }, // Weekly for quarter
+    '6M': { points: 26, intervalMinutes: 10080, volatility: 0.035, label: 'Weekly' }, // Bi-weekly
+    '1Y': { points: 12, intervalMinutes: 43800, volatility: 0.04, label: 'Monthly' }, // Monthly for year
   };
 
   const config = timeframeConfig[timeframe as keyof typeof timeframeConfig] || timeframeConfig['1D'];
+  console.log(`📊 Generating ${config.points} data points for ${timeframe} with ${config.label} intervals`);
   
   for (let i = config.points; i >= 1; i--) {
     const date = new Date();
     
-    // Calculate proper time intervals
-    date.setMinutes(date.getMinutes() - (i * config.intervalMinutes));
+    // Calculate proper time intervals based on timeframe
+    if (timeframe === '1D') {
+      date.setMinutes(date.getMinutes() - (i * config.intervalMinutes));
+    } else if (timeframe === '1W' || timeframe === '1M') {
+      date.setDate(date.getDate() - i);
+    } else {
+      date.setDate(date.getDate() - (i * 7)); // Weekly intervals for longer periods
+    }
     
-    // Add realistic volatility with trend component
-    const trendComponent = Math.sin(i / config.points * Math.PI) * 0.01;
+    // Realistic price movement with timeframe-appropriate volatility
+    const trendComponent = Math.sin(i / config.points * Math.PI * 2) * 0.02;
     const randomComponent = (Math.random() - 0.5) * config.volatility;
-    const volatility = trendComponent + randomComponent;
+    const marketHours = timeframe === '1D' ? (date.getHours() >= 9 && date.getHours() <= 16 ? 1.2 : 0.8) : 1;
     
-    price *= (1 + volatility);
-    price = Math.max(price, 50); // Minimum price floor
+    price *= (1 + (trendComponent + randomComponent) * marketHours);
+    price = Math.max(price, 50); // Price floor
     
     data.push({
       date: date.toISOString(),
@@ -69,6 +76,7 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [lastDataUpdate, setLastDataUpdate] = useState<number | null>(null);
   const [isChartLoading, setIsChartLoading] = useState(true);
+  const [chartKey, setChartKey] = useState(`${symbol}-${timeframe}-${Date.now()}`);
 
   // Memoize base price for consistent data generation
   const basePrice = useMemo(() => {
@@ -77,23 +85,22 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
 
   // Generate fresh chart data when timeframe or symbol changes
   const regenerateChartData = useCallback(() => {
-    console.log(`📈 Regenerating chart data for ${symbol} with timeframe ${timeframe}`);
+    console.log(`📈 IMMEDIATE: Regenerating chart data for ${symbol} with timeframe ${timeframe}`);
     setIsChartLoading(true);
+    setChartKey(`${symbol}-${timeframe}-${Date.now()}`); // Force chart re-render
     
-    // Small delay to show loading state
-    setTimeout(() => {
-      const newData = generateHistoricalData(basePrice, timeframe);
-      setChartData(newData);
-      setLastDataUpdate(null); // Reset to allow fresh real-time data
-      setIsChartLoading(false);
-      console.log(`✅ Chart data regenerated: ${newData.length} points for ${timeframe}`);
-    }, 300);
+    // Immediate update for responsive UX
+    const newData = generateHistoricalData(basePrice, timeframe);
+    setChartData(newData);
+    setLastDataUpdate(null);
+    setIsChartLoading(false);
+    console.log(`✅ Chart data regenerated IMMEDIATELY: ${newData.length} points for ${timeframe}`);
   }, [symbol, timeframe, basePrice]);
 
-  // Regenerate data when timeframe or symbol changes
+  // IMMEDIATE regeneration on timeframe/symbol change
   useEffect(() => {
     regenerateChartData();
-  }, [regenerateChartData]);
+  }, [timeframe, symbol, regenerateChartData]);
 
   // Add real-time market data updates
   useEffect(() => {
@@ -103,7 +110,6 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
       setChartData(prevData => {
         const newData = [...prevData];
         
-        // Add market data as the latest point
         newData.push({
           date: new Date(lastUpdated).toISOString(),
           time: lastUpdated,
@@ -114,10 +120,10 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
           timeframe: timeframe
         });
         
-        // Keep appropriate number of points
-        const maxPoints = timeframe === '1D' ? 80 : 
+        // Keep appropriate number of points based on timeframe
+        const maxPoints = timeframe === '1D' ? 50 : 
                          timeframe === '1W' ? 10 :
-                         timeframe === '1M' ? 35 : 50;
+                         timeframe === '1M' ? 25 : 30;
         
         return newData.slice(-maxPoints);
       });
@@ -126,44 +132,15 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
     }
   }, [marketPrice, lastUpdated, symbol, lastDataUpdate, timeframe]);
 
-  // Add WebSocket updates as fallback
-  useEffect(() => {
-    const currentPriceData = prices[symbol];
-    if (currentPriceData && currentPriceData.timestamp && (!lastDataUpdate || currentPriceData.timestamp > lastDataUpdate)) {
-      console.log(`🔄 Adding WebSocket update for ${symbol}: $${currentPriceData.currentPrice}`);
-      
-      setChartData(prevData => {
-        const newData = [...prevData];
-        
-        newData.push({
-          date: new Date(currentPriceData.timestamp).toISOString(),
-          time: currentPriceData.timestamp,
-          price: currentPriceData.currentPrice,
-          volume: Math.floor(Math.random() * 5000000 + 1000000),
-          isRealTime: true,
-          isWebSocket: true,
-          timeframe: timeframe
-        });
-        
-        const maxPoints = timeframe === '1D' ? 80 : 
-                         timeframe === '1W' ? 10 :
-                         timeframe === '1M' ? 35 : 50;
-        
-        return newData.slice(-maxPoints);
-      });
-      
-      setLastDataUpdate(currentPriceData.timestamp);
-    }
-  }, [prices, symbol, lastDataUpdate, timeframe]);
-
-  // Calculate Y-axis domain with proper scaling
+  // Enhanced Y-axis domain calculation with proper scaling
   const yAxisDomain = useMemo(() => {
     if (chartData.length === 0) return ['dataMin - 5', 'dataMax + 5'];
     
     const prices = chartData.map(d => d.price);
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
-    const padding = (maxPrice - minPrice) * 0.1; // 10% padding
+    const range = maxPrice - minPrice;
+    const padding = Math.max(range * 0.1, 0.5); // At least $0.50 padding
     
     return [
       Math.max(0, minPrice - padding),
@@ -171,7 +148,7 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
     ];
   }, [chartData]);
 
-  // Format X-axis based on timeframe
+  // Enhanced X-axis formatting based on timeframe
   const formatXAxis = useCallback((value: number) => {
     const date = new Date(value);
     
@@ -183,6 +160,11 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
           hour12: false 
         });
       case '1W':
+        return date.toLocaleDateString('en-US', { 
+          weekday: 'short',
+          month: 'short', 
+          day: 'numeric' 
+        });
       case '1M':
         return date.toLocaleDateString('en-US', { 
           month: 'short', 
@@ -207,13 +189,13 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
     }
   }, [timeframe]);
 
-  // Determine connection status
+  // Enhanced connection status logic
   const getConnectionStatus = () => {
     if (isChartLoading) {
       return { status: 'Loading...', color: 'text-blue-500', bgColor: 'bg-blue-500' };
     }
     
-    const hasRecentData = lastDataUpdate && (Date.now() - lastDataUpdate) < 120000; // 2 minutes
+    const hasRecentData = lastDataUpdate && (Date.now() - lastDataUpdate) < 300000; // 5 minutes
     const hasMarketData = marketPrice && !isLoading && !marketError;
     const hasWebSocketData = isConnected && prices[symbol];
     
@@ -230,11 +212,11 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
     }
     
     if (isLoading) {
-      return { status: 'Loading...', color: 'text-blue-500', bgColor: 'bg-blue-500' };
+      return { status: 'Loading Data...', color: 'text-blue-500', bgColor: 'bg-blue-500' };
     }
     
-    if (marketError && !basePrice) {
-      return { status: 'Error', color: 'text-red-500', bgColor: 'bg-red-500' };
+    if (marketError) {
+      return { status: 'Data Error', color: 'text-red-500', bgColor: 'bg-red-500' };
     }
     
     return { status: 'Demo Mode', color: 'text-gray-500', bgColor: 'bg-gray-500' };
@@ -267,7 +249,7 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
   
   return (
     <div className="h-80 relative">
-      {/* Chart status indicators */}
+      {/* Enhanced chart status indicators */}
       <div className="absolute top-2 right-2 z-10 flex items-center space-x-2">
         {displayPrice && (
           <div className="bg-black/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-gray-700">
@@ -284,8 +266,8 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
             {connectionStatus.status}
           </span>
         </div>
-        <div className="bg-black/80 backdrop-blur-sm rounded-lg px-2 py-1">
-          <span className="text-xs text-blue-400 font-bold">
+        <div className="bg-tradeiq-blue/20 backdrop-blur-sm rounded-lg px-2 py-1 border border-tradeiq-blue/30">
+          <span className="text-xs text-tradeiq-blue font-bold">
             {timeframe}
           </span>
         </div>
@@ -299,9 +281,9 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
       </div>
       
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={chartData} key={`${symbol}-${timeframe}`}>
+        <AreaChart data={chartData} key={chartKey}>
           <defs>
-            <linearGradient id={`colorPrice-${symbol}-${timeframe}`} x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id={`colorPrice-${chartKey}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#2563EB" stopOpacity={0.4}/>
               <stop offset="95%" stopColor="#2563EB" stopOpacity={0}/>
             </linearGradient>
@@ -316,6 +298,7 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
             domain={['dataMin', 'dataMax']}
             type="number"
             scale="time"
+            interval="preserveStartEnd"
           />
           <YAxis 
             stroke="#64748B"
@@ -323,6 +306,7 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
             fontFamily="Inter"
             tickFormatter={(value) => `$${value.toFixed(2)}`}
             domain={yAxisDomain}
+            width={60}
           />
           <Tooltip 
             contentStyle={{ 
@@ -340,13 +324,11 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
             }}
             formatter={(value: any, name: string, props: any) => {
               const isRealTime = props.payload.isRealTime;
-              const isWebSocket = props.payload.isWebSocket;
               const isLatest = props.payload.isLatest;
               
               let label = 'Price';
-              if (isLatest) label = '🔴 Latest Price';
-              else if (isWebSocket) label = '🟡 WebSocket Price';
-              else if (isRealTime) label = '🟢 Live Price';
+              if (isLatest) label = '🔴 Live Price';
+              else if (isRealTime) label = '🟢 Real-time';
               
               return [`$${value.toFixed(2)}`, label];
             }}
@@ -357,11 +339,10 @@ export const StockChart = ({ symbol, timeframe = '1D' }: StockChartProps) => {
             stroke="#2563EB"
             strokeWidth={2.5}
             fillOpacity={1}
-            fill={`url(#colorPrice-${symbol}-${timeframe})`}
+            fill={`url(#colorPrice-${chartKey})`}
             dot={(props: any) => {
               if (props.payload.isRealTime) {
-                const color = props.payload.isLatest ? "#10B981" : 
-                             props.payload.isWebSocket ? "#8B5CF6" : "#F59E0B";
+                const color = props.payload.isLatest ? "#10B981" : "#F59E0B";
                 return (
                   <circle
                     cx={props.cx}
