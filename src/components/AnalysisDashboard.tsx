@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ArrowLeft, Brain, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -139,15 +138,9 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
           <TechnicalIndicators symbol={stockSymbol} />
         </div>
 
-        {/* AI Analysis Sidebar */}
+        {/* Enhanced AI Analysis Sidebar */}
         <div className="space-y-6">
-          <Card className="tradeiq-card p-6 rounded-2xl">
-            <div className="flex items-center space-x-3 mb-6">
-              <Brain className="h-6 w-6 text-purple-400" />
-              <h3 className="text-xl font-bold text-white">AI Analysis</h3>
-            </div>
-            <AIAnalysis symbol={stockSymbol} stockData={{ price, change }} />
-          </Card>
+          <AIAnalysis symbol={stockSymbol} stockData={{ price, change }} />
         </div>
       </div>
     </div>
