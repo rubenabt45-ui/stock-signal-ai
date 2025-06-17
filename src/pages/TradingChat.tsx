@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { useMultipleMarketData } from "@/hooks/useMarketData";
 import { analyzeMessageContext, MessageContext } from "@/services/symbolDetectionService";
 import { generateDualModeResponse, DualModeAIResponse } from "@/services/dualModeAIService";
+import { useSessionContext } from "@/hooks/useSessionContext";
+import { ActionButtons } from "@/components/ActionButtons";
 
 interface Message {
   id: string;
@@ -19,6 +21,8 @@ interface Message {
 }
 
 const TradingChat = () => {
+  const { context: sessionContext, updateContext, resetContext } = useSessionContext();
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -59,6 +63,22 @@ const TradingChat = () => {
 
     // Analyze message context
     const context = analyzeMessageContext(inputValue);
+    
+    // Check for context from session if no symbols detected
+    if (context.symbols.length === 0 && sessionContext.activeSymbol) {
+      // Add session context symbol if the message seems to be a follow-up question
+      const followUpWords = ['what', 'how', 'when', 'why', 'the', 'its', 'this', 'that'];
+      const isFollowUp = followUpWords.some(word => inputValue.toLowerCase().includes(word));
+      
+      if (isFollowUp) {
+        context.symbols.push({
+          symbol: sessionContext.activeSymbol,
+          type: 'stock',
+          confidence: 0.8
+        });
+      }
+    }
+    
     const relevantMarketData = context.symbols.reduce((acc, symbol) => {
       if (marketData[symbol.symbol]) {
         acc[symbol.symbol] = marketData[symbol.symbol];
@@ -85,10 +105,7 @@ const TradingChat = () => {
         userMessage: inputValue,
         context,
         marketData: relevantMarketData,
-        conversationHistory: messages.slice(-5).map(m => ({
-          role: m.isUser ? 'user' : 'assistant',
-          content: m.content
-        }))
+        conversationHistory: sessionContext.conversationHistory
       });
 
       const aiMessage: Message = {
@@ -102,6 +119,11 @@ const TradingChat = () => {
       };
 
       setMessages(prev => [...prev, aiMessage]);
+      
+      // Update session context
+      const detectedSymbol = context.symbols[0]?.symbol;
+      updateContext(inputValue, aiResponse.content, detectedSymbol);
+      
     } catch (error) {
       console.error('Error generating AI response:', error);
       
@@ -124,6 +146,21 @@ const TradingChat = () => {
 
   const handleFollowUp = (suggestion: string) => {
     setInputValue(suggestion);
+  };
+
+  const handleOpenChartAI = (symbol: string) => {
+    console.log(`Opening Chart AI for ${symbol}`);
+    // TODO: Navigate to Chart AI page with symbol
+  };
+
+  const handleSetAlert = (symbol: string) => {
+    console.log(`Setting alert for ${symbol}`);
+    // TODO: Open alert modal with symbol prefilled
+  };
+
+  const handleAddToFavorites = (symbol: string) => {
+    console.log(`Adding ${symbol} to favorites`);
+    // TODO: Add symbol to favorites
   };
 
   const quickSuggestions = [
@@ -149,6 +186,15 @@ const TradingChat = () => {
             
             {/* Mode indicator and market data */}
             <div className="flex items-center space-x-4">
+              {sessionContext.activeSymbol && (
+                <div className="flex items-center space-x-2">
+                  <TrendingUp className="h-4 w-4 text-green-500" />
+                  <span className="text-sm text-gray-300">
+                    Active: {sessionContext.activeSymbol}
+                  </span>
+                </div>
+              )}
+              
               {detectedSymbols.length > 0 && (
                 <div className="flex items-center space-x-2">
                   <TrendingUp className="h-4 w-4 text-green-500" />
@@ -257,17 +303,21 @@ const TradingChat = () => {
                       </div>
                     )}
                     
-                    {/* Risk disclaimer */}
-                    {!message.isUser && message.aiResponse?.riskDisclaimer && (
-                      <div className="mt-3 p-2 bg-yellow-900/20 border border-yellow-700/30 rounded text-xs text-yellow-300">
-                        ⚠️ <strong>Disclaimer:</strong> This is educational content, not financial advice. Always do your own research and consider your risk tolerance.
-                      </div>
-                    )}
-                    
                     <span className="text-xs opacity-70 mt-2 block">
                       {message.timestamp.toLocaleTimeString()}
                     </span>
                   </Card>
+                  
+                  {/* Action buttons for AI responses */}
+                  {!message.isUser && message.context && (
+                    <ActionButtons
+                      symbol={message.context.symbols[0]?.symbol}
+                      responseType={message.aiResponse?.mode || 'mixed'}
+                      onOpenChartAI={handleOpenChartAI}
+                      onSetAlert={handleSetAlert}
+                      onAddToFavorites={handleAddToFavorites}
+                    />
+                  )}
                   
                   {/* AI response confidence and follow-ups */}
                   {!message.isUser && message.aiResponse && (
