@@ -1,5 +1,6 @@
+
 import { IntentAnalysis, analyzeUserIntent, getProductFeatureInfo, searchProductFeatures } from './intentDetectionService';
-import { MessageContext } from './symbolDetectionService';
+import { MessageContext, analyzeMessageContext } from './symbolDetectionService';
 import { UseMarketDataReturn } from '@/hooks/useMarketData';
 
 export interface DualModeAIRequest {
