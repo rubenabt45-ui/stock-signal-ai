@@ -8,7 +8,7 @@ interface MarketData {
   error: string | null;
 }
 
-interface UseMarketDataReturn extends MarketData {
+export interface UseMarketDataReturn extends MarketData {
   lastUpdated: number | null;
 }
 
