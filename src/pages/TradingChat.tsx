@@ -1,13 +1,13 @@
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, TrendingUp, AlertCircle, Clock } from "lucide-react";
+import { Send, Bot, User, TrendingUp, AlertCircle, Clock, BookOpen, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useMultipleMarketData } from "@/hooks/useMarketData";
 import { analyzeMessageContext, MessageContext } from "@/services/symbolDetectionService";
-import { generateEnhancedTradingResponse, EnhancedAIResponse } from "@/services/enhancedAIService";
+import { generateDualModeResponse, DualModeAIResponse } from "@/services/dualModeAIService";
 
 interface Message {
   id: string;
@@ -15,7 +15,7 @@ interface Message {
   isUser: boolean;
   timestamp: Date;
   context?: MessageContext;
-  aiResponse?: EnhancedAIResponse;
+  aiResponse?: DualModeAIResponse;
   marketData?: Record<string, any>;
 }
 
@@ -23,7 +23,7 @@ const TradingChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm TradeBot, your enhanced AI trading assistant. I can analyze real-time market data, detect symbols in your messages, and provide context-aware technical analysis. Try asking about specific stocks, crypto, or technical indicators!",
+      content: "Hello! I'm your **TradeIQ Assistant** 🤖\n\nI can help you with:\n📊 **Trading & Investing**: Strategies, technical analysis, market insights\n📱 **TradeIQ Features**: Chart AI, alerts, favorites, and app navigation\n\nWhat would you like to explore today?",
       isUser: false,
       timestamp: new Date(),
     }
@@ -81,8 +81,8 @@ const TradingChat = () => {
     setIsLoading(true);
 
     try {
-      // Generate enhanced AI response
-      const aiResponse = await generateEnhancedTradingResponse({
+      // Generate dual-mode AI response
+      const aiResponse = await generateDualModeResponse({
         userMessage: inputValue,
         context,
         marketData: relevantMarketData,
@@ -128,10 +128,10 @@ const TradingChat = () => {
   };
 
   const quickSuggestions = [
-    "Analyze BTC price action",
-    "TSLA support levels 1d",
-    "SPY MACD analysis",
-    "EUR/USD trend weekly"
+    "What is Chart AI?",
+    "Best crypto strategies",
+    "How do I set alerts?",
+    "TSLA technical analysis"
   ];
 
   return (
@@ -143,21 +143,31 @@ const TradingChat = () => {
             <div className="flex items-center space-x-3">
               <Bot className="h-8 w-8 text-tradeiq-blue" />
               <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">Enhanced TradingChat</h1>
-                <p className="text-sm text-gray-400 font-medium">Context-Aware AI Trading Assistant</p>
+                <h1 className="text-2xl font-bold text-white tracking-tight">TradeIQ Assistant</h1>
+                <p className="text-sm text-gray-400 font-medium">Trading Knowledge + App Guidance</p>
               </div>
             </div>
             
-            {/* Live market data indicator */}
-            {detectedSymbols.length > 0 && (
-              <div className="flex items-center space-x-2">
-                <TrendingUp className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-gray-300">
-                  Tracking: {detectedSymbols.slice(0, 3).join(", ")}
-                  {detectedSymbols.length > 3 && ` +${detectedSymbols.length - 3} more`}
-                </span>
+            {/* Mode indicator and market data */}
+            <div className="flex items-center space-x-4">
+              {detectedSymbols.length > 0 && (
+                <div className="flex items-center space-x-2">
+                  <TrendingUp className="h-4 w-4 text-green-500" />
+                  <span className="text-sm text-gray-300">
+                    Tracking: {detectedSymbols.slice(0, 3).join(", ")}
+                    {detectedSymbols.length > 3 && ` +${detectedSymbols.length - 3} more`}
+                  </span>
+                </div>
+              )}
+              
+              <div className="flex items-center space-x-2 text-xs text-gray-400">
+                <BookOpen className="h-3 w-3" />
+                <span>Trading</span>
+                <span>•</span>
+                <HelpCircle className="h-3 w-3" />
+                <span>Product Help</span>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </header>
@@ -190,6 +200,24 @@ const TradingChat = () => {
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">
                       {message.content}
                     </p>
+                    
+                    {/* Mode indicator for AI responses */}
+                    {!message.isUser && message.aiResponse && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Badge 
+                          variant={message.aiResponse.mode === 'trading' ? 'default' : 'secondary'} 
+                          className="text-xs"
+                        >
+                          {message.aiResponse.mode === 'trading' ? '📊 Trading' : 
+                           message.aiResponse.mode === 'product' ? '📱 Product' : '🔄 Mixed'}
+                        </Badge>
+                        {message.aiResponse.riskDisclaimer && (
+                          <Badge variant="outline" className="text-xs text-yellow-400 border-yellow-400">
+                            ⚠️ Investment Risk
+                          </Badge>
+                        )}
+                      </div>
+                    )}
                     
                     {/* Context indicators for user messages */}
                     {message.isUser && message.context && (
@@ -230,6 +258,13 @@ const TradingChat = () => {
                       </div>
                     )}
                     
+                    {/* Risk disclaimer */}
+                    {!message.isUser && message.aiResponse?.riskDisclaimer && (
+                      <div className="mt-3 p-2 bg-yellow-900/20 border border-yellow-700/30 rounded text-xs text-yellow-300">
+                        ⚠️ <strong>Disclaimer:</strong> This is educational content, not financial advice. Always do your own research and consider your risk tolerance.
+                      </div>
+                    )}
+                    
                     <span className="text-xs opacity-70 mt-2 block">
                       {message.timestamp.toLocaleTimeString()}
                     </span>
@@ -242,8 +277,9 @@ const TradingChat = () => {
                         <div className="flex items-center space-x-2 text-xs text-gray-400">
                           <AlertCircle className="h-3 w-3" />
                           <span>Confidence: {(message.aiResponse.confidence * 100).toFixed(0)}%</span>
-                          {message.aiResponse.dataUsed.length > 0 && (
-                            <span>• Data: {message.aiResponse.dataUsed.join(", ")}</span>
+                          <span>• Mode: {message.aiResponse.mode}</span>
+                          {message.aiResponse.relatedFeatures && message.aiResponse.relatedFeatures.length > 0 && (
+                            <span>• Features: {message.aiResponse.relatedFeatures.join(", ")}</span>
                           )}
                         </div>
                       )}
@@ -283,7 +319,7 @@ const TradingChat = () => {
                       <div className="w-2 h-2 bg-tradeiq-blue rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                       <div className="w-2 h-2 bg-tradeiq-blue rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     </div>
-                    <span className="text-sm text-gray-400">Analyzing market data...</span>
+                    <span className="text-sm text-gray-400">Analyzing your request...</span>
                   </div>
                 </Card>
               </div>
@@ -346,7 +382,7 @@ const TradingChat = () => {
               <Textarea
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Ask about specific symbols (BTC, AAPL), technical analysis (MACD, RSI), or market trends..."
+                placeholder="Ask about trading strategies, technical analysis, or TradeIQ features (Chart AI, alerts, etc.)..."
                 className="flex-1 min-h-[44px] max-h-32 resize-none bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-tradeiq-blue transition-colors"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
