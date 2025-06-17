@@ -1,3 +1,4 @@
+
 import { IntentAnalysis, analyzeUserIntent, getProductFeatureInfo, searchProductFeatures } from './intentDetectionService';
 import { MessageContext } from './symbolDetectionService';
 import { UseMarketDataReturn } from '@/hooks/useMarketData';
@@ -24,7 +25,7 @@ export const generateDualModeResponse = async (request: DualModeAIRequest): Prom
   // Analyze user intent
   const intentAnalysis = analyzeUserIntent(userMessage);
   
-  // Only use mixed/clarify responses for very low confidence
+  // Use confidence threshold of 60% for direct responses
   if (intentAnalysis.confidence < 0.4) {
     return generateDefaultResponse(userMessage);
   }
@@ -37,13 +38,15 @@ export const generateDualModeResponse = async (request: DualModeAIRequest): Prom
       return generateTradingResponse(userMessage, intentAnalysis, context, marketData);
     case 'mixed':
       // For mixed intent with reasonable confidence, choose the stronger signal
-      if (intentAnalysis.productFeatures && intentAnalysis.productFeatures.length > 0) {
-        return generateProductResponse(userMessage, intentAnalysis);
+      if (intentAnalysis.confidence >= 0.6) {
+        if (intentAnalysis.productFeatures && intentAnalysis.productFeatures.length > 0) {
+          return generateProductResponse(userMessage, intentAnalysis);
+        }
+        if (intentAnalysis.tradingTopics && intentAnalysis.tradingTopics.length > 0) {
+          return generateTradingResponse(userMessage, intentAnalysis, context, marketData);
+        }
       }
-      if (intentAnalysis.tradingTopics && intentAnalysis.tradingTopics.length > 0) {
-        return generateTradingResponse(userMessage, intentAnalysis, context, marketData);
-      }
-      return generateMixedResponse(userMessage, intentAnalysis, context, marketData);
+      return generateMixedResponse(userMessage, intentAnalysis);
     default:
       return generateDefaultResponse(userMessage);
   }
@@ -57,13 +60,13 @@ const generateProductResponse = (userMessage: string, intent: IntentAnalysis): D
     const feature = getProductFeatureInfo(intent.productFeatures[0]);
     if (feature) {
       return {
-        content: `${feature.name} is ${feature.description}.\n\nLocation: ${feature.location}\n\nThis feature helps you get more insights and control over your trading experience. To access it, look for the relevant option in your main dashboard or navigate to the specified location.`,
+        content: `${feature.name} is ${feature.description}. You can find this feature at ${feature.location}. This tool helps enhance your trading analysis by providing automated insights and pattern recognition, making it easier to spot opportunities in real-time market data.`,
         mode: 'product',
         confidence: intent.confidence,
         suggestedFollowUps: [
-          `How do I use ${feature.name} effectively?`,
-          'Show me other key TradeIQ features',
-          'What are the benefits of upgrading to Pro?'
+          `How do I get the most out of ${feature.name}?`,
+          'What other TradeIQ features complement this?',
+          'Show me advanced TradeIQ capabilities'
         ],
         relatedFeatures: intent.productFeatures
       };
@@ -73,13 +76,13 @@ const generateProductResponse = (userMessage: string, intent: IntentAnalysis): D
   // Handle upgrade questions
   if (lowerMessage.includes('upgrade') || lowerMessage.includes('pro')) {
     return {
-      content: `TradeIQ Pro provides access to advanced trading tools:\n\nAdvanced Chart AI with deeper technical analysis and pattern recognition\nUnlimited alerts so you can monitor as many price points as needed\nPremium indicators including advanced technical analysis tools\nPriority support for faster assistance\n\nTo upgrade: Navigate to Settings, then select Upgrade, or look for upgrade prompts throughout the app.\n\nPro users also get enhanced news analysis and market insights.`,
+      content: `TradeIQ Pro unlocks advanced trading capabilities including enhanced Chart AI with deeper pattern recognition, unlimited price alerts for comprehensive monitoring, premium technical indicators, and priority customer support. To upgrade, navigate to Settings and select the Upgrade option, or look for upgrade prompts throughout the app. Pro users gain access to institutional-grade analytics that can significantly improve trading decision-making.`,
       mode: 'product',
       confidence: 0.9,
       suggestedFollowUps: [
-        'What specific Chart AI features are in Pro?',
-        'How much does the Pro plan cost?',
-        'Can I try Pro features before upgrading?'
+        'What specific Chart AI upgrades are included?',
+        'How do unlimited alerts improve my trading?',
+        'Show me Pro vs Free feature comparison'
       ]
     };
   }
@@ -87,13 +90,13 @@ const generateProductResponse = (userMessage: string, intent: IntentAnalysis): D
   // Handle favorites/watchlist questions
   if (lowerMessage.includes('favorite') || lowerMessage.includes('watchlist')) {
     return {
-      content: `Favorites allow you to save and quickly access your preferred assets for faster monitoring.\n\nTo add favorites: Tap the star icon next to any asset in search results or asset pages\nTo view favorites: Access the Favorites tab in your main navigation\nReal-time updates: Your favorites display live prices and percentage changes\n\nThis streamlines your workflow by keeping important assets easily accessible without repeated searching.`,
+      content: `Favorites in TradeIQ let you create a personalized watchlist of assets you want to monitor closely. Tap the star icon next to any asset to add it to your favorites, then access your complete list through the Favorites tab in the main navigation. Your favorites display real-time prices and percentage changes, making it easy to track multiple positions and opportunities without constantly searching for specific assets.`,
       mode: 'product',
       confidence: 0.9,
       suggestedFollowUps: [
-        'How can I organize my favorites list?',
-        'Can I set price alerts on my favorites?',
-        'What other tools help track multiple assets?'
+        'How can I organize my favorites effectively?',
+        'Can I set alerts on my favorite assets?',
+        'What other portfolio tracking tools are available?'
       ]
     };
   }
@@ -101,13 +104,13 @@ const generateProductResponse = (userMessage: string, intent: IntentAnalysis): D
   // Handle alerts and notifications
   if (lowerMessage.includes('alert') || lowerMessage.includes('notification')) {
     return {
-      content: `Alerts and notifications keep you informed of important price movements without constant monitoring.\n\nSetting alerts: Use the alert icon on individual asset pages or navigate to Settings, then Notifications\nAlert types: Price targets, percentage changes, volume spikes, and technical indicator signals\nDelivery: Instant push notifications when your specified conditions are met\n\nPro tip: Set multiple alerts on the same asset to track different price levels and market scenarios.`,
+      content: `Price alerts in TradeIQ help you stay informed of market movements without constant monitoring. To set alerts, use the alert icon on individual asset pages or go to Settings, then Notifications. You can create alerts for price targets, percentage changes, volume spikes, and technical indicator signals. When your conditions are met, you receive instant push notifications, allowing you to respond quickly to market opportunities.`,
       mode: 'product',
       confidence: 0.9,
       suggestedFollowUps: [
         'What types of technical alerts can I create?',
-        'How do I manage and edit existing alerts?',
-        'Do I need Pro for unlimited alert creation?'
+        'How do I manage multiple alerts efficiently?',
+        'Do I need Pro for advanced alert features?'
       ]
     };
   }
@@ -115,13 +118,13 @@ const generateProductResponse = (userMessage: string, intent: IntentAnalysis): D
   // Handle Chart AI questions
   if (lowerMessage.includes('chart ai')) {
     return {
-      content: `Chart AI provides automated technical analysis and pattern recognition for any asset you are viewing.\n\nCore features: Identifies support and resistance levels, trend analysis, and chart patterns\nUsage: Available on individual asset pages and integrated into the main dashboard\nInsights: Provides actionable recommendations based on current market conditions\n\nPro version includes advanced pattern detection, deeper historical analysis, and enhanced prediction capabilities.`,
+      content: `Chart AI provides automated technical analysis using artificial intelligence to identify patterns, support and resistance levels, and trend changes. Available on individual asset pages and integrated into the main dashboard, Chart AI analyzes current market conditions and provides actionable recommendations. The Pro version includes advanced pattern detection, deeper historical analysis, and enhanced prediction capabilities for more sophisticated trading strategies.`,
       mode: 'product',
       confidence: 0.95,
       suggestedFollowUps: [
-        'What patterns can Chart AI detect?',
-        'How accurate are Chart AI predictions?',
-        'What additional features come with Pro Chart AI?'
+        'What chart patterns does AI detect most accurately?',
+        'How do I interpret Chart AI recommendations?',
+        'What makes Pro Chart AI more powerful?'
       ]
     };
   }
@@ -132,10 +135,10 @@ const generateProductResponse = (userMessage: string, intent: IntentAnalysis): D
     const primaryFeature = features[0];
     const additionalFeatures = features.slice(1, 3);
     
-    let content = `${primaryFeature.name}: ${primaryFeature.description}\nLocation: ${primaryFeature.location}`;
+    let content = `${primaryFeature.name} ${primaryFeature.description}. You can access this at ${primaryFeature.location}.`;
     
     if (additionalFeatures.length > 0) {
-      content += `\n\nRelated features:\n${additionalFeatures.map(f => `${f.name}: ${f.description}`).join('\n')}`;
+      content += ` Related features include ${additionalFeatures.map(f => f.name).join(' and ')}, which work together to provide comprehensive market analysis and portfolio management.`;
     }
     
     return {
@@ -143,9 +146,9 @@ const generateProductResponse = (userMessage: string, intent: IntentAnalysis): D
       mode: 'product',
       confidence: intent.confidence,
       suggestedFollowUps: [
-        `How do I get started with ${primaryFeature.name}?`,
-        'Show me advanced TradeIQ features',
-        'What Pro features would benefit my trading?'
+        `How do I maximize ${primaryFeature.name} effectiveness?`,
+        'Show me advanced TradeIQ workflows',
+        'What Pro features enhance this capability?'
       ],
       relatedFeatures: features.map(f => f.name)
     };
@@ -153,13 +156,13 @@ const generateProductResponse = (userMessage: string, intent: IntentAnalysis): D
   
   // Fallback for unclear product questions
   return {
-    content: `I can help you navigate TradeIQ features and functionality.\n\nCore features: Chart AI for technical analysis, Favorites for asset tracking, Alerts for price monitoring\nUpgrade options: Pro plan with advanced analytics and unlimited alerts\nNavigation: Most features are accessible from the main dashboard or individual asset pages\n\nCould you specify which feature or task you need help with?`,
+    content: `TradeIQ offers comprehensive tools for modern traders including Chart AI for automated technical analysis, customizable alerts for price monitoring, and favorites for portfolio tracking. Most features are accessible from the main dashboard or individual asset pages. The Pro plan unlocks advanced analytics, unlimited alerts, and priority support for serious traders.`,
     mode: 'product',
     confidence: 0.7,
     suggestedFollowUps: [
-      'Explain Chart AI capabilities',
-      'How do I upgrade to Pro?',
-      'Help me set up price alerts'
+      'Explain Chart AI capabilities in detail',
+      'How do I upgrade to Pro features?',
+      'Help me set up my first price alerts'
     ]
   };
 };
@@ -174,18 +177,57 @@ const generateTradingResponse = (
   let content = '';
   let needsRiskDisclaimer = false;
   
-  // Strategy questions - provide immediate, actionable content
-  if (lowerMessage.includes('strategy') || lowerMessage.includes('strategies')) {
+  // Long-term holding strategy
+  if (lowerMessage.includes('long term') || lowerMessage.includes('hold') || lowerMessage.includes('buy and hold')) {
+    needsRiskDisclaimer = true;
+    content = `Long-term holding focuses on buying quality assets and holding them for years to benefit from compound growth. Invest in established companies with strong fundamentals, diversified index funds like SPY or QQQ, and blue-chip stocks with consistent dividend payments. The key principles are patience, emotional discipline during market volatility, and annual portfolio rebalancing. This strategy works best when you can ignore short-term market noise and focus on long-term wealth building through consistent investing and reinvestment of dividends.`;
+  }
+  
+  // Diversification strategy
+  else if (lowerMessage.includes('diversif') || lowerMessage.includes('allocation') || lowerMessage.includes('portfolio')) {
+    needsRiskDisclaimer = true;
+    
+    if (lowerMessage.includes('conservative')) {
+      content = `Conservative portfolio allocation emphasizes capital preservation with 70-80% bonds and fixed income, 20-30% stocks focusing on dividend-paying blue chips and utility companies. This approach minimizes volatility while providing steady income through interest and dividends. Rebalance quarterly to maintain target allocation and consider treasury bonds, high-grade corporate bonds, and dividend aristocrat stocks for stability.`;
+    } else if (lowerMessage.includes('aggressive')) {
+      content = `Aggressive portfolio allocation targets maximum growth with 80-90% stocks including growth companies, small-cap stocks, and emerging markets, plus 10-20% alternative investments like REITs or commodities. This higher-risk approach aims for superior long-term returns but requires tolerance for significant volatility. Focus on growth stocks, technology sectors, and international diversification while maintaining strict risk management.`;
+    } else {
+      content = `Effective diversification spreads risk across asset classes, sectors, and geographic regions. A balanced approach might include 60% domestic stocks, 20% international stocks, 15% bonds, and 5% alternatives like REITs. Within stocks, diversify across large-cap, mid-cap, and small-cap companies in different sectors. Never put more than 5-10% in any single stock, and rebalance annually to maintain your target allocation based on your risk tolerance and investment timeline.`;
+    }
+  }
+  
+  // Crypto-specific strategies
+  else if (lowerMessage.includes('crypto') || lowerMessage.includes('bitcoin') || lowerMessage.includes('ethereum')) {
     needsRiskDisclaimer = true;
     
     if (lowerMessage.includes('beginner')) {
-      content = `Three beginner-friendly trading strategies:\n\nDollar-cost averaging: Regular purchases regardless of price to reduce timing risk and volatility impact\nTrend following: Identify and follow established price trends using moving averages and momentum indicators\nSwing trading: Hold positions for days to weeks to capture short-term price movements\n\nKey principle: Start with small position sizes and focus on risk management before increasing trade size.`;
-    } else if (lowerMessage.includes('crypto')) {
-      content = `Three effective crypto trading strategies:\n\nMomentum trading: Focus on coins with strong upward trends and high trading volume\nDollar-cost averaging: Regular purchases to smooth out crypto's high volatility\nLong-term holding: Research-based investments in established projects like Bitcoin and Ethereum\n\nCrypto markets operate 24/7 with extreme volatility, making both opportunities and risks significantly higher than traditional markets.`;
-    } else if (lowerMessage.includes('stock')) {
-      content = `Four stock investment approaches:\n\nGrowth investing: Target companies with strong earnings growth potential\nValue investing: Look for undervalued companies trading below intrinsic value\nDividend investing: Focus on companies with consistent dividend payments for income\nIndex investing: Diversify through ETFs like SPY or QQQ for broad market exposure\n\nTime horizon matters: Longer-term investments typically reduce volatility risk and transaction costs.`;
+      content = `Beginner crypto strategy should start with dollar-cost averaging into established cryptocurrencies like Bitcoin and Ethereum. Invest only what you can afford to lose completely, as crypto markets are extremely volatile. Start with 1-5% of your total investment portfolio, use reputable exchanges with strong security, and store significant amounts in hardware wallets. Focus on learning blockchain fundamentals before expanding to altcoins, and never invest based on social media hype or fear of missing out.`;
     } else {
-      content = `Essential trading strategies by risk tolerance:\n\nConservative: Index funds, blue-chip stocks, and government bonds for steady growth\nModerate: Growth stocks, sector ETFs, and dividend aristocrats for balanced returns\nAggressive: Small-cap stocks, crypto, and options trading for higher potential returns\n\nCore principle: Never risk more than you can afford to lose, and always diversify across multiple assets.`;
+      content = `Crypto trading strategies include momentum trading for trending coins with high volume, swing trading to capture multi-day price movements, and long-term holding of fundamentally strong projects. Diversify across different cryptocurrency categories like store of value (Bitcoin), smart contract platforms (Ethereum), and emerging sectors like DeFi or Layer 2 solutions. The 24/7 nature of crypto markets creates both opportunities and risks, requiring disciplined risk management and clear entry and exit strategies.`;
+    }
+  }
+  
+  // Stock-specific strategies
+  else if (lowerMessage.includes('stock') || lowerMessage.includes('equity')) {
+    needsRiskDisclaimer = true;
+    
+    if (lowerMessage.includes('growth')) {
+      content = `Growth investing targets companies with above-average earnings growth potential, typically in technology, healthcare, or emerging industries. Look for companies with strong revenue growth, expanding market share, and innovative products or services. Growth stocks often trade at higher valuations but can provide superior returns during bull markets. Focus on companies with sustainable competitive advantages, strong management teams, and clear paths to future profitability.`;
+    } else if (lowerMessage.includes('value')) {
+      content = `Value investing seeks undervalued companies trading below their intrinsic worth, often measured by low price-to-earnings ratios, price-to-book ratios, or high dividend yields. Look for profitable companies with strong balance sheets, stable cash flows, and temporary challenges that have depressed their stock price. Value stocks often outperform during market downturns and provide dividend income while you wait for price appreciation.`;
+    } else {
+      content = `Stock investment strategies should align with your investment timeline and risk tolerance. Consider index fund investing for broad market exposure with minimal effort, dividend growth investing for income and inflation protection, or sector rotation based on economic cycles. Successful stock investing requires fundamental analysis, understanding company financials, and maintaining discipline during market volatility. Diversify across sectors and company sizes to reduce single-stock risk.`;
+    }
+  }
+  
+  // Strategy questions - general
+  else if (lowerMessage.includes('strategy') || lowerMessage.includes('strategies')) {
+    needsRiskDisclaimer = true;
+    
+    if (lowerMessage.includes('beginner')) {
+      content = `Beginner trading strategies should emphasize risk management and education over quick profits. Start with dollar-cost averaging into index funds to learn market behavior, then progress to swing trading with small position sizes. Focus on trend-following strategies using simple moving averages, and always use stop-losses to limit downside risk. Paper trade new strategies before risking real money, and never risk more than 1-2% of your portfolio on any single trade.`;
+    } else {
+      content = `Effective trading strategies combine technical analysis, fundamental research, and disciplined risk management. Consider momentum trading for trending markets, mean reversion for range-bound conditions, and breakout strategies for volatile periods. Successful traders often use multiple timeframes, maintain detailed trading journals, and adapt their strategies to current market conditions. The key is finding an approach that matches your personality, available time, and risk tolerance while maintaining consistent execution.`;
     }
   }
   
@@ -194,25 +236,19 @@ const generateTradingResponse = (
     const topics = intent.tradingTopics.filter(topic => ['rsi', 'macd', 'moving average', 'support', 'resistance'].includes(topic));
     
     if (topics.includes('rsi')) {
-      content = `RSI (Relative Strength Index) measures momentum on a 0-100 scale:\n\nOverbought: Above 70 suggests potential selling pressure and price reversal\nOversold: Below 30 indicates possible buying opportunity and price bounce\nNeutral zone: 30-70 range shows balanced momentum\n\nTrading application: Look for RSI divergences with price action for stronger signals. In strong trends, RSI can remain overbought or oversold for extended periods.`;
+      content = `RSI (Relative Strength Index) measures momentum on a 0-100 scale to identify overbought and oversold conditions. Values above 70 suggest potential selling pressure and possible price reversal, while values below 30 indicate potential buying opportunities. The most reliable RSI signals occur when combined with trend analysis and divergences between RSI and price action. In strong trending markets, RSI can remain overbought or oversold for extended periods, so use additional confirmation before taking positions.`;
     } else if (topics.includes('macd')) {
-      content = `MACD (Moving Average Convergence Divergence) tracks trend changes and momentum:\n\nBullish crossover: MACD line crosses above signal line, indicating upward momentum\nBearish crossover: MACD line crosses below signal line, suggesting downward momentum\nHistogram: Shows momentum strength and potential trend changes\n\nBest practice: Combine MACD signals with trend analysis and use on higher timeframes for more reliable signals.`;
+      content = `MACD (Moving Average Convergence Divergence) tracks trend changes and momentum through the relationship between two exponential moving averages. Bullish signals occur when the MACD line crosses above the signal line, while bearish signals occur when it crosses below. The histogram shows momentum strength and potential turning points. MACD works best on longer timeframes and should be combined with price action analysis for confirmation of trend changes.`;
     } else if (topics.includes('support') || topics.includes('resistance')) {
-      content = `Support and resistance are key price levels for making trading decisions:\n\nSupport: Price level where buying interest typically emerges, acting as a floor\nResistance: Price level where selling pressure appears, acting as a ceiling\nBreakouts: When price moves beyond these levels with volume, new trends often begin\n\nTrading approach: Look for bounces at support for long entries, or resistance for short entries. Confirmed breakouts with volume often lead to strong directional moves.`;
+      content = `Support and resistance levels represent price zones where buying and selling pressure historically emerge. Support acts as a floor where demand increases, while resistance acts as a ceiling where supply increases. These levels become more significant when tested multiple times with high volume. Trading strategies include buying near support for long positions, selling near resistance for short positions, and trading breakouts when price moves decisively beyond these levels with increased volume.`;
     } else {
-      content = `Technical analysis combines multiple indicators for better trading decisions:\n\nMoving averages: Smooth price trends and identify overall direction\nVolume: Confirms price movements and validates breakouts\nMomentum indicators: RSI and MACD show overbought and oversold conditions\n\nKey principle: No single indicator is perfect. Combine multiple signals and always consider overall market context for best results.`;
+      content = `Technical analysis combines price patterns, volume analysis, and momentum indicators to make trading decisions. Moving averages help identify trend direction and dynamic support/resistance levels. Successful technical analysis requires understanding that no single indicator is perfect, so combine multiple signals for confirmation. Focus on higher timeframes for trend direction and lower timeframes for precise entry and exit points.`;
     }
   }
   
-  // Investment and asset allocation questions
-  else if (lowerMessage.includes('invest') || lowerMessage.includes('allocation')) {
-    needsRiskDisclaimer = true;
-    content = `Investment allocation guidelines by age and risk tolerance:\n\nYoung investors (20s-30s): 80-90% stocks, 10-20% bonds for growth focus\nMiddle-aged (40s-50s): 60-70% stocks, 30-40% bonds for balanced approach\nNear retirement (60+): 40-50% stocks, 50-60% bonds for capital preservation\n\nDiversification strategy: Spread investments across different asset classes, sectors, and geographic regions to reduce risk.`;
-  }
-  
-  // Risk management questions
+  // Risk management
   else if (lowerMessage.includes('risk')) {
-    content = `Essential risk management principles for trading:\n\nPosition sizing: Never risk more than 1-2% of portfolio on any single trade\nStop losses: Set predetermined exit points to limit downside exposure\nDiversification: Spread risk across different assets, sectors, and strategies\nRisk-reward ratio: Target at least 1:2 ratio (risk $1 to potentially gain $2)\n\nEmotional discipline: Stick to your plan regardless of fear or greed. Most trading losses come from abandoning risk management during volatile periods.`;
+    content = `Risk management is the foundation of successful trading and involves position sizing, diversification, and emotional discipline. Never risk more than 1-2% of your total portfolio on any single trade, and use stop-losses to limit downside exposure. Diversify across different assets, sectors, and strategies to reduce correlation risk. Maintain a risk-reward ratio of at least 1:2, meaning you target twice the profit as your potential loss. Most importantly, stick to your risk management rules regardless of market emotions or recent performance.`;
   }
   
   // Market data context analysis
@@ -225,18 +261,18 @@ const generateTradingResponse = (
       const trend = data.change >= 0 ? 'bullish' : 'bearish';
       const momentum = Math.abs(changePercent) > 2 ? 'strong' : 'moderate';
       
-      content = `${symbol.symbol} current analysis:\n\nPrice: $${data.price.toFixed(2)}\nChange: ${data.change >= 0 ? '+' : ''}${data.change.toFixed(2)} (${changePercent.toFixed(2)}%)\nMomentum: ${momentum} ${trend} movement\n\nTechnical outlook: The ${momentum} ${trend} momentum suggests ${data.change >= 0 ? 'buying interest and potential upward continuation' : 'selling pressure with possible further decline'}.\n\nKey levels to watch: Support around ${(data.price * 0.95).toFixed(2)}, resistance near ${(data.price * 1.05).toFixed(2)}.`;
+      content = `${symbol.symbol} is currently trading at $${data.price.toFixed(2)}, showing ${momentum} ${trend} momentum with a ${changePercent.toFixed(2)}% change. This ${momentum} movement suggests ${data.change >= 0 ? 'buying interest and potential continuation of upward momentum' : 'selling pressure with possible further downside'}. Key levels to monitor include support around $${(data.price * 0.95).toFixed(2)} and resistance near $${(data.price * 1.05).toFixed(2)}. Consider the broader market context and volume confirmation before making trading decisions.`;
       needsRiskDisclaimer = true;
     }
   }
   
   // Default trading response for unclear questions
   else {
-    content = `I can provide guidance on specific trading and investment topics:\n\nStrategy development: Risk-appropriate approaches for different goals and timeframes\nTechnical analysis: Chart patterns, indicators, and market timing techniques\nRisk management: Position sizing, diversification, and loss prevention\nAsset allocation: Portfolio construction for different risk tolerances\n\nWhat specific trading topic would you like to explore?`;
+    content = `I can provide specific guidance on trading strategies, technical analysis, risk management, and market insights. Whether you're interested in long-term investing, day trading, or technical indicators, I can help you understand the concepts and practical applications. What specific aspect of trading or investing would you like to explore?`;
   }
   
   return {
-    content,
+    content: needsRiskDisclaimer ? `${content}\n\nThis is educational content, not financial advice. Please do your own research before making investment decisions.` : content,
     mode: 'trading',
     confidence: intent.confidence,
     suggestedFollowUps: generateTradingFollowUps(lowerMessage, context),
@@ -244,46 +280,33 @@ const generateTradingResponse = (
   };
 };
 
-const generateMixedResponse = (
-  userMessage: string, 
-  intent: IntentAnalysis, 
-  context?: MessageContext, 
-  marketData?: Record<string, UseMarketDataReturn>
-): DualModeAIResponse => {
-  const lowerMessage = userMessage.toLowerCase();
-  
-  // Only use mixed response for truly ambiguous cases
-  if (lowerMessage.includes('help') && !lowerMessage.includes('strategy') && !lowerMessage.includes('chart')) {
-    return {
-      content: `Could you clarify if you're asking about trading strategies or how to use a specific feature in the TradeIQ app?\n\nFor trading: I can explain strategies, technical analysis, or market insights\nFor app features: I can guide you through Chart AI, alerts, favorites, or navigation`,
-      mode: 'mixed',
-      confidence: intent.confidence,
-      suggestedFollowUps: [
-        'Explain crypto trading strategies',
-        'How do I use Chart AI?',
-        'Show me technical analysis basics'
-      ]
-    };
-  }
-  
-  // Default to trading mode for most mixed cases
-  return generateTradingResponse(userMessage, intent, context, marketData);
+const generateMixedResponse = (userMessage: string, intent: IntentAnalysis): DualModeAIResponse => {
+  // Only use mixed response for very low confidence or truly ambiguous cases
+  return {
+    content: `I can help you with both trading education and TradeIQ app features. Could you clarify if you're asking about investment strategies and market analysis, or how to use specific features like Chart AI, alerts, or navigation within the app?`,
+    mode: 'mixed',
+    confidence: intent.confidence,
+    suggestedFollowUps: [
+      'Explain cryptocurrency trading strategies',
+      'How do I use Chart AI for analysis?',
+      'Show me technical indicator basics'
+    ]
+  };
 };
 
 const generateDefaultResponse = (userMessage: string): DualModeAIResponse => {
   return {
-    content: `I am your TradeIQ Assistant, ready to help with trading knowledge and app guidance.\n\nTrading assistance: Strategies, technical analysis, risk management, and market insights\nApp guidance: Chart AI, alerts, favorites, navigation, and Pro features\n\nWhat would you like to learn about?`,
+    content: `Hello and welcome to the TradeIQ Assistant. I can help you with trading and investment education including strategies, technical analysis, and market insights, as well as guidance on using TradeIQ features like Chart AI, alerts, and portfolio management. What would you like to learn about?`,
     mode: 'mixed',
     confidence: 0.5,
     suggestedFollowUps: [
-      'What are effective crypto strategies?',
-      'How do I set price alerts?',
+      'What are effective beginner trading strategies?',
+      'How do I set up price alerts?',
       'Explain key technical indicators'
     ]
   };
 };
 
-// ... keep existing code (generateTradingFollowUps function)
 const generateTradingFollowUps = (message: string, context?: MessageContext): string[] => {
   const suggestions: string[] = [];
   
