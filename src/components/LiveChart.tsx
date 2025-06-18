@@ -2,10 +2,13 @@
 import { Card } from "@/components/ui/card";
 import { BarChart3, TrendingUp, TrendingDown, Wifi, WifiOff, Activity, AlertCircle } from "lucide-react";
 import { StockChart } from "@/components/StockChart";
+import { TradingViewChart } from "@/components/TradingViewChart";
+import { TradingViewOverview } from "@/components/TradingViewOverview";
 import { LivePriceBadge } from "@/components/LivePriceBadge";
 import { useRealTimePriceContext } from "@/components/RealTimePriceProvider";
 import { useMarketData } from "@/hooks/useMarketData";
 import { useEffect, useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface LiveChartProps {
   asset: string;
@@ -183,9 +186,50 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
         </div>
       </div>
       
-      <div className="h-80">
-        <StockChart symbol={asset} timeframe={timeframe} key={chartKey} />
-      </div>
+      <Tabs defaultValue="tradingview" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 bg-black/20 border border-gray-700/50">
+          <TabsTrigger 
+            value="tradingview" 
+            className="data-[state=active]:bg-tradeiq-blue data-[state=active]:text-white text-gray-400"
+          >
+            📈 TradingView Pro
+          </TabsTrigger>
+          <TabsTrigger 
+            value="custom" 
+            className="data-[state=active]:bg-tradeiq-blue data-[state=active]:text-white text-gray-400"
+          >
+            📊 Custom Chart
+          </TabsTrigger>
+          <TabsTrigger 
+            value="overview" 
+            className="data-[state=active]:bg-tradeiq-blue data-[state=active]:text-white text-gray-400"
+          >
+            🌐 Market Overview
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="tradingview" className="mt-4">
+          <TradingViewChart 
+            symbol={asset} 
+            height="500px"
+            className="w-full"
+          />
+        </TabsContent>
+        
+        <TabsContent value="custom" className="mt-4">
+          <div className="h-80">
+            <StockChart symbol={asset} timeframe={timeframe} key={chartKey} />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="overview" className="mt-4">
+          <TradingViewOverview 
+            symbols={[asset, "AAPL", "GOOGL", "MSFT", "TSLA"]}
+            height="500px"
+            className="w-full"
+          />
+        </TabsContent>
+      </Tabs>
     </Card>
   );
 };
