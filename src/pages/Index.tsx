@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { AssetSelection } from "@/components/AssetSelection";
 import { TimeframeSelector } from "@/components/TimeframeSelector";
