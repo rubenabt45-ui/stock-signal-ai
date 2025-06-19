@@ -1,6 +1,6 @@
 
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { useMarketData } from "@/hooks/useMarketData";
+import { useRealMarketData } from "@/hooks/useRealMarketData";
 import { Badge } from "@/components/ui/badge";
 
 interface LivePriceDisplayProps {
@@ -16,7 +16,7 @@ export const LivePriceDisplay = ({
   size = 'lg',
   className = ''
 }: LivePriceDisplayProps) => {
-  const { price, change, isLoading, error, lastUpdated } = useMarketData(symbol);
+  const { price, changePercent, isLoading, error, lastUpdated } = useRealMarketData(symbol);
 
   const getSizeClasses = () => {
     switch (size) {
@@ -51,8 +51,8 @@ export const LivePriceDisplay = ({
   };
 
   const sizeClasses = getSizeClasses();
-  const isPositive = change && change > 0;
-  const isNegative = change && change < 0;
+  const isPositive = changePercent && changePercent > 0;
+  const isNegative = changePercent && changePercent < 0;
 
   const getChangeColor = () => {
     if (isPositive) return 'text-green-400';
@@ -115,14 +115,14 @@ export const LivePriceDisplay = ({
         )}
       </div>
       
-      {change !== null && (
+      {changePercent !== null && (
         <Badge className={`${getBadgeColor()} border px-3 py-1.5`}>
           <div className="flex items-center space-x-1">
             {isPositive && <TrendingUp className={sizeClasses.icon} />}
             {isNegative && <TrendingDown className={sizeClasses.icon} />}
             {!isPositive && !isNegative && <Minus className={sizeClasses.icon} />}
             <span className={sizeClasses.change}>
-              {isPositive ? '+' : ''}{change.toFixed(2)}%
+              {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
             </span>
           </div>
         </Badge>

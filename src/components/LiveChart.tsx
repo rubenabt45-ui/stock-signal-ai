@@ -21,7 +21,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
 
   return (
     <div className="space-y-8">
-      {/* Live Price Header */}
+      {/* Live Price Header - Now using real market data */}
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
           <div>
@@ -29,6 +29,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
               <BarChart3 className="h-7 w-7 text-tradeiq-blue" />
               <span>{asset} Live Price</span>
             </h2>
+            {/* Updated to use real market data that matches TradingView */}
             <LivePriceDisplay symbol={asset} showSymbol={false} size="lg" />
           </div>
           
@@ -44,7 +45,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
         </div>
       </Card>
 
-      {/* Advanced TradingView Chart */}
+      {/* Advanced TradingView Chart - Synchronized with same symbol */}
       <Card className="tradeiq-card p-8 rounded-2xl">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-3">
