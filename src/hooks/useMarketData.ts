@@ -9,7 +9,9 @@ interface MarketData {
   lastUpdated: number | null;
 }
 
-export const useMarketData = (symbol: string): MarketData => {
+export interface UseMarketDataReturn extends MarketData {}
+
+export const useMarketData = (symbol: string): UseMarketDataReturn => {
   const [marketData, setMarketData] = useState<MarketData>({
     price: null,
     change: null,
@@ -67,6 +69,84 @@ export const useMarketData = (symbol: string): MarketData => {
   }, [fetchMarketData]);
 
   return marketData;
+};
+
+// Hook for fetching multiple symbols at once
+export const useMultipleMarketData = (symbols: string[]): Record<string, UseMarketDataReturn> => {
+  const [marketDataMap, setMarketDataMap] = useState<Record<string, UseMarketDataReturn>>({});
+
+  useEffect(() => {
+    if (symbols.length === 0) {
+      setMarketDataMap({});
+      return;
+    }
+
+    // Initialize loading state for all symbols
+    const initialData: Record<string, UseMarketDataReturn> = {};
+    symbols.forEach(symbol => {
+      initialData[symbol] = {
+        price: null,
+        change: null,
+        isLoading: true,
+        error: null,
+        lastUpdated: null,
+      };
+    });
+    setMarketDataMap(initialData);
+
+    // Fetch data for all symbols
+    const fetchAllData = async () => {
+      const promises = symbols.map(async (symbol) => {
+        try {
+          await new Promise(resolve => setTimeout(resolve, Math.random() * 500)); // Stagger requests
+          
+          const basePrice = getBasePriceForSymbol(symbol);
+          const randomChange = (Math.random() - 0.5) * 10;
+          const currentPrice = basePrice * (1 + randomChange / 100);
+
+          return {
+            symbol,
+            data: {
+              price: currentPrice,
+              change: randomChange,
+              isLoading: false,
+              error: null,
+              lastUpdated: Date.now(),
+            }
+          };
+        } catch (error) {
+          return {
+            symbol,
+            data: {
+              price: null,
+              change: null,
+              isLoading: false,
+              error: error instanceof Error ? error.message : 'Failed to fetch market data',
+              lastUpdated: null,
+            }
+          };
+        }
+      });
+
+      const results = await Promise.all(promises);
+      
+      const newMarketDataMap: Record<string, UseMarketDataReturn> = {};
+      results.forEach(({ symbol, data }) => {
+        newMarketDataMap[symbol] = data;
+      });
+      
+      setMarketDataMap(newMarketDataMap);
+    };
+
+    fetchAllData();
+
+    // Refresh data every 60 seconds
+    const interval = setInterval(fetchAllData, 60000);
+    
+    return () => clearInterval(interval);
+  }, [symbols.join(',')]); // Re-run when symbols array changes
+
+  return marketDataMap;
 };
 
 // Helper function to get realistic base prices for different symbols
