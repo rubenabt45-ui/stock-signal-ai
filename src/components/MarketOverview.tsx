@@ -22,10 +22,10 @@ export const MarketOverview = ({
   className = "" 
 }: MarketOverviewProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const widgetRef = useRef<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasTimedOut, setHasTimedOut] = useState(false);
   const { actualTheme } = useTheme();
   
   // Use provided theme or fall back to user's theme preference
@@ -43,6 +43,7 @@ export const MarketOverview = ({
     containerExists: !!containerRef.current
   });
 
+  // Load TradingView script
   useEffect(() => {
     const loadTradingViewScript = () => {
       // Check if script already exists
@@ -74,29 +75,32 @@ export const MarketOverview = ({
       script.onerror = (err) => {
         console.error('❌ Failed to load TradingView market overview script:', err);
         setIsLoading(false);
-        setError('Failed to load market overview');
+        setError('Failed to load market overview script');
       };
       
       document.head.appendChild(script);
     };
 
     loadTradingViewScript();
-  }, []);
 
-  useEffect(() => {
-    if (!isLoaded || !containerRef.current) {
-      console.log('📊 Not ready to create widget:', { isLoaded, containerExists: !!containerRef.current });
-      return;
-    }
-
-    // Clear any existing widget
-    if (widgetRef.current) {
-      try {
-        widgetRef.current.remove();
-        console.log('🧹 Cleaned up previous widget');
-      } catch (e) {
-        console.log('🧹 Widget cleanup note:', e);
+    // Set timeout for fallback
+    const timeoutId = setTimeout(() => {
+      if (isLoading) {
+        console.warn('⏰ MarketOverview widget timeout after 3 seconds');
+        setHasTimedOut(true);
+        setIsLoading(false);
+        setError('Widget loading timeout');
       }
+    }, 3000);
+
+    return () => clearTimeout(timeoutId);
+  }, [isLoading]);
+
+  // Create widget when ready
+  useEffect(() => {
+    if (!isLoaded || !containerRef.current || hasTimedOut) {
+      console.log('📊 Not ready to create widget:', { isLoaded, containerExists: !!containerRef.current, hasTimedOut });
+      return;
     }
 
     // Clear container
@@ -105,16 +109,21 @@ export const MarketOverview = ({
     }
 
     try {
-      // Format symbols for TradingView display
-      const formattedSymbols = symbols.map(symbol => {
-        const displayName = symbol.replace('NASDAQ:', '').replace('NYSE:', '');
-        return {
-          s: symbol,
-          d: displayName
-        };
-      });
+      // Format symbols correctly for TradingView Market Overview
+      const symbolsGroups = [
+        {
+          name: "Related Assets",
+          symbols: symbols.map(symbol => {
+            const displayName = symbol.replace('NASDAQ:', '').replace('NYSE:', '');
+            return {
+              name: symbol,
+              displayName: displayName
+            };
+          })
+        }
+      ];
 
-      console.log('📊 Creating widget with symbols:', formattedSymbols);
+      console.log('📊 Creating widget with symbolsGroups:', symbolsGroups);
 
       const widgetConfig = {
         "colorTheme": widgetTheme === 'dark' ? 'dark' : 'light',
@@ -136,12 +145,7 @@ export const MarketOverview = ({
         "belowLineFillColorGrowingBottom": "rgba(37, 99, 235, 0)",
         "belowLineFillColorFallingBottom": "rgba(239, 68, 68, 0)",
         "symbolActiveColor": "rgba(60, 120, 216, 0.12)",
-        "tabs": [
-          {
-            "title": "Watchlist",
-            "symbols": formattedSymbols
-          }
-        ]
+        "symbolsGroups": symbolsGroups
       };
 
       // Create widget container with proper structure
@@ -166,13 +170,13 @@ export const MarketOverview = ({
       console.error('❌ Error creating MarketOverview widget:', error);
       setError('Failed to create market overview widget');
     }
-  }, [symbols, widgetTheme, isLoaded, height]);
+  }, [symbols, widgetTheme, isLoaded, height, hasTimedOut]);
 
-  if (isLoading) {
+  if (isLoading && !hasTimedOut) {
     return (
       <div 
         className={`flex items-center justify-center bg-black/10 rounded-2xl border border-gray-700/20 shadow-lg ${className}`} 
-        style={{ height, minHeight: '300px' }}
+        style={{ height, minHeight: '320px' }}
       >
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tradeiq-blue mx-auto mb-3"></div>
@@ -183,15 +187,17 @@ export const MarketOverview = ({
     );
   }
 
-  if (error || !isLoaded) {
+  if (error || !isLoaded || hasTimedOut) {
     return (
       <div 
         className={`flex items-center justify-center bg-black/10 rounded-2xl border border-gray-700/20 shadow-lg ${className}`} 
-        style={{ height, minHeight: '300px' }}
+        style={{ height, minHeight: '320px' }}
       >
         <div className="text-center py-8">
-          <p className="text-red-400 text-lg mb-2">Market data unavailable at the moment</p>
-          <p className="text-gray-500 text-sm">Please try refreshing the page</p>
+          <p className="text-red-400 text-lg mb-2">⚠️ Market data unavailable</p>
+          <p className="text-gray-500 text-sm">
+            {hasTimedOut ? "Widget loading timeout" : "Please try refreshing the page"}
+          </p>
           <button 
             onClick={() => window.location.reload()} 
             className="mt-3 px-4 py-2 bg-tradeiq-blue/20 text-tradeiq-blue rounded-lg text-sm hover:bg-tradeiq-blue/30 transition-colors"
@@ -206,7 +212,7 @@ export const MarketOverview = ({
   return (
     <div 
       className={`bg-black/5 rounded-2xl border border-gray-700/20 shadow-lg overflow-hidden w-full ${className}`}
-      style={{ height, minHeight: '300px', paddingTop: '1rem', paddingBottom: '1rem' }}
+      style={{ height, minHeight: '320px', paddingTop: '1rem', paddingBottom: '1rem' }}
     >
       <div 
         ref={containerRef} 
