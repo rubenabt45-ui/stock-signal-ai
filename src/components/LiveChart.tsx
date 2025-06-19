@@ -64,8 +64,8 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
         <TradingViewAdvancedChart 
           symbol={asset} 
           timeframe={timeframe}
-          height="480px"
-          className="w-full"
+          height="600px"
+          className="w-full min-h-[500px]"
           key={chartKey}
         />
       </Card>

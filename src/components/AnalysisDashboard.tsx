@@ -136,8 +136,8 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
             <TradingViewAdvancedChart 
               symbol={stockSymbol} 
               timeframe="1D"
-              height="480px"
-              className="w-full"
+              height="580px"
+              className="w-full min-h-[500px]"
             />
           </Card>
 
