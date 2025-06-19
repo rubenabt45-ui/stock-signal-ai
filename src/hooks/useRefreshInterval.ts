@@ -4,14 +4,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-type RefreshInterval = '30s' | '1min' | '5min';
-
-export function useRefreshInterval() {
-  const [refreshInterval, setRefreshIntervalState] = useState<RefreshInterval>('1min');
+export const useRefreshInterval = () => {
+  const [refreshInterval, setRefreshIntervalState] = useState<string>('1min');
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Load refresh interval from user_profiles
+  // Load refresh interval from user profile
   useEffect(() => {
     const loadRefreshInterval = async () => {
       if (!user?.id) return;
@@ -28,8 +26,8 @@ export function useRefreshInterval() {
           return;
         }
 
-        if (data?.refresh_interval && ['30s', '1min', '5min'].includes(data.refresh_interval)) {
-          setRefreshIntervalState(data.refresh_interval as RefreshInterval);
+        if (data?.refresh_interval) {
+          setRefreshIntervalState(data.refresh_interval);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -39,7 +37,7 @@ export function useRefreshInterval() {
     loadRefreshInterval();
   }, [user?.id]);
 
-  const setRefreshInterval = async (newInterval: RefreshInterval) => {
+  const setRefreshInterval = async (newInterval: string) => {
     setRefreshIntervalState(newInterval);
 
     if (user?.id) {
@@ -52,14 +50,14 @@ export function useRefreshInterval() {
         if (error) {
           console.error('Error updating refresh interval:', error);
           toast({
-            title: "Failed to save setting",
-            description: "Refresh interval applied locally but couldn't save to profile.",
+            title: "Failed to save refresh interval",
+            description: "Setting applied locally but couldn't save to profile.",
             variant: "destructive",
           });
         } else {
           toast({
             title: "Refresh interval updated",
-            description: `Market data will refresh every ${newInterval}`,
+            description: `Data will refresh every ${newInterval}`,
           });
         }
       } catch (error) {
@@ -69,4 +67,4 @@ export function useRefreshInterval() {
   };
 
   return { refreshInterval, setRefreshInterval };
-}
+};

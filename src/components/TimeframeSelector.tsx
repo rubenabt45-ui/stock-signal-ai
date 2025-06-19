@@ -19,7 +19,6 @@ const timeframes = [
 export const TimeframeSelector = ({ selectedTimeframe, onTimeframeSelect }: TimeframeSelectorProps) => {
   const handleTimeframeClick = (timeframeValue: string) => {
     console.log(`🕒 Timeframe selected: ${timeframeValue} (triggering immediate update)`);
-    // Immediate callback to parent component
     onTimeframeSelect(timeframeValue);
   };
 
@@ -38,10 +37,9 @@ export const TimeframeSelector = ({ selectedTimeframe, onTimeframeSelect }: Time
           <button
             key={timeframe.value}
             onClick={() => handleTimeframeClick(timeframe.value)}
-            disabled={selectedTimeframe === timeframe.value}
-            className={`px-4 py-2 rounded-xl font-semibold min-w-[60px] transition-all duration-200 cursor-pointer ${
+            className={`px-4 py-2 rounded-xl font-semibold min-w-[60px] transition-all duration-200 ${
               selectedTimeframe === timeframe.value
-                ? 'bg-tradeiq-blue text-white shadow-lg scale-105 cursor-default'
+                ? 'bg-tradeiq-blue text-white shadow-lg scale-105'
                 : 'bg-black/30 text-gray-400 hover:bg-black/50 hover:text-white hover:scale-105'
             }`}
             title={`Switch to ${timeframe.label} view (${timeframe.description})`}

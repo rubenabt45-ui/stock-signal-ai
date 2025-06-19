@@ -21,7 +21,6 @@ export const TradingViewChart = ({ symbol, height = "500px", className = "" }: T
   const [isLoading, setIsLoading] = useState(true);
   const { actualTheme } = useTheme();
   
-  // Generate unique container ID to avoid conflicts
   const containerId = `tv-chart-${symbol}-${Date.now()}`;
 
   useEffect(() => {
@@ -53,7 +52,6 @@ export const TradingViewChart = ({ symbol, height = "500px", className = "" }: T
   useEffect(() => {
     if (!isLoaded || !containerRef.current) return;
 
-    // Clear any existing widget
     if (widgetRef.current) {
       try {
         widgetRef.current.remove();
@@ -64,15 +62,10 @@ export const TradingViewChart = ({ symbol, height = "500px", className = "" }: T
 
     if (containerRef.current) {
       containerRef.current.innerHTML = '';
-    }
-
-    // Set the container ID
-    if (containerRef.current) {
       containerRef.current.id = containerId;
     }
 
     try {
-      // Create new widget
       widgetRef.current = new window.TradingView.widget({
         autosize: true,
         symbol: symbol,

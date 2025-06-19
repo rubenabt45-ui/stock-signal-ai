@@ -1,456 +1,202 @@
-import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, TrendingUp, AlertCircle, Clock, BookOpen, HelpCircle } from "lucide-react";
+
+import { useState } from "react";
+import { Send, MessageSquare, Brain, Lightbulb } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { useMultipleMarketData } from "@/hooks/useMarketData";
-import { analyzeMessageContext, MessageContext } from "@/services/symbolDetectionService";
-import { generateDualModeResponse, DualModeAIResponse } from "@/services/dualModeAIService";
-import { useSessionContext } from "@/hooks/useSessionContext";
-import { ActionButtons } from "@/components/ActionButtons";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useTranslation } from 'react-i18next';
 
 interface Message {
   id: string;
+  type: 'user' | 'assistant';
   content: string;
-  isUser: boolean;
   timestamp: Date;
-  context?: MessageContext;
-  aiResponse?: DualModeAIResponse;
-  marketData?: Record<string, any>;
 }
 
 const TradingChat = () => {
-  const { context: sessionContext, updateContext, resetContext } = useSessionContext();
-
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: "1",
-      content: "Hello and welcome to the TradeIQ Assistant.\n\nI can help you with:\n\n- Trading and investment topics such as strategies, technical indicators, or market insights\n- Navigation and usage of TradeIQ features including Chart AI, alerts, favorites, and more\n\nHow can I assist you today?",
-      isUser: false,
-      timestamp: new Date(),
+      id: '1',
+      type: 'assistant',
+      content: 'Hello! I\'m your AI trading assistant. I can help you with market analysis, trading strategies, platform questions, and more. What would you like to know?',
+      timestamp: new Date()
     }
   ]);
-  const [inputValue, setInputValue] = useState("");
+  const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [detectedSymbols, setDetectedSymbols] = useState<string[]>([]);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Get market data for detected symbols
-  const marketData = useMultipleMarketData(detectedSymbols);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  // Analyze input for symbols as user types
-  useEffect(() => {
-    if (inputValue.trim()) {
-      const context = analyzeMessageContext(inputValue);
-      const symbols = context.symbols.map(s => s.symbol);
-      setDetectedSymbols(symbols);
-    } else {
-      setDetectedSymbols([]);
-    }
-  }, [inputValue]);
+  const suggestions = [
+    "What's the best strategy for day trading?",
+    "How do I analyze market trends?",
+    "Explain support and resistance levels",
+    "What are the key indicators to watch?",
+    "How does the platform work?",
+    "Can you help me with risk management?"
+  ];
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading) return;
-
-    // Analyze message context
-    const context = analyzeMessageContext(inputValue);
-    
-    // Check for context from session if no symbols detected
-    if (context.symbols.length === 0 && sessionContext.activeSymbol) {
-      // Add session context symbol if the message seems to be a follow-up question
-      const followUpWords = ['what', 'how', 'when', 'why', 'the', 'its', 'this', 'that'];
-      const isFollowUp = followUpWords.some(word => inputValue.toLowerCase().includes(word));
-      
-      if (isFollowUp) {
-        context.symbols.push({
-          symbol: sessionContext.activeSymbol,
-          type: 'stock',
-          confidence: 0.8
-        });
-      }
-    }
-    
-    const relevantMarketData = context.symbols.reduce((acc, symbol) => {
-      if (marketData[symbol.symbol]) {
-        acc[symbol.symbol] = marketData[symbol.symbol];
-      }
-      return acc;
-    }, {} as Record<string, any>);
+    if (!inputMessage.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: inputValue,
-      isUser: true,
-      timestamp: new Date(),
-      context,
-      marketData: relevantMarketData
+      type: 'user',
+      content: inputMessage,
+      timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInputValue("");
+    setInputMessage('');
     setIsLoading(true);
 
-    try {
-      // Generate dual-mode AI response
-      const aiResponse = await generateDualModeResponse({
-        userMessage: inputValue,
-        context,
-        marketData: relevantMarketData,
-        conversationHistory: sessionContext.conversationHistory
-      });
-
-      const aiMessage: Message = {
+    // Simulate AI response
+    setTimeout(() => {
+      const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: aiResponse.content,
-        isUser: false,
-        timestamp: new Date(),
-        aiResponse,
-        context,
-        marketData: relevantMarketData
+        type: 'assistant',
+        content: generateAIResponse(inputMessage),
+        timestamp: new Date()
       };
-
-      setMessages(prev => [...prev, aiMessage]);
-      
-      // Update session context
-      const detectedSymbol = context.symbols[0]?.symbol;
-      updateContext(inputValue, aiResponse.content, detectedSymbol);
-      
-    } catch (error) {
-      console.error('Error generating AI response:', error);
-      
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "I apologize, but I encountered an error processing your request. Please try again or ask about a different topic.",
-        isUser: false,
-        timestamp: new Date(),
-      };
-      
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
+      setMessages(prev => [...prev, aiResponse]);
       setIsLoading(false);
+    }, 1000 + Math.random() * 2000);
+  };
+
+  const generateAIResponse = (question: string): string => {
+    const lowerQuestion = question.toLowerCase();
+    
+    if (lowerQuestion.includes('strategy') || lowerQuestion.includes('trading')) {
+      return "For successful trading, focus on these key principles: 1) Always have a clear plan with entry and exit points, 2) Use proper risk management - never risk more than 2% of your capital per trade, 3) Study technical analysis patterns like support/resistance levels, 4) Keep emotions in check and stick to your strategy, 5) Start with paper trading to practice. Remember, consistency beats trying to hit home runs every time.";
     }
+    
+    if (lowerQuestion.includes('analysis') || lowerQuestion.includes('trend')) {
+      return "Market analysis involves both technical and fundamental approaches. For technical analysis, focus on chart patterns, moving averages, RSI, MACD, and volume indicators. Look for trends by identifying higher highs and higher lows (uptrend) or lower highs and lower lows (downtrend). Support and resistance levels are crucial - these are price points where the asset has historically bounced. Always use multiple timeframes for confirmation.";
+    }
+    
+    if (lowerQuestion.includes('platform') || lowerQuestion.includes('how') || lowerQuestion.includes('help')) {
+      return "TradeIQ offers several powerful features: The ChartIA section provides real-time charts with AI analysis, you can save favorites for quick access to your preferred assets, the NewsAI section keeps you updated with market news, and you can set up alerts in Settings. Navigate using the bottom menu, and don't forget to check out the different timeframes (1D, 1W, 1M, etc.) for comprehensive analysis.";
+    }
+    
+    if (lowerQuestion.includes('risk') || lowerQuestion.includes('management')) {
+      return "Risk management is the foundation of successful trading. Key rules: 1) Never risk more than 1-2% of your total capital on a single trade, 2) Set stop-losses before entering any position, 3) Diversify across different assets and sectors, 4) Use position sizing based on the distance to your stop-loss, 5) Keep a trading journal to learn from both wins and losses. Remember: protecting your capital is more important than making profits.";
+    }
+    
+    if (lowerQuestion.includes('indicator') || lowerQuestion.includes('rsi') || lowerQuestion.includes('macd')) {
+      return "Popular technical indicators include: RSI (Relative Strength Index) - shows overbought/oversold conditions (above 70 = overbought, below 30 = oversold), MACD - reveals trend changes and momentum, Moving Averages - smooth out price action to show trend direction, Bollinger Bands - show volatility and potential reversal points, Volume - confirms price movements. Use indicators as confirmation tools, not standalone signals.";
+    }
+    
+    return "That's a great question! While I can provide general trading education and platform guidance, remember that all trading involves risk and you should never invest more than you can afford to lose. For specific investment advice, consider consulting with a licensed financial advisor. Is there a particular aspect of trading or our platform you'd like to learn more about?";
   };
 
-  const handleQuickSuggestion = (suggestion: string) => {
-    setInputValue(suggestion);
+  const handleSuggestionClick = (suggestion: string) => {
+    setInputMessage(suggestion);
   };
-
-  const handleFollowUp = (suggestion: string) => {
-    setInputValue(suggestion);
-  };
-
-  const handleOpenChartAI = (symbol: string) => {
-    console.log(`Opening Chart AI for ${symbol}`);
-    // TODO: Navigate to Chart AI page with symbol
-  };
-
-  const handleSetAlert = (symbol: string) => {
-    console.log(`Setting alert for ${symbol}`);
-    // TODO: Open alert modal with symbol prefilled
-  };
-
-  const handleAddToFavorites = (symbol: string) => {
-    console.log(`Adding ${symbol} to favorites`);
-    // TODO: Add symbol to favorites
-  };
-
-  const quickSuggestions = [
-    "What is Chart AI?",
-    "Best crypto strategies",
-    "How do I set alerts?",
-    "TSLA technical analysis"
-  ];
 
   return (
-    <div className="min-h-screen bg-tradeiq-navy flex flex-col">
+    <div className="min-h-screen bg-tradeiq-navy">
       {/* Header */}
       <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Bot className="h-8 w-8 text-tradeiq-blue" />
-              <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">TradeIQ Assistant</h1>
-                <p className="text-sm text-gray-400 font-medium">Trading Knowledge + App Guidance</p>
-              </div>
-            </div>
-            
-            {/* Mode indicator and market data */}
-            <div className="flex items-center space-x-4">
-              {sessionContext.activeSymbol && (
-                <div className="flex items-center space-x-2">
-                  <TrendingUp className="h-4 w-4 text-green-500" />
-                  <span className="text-sm text-gray-300">
-                    Active: {sessionContext.activeSymbol}
-                  </span>
-                </div>
-              )}
-              
-              {detectedSymbols.length > 0 && (
-                <div className="flex items-center space-x-2">
-                  <TrendingUp className="h-4 w-4 text-green-500" />
-                  <span className="text-sm text-gray-300">
-                    Tracking: {detectedSymbols.slice(0, 3).join(", ")}
-                    {detectedSymbols.length > 3 && ` +${detectedSymbols.length - 3} more`}
-                  </span>
-                </div>
-              )}
-              
-              <div className="flex items-center space-x-2 text-xs text-gray-400">
-                <BookOpen className="h-3 w-3" />
-                <span>Trading</span>
-                <span>•</span>
-                <HelpCircle className="h-3 w-3" />
-                <span>Product Help</span>
-              </div>
+          <div className="flex items-center space-x-3">
+            <MessageSquare className="h-8 w-8 text-tradeiq-blue" />
+            <div>
+              <h1 className="text-2xl font-bold text-white tracking-tight">{t('navigation.tradingChat')}</h1>
+              <p className="text-sm text-gray-400 font-medium">AI-Powered Trading Assistant</p>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 pb-48">
-        <div className="max-w-4xl mx-auto space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-            >
-              <div className={`flex max-w-[85%] ${message.isUser ? 'flex-row-reverse' : 'flex-row'} items-start space-x-3`}>
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                  message.isUser ? 'bg-tradeiq-blue ml-3' : 'bg-gray-700 mr-3'
-                }`}>
-                  {message.isUser ? (
-                    <User className="h-4 w-4 text-white" />
-                  ) : (
-                    <Bot className="h-4 w-4 text-tradeiq-blue" />
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Card className={`p-4 ${
-                    message.isUser 
-                      ? 'bg-tradeiq-blue text-white' 
-                      : 'tradeiq-card text-gray-100'
-                  }`}>
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                      {message.content}
-                    </p>
-                    
-                    {/* Mode indicator for AI responses */}
-                    {!message.isUser && message.aiResponse && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <Badge 
-                          variant={message.aiResponse.mode === 'trading' ? 'default' : 'secondary'} 
-                          className="text-xs"
-                        >
-                          {message.aiResponse.mode === 'trading' ? '📊 Trading' : 
-                           message.aiResponse.mode === 'product' ? '📱 Product' : '🔄 Mixed'}
-                        </Badge>
-                        {message.aiResponse.riskDisclaimer && (
-                          <Badge variant="outline" className="text-xs text-yellow-400 border-yellow-400">
-                            ⚠️ Investment Risk
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-                    
-                    {/* Context indicators for user messages */}
-                    {message.isUser && message.context && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {message.context.symbols.map((symbol, idx) => (
-                          <Badge key={idx} variant="secondary" className="text-xs">
-                            {symbol.symbol} ({symbol.type})
-                          </Badge>
-                        ))}
-                        {message.context.technicalRequests.map((req, idx) => (
-                          <Badge key={idx} variant="outline" className="text-xs">
-                            {req.type.replace('_', ' ')}
-                          </Badge>
-                        ))}
-                        {message.context.timeframes.map((tf, idx) => (
-                          <Badge key={idx} variant="outline" className="text-xs flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {tf.timeframe}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {/* Market data display */}
-                    {message.marketData && Object.keys(message.marketData).length > 0 && (
-                      <div className="mt-3 p-3 bg-black/20 rounded-lg">
-                        <p className="text-xs text-gray-300 mb-2">Market Data Used:</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {Object.entries(message.marketData).map(([symbol, data]: [string, any]) => (
-                            <div key={symbol} className="flex justify-between items-center text-xs">
-                              <span className="font-medium">{symbol}:</span>
-                              <span className={`${data.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                ${data.price?.toFixed(2)} ({data.change >= 0 ? '+' : ''}{data.change?.toFixed(2)})
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
-                    <span className="text-xs opacity-70 mt-2 block">
-                      {message.timestamp.toLocaleTimeString()}
-                    </span>
-                  </Card>
-                  
-                  {/* Action buttons for AI responses */}
-                  {!message.isUser && message.context && (
-                    <ActionButtons
-                      symbol={message.context.symbols[0]?.symbol}
-                      responseType={message.aiResponse?.mode || 'mixed'}
-                      onOpenChartAI={handleOpenChartAI}
-                      onSetAlert={handleSetAlert}
-                      onAddToFavorites={handleAddToFavorites}
-                    />
-                  )}
-                  
-                  {/* AI response confidence and follow-ups */}
-                  {!message.isUser && message.aiResponse && (
-                    <div className="space-y-2">
-                      {message.aiResponse.confidence && (
-                        <div className="flex items-center space-x-2 text-xs text-gray-400">
-                          <AlertCircle className="h-3 w-3" />
-                          <span>Confidence: {(message.aiResponse.confidence * 100).toFixed(0)}%</span>
-                          <span>• Mode: {message.aiResponse.mode}</span>
-                          {message.aiResponse.relatedFeatures && message.aiResponse.relatedFeatures.length > 0 && (
-                            <span>• Features: {message.aiResponse.relatedFeatures.join(", ")}</span>
-                          )}
-                        </div>
-                      )}
-                      
-                      {message.aiResponse.suggestedFollowUps && message.aiResponse.suggestedFollowUps.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {message.aiResponse.suggestedFollowUps.map((suggestion, idx) => (
-                            <Button
-                              key={idx}
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleFollowUp(suggestion)}
-                              className="text-xs h-7 border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
-                            >
-                              {suggestion}
-                            </Button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
+      {/* Content */}
+      <main className="container mx-auto px-4 py-6 pb-24 max-w-4xl">
+        <Card className="tradeiq-card h-[calc(100vh-200px)] flex flex-col">
+          <CardHeader>
+            <div className="flex items-center space-x-3">
+              <Brain className="h-5 w-5 text-tradeiq-blue" />
+              <CardTitle className="text-white">Trading Assistant</CardTitle>
             </div>
-          ))}
+          </CardHeader>
           
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center mr-3">
-                  <Bot className="h-4 w-4 text-tradeiq-blue" />
-                </div>
-                <Card className="tradeiq-card text-gray-100 p-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-tradeiq-blue rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-tradeiq-blue rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-tradeiq-blue rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+          <CardContent className="flex-1 flex flex-col space-y-4">
+            {/* Messages */}
+            <ScrollArea className="flex-1 pr-4">
+              <div className="space-y-4">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                        message.type === 'user'
+                          ? 'bg-tradeiq-blue text-white'
+                          : 'bg-black/30 text-gray-200 border border-gray-700/50'
+                      }`}
+                    >
+                      <p className="text-sm leading-relaxed">{message.content}</p>
+                      <p className="text-xs opacity-70 mt-2">
+                        {message.timestamp.toLocaleTimeString()}
+                      </p>
                     </div>
-                    <span className="text-sm text-gray-400">Analyzing your request...</span>
                   </div>
-                </Card>
+                ))}
+                
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-black/30 text-gray-200 border border-gray-700/50 rounded-2xl px-4 py-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-tradeiq-blue"></div>
+                        <span className="text-sm">AI is thinking...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
-          
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
+            </ScrollArea>
 
-      {/* Input Area with Quick Suggestions */}
-      <div className="fixed bottom-16 left-0 right-0 bg-tradeiq-navy border-t border-gray-800/50">
-        {/* Symbol detection preview */}
-        {detectedSymbols.length > 0 && (
-          <div className="px-4 pt-2">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex items-center space-x-2 text-xs text-gray-400">
-                <TrendingUp className="h-3 w-3" />
-                <span>Detected symbols: </span>
-                <div className="flex flex-wrap gap-1">
-                  {detectedSymbols.map(symbol => (
-                    <Badge key={symbol} variant="outline" className="text-xs h-5">
-                      {symbol}
-                      {marketData[symbol] && !marketData[symbol].isLoading && !marketData[symbol].error && (
-                        <span className={`ml-1 ${marketData[symbol].change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                          ${marketData[symbol].price.toFixed(2)}
-                        </span>
-                      )}
-                    </Badge>
+            {/* Suggestions */}
+            {messages.length === 1 && (
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <Lightbulb className="h-4 w-4 text-yellow-500" />
+                  <span className="text-sm text-gray-400">Try asking:</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {suggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      className="text-left text-sm p-3 rounded-lg bg-black/20 border border-gray-700/50 hover:bg-black/40 hover:border-tradeiq-blue/50 transition-colors text-gray-300"
+                    >
+                      {suggestion}
+                    </button>
                   ))}
                 </div>
               </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Quick Suggestions */}
-        <div className="px-4 pt-3 pb-2">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-              {quickSuggestions.map((suggestion) => (
-                <Button
-                  key={suggestion}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleQuickSuggestion(suggestion)}
-                  className="border-gray-700 hover:bg-gray-800 hover:border-tradeiq-blue text-gray-300 hover:text-white text-xs px-3 py-2 transition-all duration-200"
-                >
-                  {suggestion}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </div>
-        
-        {/* Input Field */}
-        <div className="px-4 pb-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex space-x-3">
-              <Textarea
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Ask about trading strategies, technical analysis, or TradeIQ features (Chart AI, alerts, etc.)..."
-                className="flex-1 min-h-[44px] max-h-32 resize-none bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-tradeiq-blue transition-colors"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage();
-                  }
-                }}
+            )}
+
+            {/* Input */}
+            <div className="flex space-x-2">
+              <Input
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="Ask about trading strategies, market analysis, or platform features..."
+                className="flex-1 bg-black/20 border-gray-700 text-white placeholder:text-gray-500"
+                disabled={isLoading}
               />
               <Button
                 onClick={handleSendMessage}
-                disabled={!inputValue.trim() || isLoading}
-                className="tradeiq-button-primary px-6"
+                disabled={!inputMessage.trim() || isLoading}
+                className="tradeiq-button-primary"
               >
                 <Send className="h-4 w-4" />
               </Button>
             </div>
-          </div>
-        </div>
-      </div>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 };
