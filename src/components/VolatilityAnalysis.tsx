@@ -2,23 +2,41 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Zap, AlertCircle, Shield, TrendingUp as VolHigh } from "lucide-react";
+import { useExternalMarketData } from "@/hooks/useExternalMarketData";
 
 interface VolatilityAnalysisProps {
   asset: string;
   timeframe: string;
 }
 
-const generateVolatilityData = () => {
-  const volatility = Math.random() * 100;
+const calculateVolatilityData = (marketData: any) => {
+  if (!marketData) {
+    return {
+      volatility: 0,
+      level: 'Low' as const,
+      icon: Shield,
+      color: 'text-tradeiq-success'
+    };
+  }
+
+  const { high, low, currentPrice, changePercent } = marketData;
+  
+  // Calculate true range volatility
+  const trueRange = ((high - low) / currentPrice) * 100;
+  const priceVolatility = Math.abs(changePercent);
+  
+  // Combined volatility score
+  const volatility = (trueRange * 0.6) + (priceVolatility * 0.4);
+  
   let level: 'Low' | 'Medium' | 'High';
   let icon;
   let color;
 
-  if (volatility < 30) {
+  if (volatility < 2) {
     level = 'Low';
     icon = Shield;
     color = 'text-tradeiq-success';
-  } else if (volatility < 70) {
+  } else if (volatility < 5) {
     level = 'Medium';
     icon = AlertCircle;
     color = 'text-tradeiq-warning';
@@ -32,7 +50,23 @@ const generateVolatilityData = () => {
 };
 
 export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps) => {
-  const { volatility, level, icon: VolIcon, color } = generateVolatilityData();
+  const { data: marketData, isLoading } = useExternalMarketData(asset, timeframe);
+  const { volatility, level, icon: VolIcon, color } = calculateVolatilityData(marketData);
+
+  if (isLoading) {
+    return (
+      <Card className="tradeiq-card p-6 rounded-2xl">
+        <div className="flex items-center space-x-3 mb-6">
+          <Zap className="h-6 w-6 text-tradeiq-warning" />
+          <h3 className="text-xl font-bold text-white">Volatility Analysis</h3>
+        </div>
+        <div className="animate-pulse space-y-6">
+          <div className="h-20 bg-gray-700/30 rounded-2xl"></div>
+          <div className="h-16 bg-gray-700/30 rounded-xl"></div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="tradeiq-card p-6 rounded-2xl">
@@ -66,13 +100,24 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
             <div className="w-full bg-gray-800 rounded-full h-3">
               <div 
                 className={`h-3 rounded-full transition-all duration-500 ${
-                  volatility > 70 ? 'bg-tradeiq-danger' : 
-                  volatility > 30 ? 'bg-tradeiq-warning' : 'bg-tradeiq-success'
+                  volatility > 5 ? 'bg-tradeiq-danger' : 
+                  volatility > 2 ? 'bg-tradeiq-warning' : 'bg-tradeiq-success'
                 }`}
-                style={{ width: `${Math.min(volatility, 100)}%` }}
+                style={{ width: `${Math.min(volatility * 10, 100)}%` }}
               ></div>
             </div>
           </div>
+          
+          {marketData && (
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400 font-medium">Daily Range</span>
+                <span className="text-white font-bold">
+                  ${marketData.low.toFixed(2)} - ${marketData.high.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Risk Assessment */}
@@ -96,6 +141,11 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
             {level === 'Medium' && 'Moderate price swings expected. Monitor for potential breakouts.'}
             {level === 'High' && 'Significant price movements likely. Exercise caution with position sizing.'}
           </p>
+          {marketData && (
+            <p className="text-xs text-gray-500 mt-2">
+              Current: ${marketData.currentPrice.toFixed(2)} ({marketData.changePercent > 0 ? '+' : ''}{marketData.changePercent.toFixed(2)}%)
+            </p>
+          )}
         </div>
       </div>
     </Card>
