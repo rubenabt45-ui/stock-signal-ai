@@ -38,7 +38,10 @@ const Index = () => {
     };
 
     const baseSymbol = symbol.replace('NASDAQ:', '').replace('NYSE:', '');
-    return relatedMap[baseSymbol] || [`NASDAQ:${baseSymbol}`, 'NASDAQ:AAPL', 'NASDAQ:MSFT', 'NASDAQ:GOOGL', 'NASDAQ:AMZN'];
+    const relatedSymbols = relatedMap[baseSymbol] || [`NASDAQ:${baseSymbol}`, 'NASDAQ:AAPL', 'NASDAQ:MSFT', 'NASDAQ:GOOGL', 'NASDAQ:AMZN'];
+    
+    console.log(`🔗 Related symbols for ${symbol}:`, relatedSymbols);
+    return relatedSymbols;
   };
 
   return (
@@ -84,7 +87,7 @@ const Index = () => {
           onTimeframeSelect={handleTimeframeSelect} 
         />
 
-        {/* Live Chart with unified pricing */}
+        {/* Live Chart */}
         <LiveChart 
           asset={selectedAsset} 
           timeframe={selectedTimeframe}
@@ -104,6 +107,7 @@ const Index = () => {
               symbols={getRelatedSymbols(selectedAsset)}
               height={450}
               className="w-full"
+              key={`market-overview-${selectedAsset}`}
             />
           </CardContent>
         </Card>
