@@ -20,7 +20,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
   }, [asset, timeframe]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Live Price Header */}
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
@@ -45,8 +45,8 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
       </Card>
 
       {/* Advanced TradingView Chart */}
-      <Card className="tradeiq-card p-6 rounded-2xl">
-        <div className="flex items-center justify-between mb-6">
+      <Card className="tradeiq-card p-8 rounded-2xl">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-3">
             <BarChart3 className="h-6 w-6 text-tradeiq-blue" />
             <div>
@@ -61,13 +61,14 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
           </div>
         </div>
         
-        <TradingViewAdvancedChart 
-          symbol={asset} 
-          timeframe={timeframe}
-          height="600px"
-          className="w-full min-h-[500px]"
-          key={chartKey}
-        />
+        <div className="py-4">
+          <TradingViewAdvancedChart 
+            symbol={asset} 
+            timeframe={timeframe}
+            className="w-full"
+            key={chartKey}
+          />
+        </div>
       </Card>
 
       {/* Future AI Chart Summary Container */}

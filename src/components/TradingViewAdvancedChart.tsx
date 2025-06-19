@@ -31,7 +31,7 @@ const getInterval = (timeframe: string): string => {
 export const TradingViewAdvancedChart = ({ 
   symbol, 
   timeframe, 
-  height = "480px", 
+  height = "600px", 
   className = "" 
 }: TradingViewAdvancedChartProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -133,7 +133,7 @@ export const TradingViewAdvancedChart = ({
 
   if (isLoading) {
     return (
-      <div className={`flex items-center justify-center bg-black/5 rounded-xl border border-gray-700/20 ${className}`} style={{ height }}>
+      <div className={`flex items-center justify-center bg-black/5 rounded-xl border border-gray-700/20 min-h-[600px] lg:min-h-[700px] h-[60vh] lg:h-[700px] ${className}`}>
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tradeiq-blue mx-auto"></div>
           <div>
@@ -147,7 +147,7 @@ export const TradingViewAdvancedChart = ({
 
   if (!isLoaded) {
     return (
-      <div className={`flex items-center justify-center bg-black/5 rounded-xl border border-gray-700/20 ${className}`} style={{ height }}>
+      <div className={`flex items-center justify-center bg-black/5 rounded-xl border border-gray-700/20 min-h-[600px] lg:min-h-[700px] h-[60vh] lg:h-[700px] ${className}`}>
         <div className="text-center space-y-4">
           <p className="text-red-400 text-lg font-medium">Chart Unavailable</p>
           <p className="text-gray-500 text-sm">Failed to load the TradingView widget</p>
@@ -157,7 +157,7 @@ export const TradingViewAdvancedChart = ({
   }
 
   return (
-    <div className={`bg-black/5 rounded-xl border border-gray-700/20 overflow-hidden ${className}`} style={{ height }}>
+    <div className={`bg-black/5 rounded-xl border border-gray-700/20 overflow-hidden w-full min-h-[600px] lg:min-h-[700px] h-[60vh] lg:h-[700px] ${className}`}>
       <div ref={containerRef} className="w-full h-full" />
     </div>
   );

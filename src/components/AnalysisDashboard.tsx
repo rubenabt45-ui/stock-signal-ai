@@ -128,17 +128,18 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Chart Section */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="tradeiq-card p-6 rounded-2xl">
-            <div className="flex items-center space-x-3 mb-6">
+          <Card className="tradeiq-card p-8 rounded-2xl">
+            <div className="flex items-center space-x-3 mb-8">
               <BarChart3 className="h-6 w-6 text-tradeiq-blue" />
               <h3 className="text-xl font-bold text-white">Price Chart</h3>
             </div>
-            <TradingViewAdvancedChart 
-              symbol={stockSymbol} 
-              timeframe="1D"
-              height="580px"
-              className="w-full min-h-[500px]"
-            />
+            <div className="py-4">
+              <TradingViewAdvancedChart 
+                symbol={stockSymbol} 
+                timeframe="1D"
+                className="w-full"
+              />
+            </div>
           </Card>
 
           <TechnicalIndicators symbol={stockSymbol} />
