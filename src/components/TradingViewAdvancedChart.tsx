@@ -89,7 +89,9 @@ export const TradingViewAdvancedChart = ({
 
     try {
       const widgetConfig = {
-        autosize: true,
+        autosize: false,
+        width: "100%",
+        height: 600, // Fixed height for proper rendering
         symbol: symbol,
         interval: getInterval(timeframe),
         timezone: "Etc/UTC",
@@ -109,8 +111,11 @@ export const TradingViewAdvancedChart = ({
           "MACD@tv-basicstudies"
         ],
         container_id: containerId,
-        width: "100%",
-        height: "100%"
+        // Remove scrollbars and ensure full content visibility
+        hide_top_toolbar: false,
+        hide_legend: false,
+        save_image: false,
+        hide_volume: false
       };
 
       widgetRef.current = new window.TradingView.widget(widgetConfig);
@@ -157,8 +162,22 @@ export const TradingViewAdvancedChart = ({
   }
 
   return (
-    <div className={`bg-black/5 rounded-xl border border-gray-700/20 overflow-hidden w-full min-h-[600px] lg:min-h-[700px] h-[60vh] lg:h-[700px] ${className}`}>
-      <div ref={containerRef} className="w-full h-full" />
+    <div 
+      className={`bg-black/5 rounded-xl border border-gray-700/20 overflow-hidden w-full min-h-[600px] lg:min-h-[700px] ${className}`}
+      style={{ 
+        height: '600px',
+        minHeight: '600px'
+      }}
+    >
+      <div 
+        ref={containerRef} 
+        className="w-full h-full" 
+        style={{ 
+          height: '600px',
+          minHeight: '600px',
+          overflow: 'hidden'
+        }}
+      />
     </div>
   );
 };
