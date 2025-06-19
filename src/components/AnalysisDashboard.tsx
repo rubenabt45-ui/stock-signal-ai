@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { ArrowLeft, Brain, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { StockChart } from "@/components/StockChart";
+import { TradingViewAdvancedChart } from "@/components/TradingViewAdvancedChart";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AIAnalysis } from "@/components/AIAnalysis";
 import { MarketPrice } from "@/components/MarketPrice";
@@ -132,7 +133,12 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
               <BarChart3 className="h-6 w-6 text-tradeiq-blue" />
               <h3 className="text-xl font-bold text-white">Price Chart</h3>
             </div>
-            <StockChart symbol={stockSymbol} />
+            <TradingViewAdvancedChart 
+              symbol={stockSymbol} 
+              timeframe="1D"
+              height="480px"
+              className="w-full"
+            />
           </Card>
 
           <TechnicalIndicators symbol={stockSymbol} />
