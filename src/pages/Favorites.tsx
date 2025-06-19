@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Plus, Edit3, Check, Filter, BarChart3, LogIn, RefreshCw } from "lucide-react";
@@ -9,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/comp
 import { FavoritesList } from "@/components/FavoritesList";
 import { AddSymbolModal } from "@/components/AddSymbolModal";
 import { FilterDropdown } from "@/components/FilterDropdown";
+import { MarketOverview } from "@/components/MarketOverview";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useAuth } from "@/contexts/AuthContext";
 import { ChartCandlestick } from "lucide-react";
@@ -22,6 +22,23 @@ const Favorites = () => {
   const { favorites, loading, error, addFavorite, removeFavorite, reorderFavorites, refetch } = useFavorites();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Get market overview symbols from favorites
+  const getMarketOverviewSymbols = () => {
+    if (!user || favorites.length === 0) {
+      return ['NASDAQ:AAPL', 'NASDAQ:MSFT', 'NASDAQ:TSLA', 'NASDAQ:NVDA', 'NASDAQ:AMZN'];
+    }
+    
+    // Format favorite symbols for TradingView
+    return favorites.slice(0, 8).map(fav => {
+      const symbol = fav.symbol.toUpperCase();
+      // Add exchange prefix if not present
+      if (!symbol.includes(':')) {
+        return `NASDAQ:${symbol}`;
+      }
+      return symbol;
+    });
+  };
 
   const filteredFavorites = favorites.filter(fav => 
     categoryFilter === 'all' || fav.category === categoryFilter
@@ -162,7 +179,7 @@ const Favorites = () => {
         </header>
 
         {/* Main Content */}
-        <main className="container mx-auto px-4 py-6">
+        <main className="container mx-auto px-4 py-6 space-y-6">
           <Card className="tradeiq-card">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
@@ -232,6 +249,25 @@ const Favorites = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Market Overview Section */}
+          {user && favorites.length > 0 && (
+            <Card className="tradeiq-card">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-white text-lg flex items-center space-x-2">
+                  <BarChart3 className="h-5 w-5 text-tradeiq-blue" />
+                  <span>📈 Market Overview</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MarketOverview 
+                  symbols={getMarketOverviewSymbols()}
+                  height={450}
+                  className="w-full"
+                />
+              </CardContent>
+            </Card>
+          )}
         </main>
 
         {/* Add Symbol Modal */}
