@@ -8,7 +8,7 @@ import { PatternDetection } from "@/components/PatternDetection";
 import { TrendAnalysis } from "@/components/TrendAnalysis";
 import { VolatilityAnalysis } from "@/components/VolatilityAnalysis";
 import { AISuggestions } from "@/components/AISuggestions";
-import { MarketPrice } from "@/components/MarketPrice";
+import { LivePriceDisplay } from "@/components/LivePriceDisplay";
 import { ChartCandlestick, Brain, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,7 +21,6 @@ const Index = () => {
 
   const handleTimeframeSelect = useCallback((timeframe: string) => {
     console.log(`🎯 Index: Timeframe changed to ${timeframe} for asset ${selectedAsset}`);
-    // Cast string to Timeframe type and update state immediately
     setSelectedTimeframe(timeframe as Timeframe);
   }, [selectedAsset]);
 
@@ -62,39 +61,13 @@ const Index = () => {
           onAssetSelect={setSelectedAsset} 
         />
 
-        {/* Live Price Card for Selected Asset */}
-        <Card className="tradeiq-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-white mb-2">
-                  {selectedAsset} Live Price
-                </h2>
-                <MarketPrice 
-                  symbol={selectedAsset} 
-                  size="lg"
-                />
-              </div>
-              <div className="text-right">
-                <div className="flex items-center space-x-2 text-sm text-gray-400 mb-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span>Live Updates</span>
-                </div>
-                <p className="text-xs text-gray-500">
-                  Refreshes every 60 seconds
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Timeframe Selector */}
         <TimeframeSelector 
           selectedTimeframe={selectedTimeframe} 
           onTimeframeSelect={handleTimeframeSelect} 
         />
 
-        {/* Live Chart with key prop to force re-render on timeframe change */}
+        {/* Live Chart with unified pricing */}
         <LiveChart 
           asset={selectedAsset} 
           timeframe={selectedTimeframe}
