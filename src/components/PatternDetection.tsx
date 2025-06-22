@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Target, CheckCircle, AlertTriangle } from "lucide-react";
 import { useGlobalMarketData, formatPrice, formatChangePercent } from "@/hooks/useGlobalMarketData";
+import { memo, useMemo } from "react";
 
 interface PatternDetectionProps {
   asset: string;
@@ -36,11 +37,15 @@ const generatePatterns = (marketData: any) => {
   return patterns.slice(0, Math.floor(Math.random() * 3) + 1);
 };
 
-export const PatternDetection = ({ asset, timeframe }: PatternDetectionProps) => {
+const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) => {
   const marketData = useGlobalMarketData(asset);
-  const detectedPatterns = generatePatterns(marketData);
+  
+  // Memoize patterns to prevent unnecessary recalculations
+  const detectedPatterns = useMemo(() => {
+    return generatePatterns(marketData);
+  }, [marketData.price, marketData.changePercent, marketData.high, marketData.low, marketData.volume]);
 
-  // Console log for sync validation
+  // Console log for sync validation (only when price actually changes)
   if (process.env.NODE_ENV === 'development' && marketData.price) {
     console.log(`📊 PatternDetection [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)})`);
   }
@@ -122,3 +127,8 @@ export const PatternDetection = ({ asset, timeframe }: PatternDetectionProps) =>
     </Card>
   );
 };
+
+// Export memoized component to prevent unnecessary re-renders
+export const PatternDetection = memo(PatternDetectionComponent, (prevProps, nextProps) => {
+  return prevProps.asset === nextProps.asset && prevProps.timeframe === nextProps.timeframe;
+});

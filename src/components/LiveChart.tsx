@@ -3,8 +3,7 @@ import { Card } from "@/components/ui/card";
 import { BarChart3, Activity } from "lucide-react";
 import { TradingViewAdvancedChart } from "@/components/TradingViewAdvancedChart";
 import { LivePriceDisplay } from "@/components/LivePriceDisplay";
-import { useGlobalMarketData } from "@/hooks/useGlobalMarketData";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 interface LiveChartProps {
   asset: string;
@@ -13,20 +12,26 @@ interface LiveChartProps {
 
 export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
   const [chartKey, setChartKey] = useState(`${asset}-${timeframe}-${Date.now()}`);
-  const marketData = useGlobalMarketData(asset);
   
-  // Force chart regeneration when timeframe changes
+  // Force chart regeneration only when asset or timeframe changes (not on price updates)
   useEffect(() => {
     console.log(`🎯 LiveChart: Asset ${asset} timeframe changed to ${timeframe} - updating chart`);
     setChartKey(`${asset}-${timeframe}-${Date.now()}`);
   }, [asset, timeframe]);
 
-  // Console log for sync validation
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development' && marketData.price) {
-      console.log(`📊 LiveChart [${asset}]: Synced with global data - $${marketData.price.toFixed(2)}`);
-    }
-  }, [asset, marketData.price]);
+  // Memoize the TradingView chart to prevent re-renders on price updates
+  const memoizedChart = useMemo(() => {
+    console.log(`📊 LiveChart: Creating memoized chart for ${asset} (${timeframe})`);
+    return (
+      <TradingViewAdvancedChart 
+        symbol={asset} 
+        timeframe={timeframe}
+        className="w-full"
+        height="600px"
+        key={chartKey}
+      />
+    );
+  }, [asset, timeframe, chartKey]);
 
   return (
     <div className="space-y-6">
@@ -42,7 +47,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
           </div>
           
           <div className="flex items-center space-x-4">
-            {/* Live Price Display - Now using global synchronized data */}
+            {/* Live Price Display - Isolated from chart rendering */}
             <div className="text-right">
               <LivePriceDisplay 
                 symbol={asset} 
@@ -63,13 +68,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
         </div>
         
         <div className="w-full">
-          <TradingViewAdvancedChart 
-            symbol={asset} 
-            timeframe={timeframe}
-            className="w-full"
-            height="600px"
-            key={chartKey}
-          />
+          {memoizedChart}
         </div>
       </Card>
     </div>

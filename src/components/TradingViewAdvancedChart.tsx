@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 interface TradingViewAdvancedChartProps {
@@ -28,7 +28,8 @@ const getInterval = (timeframe: string): string => {
   return intervalMap[timeframe] || '1D';
 };
 
-export const TradingViewAdvancedChart = ({ 
+// Memoized component to prevent unnecessary re-renders
+const TradingViewAdvancedChartComponent = ({ 
   symbol, 
   timeframe, 
   height = "600px", 
@@ -41,6 +42,11 @@ export const TradingViewAdvancedChart = ({
   const { actualTheme } = useTheme();
   
   const containerId = `tv-advanced-chart-${symbol}-${Date.now()}`;
+
+  // Debug logging to track re-renders
+  useEffect(() => {
+    console.log(`🔄 TradingViewAdvancedChart: Component rendered for ${symbol} (${timeframe})`);
+  });
 
   useEffect(() => {
     const loadTradingViewScript = () => {
@@ -71,6 +77,8 @@ export const TradingViewAdvancedChart = ({
 
   useEffect(() => {
     if (!isLoaded || !containerRef.current) return;
+
+    console.log(`🎯 TradingView: Creating widget for ${symbol} (${timeframe}) - Theme: ${actualTheme}`);
 
     // Clean up previous widget
     if (widgetRef.current) {
@@ -181,3 +189,21 @@ export const TradingViewAdvancedChart = ({
     </div>
   );
 };
+
+// Export memoized component that only re-renders when symbol, timeframe, or theme changes
+export const TradingViewAdvancedChart = memo(TradingViewAdvancedChartComponent, (prevProps, nextProps) => {
+  // Only re-render if symbol, timeframe, height, or className actually change
+  const shouldNotRerender = 
+    prevProps.symbol === nextProps.symbol &&
+    prevProps.timeframe === nextProps.timeframe &&
+    prevProps.height === nextProps.height &&
+    prevProps.className === nextProps.className;
+  
+  if (shouldNotRerender) {
+    console.log(`✅ TradingView: Skipping re-render for ${nextProps.symbol} - props unchanged`);
+  } else {
+    console.log(`🔄 TradingView: Re-rendering for ${nextProps.symbol} - props changed`);
+  }
+  
+  return shouldNotRerender;
+});
