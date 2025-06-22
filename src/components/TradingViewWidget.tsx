@@ -49,10 +49,16 @@ export const TradingViewWidget = ({
   const [widgetReady, setWidgetReady] = useState(false);
   const widgetRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const priceIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const { actualTheme } = useTheme();
 
   // Cleanup function
   const cleanup = () => {
+    if (priceIntervalRef.current) {
+      clearInterval(priceIntervalRef.current);
+      priceIntervalRef.current = null;
+    }
+    
     if (widgetRef.current) {
       try {
         widgetRef.current.remove();
@@ -66,55 +72,72 @@ export const TradingViewWidget = ({
     setIsLoading(true);
   };
 
-  // Extract price data from widget
-  const extractPriceData = () => {
+  // Extract price data from widget using TradingView API
+  const extractPriceData = async () => {
     if (!widgetRef.current || !widgetReady) return;
 
     try {
       const chart = widgetRef.current.activeChart();
       if (!chart) return;
 
-      // Get the last bar data
+      // Get symbol info and latest data
+      const symbolInfo = await chart.symbolInfo();
+      const priceScale = chart.getPanes()[0].getMainSourcePriceScale();
+      
+      // Get the latest bar data
       chart.onDataLoaded().subscribe(null, () => {
         try {
-          const series = chart.getAllSeries()[0];
-          if (series) {
-            const lastBar = series.lastBarClose();
-            const priceData = series.data();
+          const dataWindow = chart.getDataWindow();
+          if (dataWindow && dataWindow.length > 0) {
+            const latestData = dataWindow[dataWindow.length - 1];
+            const previousData = dataWindow[dataWindow.length - 2];
             
-            if (lastBar && priceData && priceData.length > 0) {
-              const currentData = priceData[priceData.length - 1];
-              const previousData = priceData[priceData.length - 2];
-              
-              const price = lastBar;
-              const prevClose = previousData?.close || price;
-              const changePercent = ((price - prevClose) / prevClose) * 100;
+            if (latestData && latestData.close !== undefined) {
+              const currentPrice = latestData.close;
+              const prevClose = previousData?.close || currentPrice;
+              const changePercent = ((currentPrice - prevClose) / prevClose) * 100;
               
               const extractedData = {
-                price: price,
+                price: currentPrice,
                 changePercent: changePercent,
-                high: currentData?.high || price,
-                low: currentData?.low || price,
-                volume: currentData?.volume,
+                high: latestData.high || currentPrice,
+                low: latestData.low || currentPrice,
+                volume: latestData.volume,
                 lastUpdated: Date.now()
               };
 
-              console.log(`📊 TradingView price extracted: ${symbol} $${price.toFixed(2)} (${changePercent.toFixed(2)}%)`);
+              console.log(`📊 TradingView price extracted: ${symbol} $${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%) at ${new Date().toLocaleTimeString()}`);
               onPriceUpdate?.(extractedData);
             }
           }
         } catch (error) {
-          console.warn('Price extraction error:', error);
+          console.warn('Price extraction from data window failed:', error);
+          // Fallback: try to get price from symbol info
+          if (symbolInfo && symbolInfo.last_price) {
+            const extractedData = {
+              price: symbolInfo.last_price,
+              changePercent: symbolInfo.change_percent || 0,
+              high: symbolInfo.high || symbolInfo.last_price,
+              low: symbolInfo.low || symbolInfo.last_price,
+              volume: symbolInfo.volume,
+              lastUpdated: Date.now()
+            };
+            
+            console.log(`📊 TradingView price (fallback): ${symbol} $${symbolInfo.last_price.toFixed(2)} at ${new Date().toLocaleTimeString()}`);
+            onPriceUpdate?.(extractedData);
+          }
         }
       });
     } catch (error) {
-      console.warn('Widget data extraction error:', error);
+      console.warn('TradingView price extraction error:', error);
     }
   };
 
   useEffect(() => {
     if (!containerRef.current) return;
 
+    console.log(`🔄 TradingView widget initializing for ${symbol} (${timeframe}) at ${new Date().toLocaleTimeString()}`);
+    
     // Cleanup previous widget
     cleanup();
 
@@ -158,10 +181,15 @@ export const TradingViewWidget = ({
             setIsLoading(false);
             setWidgetReady(true);
             
-            // Extract initial price data
+            // Start price extraction after widget is ready
             setTimeout(() => {
               extractPriceData();
-            }, 1000);
+              
+              // Set up periodic price updates every 5 seconds
+              priceIntervalRef.current = setInterval(() => {
+                extractPriceData();
+              }, 5000);
+            }, 2000);
           }
         });
 
@@ -175,17 +203,6 @@ export const TradingViewWidget = ({
 
     return cleanup;
   }, [symbol, timeframe, actualTheme]);
-
-  // Set up price update polling
-  useEffect(() => {
-    if (!widgetReady) return;
-
-    const interval = setInterval(() => {
-      extractPriceData();
-    }, 10000); // Update every 10 seconds
-
-    return () => clearInterval(interval);
-  }, [widgetReady]);
 
   return (
     <div 

@@ -22,6 +22,11 @@ export const useTradingViewWidgetData = (symbol: string) => {
   const { getData } = useTradingViewData();
   const data = getData(symbol);
   
+  // Log when data is successfully retrieved
+  if (data.price !== null && process.env.NODE_ENV === 'development') {
+    console.log(`📊 useTradingViewWidgetData [${symbol}]: Price $${formatPrice(data.price)} (${formatChangePercent(data.changePercent)}) - Last updated: ${data.lastUpdated ? new Date(data.lastUpdated).toLocaleTimeString() : 'Never'}`);
+  }
+  
   return {
     price: data.price,
     changePercent: data.changePercent,
@@ -30,6 +35,6 @@ export const useTradingViewWidgetData = (symbol: string) => {
     volume: data.volume,
     lastUpdated: data.lastUpdated,
     isLoading: data.price === null,
-    error: null
+    error: data.price === null && data.lastUpdated === null ? 'No TradingView data available' : null
   };
 };

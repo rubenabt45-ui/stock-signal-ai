@@ -92,7 +92,7 @@ export const LivePriceDisplay = ({
         <div className="h-6 bg-gray-700/50 rounded w-20"></div>
         <div className="text-xs text-blue-500 flex items-center space-x-1">
           <div className="animate-spin rounded-full h-3 w-3 border-b border-blue-500"></div>
-          <span>Syncing with TradingView...</span>
+          <span>Syncing with TradingView chart...</span>
         </div>
       </div>
     );
@@ -103,7 +103,7 @@ export const LivePriceDisplay = ({
       {showSymbol && (
         <div className="flex items-center space-x-2">
           <span className={sizeClasses.symbol}>{symbol}</span>
-          <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/30 text-xs">
+          <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
             TradingView Synced
           </Badge>
         </div>
@@ -114,7 +114,7 @@ export const LivePriceDisplay = ({
           ${formatPrice(price)}
         </span>
         {lastUpdated && (
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="TradingView synced"></div>
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="TradingView chart data"></div>
         )}
       </div>
       
@@ -133,7 +133,10 @@ export const LivePriceDisplay = ({
       
       {lastUpdated && (
         <div className={`${sizeClasses.time} text-green-500 flex items-center space-x-1`}>
-          <span>TradingView: {new Date(lastUpdated).toLocaleTimeString()}</span>
+          <span>Chart: {new Date(lastUpdated).toLocaleTimeString()}</span>
+          <div className="text-xs bg-blue-500/20 px-2 py-0.5 rounded text-blue-400">
+            Powered by TradingView
+          </div>
         </div>
       )}
     </div>

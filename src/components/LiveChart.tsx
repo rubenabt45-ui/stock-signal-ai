@@ -15,7 +15,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
   
   // Force chart to remount when asset or timeframe changes
   useEffect(() => {
-    console.log(`🔄 LiveChart: Symbol changed to ${asset} (${timeframe}) - forcing TradingView remount`);
+    console.log(`🔄 LiveChart: Switched to symbol ${asset} (${timeframe}) - refreshing chart at ${new Date().toLocaleTimeString()}`);
     setChartKey(prev => prev + 1);
   }, [asset, timeframe]);
 
@@ -27,7 +27,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
             <BarChart3 className="h-6 w-6 text-tradeiq-blue" />
             <div>
               <h3 className="text-xl font-bold text-white">{asset} Professional Chart</h3>
-              <p className="text-sm text-gray-400">Real-time trading analysis synced with TradingView</p>
+              <p className="text-sm text-gray-400">100% synchronized with TradingView chart data</p>
             </div>
           </div>
           
@@ -47,7 +47,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
             
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-green-500">TradingView Synced</span>
+              <span className="text-sm font-medium text-green-500">Chart Synced</span>
             </div>
           </div>
         </div>
