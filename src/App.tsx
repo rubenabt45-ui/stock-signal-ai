@@ -1,4 +1,5 @@
 
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,8 +37,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <LanguageProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <LanguageProvider>
             <ThemeProvider>
               <MarketDataProvider>
                 <TooltipProvider>
@@ -88,11 +89,12 @@ function App() {
                 </TooltipProvider>
               </MarketDataProvider>
             </ThemeProvider>
-          </AuthProvider>
-        </LanguageProvider>
+          </LanguageProvider>
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );
 }
 
 export default App;
+
