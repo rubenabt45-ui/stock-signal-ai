@@ -17,9 +17,13 @@ export const LivePriceDisplay = ({
 }: LivePriceDisplayProps) => {
   const { price, changePercent, isLoading, error, lastUpdated } = useTradingViewWidgetData(symbol);
 
-  // Critical debug logs to verify synchronization
-  if (process.env.NODE_ENV === 'development' && price !== null) {
-    console.log(`🎯 LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - TradingView Synced: ${new Date(lastUpdated || 0).toLocaleTimeString()}`);
+  // 🎯 CRITICAL DEBUG: Log chart vs display price for verification
+  console.log(`🎯 LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - TradingView Direct: ${new Date(lastUpdated || 0).toLocaleTimeString()}`);
+  
+  // Debug widget price extraction
+  if (price !== null) {
+    console.log(`💎 Chart Price: $${formatPrice(price)}`);
+    console.log(`💎 LivePriceDisplay: $${formatPrice(price)}`);
   }
 
   const getSizeClasses = () => {
@@ -85,6 +89,7 @@ export const LivePriceDisplay = ({
         {showSymbol && <div className="h-6 bg-gray-700/50 rounded w-16"></div>}
         <div className="h-10 bg-gray-700/50 rounded w-32"></div>
         <div className="h-6 bg-gray-700/50 rounded w-20"></div>
+        <div className="text-xs text-yellow-500">Waiting for TradingView widget...</div>
       </div>
     );
   }
@@ -95,7 +100,7 @@ export const LivePriceDisplay = ({
         <div className="flex items-center space-x-2">
           <span className={sizeClasses.symbol}>{symbol}</span>
           <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
-            TradingView Synced
+            TradingView Direct
           </Badge>
         </div>
       )}
@@ -124,7 +129,7 @@ export const LivePriceDisplay = ({
       
       {lastUpdated && (
         <div className={`${sizeClasses.time} text-gray-500 flex items-center space-x-1`}>
-          <span>TradingView: {new Date(lastUpdated).toLocaleTimeString()}</span>
+          <span>Widget: {new Date(lastUpdated).toLocaleTimeString()}</span>
         </div>
       )}
     </div>

@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState, memo, useCallback } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
@@ -132,17 +131,26 @@ const TradingViewAdvancedChartComponent = ({
       const widget = new window.TradingView.widget(widgetConfig);
       widgetRef.current = widget;
 
-      // 🎯 CRITICAL: Set the widget reference for data extraction
+      // 🎯 CRITICAL: Set the widget reference and setup price extraction
       widget.onChartReady(() => {
-        console.log(`✅ TradingView widget ready for ${symbol} - setting global reference`);
+        console.log(`✅ TradingView widget ready for ${symbol} - setting global reference for price extraction`);
         setTradingViewWidget(widget);
         
-        // Log when chart data changes
+        // Setup real-time price monitoring
         try {
           const chart = widget.activeChart();
           if (chart) {
+            // Monitor symbol changes
             chart.onSymbolChanged().subscribe(null, () => {
               console.log(`📊 Symbol changed in TradingView: ${symbol}`);
+              // Trigger price extraction after symbol change
+              setTimeout(() => setTradingViewWidget(widget), 500);
+            });
+            
+            // Monitor data updates
+            chart.onDataLoaded().subscribe(null, () => {
+              console.log(`📈 Data loaded for ${symbol} - triggering price extraction`);
+              setTimeout(() => setTradingViewWidget(widget), 100);
             });
           }
         } catch (e) {

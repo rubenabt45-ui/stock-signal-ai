@@ -21,14 +21,101 @@ declare global {
   }
 }
 
-// Global widget reference and data management
+// Global widget reference for direct price extraction
 let globalTradingViewWidget: any = null;
 const dataSubscribers = new Set<(data: TradingViewWidgetData) => void>();
-const symbolDataCache = new Map<string, TradingViewWidgetData>();
+const currentWidgetData: TradingViewWidgetData = {
+  symbol: '',
+  price: null,
+  change: null,
+  changePercent: null,
+  open: null,
+  high: null,
+  low: null,
+  volume: null,
+  lastUpdated: null,
+  isLoading: true,
+  error: null,
+};
 
 export const setTradingViewWidget = (widget: any) => {
   globalTradingViewWidget = widget;
-  console.log('🎯 TradingView widget reference updated for data extraction');
+  console.log('🎯 TradingView widget reference updated for direct price extraction');
+  
+  // Extract price immediately when widget is set
+  if (widget) {
+    setTimeout(() => {
+      extractWidgetPrice();
+    }, 1000); // Give widget time to load data
+  }
+};
+
+const extractWidgetPrice = () => {
+  if (!globalTradingViewWidget) {
+    console.log('⚠️ No TradingView widget available for price extraction');
+    return;
+  }
+
+  try {
+    const chart = globalTradingViewWidget.activeChart?.();
+    if (chart) {
+      // Get symbol info
+      const symbolInfo = chart.symbol();
+      console.log(`📊 TradingView active symbol: ${symbolInfo}`);
+      
+      // Try to get current price from chart
+      try {
+        const series = chart.getSeries();
+        if (series && series.length > 0) {
+          const lastBar = series[0].data()[series[0].data().length - 1];
+          if (lastBar) {
+            const price = lastBar.close || lastBar.value;
+            const open = lastBar.open;
+            const high = lastBar.high;
+            const low = lastBar.low;
+            const volume = lastBar.volume;
+            
+            const change = price && open ? price - open : null;
+            const changePercent = change && open ? (change / open) * 100 : null;
+            
+            const widgetData: TradingViewWidgetData = {
+              symbol: symbolInfo || currentWidgetData.symbol,
+              price: price || null,
+              change: change,
+              changePercent: changePercent,
+              open: open || null,
+              high: high || null,
+              low: low || null,
+              volume: volume || null,
+              lastUpdated: Date.now(),
+              isLoading: false,
+              error: null,
+            };
+            
+            console.log(`💎 Direct TradingView price extracted: $${formatPrice(widgetData.price)} for ${widgetData.symbol}`);
+            
+            // Update global data and notify subscribers
+            Object.assign(currentWidgetData, widgetData);
+            dataSubscribers.forEach(callback => {
+              try {
+                callback(widgetData);
+              } catch (e) {
+                console.log('Subscriber notification error:', e);
+              }
+            });
+            
+            return widgetData;
+          }
+        }
+      } catch (seriesError) {
+        console.log('📊 Series data extraction failed, trying alternative method:', seriesError);
+      }
+    }
+  } catch (error) {
+    console.log('⚠️ TradingView widget price extraction failed:', error);
+  }
+  
+  return null;
 };
 
 export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData => {
@@ -52,85 +139,43 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
   // Update current symbol reference
   useEffect(() => {
     currentSymbolRef.current = symbol;
+    currentWidgetData.symbol = symbol;
   }, [symbol]);
 
-  const extractWidgetData = useCallback(async (targetSymbol: string): Promise<TradingViewWidgetData> => {
-    console.log(`🔍 Extracting data for ${targetSymbol}`);
-    
-    try {
-      // First, try to extract from TradingView widget
-      if (globalTradingViewWidget) {
-        try {
-          const chart = globalTradingViewWidget.activeChart?.();
-          if (chart) {
-            // Try to get current symbol info
-            const symbolInfo = chart.symbol();
-            console.log(`📊 TradingView active symbol: ${symbolInfo}`);
-            
-            // If the widget symbol matches our target symbol, try to extract data
-            if (symbolInfo && symbolInfo.includes(targetSymbol)) {
-              // This is a simplified approach - in practice, TradingView widget data extraction
-              // requires more complex API calls that may not be available in all widget versions
-              console.log(`✅ TradingView widget matches symbol ${targetSymbol}`);
-            }
-          }
-        } catch (widgetError) {
-          console.log('⚠️ TradingView widget data extraction failed:', widgetError);
-        }
-      }
-
-      // Use Alpha Vantage as reliable fallback
-      return await fetchAlphaVantageData(targetSymbol);
-
-    } catch (error) {
-      console.error(`❌ Error extracting data for ${targetSymbol}:`, error);
-      return generateFallbackData(targetSymbol);
-    }
-  }, []);
-
-  const updateData = useCallback(async () => {
+  const updateDataFromWidget = useCallback(() => {
     if (!currentSymbolRef.current) return;
 
     const targetSymbol = currentSymbolRef.current;
-    console.log(`🔄 Updating data for ${targetSymbol}`);
+    console.log(`🔄 Extracting TradingView widget data for ${targetSymbol}`);
     
-    // Check cache first (5-second cache)
-    const cached = symbolDataCache.get(targetSymbol);
-    if (cached && cached.lastUpdated && (Date.now() - cached.lastUpdated) < 5000) {
-      console.log(`📋 Using cached data for ${targetSymbol}`);
-      setWidgetData(cached);
+    // Try to extract from TradingView widget first
+    const extractedData = extractWidgetPrice();
+    
+    if (extractedData && extractedData.symbol.includes(targetSymbol)) {
+      console.log(`✅ Using TradingView widget data for ${targetSymbol}: $${formatPrice(extractedData.price)}`);
+      setWidgetData(extractedData);
       return;
     }
-
-    const freshData = await extractWidgetData(targetSymbol);
     
-    // Only update if the symbol is still current
-    if (targetSymbol === currentSymbolRef.current) {
-      symbolDataCache.set(targetSymbol, freshData);
-      setWidgetData(freshData);
-      
-      // Notify other subscribers
-      dataSubscribers.forEach(callback => {
-        try {
-          callback(freshData);
-        } catch (e) {
-          console.log('Subscriber notification error:', e);
-        }
-      });
-      
-      console.log(`💾 Updated data for ${targetSymbol}: $${formatPrice(freshData.price)}`);
-    }
-  }, [extractWidgetData]);
+    // If no widget data available, show loading state
+    console.log(`⏳ TradingView widget not ready for ${targetSymbol}, waiting...`);
+    setWidgetData(prev => ({
+      ...prev,
+      symbol: targetSymbol,
+      isLoading: true,
+      error: null,
+    }));
+  }, []);
 
-  // Setup data fetching and polling
+  // Setup data extraction and polling
   useEffect(() => {
-    console.log(`🎯 Setting up data fetching for ${symbol}`);
+    console.log(`🎯 Setting up TradingView widget data extraction for ${symbol}`);
     
-    // Initial fetch
-    updateData();
+    // Initial extraction
+    updateDataFromWidget();
     
-    // Setup polling every 10 seconds
-    intervalRef.current = setInterval(updateData, 10000);
+    // Setup frequent polling to catch widget updates (every 2 seconds)
+    intervalRef.current = setInterval(updateDataFromWidget, 2000);
     
     // Subscribe to updates
     dataSubscribers.add(setWidgetData);
@@ -140,81 +185,11 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
         clearInterval(intervalRef.current);
       }
       dataSubscribers.delete(setWidgetData);
-      console.log(`🛑 Cleaned up data fetching for ${symbol}`);
+      console.log(`🛑 Cleaned up TradingView widget data extraction for ${symbol}`);
     };
-  }, [symbol, updateData]);
+  }, [symbol, updateDataFromWidget]);
 
   return widgetData;
-};
-
-// Fetch data from Alpha Vantage (TradingView-compatible)
-const fetchAlphaVantageData = async (symbol: string): Promise<TradingViewWidgetData> => {
-  console.log(`🔄 Fetching Alpha Vantage data for ${symbol}`);
-  
-  try {
-    const response = await fetch(
-      `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=demo`
-    );
-    const data = await response.json();
-    
-    if (data['Global Quote'] && Object.keys(data['Global Quote']).length > 0) {
-      const quote = data['Global Quote'];
-      const extractedData = {
-        symbol,
-        price: parseFloat(quote['05. price']),
-        change: parseFloat(quote['09. change']),
-        changePercent: parseFloat(quote['10. change percent'].replace('%', '')),
-        open: parseFloat(quote['02. open']),
-        high: parseFloat(quote['03. high']),
-        low: parseFloat(quote['04. low']),
-        volume: parseInt(quote['06. volume']),
-        lastUpdated: Date.now(),
-        isLoading: false,
-        error: null,
-      };
-      
-      console.log(`✅ Alpha Vantage data for ${symbol}:`, extractedData);
-      return extractedData;
-    }
-  } catch (error) {
-    console.warn(`⚠️ Alpha Vantage failed for ${symbol}:`, error);
-  }
-
-  return generateFallbackData(symbol);
-};
-
-// Generate realistic fallback data
-const generateFallbackData = (symbol: string): TradingViewWidgetData => {
-  console.log(`🎲 Generating fallback data for ${symbol}`);
-  
-  const basePrices: Record<string, number> = {
-    'AAPL': 200.92, // Match your screenshot
-    'MSFT': 384.52,
-    'GOOGL': 140.25,
-    'TSLA': 248.87,
-    'NVDA': 478.12,
-  };
-
-  const basePrice = basePrices[symbol] || 150.00;
-  const variation = (Math.random() - 0.5) * 0.02; // ±1% variation
-  const currentPrice = basePrice * (1 + variation);
-  const open = basePrice * (1 + (Math.random() - 0.5) * 0.015);
-  const change = currentPrice - open;
-  const changePercent = (change / open) * 100;
-
-  return {
-    symbol,
-    price: Number(currentPrice.toFixed(2)),
-    change: Number(change.toFixed(2)),
-    changePercent: Number(changePercent.toFixed(2)),
-    open: Number(open.toFixed(2)),
-    high: Number((Math.max(currentPrice, open) * 1.005).toFixed(2)),
-    low: Number((Math.min(currentPrice, open) * 0.995).toFixed(2)),
-    volume: Math.floor(1000000 + Math.random() * 5000000),
-    lastUpdated: Date.now(),
-    isLoading: false,
-    error: null,
-  };
 };
 
 // Utility functions
