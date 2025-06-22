@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useMarketDataContext } from '@/contexts/MarketDataContext';
 
@@ -43,7 +42,19 @@ export const useGlobalMarketData = (symbol: string): GlobalMarketData => {
     error: null,
   };
 
-  return data;
+  return {
+    symbol,
+    price: data.price,
+    change: data.change,
+    changePercent: data.changePercent,
+    open: data.open,
+    high: data.high,
+    low: data.low,
+    volume: data.volume,
+    lastUpdated: data.lastUpdated,
+    isLoading: data.isLoading,
+    error: data.error,
+  };
 };
 
 // Utility functions for consistent formatting across the app
