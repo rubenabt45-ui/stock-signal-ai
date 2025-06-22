@@ -15,15 +15,20 @@ export type Timeframe = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y";
 const Index = () => {
   const [selectedAsset, setSelectedAsset] = useState<string>("AAPL");
   const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>("1D");
+  const [remountKey, setRemountKey] = useState<number>(0);
 
   const handleTimeframeSelect = useCallback((timeframe: string) => {
-    console.log(`🎯 Index: Timeframe changed to ${timeframe} for ${selectedAsset}`);
+    console.log(`🎯 [${new Date().toLocaleTimeString()}] Index: Timeframe changed to ${timeframe} for ${selectedAsset}`);
     setSelectedTimeframe(timeframe as Timeframe);
+    // Force complete remount
+    setRemountKey(prev => prev + 1);
   }, [selectedAsset]);
 
   const handleAssetSelect = useCallback((asset: string) => {
-    console.log(`🎯 Index: Asset changed from ${selectedAsset} to ${asset} - all components will sync`);
+    console.log(`🎯 [${new Date().toLocaleTimeString()}] Index: Asset changed from ${selectedAsset} to ${asset} - forcing complete remount`);
     setSelectedAsset(asset);
+    // Force complete remount on asset change
+    setRemountKey(prev => prev + 1);
   }, [selectedAsset]);
 
   return (
@@ -63,24 +68,28 @@ const Index = () => {
           onAssetSelect={handleAssetSelect} 
         />
 
-        {/* TradingView Live Chart - Single Source of Truth */}
+        {/* TradingView Live Chart - Single Source of Truth with Enhanced Remount */}
         <LiveChart 
+          key={`chart-${selectedAsset}-${selectedTimeframe}-${remountKey}`}
           asset={selectedAsset} 
           timeframe={selectedTimeframe}
         />
 
-        {/* Synchronized Analysis Grid */}
+        {/* Synchronized Analysis Grid with Enhanced Keys */}
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="space-y-6">
             <PatternDetection 
+              key={`pattern-${selectedAsset}-${selectedTimeframe}-${remountKey}`}
               asset={selectedAsset} 
               timeframe={selectedTimeframe} 
             />
             <TrendAnalysis 
+              key={`trend-${selectedAsset}-${selectedTimeframe}-${remountKey}`}
               asset={selectedAsset} 
               timeframe={selectedTimeframe} 
             />
             <VolatilityAnalysis 
+              key={`volatility-${selectedAsset}-${selectedTimeframe}-${remountKey}`}
               asset={selectedAsset} 
               timeframe={selectedTimeframe} 
             />
@@ -88,6 +97,7 @@ const Index = () => {
           
           <div>
             <AISuggestions 
+              key={`ai-${selectedAsset}-${selectedTimeframe}-${remountKey}`}
               asset={selectedAsset} 
               timeframe={selectedTimeframe} 
             />

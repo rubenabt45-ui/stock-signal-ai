@@ -1,5 +1,5 @@
 
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, RefreshCw } from "lucide-react";
 import { useTradingViewWidgetData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewWidgetData";
 import { Badge } from "@/components/ui/badge";
 
@@ -18,8 +18,8 @@ export const LivePriceDisplay = ({
 }: LivePriceDisplayProps) => {
   const { price, changePercent, isLoading, error, lastUpdated } = useTradingViewWidgetData(symbol);
 
-  // 🎯 CRITICAL DEBUG: Log chart vs display price for verification
-  console.log(`🎯 LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - TradingView Direct: ${new Date(lastUpdated || 0).toLocaleTimeString()}`);
+  // Enhanced debug logging
+  console.log(`🎯 [${new Date().toLocaleTimeString()}] LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - TradingView Direct: ${lastUpdated ? new Date(lastUpdated).toLocaleTimeString() : 'No data'}`);
 
   const getSizeClasses = () => {
     switch (size) {
@@ -72,14 +72,17 @@ export const LivePriceDisplay = ({
   if (error) {
     return (
       <div className={`${sizeClasses.container} ${className}`}>
-        <p className="text-red-400 font-medium">Error loading {symbol}</p>
+        <div className="flex items-center space-x-2">
+          <p className="text-red-400 font-medium">Error: {symbol}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="text-xs text-tradeiq-blue hover:underline flex items-center space-x-1"
+          >
+            <RefreshCw className="h-3 w-3" />
+            <span>Retry</span>
+          </button>
+        </div>
         <p className="text-gray-500 text-sm">{error}</p>
-        <button 
-          onClick={() => window.location.reload()} 
-          className="text-xs text-tradeiq-blue hover:underline"
-        >
-          Retry
-        </button>
       </div>
     );
   }
@@ -90,8 +93,9 @@ export const LivePriceDisplay = ({
         {showSymbol && <div className="h-6 bg-gray-700/50 rounded w-16"></div>}
         <div className="h-10 bg-gray-700/50 rounded w-32"></div>
         <div className="h-6 bg-gray-700/50 rounded w-20"></div>
-        <div className="text-xs text-yellow-500">
-          {error ? 'Failed to load TradingView widget' : 'Waiting for TradingView widget...'}
+        <div className="text-xs text-yellow-500 flex items-center space-x-1">
+          <div className="animate-spin rounded-full h-3 w-3 border-b border-yellow-500"></div>
+          <span>Connecting to TradingView widget...</span>
         </div>
       </div>
     );
@@ -113,7 +117,7 @@ export const LivePriceDisplay = ({
           ${formatPrice(price)}
         </span>
         {lastUpdated && (
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Live data"></div>
         )}
       </div>
       
@@ -132,7 +136,7 @@ export const LivePriceDisplay = ({
       
       {lastUpdated && (
         <div className={`${sizeClasses.time} text-gray-500 flex items-center space-x-1`}>
-          <span>Live: {new Date(lastUpdated).toLocaleTimeString()}</span>
+          <span>Synced: {new Date(lastUpdated).toLocaleTimeString()}</span>
         </div>
       )}
     </div>

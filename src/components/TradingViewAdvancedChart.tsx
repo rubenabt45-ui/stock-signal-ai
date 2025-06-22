@@ -39,9 +39,11 @@ const TradingViewAdvancedChartComponent = ({
 }: TradingViewAdvancedChartProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<any>(null);
+  const cleanupRef = useRef<() => void>();
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [chartReady, setChartReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { actualTheme } = useTheme();
   
   // Force chart to be visible for data extraction
@@ -54,7 +56,7 @@ const TradingViewAdvancedChartComponent = ({
   // Generate unique container ID for each symbol/timeframe combination
   const containerId = `tradingview-chart-${symbol}-${timeframe}-${Date.now()}`;
 
-  console.log(`🎯 TradingView Chart: ${symbol} (${timeframe}) - Visible: ${isIntersecting}, Ready: ${chartReady}`);
+  console.log(`🎯 [${new Date().toLocaleTimeString()}] TradingView Chart: ${symbol} (${timeframe}) - Visible: ${isIntersecting}, Ready: ${chartReady}`);
 
   // Load TradingView script
   const loadTradingViewScript = useCallback(() => {
@@ -65,17 +67,20 @@ const TradingViewAdvancedChartComponent = ({
     }
 
     setIsLoading(true);
+    setError(null);
+    
     const script = document.createElement('script');
     script.src = 'https://s3.tradingview.com/tv.js';
     script.async = true;
     script.onload = () => {
       setIsLoaded(true);
       setIsLoading(false);
-      console.log('📊 TradingView script loaded successfully');
+      console.log(`📊 [${new Date().toLocaleTimeString()}] TradingView script loaded successfully`);
     };
     script.onerror = () => {
       setIsLoading(false);
-      console.error('❌ Failed to load TradingView script');
+      setError('Failed to load TradingView script');
+      console.error(`❌ [${new Date().toLocaleTimeTime()}] Failed to load TradingView script`);
     };
     
     document.head.appendChild(script);
@@ -88,22 +93,40 @@ const TradingViewAdvancedChartComponent = ({
     }
   }, [isLoaded, isLoading, loadTradingViewScript]);
 
-  // Create/recreate widget when symbol or timeframe changes
-  useEffect(() => {
-    if (!isLoaded || !containerRef.current || !isIntersecting) return;
-
-    console.log(`🔄 Creating TradingView widget for ${symbol} (${timeframe})`);
-    setChartReady(false); // Reset ready state
-
-    // Clean up previous widget
+  // Cleanup function
+  const cleanupWidget = useCallback(() => {
+    console.log(`🧹 [${new Date().toLocaleTimeString()}] Cleaning up widget for ${symbol}`);
+    
+    if (cleanupRef.current) {
+      cleanupRef.current();
+      cleanupRef.current = undefined;
+    }
+    
     if (widgetRef.current) {
       try {
-        widgetRef.current.remove();
+        if (typeof widgetRef.current.remove === 'function') {
+          widgetRef.current.remove();
+        }
       } catch (e) {
-        console.log('Previous widget cleanup:', e);
+        console.log('Widget cleanup error:', e);
       }
       widgetRef.current = null;
     }
+    
+    setChartReady(false);
+    setError(null);
+  }, [symbol]);
+
+  // Create/recreate widget when symbol or timeframe changes
+  useEffect(() => {
+    if (!isLoaded || !containerRef.current || !isIntersecting) {
+      return;
+    }
+
+    console.log(`🔄 [${new Date().toLocaleTimeString()}] Creating TradingView widget for ${symbol} (${timeframe})`);
+    
+    // Cleanup previous widget
+    cleanupWidget();
 
     // Clear container and set new ID
     if (containerRef.current) {
@@ -124,6 +147,9 @@ const TradingViewAdvancedChartComponent = ({
         // Minimal studies for performance
         studies: [],
         
+        // Force widget refresh
+        autosize: true,
+        
         // Theme-based overrides
         overrides: {
           ...baseConfig.overrides,
@@ -134,65 +160,58 @@ const TradingViewAdvancedChartComponent = ({
       const widget = new window.TradingView.widget(widgetConfig);
       widgetRef.current = widget;
 
-      // 🎯 CRITICAL: Properly handle widget ready state
-      if (typeof widget.onChartReady === 'function') {
-        widget.onChartReady(() => {
-          console.log(`✅ TradingView widget ready for ${symbol} - chart is fully initialized`);
-          setChartReady(true);
-          
-          // Set the global widget reference ONLY after chart is ready
-          setTradingViewWidget(widget);
-          
-          // Setup real-time monitoring
-          try {
-            const chart = widget.activeChart();
-            if (chart) {
-              // Monitor symbol changes
-              if (typeof chart.onSymbolChanged === 'function') {
-                chart.onSymbolChanged().subscribe(null, () => {
-                  console.log(`📊 Symbol changed in TradingView: ${symbol}`);
-                  setTimeout(() => setTradingViewWidget(widget), 500);
-                });
-              }
-              
-              // Monitor data updates
-              if (typeof chart.onDataLoaded === 'function') {
-                chart.onDataLoaded().subscribe(null, () => {
-                  console.log(`📈 Data loaded for ${symbol} - triggering price extraction`);
-                  setTimeout(() => setTradingViewWidget(widget), 100);
-                });
-              }
-            }
-          } catch (e) {
-            console.log('Chart event setup:', e);
-          }
-        });
-      } else {
-        console.warn('⚠️ Widget onChartReady method not available');
-        // Fallback timeout for widgets without onChartReady
-        setTimeout(() => {
-          setChartReady(true);
-          setTradingViewWidget(widget);
-        }, 3000);
-      }
+      console.log(`📊 [${new Date().toLocaleTimeString()}] TradingView widget created for ${symbol}`);
 
-      console.log(`✅ TradingView widget created for ${symbol} (${timeframe})`);
+      // Setup cleanup function
+      cleanupRef.current = () => {
+        try {
+          if (widget && typeof widget.remove === 'function') {
+            widget.remove();
+          }
+        } catch (e) {
+          console.log('Widget removal error:', e);
+        }
+      };
+
+      // Set widget reference for data extraction (enhanced method)
+      setTimeout(() => {
+        setTradingViewWidget(widget, symbol);
+        setChartReady(true);
+      }, 1000);
+
+      console.log(`✅ [${new Date().toLocaleTimeString()}] TradingView widget setup complete for ${symbol} (${timeframe})`);
+      
     } catch (error) {
-      console.error('❌ Error creating TradingView widget:', error);
+      console.error(`❌ [${new Date().toLocaleTimeString()}] Error creating TradingView widget:`, error);
+      setError(`Failed to create TradingView widget: ${error}`);
       setChartReady(false);
     }
 
-    return () => {
-      if (widgetRef.current) {
-        try {
-          widgetRef.current.remove();
-        } catch (e) {
-          console.log('Widget cleanup on unmount:', e);
-        }
-      }
-      setChartReady(false);
-    };
-  }, [symbol, timeframe, actualTheme, isLoaded, containerId, isIntersecting]);
+    return cleanupWidget;
+  }, [symbol, timeframe, actualTheme, isLoaded, containerId, isIntersecting, cleanupWidget]);
+
+  if (error) {
+    return (
+      <div 
+        ref={targetRef}
+        className={`flex items-center justify-center bg-black/5 rounded-xl border border-red-500/20 min-h-[600px] ${className}`}
+      >
+        <div className="text-center space-y-4">
+          <p className="text-red-400 text-lg font-medium">Chart Error</p>
+          <p className="text-gray-500 text-sm">{error}</p>
+          <button 
+            onClick={() => {
+              setError(null);
+              loadTradingViewScript();
+            }}
+            className="px-4 py-2 bg-tradeiq-blue text-white rounded-lg hover:bg-tradeiq-blue/80 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!isIntersecting) {
     return (
@@ -237,6 +256,12 @@ const TradingViewAdvancedChartComponent = ({
         <div className="text-center space-y-4">
           <p className="text-red-400 text-lg font-medium">Chart Unavailable</p>
           <p className="text-gray-500 text-sm">Failed to load TradingView for {symbol}</p>
+          <button 
+            onClick={loadTradingViewScript}
+            className="px-4 py-2 bg-tradeiq-blue text-white rounded-lg hover:bg-tradeiq-blue/80 transition-colors"
+          >
+            Retry Loading
+          </button>
         </div>
       </div>
     );
@@ -245,7 +270,7 @@ const TradingViewAdvancedChartComponent = ({
   return (
     <div 
       ref={targetRef}
-      className={`bg-black/5 rounded-xl border border-gray-700/20 overflow-hidden w-full min-h-[600px] ${className}`}
+      className={`bg-black/5 rounded-xl border border-gray-700/20 overflow-hidden w-full min-h-[600px] relative ${className}`}
       style={{ 
         height: '600px',
         minHeight: '600px'
@@ -261,7 +286,7 @@ const TradingViewAdvancedChartComponent = ({
         }}
       />
       
-      {/* Debug info overlay when chart is not ready */}
+      {/* Loading overlay when chart is not ready */}
       {!chartReady && isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl">
           <div className="text-center space-y-2">
@@ -271,11 +296,19 @@ const TradingViewAdvancedChartComponent = ({
           </div>
         </div>
       )}
+      
+      {/* Ready indicator */}
+      {chartReady && (
+        <div className="absolute top-2 right-2 flex items-center space-x-1 bg-green-500/20 px-2 py-1 rounded">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-green-500 text-xs font-medium">Live</span>
+        </div>
+      )}
     </div>
   );
 };
 
-// Custom memo comparator - only re-render if symbol or timeframe actually changes
+// Enhanced memo comparator to force re-render on symbol/timeframe change
 export const TradingViewAdvancedChart = memo(TradingViewAdvancedChartComponent, (prevProps, nextProps) => {
   const shouldNotRerender = 
     prevProps.symbol === nextProps.symbol &&
@@ -284,7 +317,7 @@ export const TradingViewAdvancedChart = memo(TradingViewAdvancedChartComponent, 
     prevProps.className === nextProps.className;
   
   if (!shouldNotRerender) {
-    console.log(`🔄 TradingView re-rendering: ${prevProps.symbol} → ${nextProps.symbol}`);
+    console.log(`🔄 [${new Date().toLocaleTimeString()}] TradingView re-rendering: ${prevProps.symbol} → ${nextProps.symbol}, ${prevProps.timeframe} → ${nextProps.timeframe}`);
   }
   
   return shouldNotRerender;
