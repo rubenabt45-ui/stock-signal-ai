@@ -22,7 +22,7 @@ declare global {
   }
 }
 
-// Global widget state management
+// Global widget state management - single source of truth
 let currentWidgetInstance: any = null;
 let isWidgetReady: boolean = false;
 let currentSymbol: string = '';
@@ -74,33 +74,45 @@ export const setTradingViewWidget = (widget: any, symbol: string) => {
 
   // Setup widget data extraction after ready
   try {
-    const chart = widget.activeChart();
-    if (chart) {
-      console.log(`[TV-SYNC] ${new Date().toISOString()} - Widget ready for data extraction: ${symbol}`);
-      isWidgetReady = true;
-      setupPriceExtraction();
-      
-      // Setup event listeners for data updates
-      if (chart.onDataLoaded && typeof chart.onDataLoaded === 'function') {
-        chart.onDataLoaded().subscribe(null, () => {
-          console.log(`[TV-DATA] ${new Date().toISOString()} - Data loaded for ${symbol}`);
-          setTimeout(() => extractWidgetPrice(), 100);
-        });
-      }
-      
-      // Initial price extraction
-      setTimeout(() => extractWidgetPrice(), 500);
-    } else {
-      console.log(`[TV-SYNC] Chart not immediately available, will retry...`);
-      setTimeout(() => {
-        const retryChart = widget.activeChart();
-        if (retryChart) {
+    // Wait for widget to be fully ready
+    setTimeout(() => {
+      try {
+        const chart = widget.activeChart();
+        if (chart) {
+          console.log(`[TV-SYNC] ${new Date().toISOString()} - Widget ready for data extraction: ${symbol}`);
           isWidgetReady = true;
           setupPriceExtraction();
-          setTimeout(() => extractWidgetPrice(), 500);
+          
+          // Setup event listeners for data updates
+          try {
+            if (chart.onDataLoaded && typeof chart.onDataLoaded === 'function') {
+              chart.onDataLoaded().subscribe(null, () => {
+                console.log(`[TV-DATA] ${new Date().toISOString()} - Data loaded for ${symbol}`);
+                setTimeout(() => extractWidgetPrice(), 200);
+              });
+            }
+          } catch (e) {
+            console.log(`[TV-LISTENER] Data loaded listener setup failed:`, e);
+          }
+          
+          // Initial price extraction
+          setTimeout(() => extractWidgetPrice(), 1000);
+        } else {
+          console.log(`[TV-SYNC] Chart not available yet, retrying...`);
+          setTimeout(() => {
+            const retryChart = widget.activeChart();
+            if (retryChart) {
+              isWidgetReady = true;
+              setupPriceExtraction();
+              setTimeout(() => extractWidgetPrice(), 1000);
+            }
+          }, 2000);
         }
-      }, 1000);
-    }
+      } catch (error) {
+        console.error(`[TV-SYNC] Widget setup error for ${symbol}:`, error);
+        notifyError(`Widget setup failed: ${error}`);
+      }
+    }, 500);
   } catch (error) {
     console.error(`[TV-SYNC] Widget setup error for ${symbol}:`, error);
     notifyError(`Widget setup failed: ${error}`);
@@ -113,12 +125,12 @@ const setupPriceExtraction = () => {
     clearInterval(priceExtractionInterval);
   }
   
-  // Extract price every 1000ms for reliable updates
+  // Extract price every 2000ms for reliable updates without overwhelming the widget
   priceExtractionInterval = setInterval(() => {
     if (isWidgetReady && currentWidgetInstance) {
       extractWidgetPrice();
     }
-  }, 1000);
+  }, 2000);
 };
 
 const extractWidgetPrice = () => {
@@ -142,37 +154,61 @@ const extractWidgetPrice = () => {
     
     console.log(`[TV-EXTRACT] ${new Date().toISOString()} - Extracting price for: ${symbolInfo}`);
     
-    // Try to get price data from chart
+    // Try to get price data from chart - using multiple methods for reliability
     let priceData = null;
 
-    // Method 1: Try series data (most reliable for OHLCV)
+    // Method 1: Try to get data from chart entity
     try {
-      const series = chart.getSeries?.();
-      if (series && series.length > 0) {
-        const mainSeries = series[0];
-        if (mainSeries && mainSeries.data) {
-          const seriesData = mainSeries.data();
-          
-          if (seriesData && seriesData.length > 0) {
-            const lastBar = seriesData[seriesData.length - 1];
-            if (lastBar && lastBar.close) {
-              priceData = {
-                price: lastBar.close,
-                open: lastBar.open || null,
-                high: lastBar.high || null,
-                low: lastBar.low || null,
-                volume: lastBar.volume || null,
-              };
-              console.log(`[TV-EXTRACT] ${new Date().toISOString()} - Price via series: $${formatPrice(priceData.price)}`);
-            }
+      if (chart.entity && chart.entity().data) {
+        const entityData = chart.entity().data();
+        if (entityData && entityData.length > 0) {
+          const lastBar = entityData[entityData.length - 1];
+          if (lastBar && lastBar.close !== undefined) {
+            priceData = {
+              price: lastBar.close,
+              open: lastBar.open || null,
+              high: lastBar.high || null,
+              low: lastBar.low || null,
+              volume: lastBar.volume || null,
+            };
+            console.log(`[TV-EXTRACT] ${new Date().toISOString()} - Price via entity: $${formatPrice(priceData.price)}`);
           }
         }
       }
     } catch (e) {
-      console.log(`[TV-EXTRACT] Series extraction failed:`, e);
+      console.log(`[TV-EXTRACT] Entity extraction attempt:`, e);
     }
 
-    // Method 2: Try current price methods
+    // Method 2: Try series data (most reliable for OHLCV)
+    if (!priceData?.price) {
+      try {
+        const series = chart.getSeries?.();
+        if (series && series.length > 0) {
+          const mainSeries = series[0];
+          if (mainSeries && mainSeries.data) {
+            const seriesData = mainSeries.data();
+            
+            if (seriesData && seriesData.length > 0) {
+              const lastBar = seriesData[seriesData.length - 1];
+              if (lastBar && lastBar.close !== undefined) {
+                priceData = {
+                  price: lastBar.close,
+                  open: lastBar.open || null,
+                  high: lastBar.high || null,
+                  low: lastBar.low || null,
+                  volume: lastBar.volume || null,
+                };
+                console.log(`[TV-EXTRACT] ${new Date().toISOString()} - Price via series: $${formatPrice(priceData.price)}`);
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.log(`[TV-EXTRACT] Series extraction attempt:`, e);
+      }
+    }
+
+    // Method 3: Try current price methods
     if (!priceData?.price) {
       try {
         const currentPrice = chart.getCurrentPrice?.() || chart.getPrice?.();
@@ -181,7 +217,7 @@ const extractWidgetPrice = () => {
           console.log(`[TV-EXTRACT] ${new Date().toISOString()} - Price via getCurrentPrice: $${formatPrice(priceData.price)}`);
         }
       } catch (e) {
-        console.log(`[TV-EXTRACT] getCurrentPrice failed:`, e);
+        console.log(`[TV-EXTRACT] getCurrentPrice attempt:`, e);
       }
     }
 
@@ -203,7 +239,7 @@ const extractWidgetPrice = () => {
         error: null,
       };
 
-      console.log(`[TV-SYNC] ${new Date().toISOString()} - Price Update: ${widgetData.symbol} = $${formatPrice(widgetData.price)} (${formatChangePercent(widgetData.changePercent)})`);
+      console.log(`[TV-SYNC] LivePrice: $${formatPrice(widgetData.price)} - ${widgetData.symbol} (${formatChangePercent(widgetData.changePercent)})`);
       
       // Update global data and notify all subscribers
       Object.assign(currentWidgetData, widgetData);
@@ -268,7 +304,7 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
     if (currentWidgetData.symbol === targetSymbol && 
         currentWidgetData.price !== null && 
         currentWidgetData.lastUpdated && 
-        (Date.now() - currentWidgetData.lastUpdated) < 3000) {
+        (Date.now() - currentWidgetData.lastUpdated) < 5000) {
       console.log(`[TV-USE] ${new Date().toISOString()} - Using cached data for ${targetSymbol}: $${formatPrice(currentWidgetData.price)}`);
       setWidgetData({ ...currentWidgetData });
       return;
@@ -334,7 +370,7 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
       dataSubscribers.delete(handleUpdate);
       console.log(`[TV-USE] ${new Date().toISOString()} - Cleaned up widget data subscription for ${symbol}`);
     };
-  }, [symbol, updateDataFromWidget]);
+  }, [symbol, updateDataFromWidget, widgetData.isLoading, widgetData.price]);
 
   return widgetData;
 };

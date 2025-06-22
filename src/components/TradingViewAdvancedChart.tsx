@@ -41,6 +41,7 @@ const TradingViewAdvancedChartComponent = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<any>(null);
   const initTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const cleanupRef = useRef<boolean>(false);
   
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,13 +58,15 @@ const TradingViewAdvancedChartComponent = ({
   });
   
   // Fixed container ID for stable widget management
-  const containerId = 'tv_chart_container';
+  const containerId = `tv_chart_container_${symbol.replace(/[^a-zA-Z0-9]/g, '_')}`;
 
   console.log(`[TV-DEBUG] ${new Date().toISOString()} - Chart Component: ${symbol} (${timeframe}) - Visible: ${isIntersecting}, Ready: ${chartReady}`);
 
-  // Complete widget cleanup
+  // Complete widget cleanup with proper destruction
   const destroyWidget = useCallback(() => {
     console.log(`[TV-CLEANUP] ${new Date().toISOString()} - Destroying widget for ${symbol}`);
+    
+    cleanupRef.current = true;
     
     // Clear initialization timeout
     if (initTimeoutRef.current) {
@@ -71,31 +74,33 @@ const TradingViewAdvancedChartComponent = ({
       initTimeoutRef.current = null;
     }
     
-    // Destroy global widget instance
+    // Destroy global widget instance completely
     if (window.tvWidget) {
       try {
+        console.log(`[TV-CLEANUP] Removing global widget instance`);
         if (typeof window.tvWidget.remove === 'function') {
           window.tvWidget.remove();
         }
+        delete window.tvWidget;
       } catch (e) {
-        console.log(`[TV-CLEANUP] Widget removal error:`, e);
+        console.log(`[TV-CLEANUP] Global widget removal error:`, e);
       }
-      window.tvWidget = null;
     }
     
     // Destroy local widget reference
     if (widgetRef.current) {
       try {
+        console.log(`[TV-CLEANUP] Removing local widget reference`);
         if (typeof widgetRef.current.remove === 'function') {
           widgetRef.current.remove();
         }
+        widgetRef.current = null;
       } catch (e) {
         console.log(`[TV-CLEANUP] Local widget removal error:`, e);
       }
-      widgetRef.current = null;
     }
     
-    // Clear container completely
+    // Clear container completely and reset ID
     if (containerRef.current) {
       containerRef.current.innerHTML = '';
       containerRef.current.id = containerId;
@@ -103,9 +108,11 @@ const TradingViewAdvancedChartComponent = ({
     
     setChartReady(false);
     setError(null);
-  }, [symbol]);
+    
+    cleanupRef.current = false;
+  }, [symbol, containerId]);
 
-  // Load TradingView script
+  // Load TradingView script with proper error handling
   const loadTradingViewScript = useCallback(async (): Promise<boolean> => {
     if (window.TradingView) {
       setIsLoaded(true);
@@ -139,9 +146,9 @@ const TradingViewAdvancedChartComponent = ({
     });
   }, []);
 
-  // Create widget with clean initialization
+  // Create widget with proper lifecycle management
   const createWidget = useCallback(() => {
-    if (!isLoaded || !containerRef.current || !isIntersecting) {
+    if (!isLoaded || !containerRef.current || !isIntersecting || cleanupRef.current) {
       return;
     }
 
@@ -150,8 +157,10 @@ const TradingViewAdvancedChartComponent = ({
     // Ensure complete cleanup before creating new widget
     destroyWidget();
     
-    // Wait a moment for cleanup to complete
+    // Wait for cleanup to complete
     setTimeout(() => {
+      if (cleanupRef.current) return;
+      
       try {
         // Ensure container is ready
         if (containerRef.current) {
@@ -165,13 +174,43 @@ const TradingViewAdvancedChartComponent = ({
           ...baseConfig,
           symbol: symbol,
           interval: getInterval(timeframe),
-          height: 600,
           container_id: containerId,
-          studies: [],
+          height: 600,
           autosize: true,
+          studies: [],
           overrides: {
             ...baseConfig.overrides,
             "paneProperties.background": actualTheme === 'dark' ? "#0f172a" : "#ffffff"
+          },
+          // Proper TradingView widget callbacks
+          onChartReady: () => {
+            if (cleanupRef.current) return;
+            
+            console.log(`[TV-INIT] Widget Initialized: ${symbol} at ${new Date().toLocaleTimeString()}`);
+            
+            if (initTimeoutRef.current) {
+              clearTimeout(initTimeoutRef.current);
+              initTimeoutRef.current = null;
+            }
+            
+            // Set up widget for data extraction
+            if (widgetRef.current) {
+              setTradingViewWidget(widgetRef.current, symbol);
+              setChartReady(true);
+              setError(null);
+              
+              // Setup symbol change listener
+              try {
+                const chart = widgetRef.current.activeChart();
+                if (chart && chart.onSymbolChanged) {
+                  chart.onSymbolChanged().subscribe(null, () => {
+                    console.log(`[TV-SYMBOL] ${new Date().toISOString()} - Symbol changed detected for ${symbol}`);
+                  });
+                }
+              } catch (e) {
+                console.log(`[TV-LISTENER] Setup warning:`, e);
+              }
+            }
           }
         };
 
@@ -183,44 +222,17 @@ const TradingViewAdvancedChartComponent = ({
 
         // Set initialization timeout (10 seconds max)
         initTimeoutRef.current = setTimeout(() => {
-          if (!chartReady) {
+          if (!chartReady && !cleanupRef.current) {
             console.warn(`[TV-TIMEOUT] ${new Date().toISOString()} - Widget initialization timeout for ${symbol}`);
             setError(`Chart failed to load within 10 seconds for ${symbol}`);
           }
         }, 10000);
-
-        // Use onChartReady for reliable initialization
-        widget.onChartReady(() => {
-          console.log(`[TV-DEBUG] ${new Date().toISOString()} - Symbol Loaded: ${symbol}, Chart Ready`);
-          
-          if (initTimeoutRef.current) {
-            clearTimeout(initTimeoutRef.current);
-            initTimeoutRef.current = null;
-          }
-          
-          // Set up widget for data extraction
-          setTradingViewWidget(widget, symbol);
-          setChartReady(true);
-          setError(null);
-          
-          // Setup symbol change listener
-          try {
-            const chart = widget.activeChart();
-            if (chart && chart.onSymbolChanged) {
-              chart.onSymbolChanged().subscribe(null, () => {
-                console.log(`[TV-SYMBOL] ${new Date().toISOString()} - Symbol changed detected for ${symbol}`);
-              });
-            }
-          } catch (e) {
-            console.log(`[TV-LISTENER] Setup warning:`, e);
-          }
-        });
         
       } catch (error) {
         console.error(`[TV-ERROR] ${new Date().toISOString()} - Error creating TradingView widget:`, error);
         setError(`Widget creation failed: ${error}`);
       }
-    }, 100);
+    }, 200);
   }, [symbol, timeframe, actualTheme, isLoaded, containerId, isIntersecting, destroyWidget]);
 
   // Load script when component mounts
@@ -239,16 +251,17 @@ const TradingViewAdvancedChartComponent = ({
   // Manual retry function
   const handleManualRetry = () => {
     setError(null);
+    setChartReady(false);
     destroyWidget();
     
     if (!isLoaded) {
       loadTradingViewScript().then((success) => {
         if (success) {
-          setTimeout(createWidget, 200);
+          setTimeout(createWidget, 500);
         }
       });
     } else {
-      setTimeout(createWidget, 200);
+      setTimeout(createWidget, 500);
     }
   };
 
