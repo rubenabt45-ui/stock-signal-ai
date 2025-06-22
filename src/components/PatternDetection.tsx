@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Target, CheckCircle, AlertTriangle } from "lucide-react";
-import { useExternalMarketData } from "@/hooks/useExternalMarketData";
+import { useSyncedMarketData, formatPrice, formatChangePercent } from "@/hooks/useSyncedMarketData";
 
 interface PatternDetectionProps {
   asset: string;
@@ -10,10 +10,10 @@ interface PatternDetectionProps {
 }
 
 const generatePatterns = (marketData: any) => {
-  if (!marketData) return [];
+  if (!marketData || !marketData.price) return [];
   
-  const { currentPrice, changePercent, high, low, volume } = marketData;
-  const volatility = ((high - low) / currentPrice) * 100;
+  const { price, changePercent, high, low, volume } = marketData;
+  const volatility = high && low ? ((high - low) / price) * 100 : 0;
   
   const patterns = [];
   
@@ -38,10 +38,10 @@ const generatePatterns = (marketData: any) => {
 };
 
 export const PatternDetection = ({ asset, timeframe }: PatternDetectionProps) => {
-  const { data: marketData, isLoading } = useExternalMarketData(asset, timeframe);
+  const marketData = useSyncedMarketData(asset);
   const detectedPatterns = generatePatterns(marketData);
 
-  if (isLoading) {
+  if (marketData.isLoading) {
     return (
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex items-center space-x-3 mb-6">
@@ -97,9 +97,9 @@ export const PatternDetection = ({ asset, timeframe }: PatternDetectionProps) =>
               </div>
             </div>
             
-            {marketData && (
+            {marketData.price && (
               <div className="mt-2 text-xs text-gray-500">
-                Based on: Price ${marketData.currentPrice.toFixed(2)} | Change {marketData.changePercent.toFixed(2)}%
+                Based on: Price ${formatPrice(marketData.price)} | Change {formatChangePercent(marketData.changePercent)}
               </div>
             )}
           </div>
@@ -109,7 +109,7 @@ export const PatternDetection = ({ asset, timeframe }: PatternDetectionProps) =>
           <div className="text-center py-8 text-gray-400">
             <Target className="h-12 w-12 mx-auto mb-3 opacity-50" />
             <p>No clear patterns detected</p>
-            {marketData && (
+            {marketData.price && marketData.changePercent !== null && (
               <p className="text-xs mt-2">Market conditions: {Math.abs(marketData.changePercent) < 1 ? 'Low volatility' : 'Active movement'}</p>
             )}
           </div>

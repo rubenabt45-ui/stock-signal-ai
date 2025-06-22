@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Minus, Activity } from "lucide-react";
-import { useExternalMarketData } from "@/hooks/useExternalMarketData";
+import { useSyncedMarketData, formatPrice, formatChangePercent } from "@/hooks/useSyncedMarketData";
 
 interface TrendAnalysisProps {
   asset: string;
@@ -10,7 +10,7 @@ interface TrendAnalysisProps {
 }
 
 const generateTrendData = (marketData: any) => {
-  if (!marketData) {
+  if (!marketData || !marketData.price) {
     return {
       trend: 'Sideways' as const,
       strength: 50,
@@ -18,7 +18,7 @@ const generateTrendData = (marketData: any) => {
     };
   }
 
-  const { changePercent, high, low, currentPrice, open } = marketData;
+  const { changePercent, high, low, price, open } = marketData;
   
   // Determine trend based on price action
   let trend: 'Bullish' | 'Bearish' | 'Sideways';
@@ -31,7 +31,7 @@ const generateTrendData = (marketData: any) => {
   }
   
   // Calculate trend strength based on price position within range
-  const pricePosition = ((currentPrice - low) / (high - low)) * 100;
+  const pricePosition = high && low ? ((price - low) / (high - low)) * 100 : 50;
   const strength = Math.min(Math.max(pricePosition + Math.abs(changePercent) * 10, 0), 100);
   
   // Calculate momentum based on change and volume indicators
@@ -41,7 +41,7 @@ const generateTrendData = (marketData: any) => {
 };
 
 export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
-  const { data: marketData, isLoading } = useExternalMarketData(asset, timeframe);
+  const marketData = useSyncedMarketData(asset);
   const { trend, strength, momentum } = generateTrendData(marketData);
 
   const getTrendIcon = () => {
@@ -62,7 +62,7 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
 
   const TrendIcon = getTrendIcon();
 
-  if (isLoading) {
+  if (marketData.isLoading) {
     return (
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex items-center space-x-3 mb-6">
@@ -139,9 +139,9 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
               {trend} Trend
             </Badge>
           </div>
-          {marketData && (
+          {marketData.price && (
             <div className="text-xs text-gray-500 mt-2">
-              Price: ${marketData.currentPrice.toFixed(2)} | Change: {marketData.changePercent > 0 ? '+' : ''}{marketData.changePercent.toFixed(2)}%
+              Price: ${formatPrice(marketData.price)} | Change: {formatChangePercent(marketData.changePercent)}
             </div>
           )}
         </div>

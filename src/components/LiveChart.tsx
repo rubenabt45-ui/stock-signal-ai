@@ -2,6 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { BarChart3, Activity } from "lucide-react";
 import { TradingViewAdvancedChart } from "@/components/TradingViewAdvancedChart";
+import { LivePriceDisplay } from "@/components/LivePriceDisplay";
 import { useEffect, useState } from "react";
 
 interface LiveChartProps {
@@ -32,9 +33,19 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
           </div>
           
           <div className="flex items-center space-x-4">
+            {/* Live Price Display */}
+            <div className="text-right">
+              <LivePriceDisplay 
+                symbol={asset} 
+                showSymbol={false} 
+                size="md" 
+              />
+            </div>
+            
             <div className="bg-tradeiq-blue/20 px-3 py-1.5 rounded-lg border border-tradeiq-blue/30">
               <span className="text-sm font-bold text-tradeiq-blue">Timeframe: {timeframe}</span>
             </div>
+            
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span className="text-sm font-medium text-green-500">Live</span>

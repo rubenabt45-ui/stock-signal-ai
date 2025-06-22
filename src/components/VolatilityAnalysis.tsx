@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Zap, AlertCircle, Shield, TrendingUp as VolHigh } from "lucide-react";
-import { useExternalMarketData } from "@/hooks/useExternalMarketData";
+import { useSyncedMarketData, formatPrice, formatChangePercent } from "@/hooks/useSyncedMarketData";
 
 interface VolatilityAnalysisProps {
   asset: string;
@@ -10,7 +10,7 @@ interface VolatilityAnalysisProps {
 }
 
 const calculateVolatilityData = (marketData: any) => {
-  if (!marketData) {
+  if (!marketData || !marketData.price) {
     return {
       volatility: 0,
       level: 'Low' as const,
@@ -19,11 +19,11 @@ const calculateVolatilityData = (marketData: any) => {
     };
   }
 
-  const { high, low, currentPrice, changePercent } = marketData;
+  const { high, low, price, changePercent } = marketData;
   
   // Calculate true range volatility
-  const trueRange = ((high - low) / currentPrice) * 100;
-  const priceVolatility = Math.abs(changePercent);
+  const trueRange = high && low ? ((high - low) / price) * 100 : 0;
+  const priceVolatility = Math.abs(changePercent || 0);
   
   // Combined volatility score
   const volatility = (trueRange * 0.6) + (priceVolatility * 0.4);
@@ -50,10 +50,10 @@ const calculateVolatilityData = (marketData: any) => {
 };
 
 export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps) => {
-  const { data: marketData, isLoading } = useExternalMarketData(asset, timeframe);
+  const marketData = useSyncedMarketData(asset);
   const { volatility, level, icon: VolIcon, color } = calculateVolatilityData(marketData);
 
-  if (isLoading) {
+  if (marketData.isLoading) {
     return (
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex items-center space-x-3 mb-6">
@@ -108,12 +108,12 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
             </div>
           </div>
           
-          {marketData && (
+          {marketData.high && marketData.low && (
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-gray-400 font-medium">Daily Range</span>
                 <span className="text-white font-bold">
-                  ${marketData.low.toFixed(2)} - ${marketData.high.toFixed(2)}
+                  ${formatPrice(marketData.low)} - ${formatPrice(marketData.high)}
                 </span>
               </div>
             </div>
@@ -141,9 +141,9 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
             {level === 'Medium' && 'Moderate price swings expected. Monitor for potential breakouts.'}
             {level === 'High' && 'Significant price movements likely. Exercise caution with position sizing.'}
           </p>
-          {marketData && (
+          {marketData.price && (
             <p className="text-xs text-gray-500 mt-2">
-              Current: ${marketData.currentPrice.toFixed(2)} ({marketData.changePercent > 0 ? '+' : ''}{marketData.changePercent.toFixed(2)}%)
+              Current: ${formatPrice(marketData.price)} ({formatChangePercent(marketData.changePercent)})
             </p>
           )}
         </div>

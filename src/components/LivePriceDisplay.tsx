@@ -1,6 +1,6 @@
 
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { useRealMarketData } from "@/hooks/useRealMarketData";
+import { useSyncedMarketData, formatPrice, formatChangePercent } from "@/hooks/useSyncedMarketData";
 import { Badge } from "@/components/ui/badge";
 
 interface LivePriceDisplayProps {
@@ -16,7 +16,7 @@ export const LivePriceDisplay = ({
   size = 'lg',
   className = ''
 }: LivePriceDisplayProps) => {
-  const { price, changePercent, isLoading, error, lastUpdated } = useRealMarketData(symbol);
+  const { price, changePercent, isLoading, error, lastUpdated } = useSyncedMarketData(symbol);
 
   const getSizeClasses = () => {
     switch (size) {
@@ -66,16 +66,6 @@ export const LivePriceDisplay = ({
     return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
   };
 
-  const formatPrice = (value: number) => {
-    if (value >= 1000) {
-      return value.toLocaleString(undefined, { 
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 2 
-      });
-    }
-    return value.toFixed(2);
-  };
-
   if (error) {
     return (
       <div className={`${sizeClasses.container} ${className}`}>
@@ -122,7 +112,7 @@ export const LivePriceDisplay = ({
             {isNegative && <TrendingDown className={sizeClasses.icon} />}
             {!isPositive && !isNegative && <Minus className={sizeClasses.icon} />}
             <span className={sizeClasses.change}>
-              {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
+              {formatChangePercent(changePercent)}
             </span>
           </div>
         </Badge>
