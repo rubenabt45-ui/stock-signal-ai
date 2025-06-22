@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Target, CheckCircle, AlertTriangle } from "lucide-react";
-import { useTradingViewData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewData";
+import { useSyncedMarketData, formatPrice, formatChangePercent } from "@/hooks/useSyncedMarketData";
 import { memo, useMemo } from "react";
 
 interface PatternDetectionProps {
@@ -10,15 +10,15 @@ interface PatternDetectionProps {
   timeframe: string;
 }
 
-const generatePatterns = (tradingViewData: any) => {
-  if (!tradingViewData || !tradingViewData.price) return [];
+const generatePatterns = (marketData: any) => {
+  if (!marketData || !marketData.price) return [];
   
-  const { price, changePercent, high, low, volume } = tradingViewData;
+  const { price, changePercent, high, low, volume } = marketData;
   const volatility = high && low ? ((high - low) / price) * 100 : 0;
   
   const patterns = [];
   
-  // Pattern detection based on real TradingView data
+  // Pattern detection based on real market data
   if (changePercent > 2 && volatility < 3) {
     patterns.push({ name: "Bull Flag", confidence: 85 + Math.random() * 10, type: "bullish" });
   }
@@ -39,19 +39,19 @@ const generatePatterns = (tradingViewData: any) => {
 };
 
 const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) => {
-  const tradingViewData = useTradingViewData(asset);
+  const marketData = useSyncedMarketData(asset);
   
   // Memoize patterns to prevent unnecessary recalculations
   const detectedPatterns = useMemo(() => {
-    return generatePatterns(tradingViewData);
-  }, [tradingViewData.price, tradingViewData.changePercent, tradingViewData.high, tradingViewData.low, tradingViewData.volume]);
+    return generatePatterns(marketData);
+  }, [marketData.price, marketData.changePercent, marketData.high, marketData.low, marketData.volume]);
 
-  // TradingView data sync log
-  if (process.env.NODE_ENV === 'development' && tradingViewData.price !== null) {
-    console.log(`📊 PatternDetection [${asset}]: $${formatPrice(tradingViewData.price)} (${formatChangePercent(tradingViewData.changePercent)}) - TradingView sync: ${new Date(tradingViewData.lastUpdated || 0).toLocaleTimeString()}`);
+  // Synced market data log
+  if (process.env.NODE_ENV === 'development' && marketData.price !== null) {
+    console.log(`📊 PatternDetection [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Synced: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
   }
 
-  if (tradingViewData.isLoading) {
+  if (marketData.isLoading) {
     return (
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex items-center space-x-3 mb-6">
@@ -72,7 +72,7 @@ const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) 
         <Target className="h-6 w-6 text-purple-400" />
         <h3 className="text-xl font-bold text-white">Pattern Detection</h3>
         <Badge className="bg-tradeiq-blue/20 text-tradeiq-blue border-tradeiq-blue/30 text-xs">
-          TradingView
+          Synced
         </Badge>
       </div>
 
@@ -110,9 +110,9 @@ const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) 
               </div>
             </div>
             
-            {tradingViewData.price && (
+            {marketData.price && (
               <div className="mt-2 text-xs text-gray-500">
-                TradingView: ${formatPrice(tradingViewData.price)} | Change {formatChangePercent(tradingViewData.changePercent)}
+                Synced: ${formatPrice(marketData.price)} | Change {formatChangePercent(marketData.changePercent)}
               </div>
             )}
           </div>
@@ -122,8 +122,8 @@ const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) 
           <div className="text-center py-8 text-gray-400">
             <Target className="h-12 w-12 mx-auto mb-3 opacity-50" />
             <p>No clear patterns detected</p>
-            {tradingViewData.price && tradingViewData.changePercent !== null && (
-              <p className="text-xs mt-2">Market conditions: {Math.abs(tradingViewData.changePercent) < 1 ? 'Low volatility' : 'Active movement'}</p>
+            {marketData.price && marketData.changePercent !== null && (
+              <p className="text-xs mt-2">Market conditions: {Math.abs(marketData.changePercent) < 1 ? 'Low volatility' : 'Active movement'}</p>
             )}
           </div>
         )}
