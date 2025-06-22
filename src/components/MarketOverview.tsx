@@ -116,9 +116,9 @@ export const MarketOverview = ({
         }
       ];
 
-      console.log('📊 Creating widget with symbolsGroups:', symbolsGroups);
+      console.log('📊 Creating clean widget with symbolsGroups:', symbolsGroups);
 
-      // Widget configuration
+      // Enhanced widget configuration for cleaner appearance
       const config = {
         colorTheme: widgetTheme === 'dark' ? 'dark' : 'light',
         dateRange: "12M",
@@ -130,6 +130,7 @@ export const MarketOverview = ({
         isTransparent: false,
         showSymbolLogo: true,
         showFloatingTooltip: false,
+        // Clean styling options
         plotLineColorGrowing: "rgba(37, 99, 235, 1)",
         plotLineColorFalling: "rgba(239, 68, 68, 1)",
         gridLineColor: "rgba(240, 243, 250, 0.06)",
@@ -139,6 +140,17 @@ export const MarketOverview = ({
         belowLineFillColorGrowingBottom: "rgba(37, 99, 235, 0)",
         belowLineFillColorFallingBottom: "rgba(239, 68, 68, 0)",
         symbolActiveColor: "rgba(60, 120, 216, 0.12)",
+        // Professional cleanup options
+        hideTopToolbar: true,        // Hide the timeframe toolbar (1m, 30m, 1h, etc.)
+        hideBottomToolbar: true,     // Hide bottom controls including settings button
+        hideDateRanges: true,        // Hide date range selector
+        hideMarketStatus: false,     // Keep market status but clean
+        hideSymbolSearch: true,      // Hide symbol search to keep it focused
+        hideVolumeMA: true,         // Hide volume moving average for cleaner look
+        allowSymbolChange: false,    // Prevent symbol changes to maintain focus
+        details: false,             // Hide detailed information panel
+        hotlist: false,             // Hide hotlist/trending symbols
+        calendar: false,            // Hide economic calendar
         symbolsGroups: symbolsGroups
       };
 
@@ -148,7 +160,7 @@ export const MarketOverview = ({
           container_id: containerId,
           ...config
         });
-        console.log('✅ TradingView widget created successfully');
+        console.log('✅ Clean TradingView widget created successfully');
       } else {
         // Fallback: inject script directly
         const scriptContent = `
@@ -163,11 +175,11 @@ export const MarketOverview = ({
         const widgetScript = document.createElement('script');
         widgetScript.innerHTML = scriptContent;
         containerRef.current.appendChild(widgetScript);
-        console.log('📊 Widget script injected as fallback');
+        console.log('📊 Clean widget script injected as fallback');
       }
 
     } catch (error) {
-      console.error('❌ Error creating widget:', error);
+      console.error('❌ Error creating clean widget:', error);
       setError('Failed to create widget');
     }
   }, [symbols, widgetTheme, isLoaded, height, containerId]);
