@@ -2,6 +2,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 
+// Declare TradingView types
+declare global {
+  interface Window {
+    TradingView: any;
+    Datafeeds: any;
+  }
+}
+
 interface TradingViewWidgetProps {
   symbol: string;
   timeframe: string;
@@ -129,7 +137,6 @@ export const TradingViewWidget = ({
 
       try {
         const widget = new window.TradingView.widget({
-          autosize: true,
           symbol: symbol,
           interval: getInterval(timeframe),
           container: containerRef.current,
