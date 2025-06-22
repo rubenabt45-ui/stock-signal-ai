@@ -15,6 +15,7 @@ interface TradingViewAdvancedChartProps {
 declare global {
   interface Window {
     TradingView: any;
+    tvWidget: any;
   }
 }
 
@@ -39,15 +40,12 @@ const TradingViewAdvancedChartComponent = ({
 }: TradingViewAdvancedChartProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<any>(null);
-  const cleanupRef = useRef<() => void>();
-  const retryCountRef = useRef<number>(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const initTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [chartReady, setChartReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isRetrying, setIsRetrying] = useState(false);
   
   const { actualTheme } = useTheme();
   
@@ -58,12 +56,56 @@ const TradingViewAdvancedChartComponent = ({
     triggerOnce: false
   });
   
-  // Generate unique container ID for each symbol/timeframe combination
-  const containerId = `tradingview-chart-${symbol}-${timeframe}-${Date.now()}`;
+  // Fixed container ID for stable widget management
+  const containerId = 'tv_chart_container';
 
-  console.log(`🎯 [${new Date().toLocaleTimeString()}] TradingView Chart: ${symbol} (${timeframe}) - Visible: ${isIntersecting}, Ready: ${chartReady}, Retries: ${retryCountRef.current}`);
+  console.log(`[TV-DEBUG] ${new Date().toISOString()} - Chart Component: ${symbol} (${timeframe}) - Visible: ${isIntersecting}, Ready: ${chartReady}`);
 
-  // Load TradingView script with retry logic
+  // Complete widget cleanup
+  const destroyWidget = useCallback(() => {
+    console.log(`[TV-CLEANUP] ${new Date().toISOString()} - Destroying widget for ${symbol}`);
+    
+    // Clear initialization timeout
+    if (initTimeoutRef.current) {
+      clearTimeout(initTimeoutRef.current);
+      initTimeoutRef.current = null;
+    }
+    
+    // Destroy global widget instance
+    if (window.tvWidget) {
+      try {
+        if (typeof window.tvWidget.remove === 'function') {
+          window.tvWidget.remove();
+        }
+      } catch (e) {
+        console.log(`[TV-CLEANUP] Widget removal error:`, e);
+      }
+      window.tvWidget = null;
+    }
+    
+    // Destroy local widget reference
+    if (widgetRef.current) {
+      try {
+        if (typeof widgetRef.current.remove === 'function') {
+          widgetRef.current.remove();
+        }
+      } catch (e) {
+        console.log(`[TV-CLEANUP] Local widget removal error:`, e);
+      }
+      widgetRef.current = null;
+    }
+    
+    // Clear container completely
+    if (containerRef.current) {
+      containerRef.current.innerHTML = '';
+      containerRef.current.id = containerId;
+    }
+    
+    setChartReady(false);
+    setError(null);
+  }, [symbol]);
+
+  // Load TradingView script
   const loadTradingViewScript = useCallback(async (): Promise<boolean> => {
     if (window.TradingView) {
       setIsLoaded(true);
@@ -82,14 +124,14 @@ const TradingViewAdvancedChartComponent = ({
       script.onload = () => {
         setIsLoaded(true);
         setIsLoading(false);
-        console.log(`📊 [${new Date().toLocaleTimeString()}] TradingView script loaded successfully`);
+        console.log(`[TV-SCRIPT] ${new Date().toISOString()} - TradingView script loaded successfully`);
         resolve(true);
       };
       
       script.onerror = () => {
         setIsLoading(false);
         setError('Failed to load TradingView script');
-        console.error(`❌ [${new Date().toLocaleTimeString()}] Failed to load TradingView script`);
+        console.error(`[TV-SCRIPT] ${new Date().toISOString()} - Failed to load TradingView script`);
         resolve(false);
       };
       
@@ -97,225 +139,89 @@ const TradingViewAdvancedChartComponent = ({
     });
   }, []);
 
-  // Enhanced cleanup function
-  const cleanupWidget = useCallback(() => {
-    console.log(`🧹 [${new Date().toLocaleTimeString()}] Cleaning up widget for ${symbol}`);
-    
-    // Clear timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    
-    // Run custom cleanup
-    if (cleanupRef.current) {
-      try {
-        cleanupRef.current();
-      } catch (e) {
-        console.log('Custom cleanup error:', e);
-      }
-      cleanupRef.current = undefined;
-    }
-    
-    // Remove widget
-    if (widgetRef.current) {
-      try {
-        if (typeof widgetRef.current.remove === 'function') {
-          widgetRef.current.remove();
-        }
-      } catch (e) {
-        console.log('Widget cleanup error:', e);
-      }
-      widgetRef.current = null;
-    }
-    
-    setChartReady(false);
-    setError(null);
-  }, [symbol]);
-
-  // Retry widget creation with exponential backoff
-  const retryWidgetCreation = useCallback(async () => {
-    const maxRetries = 3;
-    
-    if (retryCountRef.current >= maxRetries) {
-      setError(`Widget failed to initialize after ${maxRetries} attempts`);
-      setIsRetrying(false);
-      console.error(`❌ [${new Date().toLocaleTimeString()}] Widget initialization failed permanently for ${symbol}`);
-      return;
-    }
-
-    retryCountRef.current++;
-    setIsRetrying(true);
-    
-    console.log(`🔄 [${new Date().toLocaleTimeString()}] Retrying widget creation for ${symbol} (attempt ${retryCountRef.current}/${maxRetries})`);
-    
-    // Wait with exponential backoff
-    const delay = Math.pow(2, retryCountRef.current - 1) * 1000; // 1s, 2s, 4s
-    await new Promise(resolve => setTimeout(resolve, delay));
-    
-    // Clean up previous attempt
-    cleanupWidget();
-    
-    // Try again
-    createWidget();
-  }, [symbol, cleanupWidget]);
-
-  // Create widget with robust error handling
+  // Create widget with clean initialization
   const createWidget = useCallback(() => {
     if (!isLoaded || !containerRef.current || !isIntersecting) {
       return;
     }
 
-    console.log(`🔄 [${new Date().toLocaleTimeString()}] Creating TradingView widget for ${symbol} (${timeframe})`);
+    console.log(`[TV-INIT] ${new Date().toISOString()} - Creating TradingView widget for ${symbol} (${timeframe})`);
     
-    // Clear container and set new ID
-    if (containerRef.current) {
-      containerRef.current.innerHTML = '';
-      containerRef.current.id = containerId;
-    }
-
-    try {
-      const baseConfig = getTradingViewConfig(actualTheme);
-      
-      const widgetConfig = {
-        ...baseConfig,
-        symbol: symbol,
-        interval: getInterval(timeframe),
-        height: 600,
-        container_id: containerId,
-        studies: [],
-        autosize: true,
-        overrides: {
-          ...baseConfig.overrides,
-          "paneProperties.background": actualTheme === 'dark' ? "#0f172a" : "#ffffff"
+    // Ensure complete cleanup before creating new widget
+    destroyWidget();
+    
+    // Wait a moment for cleanup to complete
+    setTimeout(() => {
+      try {
+        // Ensure container is ready
+        if (containerRef.current) {
+          containerRef.current.innerHTML = '';
+          containerRef.current.id = containerId;
         }
-      };
 
-      const widget = new window.TradingView.widget(widgetConfig);
-      widgetRef.current = widget;
-
-      console.log(`📊 [${new Date().toLocaleTimeString()}] TradingView widget created for ${symbol}`);
-
-      // Set up initialization timeout (10 seconds)
-      timeoutRef.current = setTimeout(() => {
-        if (!chartReady) {
-          console.warn(`⏰ [${new Date().toLocaleTimeString()}] Widget initialization timeout for ${symbol}`);
-          retryWidgetCreation();
-        }
-      }, 10000);
-
-      // Enhanced widget ready detection
-      const initializeWidget = () => {
-        try {
-          // Method 1: Use onChartReady if available
-          if (widget.onChartReady && typeof widget.onChartReady === 'function') {
-            console.log(`📊 [${new Date().toLocaleTimeString()}] Using onChartReady for ${symbol}`);
-            
-            widget.onChartReady(() => {
-              console.log(`✅ [TV-DEBUG] Symbol Loaded: ${symbol}, Chart Ready: ${new Date().toLocaleTimeString()}`);
-              
-              if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-              }
-              
-              setupWidgetListeners(widget, symbol);
-              setTradingViewWidget(widget, symbol);
-              setChartReady(true);
-              setIsRetrying(false);
-              retryCountRef.current = 0; // Reset retry count on success
-            });
-          } else {
-            // Method 2: Polling fallback
-            console.log(`⏰ [${new Date().toLocaleTimeString()}] Using polling fallback for ${symbol}`);
-            let attempts = 0;
-            const maxAttempts = 50;
-            
-            const pollForReady = () => {
-              attempts++;
-              
-              try {
-                const chart = widget.activeChart && widget.activeChart();
-                if (chart && chart.symbol) {
-                  console.log(`✅ [TV-DEBUG] Symbol Loaded: ${symbol}, Chart Ready: ${new Date().toLocaleTimeString()} (polling attempt ${attempts})`);
-                  
-                  if (timeoutRef.current) {
-                    clearTimeout(timeoutRef.current);
-                    timeoutRef.current = null;
-                  }
-                  
-                  setupWidgetListeners(widget, symbol);
-                  setTradingViewWidget(widget, symbol);
-                  setChartReady(true);
-                  setIsRetrying(false);
-                  retryCountRef.current = 0;
-                  return;
-                }
-              } catch (e) {
-                // Continue polling
-              }
-              
-              if (attempts < maxAttempts) {
-                setTimeout(pollForReady, 200);
-              } else {
-                console.error(`❌ [${new Date().toLocaleTimeString()}] Widget polling failed after ${attempts} attempts for ${symbol}`);
-                retryWidgetCreation();
-              }
-            };
-            
-            setTimeout(pollForReady, 500);
+        const baseConfig = getTradingViewConfig(actualTheme);
+        
+        const widgetConfig = {
+          ...baseConfig,
+          symbol: symbol,
+          interval: getInterval(timeframe),
+          height: 600,
+          container_id: containerId,
+          studies: [],
+          autosize: true,
+          overrides: {
+            ...baseConfig.overrides,
+            "paneProperties.background": actualTheme === 'dark' ? "#0f172a" : "#ffffff"
           }
-        } catch (error) {
-          console.error(`❌ [${new Date().toLocaleTimeString()}] Widget initialization error for ${symbol}:`, error);
-          retryWidgetCreation();
-        }
-      };
+        };
 
-      // Setup cleanup function
-      cleanupRef.current = () => {
-        try {
-          if (widget && typeof widget.remove === 'function') {
-            widget.remove();
+        const widget = new window.TradingView.widget(widgetConfig);
+        widgetRef.current = widget;
+        window.tvWidget = widget;
+
+        console.log(`[TV-INIT] ${new Date().toISOString()} - TradingView widget created for ${symbol}`);
+
+        // Set initialization timeout (10 seconds max)
+        initTimeoutRef.current = setTimeout(() => {
+          if (!chartReady) {
+            console.warn(`[TV-TIMEOUT] ${new Date().toISOString()} - Widget initialization timeout for ${symbol}`);
+            setError(`Chart failed to load within 10 seconds for ${symbol}`);
           }
-        } catch (e) {
-          console.log('Widget removal error:', e);
-        }
-      };
+        }, 10000);
 
-      // Initialize with delay
-      setTimeout(initializeWidget, 100);
-      
-    } catch (error) {
-      console.error(`❌ [${new Date().toLocaleTimeString()}] Error creating TradingView widget:`, error);
-      retryWidgetCreation();
-    }
-  }, [symbol, timeframe, actualTheme, isLoaded, containerId, isIntersecting, retryWidgetCreation]);
-
-  // Setup widget event listeners
-  const setupWidgetListeners = useCallback((widget: any, widgetSymbol: string) => {
-    try {
-      const chart = widget.activeChart();
-      if (!chart) return;
-
-      // Listen for symbol changes
-      if (chart.onSymbolChanged && typeof chart.onSymbolChanged === 'function') {
-        chart.onSymbolChanged().subscribe(null, () => {
-          console.log(`📈 [${new Date().toLocaleTimeString()}] Symbol changed detected for ${widgetSymbol}`);
+        // Use onChartReady for reliable initialization
+        widget.onChartReady(() => {
+          console.log(`[TV-DEBUG] ${new Date().toISOString()} - Symbol Loaded: ${symbol}, Chart Ready`);
+          
+          if (initTimeoutRef.current) {
+            clearTimeout(initTimeoutRef.current);
+            initTimeoutRef.current = null;
+          }
+          
+          // Set up widget for data extraction
+          setTradingViewWidget(widget, symbol);
+          setChartReady(true);
+          setError(null);
+          
+          // Setup symbol change listener
+          try {
+            const chart = widget.activeChart();
+            if (chart && chart.onSymbolChanged) {
+              chart.onSymbolChanged().subscribe(null, () => {
+                console.log(`[TV-SYMBOL] ${new Date().toISOString()} - Symbol changed detected for ${symbol}`);
+              });
+            }
+          } catch (e) {
+            console.log(`[TV-LISTENER] Setup warning:`, e);
+          }
         });
+        
+      } catch (error) {
+        console.error(`[TV-ERROR] ${new Date().toISOString()} - Error creating TradingView widget:`, error);
+        setError(`Widget creation failed: ${error}`);
       }
-
-      // Listen for data updates
-      if (chart.onDataLoaded && typeof chart.onDataLoaded === 'function') {
-        chart.onDataLoaded().subscribe(null, () => {
-          console.log(`📊 [${new Date().toLocaleTimeString()}] Data loaded for ${widgetSymbol}`);
-        });
-      }
-
-      console.log(`🎧 [${new Date().toLocaleTimeString()}] Event listeners setup for ${widgetSymbol}`);
-    } catch (error) {
-      console.warn(`⚠️ Event listener setup failed for ${widgetSymbol}:`, error);
-    }
-  }, []);
+    }, 100);
+  }, [symbol, timeframe, actualTheme, isLoaded, containerId, isIntersecting, destroyWidget]);
 
   // Load script when component mounts
   useEffect(() => {
@@ -326,33 +232,27 @@ const TradingViewAdvancedChartComponent = ({
 
   // Create/recreate widget when dependencies change
   useEffect(() => {
-    // Reset retry count on symbol/timeframe change
-    retryCountRef.current = 0;
-    setIsRetrying(false);
-    
     createWidget();
-    return cleanupWidget;
-  }, [symbol, timeframe, actualTheme, isLoaded, isIntersecting, createWidget, cleanupWidget]);
+    return destroyWidget;
+  }, [symbol, timeframe, actualTheme, isLoaded, isIntersecting, createWidget, destroyWidget]);
 
   // Manual retry function
   const handleManualRetry = () => {
-    retryCountRef.current = 0;
     setError(null);
-    setIsRetrying(false);
-    cleanupWidget();
+    destroyWidget();
     
     if (!isLoaded) {
       loadTradingViewScript().then((success) => {
         if (success) {
-          createWidget();
+          setTimeout(createWidget, 200);
         }
       });
     } else {
-      createWidget();
+      setTimeout(createWidget, 200);
     }
   };
 
-  if (error && !isRetrying) {
+  if (error) {
     return (
       <div 
         ref={targetRef}
@@ -365,7 +265,7 @@ const TradingViewAdvancedChartComponent = ({
             onClick={handleManualRetry}
             className="px-4 py-2 bg-tradeiq-blue text-white rounded-lg hover:bg-tradeiq-blue/80 transition-colors"
           >
-            Retry Widget
+            Retry Chart
           </button>
         </div>
       </div>
@@ -389,7 +289,7 @@ const TradingViewAdvancedChartComponent = ({
     );
   }
 
-  if (isLoading || isRetrying) {
+  if (isLoading) {
     return (
       <div 
         ref={targetRef}
@@ -398,9 +298,7 @@ const TradingViewAdvancedChartComponent = ({
         <div className="text-center space-y-4">
           <div className="animate-pulse rounded-full h-8 w-8 bg-tradeiq-blue/40 mx-auto"></div>
           <div>
-            <p className="text-white font-medium">
-              {isRetrying ? `Retrying... (${retryCountRef.current}/3)` : 'Loading TradingView...'}
-            </p>
+            <p className="text-white font-medium">Loading TradingView...</p>
             <p className="text-gray-400 text-sm">Initializing chart for {symbol}</p>
           </div>
         </div>
@@ -419,6 +317,7 @@ const TradingViewAdvancedChartComponent = ({
     >
       <div 
         ref={containerRef} 
+        id={containerId}
         className="w-full h-full" 
         style={{ 
           height: '600px',
@@ -458,7 +357,7 @@ export const TradingViewAdvancedChart = memo(TradingViewAdvancedChartComponent, 
     prevProps.className === nextProps.className;
   
   if (!shouldNotRerender) {
-    console.log(`🔄 [${new Date().toLocaleTimeString()}] TradingView re-rendering: ${prevProps.symbol} → ${nextProps.symbol}, ${prevProps.timeframe} → ${nextProps.timeframe}`);
+    console.log(`[TV-MEMO] ${new Date().toISOString()} - Re-rendering: ${prevProps.symbol} → ${nextProps.symbol}, ${prevProps.timeframe} → ${nextProps.timeframe}`);
   }
   
   return shouldNotRerender;

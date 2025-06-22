@@ -18,11 +18,12 @@ export interface TradingViewWidgetData {
 declare global {
   interface Window {
     TradingView: any;
+    tvWidget: any;
   }
 }
 
 // Global widget state management
-let globalTradingViewWidget: any = null;
+let currentWidgetInstance: any = null;
 let isWidgetReady: boolean = false;
 let currentSymbol: string = '';
 const dataSubscribers = new Set<(data: TradingViewWidgetData) => void>();
@@ -40,10 +41,13 @@ const currentWidgetData: TradingViewWidgetData = {
   error: null,
 };
 
+// Price extraction interval
+let priceExtractionInterval: NodeJS.Timeout | null = null;
+
 export const setTradingViewWidget = (widget: any, symbol: string) => {
-  console.log(`🎯 [${new Date().toLocaleTimeString()}] Setting TradingView widget for ${symbol}`);
+  console.log(`[TV-SYNC] ${new Date().toISOString()} - Setting TradingView widget for ${symbol}`);
   
-  globalTradingViewWidget = widget;
+  currentWidgetInstance = widget;
   currentSymbol = symbol;
   isWidgetReady = false;
   
@@ -63,113 +67,45 @@ export const setTradingViewWidget = (widget: any, symbol: string) => {
   });
   
   if (!widget) {
-    console.warn('⚠️ Widget is null');
+    console.warn(`[TV-SYNC] Widget is null for ${symbol}`);
     notifyError('Widget is null or undefined');
     return;
   }
 
-  // Enhanced widget ready detection with guaranteed callback
-  const initializeWidgetData = () => {
-    try {
-      // Method 1: Use onChartReady if available
-      if (widget.onChartReady && typeof widget.onChartReady === 'function') {
-        console.log(`📊 [${new Date().toLocaleTimeString()}] Using onChartReady for widget data ${symbol}`);
-        
-        widget.onChartReady(() => {
-          console.log(`✅ [${new Date().toLocaleTimeString()}] Widget data ready via onChartReady for ${symbol}`);
-          isWidgetReady = true;
-          setupWidgetListeners(widget, symbol);
-          
-          // Start price extraction immediately and set up interval
-          extractWidgetPrice();
-          setupPriceExtraction();
-        });
-      } else {
-        // Method 2: Polling fallback with more aggressive checking
-        console.log(`⏰ [${new Date().toLocaleTimeString()}] Using polling fallback for widget data ${symbol}`);
-        let attempts = 0;
-        const maxAttempts = 30; // 6 seconds with 200ms intervals
-        
-        const pollForReady = () => {
-          attempts++;
-          
-          try {
-            // Check multiple conditions for readiness
-            const chart = widget.activeChart && widget.activeChart();
-            const hasSymbol = chart && (chart.symbol() || chart.getSymbol);
-            const hasContainer = document.getElementById(widget._options?.container_id);
-            
-            if (chart && hasSymbol && hasContainer) {
-              console.log(`✅ [${new Date().toLocaleTimeString()}] Widget data ready via polling for ${symbol} (attempt ${attempts})`);
-              isWidgetReady = true;
-              setupWidgetListeners(widget, symbol);
-              
-              // Start price extraction
-              extractWidgetPrice();
-              setupPriceExtraction();
-              return;
-            }
-          } catch (e) {
-            // Continue polling
-          }
-          
-          if (attempts < maxAttempts) {
-            setTimeout(pollForReady, 200);
-          } else {
-            console.error(`❌ [${new Date().toLocaleTimeString()}] Widget data polling failed after ${attempts} attempts for ${symbol}`);
-            notifyError(`Widget failed to initialize data extraction for ${symbol}`);
-          }
-        };
-        
-        // Start polling after brief delay
-        setTimeout(pollForReady, 300);
-      }
-    } catch (error) {
-      console.error(`❌ [${new Date().toLocaleTimeString()}] Widget data initialization error for ${symbol}:`, error);
-      notifyError(`Widget data initialization failed: ${error}`);
-    }
-  };
-
-  // Initialize with slight delay to ensure DOM is ready
-  setTimeout(initializeWidgetData, 200);
-};
-
-const setupWidgetListeners = (widget: any, symbol: string) => {
+  // Setup widget data extraction after ready
   try {
     const chart = widget.activeChart();
-    if (!chart) return;
-
-    // Listen for symbol changes
-    if (chart.onSymbolChanged && typeof chart.onSymbolChanged === 'function') {
-      chart.onSymbolChanged().subscribe(null, () => {
-        console.log(`📈 [${new Date().toLocaleTimeString()}] Symbol changed detected for widget data ${symbol}`);
-        setTimeout(() => extractWidgetPrice(), 100);
-      });
+    if (chart) {
+      console.log(`[TV-SYNC] ${new Date().toISOString()} - Widget ready for data extraction: ${symbol}`);
+      isWidgetReady = true;
+      setupPriceExtraction();
+      
+      // Setup event listeners for data updates
+      if (chart.onDataLoaded && typeof chart.onDataLoaded === 'function') {
+        chart.onDataLoaded().subscribe(null, () => {
+          console.log(`[TV-DATA] ${new Date().toISOString()} - Data loaded for ${symbol}`);
+          setTimeout(() => extractWidgetPrice(), 100);
+        });
+      }
+      
+      // Initial price extraction
+      setTimeout(() => extractWidgetPrice(), 500);
+    } else {
+      console.log(`[TV-SYNC] Chart not immediately available, will retry...`);
+      setTimeout(() => {
+        const retryChart = widget.activeChart();
+        if (retryChart) {
+          isWidgetReady = true;
+          setupPriceExtraction();
+          setTimeout(() => extractWidgetPrice(), 500);
+        }
+      }, 1000);
     }
-
-    // Listen for data updates
-    if (chart.onDataLoaded && typeof chart.onDataLoaded === 'function') {
-      chart.onDataLoaded().subscribe(null, () => {
-        console.log(`📊 [${new Date().toLocaleTimeString()}] Data loaded for widget data ${symbol}`);
-        setTimeout(() => extractWidgetPrice(), 50);
-      });
-    }
-
-    // Listen for price scale changes
-    if (chart.onPriceScaleChanged && typeof chart.onPriceScaleChanged === 'function') {
-      chart.onPriceScaleChanged().subscribe(null, () => {
-        setTimeout(() => extractWidgetPrice(), 50);
-      });
-    }
-
-    console.log(`🎧 [${new Date().toLocaleTimeString()}] Widget data event listeners setup for ${symbol}`);
   } catch (error) {
-    console.warn(`⚠️ Widget data event listener setup failed for ${symbol}:`, error);
+    console.error(`[TV-SYNC] Widget setup error for ${symbol}:`, error);
+    notifyError(`Widget setup failed: ${error}`);
   }
 };
-
-// Set up continuous price extraction
-let priceExtractionInterval: NodeJS.Timeout | null = null;
 
 const setupPriceExtraction = () => {
   // Clear existing interval
@@ -177,41 +113,39 @@ const setupPriceExtraction = () => {
     clearInterval(priceExtractionInterval);
   }
   
-  // Extract price every 500ms for live updates
+  // Extract price every 1000ms for reliable updates
   priceExtractionInterval = setInterval(() => {
-    if (isWidgetReady && globalTradingViewWidget) {
+    if (isWidgetReady && currentWidgetInstance) {
       extractWidgetPrice();
     }
-  }, 500);
+  }, 1000);
 };
 
 const extractWidgetPrice = () => {
-  if (!globalTradingViewWidget || !isWidgetReady) {
-    console.log(`⏳ [${new Date().toLocaleTimeString()}] Widget not ready for price extraction`);
+  if (!currentWidgetInstance || !isWidgetReady) {
     return null;
   }
 
   try {
-    const chart = globalTradingViewWidget.activeChart();
+    const chart = currentWidgetInstance.activeChart();
     if (!chart) {
-      console.log(`⚠️ [${new Date().toLocaleTimeString()}] No active chart available for price extraction`);
       return null;
     }
 
     // Get current symbol
     let symbolInfo = '';
     try {
-      symbolInfo = chart.symbol() || chart.getSymbol?.() || currentSymbol;
+      symbolInfo = chart.symbol() || currentSymbol;
     } catch (e) {
       symbolInfo = currentSymbol;
     }
     
-    console.log(`📊 [${new Date().toLocaleTimeString()}] Extracting price for symbol: ${symbolInfo}`);
+    console.log(`[TV-EXTRACT] ${new Date().toISOString()} - Extracting price for: ${symbolInfo}`);
     
-    // Multiple methods to get price data with priority order
+    // Try to get price data from chart
     let priceData = null;
 
-    // Method 1: Try to get series data (most reliable)
+    // Method 1: Try series data (most reliable for OHLCV)
     try {
       const series = chart.getSeries?.();
       if (series && series.length > 0) {
@@ -221,49 +155,33 @@ const extractWidgetPrice = () => {
           
           if (seriesData && seriesData.length > 0) {
             const lastBar = seriesData[seriesData.length - 1];
-            if (lastBar) {
+            if (lastBar && lastBar.close) {
               priceData = {
-                price: lastBar.close || lastBar.value || lastBar.price,
-                open: lastBar.open,
-                high: lastBar.high,
-                low: lastBar.low,
-                volume: lastBar.volume,
+                price: lastBar.close,
+                open: lastBar.open || null,
+                high: lastBar.high || null,
+                low: lastBar.low || null,
+                volume: lastBar.volume || null,
               };
-              console.log(`💎 [${new Date().toLocaleTimeString()}] Price extracted via series: $${formatPrice(priceData.price)}`);
+              console.log(`[TV-EXTRACT] ${new Date().toISOString()} - Price via series: $${formatPrice(priceData.price)}`);
             }
           }
         }
       }
-    } catch (seriesError) {
-      console.log(`📊 Series extraction failed:`, seriesError);
+    } catch (e) {
+      console.log(`[TV-EXTRACT] Series extraction failed:`, e);
     }
 
-    // Method 2: Try to get current price from price scale
+    // Method 2: Try current price methods
     if (!priceData?.price) {
       try {
-        const priceScale = chart.getPriceScale?.();
-        if (priceScale) {
-          const visibleRange = chart.getVisibleRange?.();
-          if (visibleRange && visibleRange.to) {
-            priceData = { price: visibleRange.to };
-            console.log(`💰 [${new Date().toLocaleTimeString()}] Price extracted via price scale: $${formatPrice(priceData.price)}`);
-          }
-        }
-      } catch (e) {
-        console.log(`💰 Price scale extraction failed:`, e);
-      }
-    }
-
-    // Method 3: Try to get price from chart API
-    if (!priceData?.price) {
-      try {
-        const currentPrice = chart.getCurrentPrice?.();
-        if (currentPrice) {
+        const currentPrice = chart.getCurrentPrice?.() || chart.getPrice?.();
+        if (currentPrice && !isNaN(currentPrice)) {
           priceData = { price: currentPrice };
-          console.log(`🎯 [${new Date().toLocaleTimeString()}] Price extracted via getCurrentPrice: $${formatPrice(priceData.price)}`);
+          console.log(`[TV-EXTRACT] ${new Date().toISOString()} - Price via getCurrentPrice: $${formatPrice(priceData.price)}`);
         }
       } catch (e) {
-        console.log(`🎯 getCurrentPrice extraction failed:`, e);
+        console.log(`[TV-EXTRACT] getCurrentPrice failed:`, e);
       }
     }
 
@@ -285,19 +203,16 @@ const extractWidgetPrice = () => {
         error: null,
       };
 
-      console.log(`✅ [TV-SYNC] Price Update: ${widgetData.symbol} = $${formatPrice(widgetData.price)} (${formatChangePercent(widgetData.changePercent)}) at ${new Date().toLocaleTimeString()}`);
+      console.log(`[TV-SYNC] ${new Date().toISOString()} - Price Update: ${widgetData.symbol} = $${formatPrice(widgetData.price)} (${formatChangePercent(widgetData.changePercent)})`);
       
       // Update global data and notify all subscribers
       Object.assign(currentWidgetData, widgetData);
       notifySubscribers(widgetData);
       
       return widgetData;
-    } else {
-      console.log(`⚠️ [${new Date().toLocaleTimeString()}] No valid price data extracted`);
     }
   } catch (error) {
-    console.error(`❌ [${new Date().toLocaleTimeString()}] Price extraction error:`, error);
-    notifyError(`Price extraction failed: ${error}`);
+    console.error(`[TV-EXTRACT] ${new Date().toISOString()} - Price extraction error:`, error);
   }
   
   return null;
@@ -308,7 +223,7 @@ const notifySubscribers = (data: TradingViewWidgetData) => {
     try {
       callback(data);
     } catch (e) {
-      console.warn('Subscriber notification error:', e);
+      console.warn('[TV-NOTIFY] Subscriber notification error:', e);
     }
   });
 };
@@ -353,20 +268,20 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
     if (currentWidgetData.symbol === targetSymbol && 
         currentWidgetData.price !== null && 
         currentWidgetData.lastUpdated && 
-        (Date.now() - currentWidgetData.lastUpdated) < 5000) {
-      console.log(`🔄 [${new Date().toLocaleTimeString()}] Using cached data for ${targetSymbol}: $${formatPrice(currentWidgetData.price)}`);
+        (Date.now() - currentWidgetData.lastUpdated) < 3000) {
+      console.log(`[TV-USE] ${new Date().toISOString()} - Using cached data for ${targetSymbol}: $${formatPrice(currentWidgetData.price)}`);
       setWidgetData({ ...currentWidgetData });
       return;
     }
 
     // Try to extract fresh data if widget is ready
-    if (isWidgetReady && globalTradingViewWidget) {
+    if (isWidgetReady && currentWidgetInstance) {
       const extracted = extractWidgetPrice();
-      if (extracted && extracted.symbol === targetSymbol) {
+      if (extracted && (extracted.symbol === targetSymbol || extracted.symbol.includes(targetSymbol))) {
         setWidgetData(extracted);
       }
     } else {
-      console.log(`⏳ [${new Date().toLocaleTimeString()}] Widget not ready for ${targetSymbol}, waiting...`);
+      console.log(`[TV-USE] ${new Date().toISOString()} - Widget not ready for ${targetSymbol}, waiting...`);
       setWidgetData(prev => ({
         ...prev,
         symbol: targetSymbol,
@@ -376,9 +291,9 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
     }
   }, []);
 
-  // Setup data extraction and polling
+  // Setup data extraction and subscription
   useEffect(() => {
-    console.log(`🎯 [${new Date().toLocaleTimeString()}] Setting up widget data subscription for ${symbol}`);
+    console.log(`[TV-USE] ${new Date().toISOString()} - Setting up widget data subscription for ${symbol}`);
     
     // Clear existing timeout
     if (timeoutRef.current) {
@@ -388,10 +303,10 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
     // Initial update
     updateDataFromWidget();
     
-    // Setup timeout fallback (15 seconds for more reliability)
+    // Setup timeout fallback (15 seconds)
     timeoutRef.current = setTimeout(() => {
       if (widgetData.isLoading && !widgetData.price) {
-        console.warn(`⚠️ [${new Date().toLocaleTimeString()}] Widget data timeout for ${symbol}`);
+        console.warn(`[TV-USE] ${new Date().toISOString()} - Widget data timeout for ${symbol}`);
         setWidgetData(prev => ({
           ...prev,
           isLoading: false,
@@ -417,7 +332,7 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
         clearTimeout(timeoutRef.current);
       }
       dataSubscribers.delete(handleUpdate);
-      console.log(`🛑 [${new Date().toLocaleTimeString()}] Cleaned up widget data subscription for ${symbol}`);
+      console.log(`[TV-USE] ${new Date().toISOString()} - Cleaned up widget data subscription for ${symbol}`);
     };
   }, [symbol, updateDataFromWidget]);
 
