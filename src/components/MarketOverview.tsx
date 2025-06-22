@@ -1,6 +1,7 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo, useCallback } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
 interface MarketOverviewProps {
   symbols?: string[];
@@ -15,7 +16,7 @@ declare global {
   }
 }
 
-export const MarketOverview = ({ 
+const MarketOverviewComponent = ({ 
   symbols = ['NASDAQ:AAPL', 'NASDAQ:MSFT', 'NASDAQ:TSLA', 'NASDAQ:NVDA', 'NASDAQ:AMZN'], 
   theme,
   height = 400, 
@@ -24,67 +25,69 @@ export const MarketOverview = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { actualTheme } = useTheme();
+  
+  // Lazy loading: only load when component is visible
+  const { targetRef, isIntersecting } = useIntersectionObserver({
+    threshold: 0.1,
+    rootMargin: '100px',
+    triggerOnce: true
+  });
   
   // Use provided theme or fall back to user's theme preference
   const widgetTheme = theme || actualTheme;
   
-  // Generate unique container ID
-  const containerId = `tradingview-widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  // Generate stable container ID
+  const containerId = useRef(`tradingview-widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`).current;
 
-  console.log(`🔧 MarketOverview mounting with symbols:`, symbols);
-  console.log(`🎨 Theme: ${widgetTheme}`);
+  console.log(`🔧 MarketOverview: Visible=${isIntersecting}, Symbols=${symbols.length}`);
 
-  // Load TradingView script
-  useEffect(() => {
-    const loadScript = () => {
-      // Check if script already exists
-      const existingScript = document.querySelector('script[src*="market-overview"]');
-      if (existingScript) {
-        console.log('📊 TradingView script already loaded');
-        setIsLoaded(true);
-        setIsLoading(false);
-        return;
-      }
+  // Memoized script loading function
+  const loadScript = useCallback(() => {
+    if (!isIntersecting) return;
+    
+    // Check if script already exists
+    const existingScript = document.querySelector('script[src*="market-overview"]');
+    if (existingScript) {
+      console.log('📊 TradingView script already loaded');
+      setIsLoaded(true);
+      setIsLoading(false);
+      return;
+    }
 
-      console.log('📊 Loading TradingView market overview script...');
-      const script = document.createElement('script');
-      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
-      script.async = true;
-      script.onload = () => {
-        console.log('✅ TradingView script loaded');
-        setIsLoaded(true);
-        setIsLoading(false);
-        setError(null);
-      };
-      script.onerror = () => {
-        console.error('❌ Failed to load TradingView script');
-        setIsLoading(false);
-        setError('Failed to load market overview');
-      };
-      
-      document.head.appendChild(script);
+    console.log('📊 Loading TradingView market overview script...');
+    setIsLoading(true);
+    
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+    script.async = true;
+    script.onload = () => {
+      console.log('✅ TradingView script loaded');
+      setIsLoaded(true);
+      setIsLoading(false);
+      setError(null);
     };
+    script.onerror = () => {
+      console.error('❌ Failed to load TradingView script');
+      setIsLoading(false);
+      setError('Failed to load market overview');
+    };
+    
+    document.head.appendChild(script);
+  }, [isIntersecting]);
 
-    loadScript();
-
-    // Timeout fallback
-    const timeout = setTimeout(() => {
-      if (isLoading) {
-        console.warn('⏰ Script loading timeout');
-        setIsLoading(false);
-        setError('Loading timeout');
-      }
-    }, 5000);
-
-    return () => clearTimeout(timeout);
-  }, [isLoading]);
-
-  // Create widget when script is loaded
+  // Load script when component becomes visible
   useEffect(() => {
-    if (!isLoaded || !containerRef.current) {
+    if (isIntersecting && !isLoaded && !isLoading) {
+      loadScript();
+    }
+  }, [isIntersecting, isLoaded, isLoading, loadScript]);
+
+  // Create widget when script is loaded and component is visible
+  useEffect(() => {
+    if (!isLoaded || !containerRef.current || !isIntersecting) {
       return;
     }
 
@@ -116,9 +119,9 @@ export const MarketOverview = ({
         }
       ];
 
-      console.log('📊 Creating clean widget with symbolsGroups:', symbolsGroups);
+      console.log('📊 Creating optimized widget with symbolsGroups:', symbolsGroups);
 
-      // Enhanced widget configuration for cleaner appearance
+      // Highly optimized widget configuration for minimal resource usage
       const config = {
         colorTheme: widgetTheme === 'dark' ? 'dark' : 'light',
         dateRange: "12M",
@@ -128,9 +131,9 @@ export const MarketOverview = ({
         height: height,
         largeChartUrl: "",
         isTransparent: false,
-        showSymbolLogo: true,
-        showFloatingTooltip: false,
-        // Clean styling options
+        showSymbolLogo: false,        // Disable logos for performance
+        showFloatingTooltip: false,   // Disable tooltips for performance
+        // Performance-optimized styling
         plotLineColorGrowing: "rgba(37, 99, 235, 1)",
         plotLineColorFalling: "rgba(239, 68, 68, 1)",
         gridLineColor: "rgba(240, 243, 250, 0.06)",
@@ -140,17 +143,33 @@ export const MarketOverview = ({
         belowLineFillColorGrowingBottom: "rgba(37, 99, 235, 0)",
         belowLineFillColorFallingBottom: "rgba(239, 68, 68, 0)",
         symbolActiveColor: "rgba(60, 120, 216, 0.12)",
-        // Professional cleanup options
-        hideTopToolbar: true,        // Hide the timeframe toolbar (1m, 30m, 1h, etc.)
-        hideBottomToolbar: true,     // Hide bottom controls including settings button
-        hideDateRanges: true,        // Hide date range selector
-        hideMarketStatus: false,     // Keep market status but clean
-        hideSymbolSearch: true,      // Hide symbol search to keep it focused
-        hideVolumeMA: true,         // Hide volume moving average for cleaner look
-        allowSymbolChange: false,    // Prevent symbol changes to maintain focus
-        details: false,             // Hide detailed information panel
-        hotlist: false,             // Hide hotlist/trending symbols
-        calendar: false,            // Hide economic calendar
+        // Aggressive cleanup for performance
+        hideTopToolbar: true,         // Hide timeframe toolbar
+        hideBottomToolbar: true,      // Hide settings and controls
+        hideDateRanges: true,         // Hide date selectors
+        hideMarketStatus: true,       // Hide market status for cleaner look
+        hideSymbolSearch: true,       // Hide search to prevent interactions
+        hideVolumeMA: true,          // Hide volume indicators
+        allowSymbolChange: false,     // Lock symbols to prevent changes
+        details: false,              // Hide detailed panels
+        hotlist: false,              // Hide trending lists
+        calendar: false,             // Hide economic calendar
+        news: false,                 // Hide news feed
+        screener_popup: false,       // Hide screener popups
+        enable_publishing: false,    // Disable publishing features
+        withdateranges: false,       // Disable date ranges
+        hide_side_toolbar: true,     // Hide side controls
+        save_image: false,           // Disable image saving
+        studies_overrides: {},       // Disable technical studies
+        overrides: {
+          // Minimal chart styling for performance
+          "mainSeriesProperties.candleStyle.upColor": "rgba(37, 99, 235, 1)",
+          "mainSeriesProperties.candleStyle.downColor": "rgba(239, 68, 68, 1)",
+          "mainSeriesProperties.candleStyle.borderUpColor": "rgba(37, 99, 235, 1)",
+          "mainSeriesProperties.candleStyle.borderDownColor": "rgba(239, 68, 68, 1)",
+          "paneProperties.background": widgetTheme === 'dark' ? "#0f172a" : "#ffffff",
+          "paneProperties.backgroundType": "solid"
+        },
         symbolsGroups: symbolsGroups
       };
 
@@ -160,7 +179,7 @@ export const MarketOverview = ({
           container_id: containerId,
           ...config
         });
-        console.log('✅ Clean TradingView widget created successfully');
+        console.log('✅ Optimized TradingView widget created');
       } else {
         // Fallback: inject script directly
         const scriptContent = `
@@ -175,14 +194,14 @@ export const MarketOverview = ({
         const widgetScript = document.createElement('script');
         widgetScript.innerHTML = scriptContent;
         containerRef.current.appendChild(widgetScript);
-        console.log('📊 Clean widget script injected as fallback');
+        console.log('📊 Optimized widget script injected');
       }
 
     } catch (error) {
-      console.error('❌ Error creating clean widget:', error);
+      console.error('❌ Error creating optimized widget:', error);
       setError('Failed to create widget');
     }
-  }, [symbols, widgetTheme, isLoaded, height, containerId]);
+  }, [symbols, widgetTheme, isLoaded, height, containerId, isIntersecting]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -197,9 +216,26 @@ export const MarketOverview = ({
     };
   }, []);
 
+  if (!isIntersecting) {
+    return (
+      <div 
+        ref={targetRef}
+        className={`flex items-center justify-center bg-black/10 rounded-2xl border border-gray-700/20 shadow-lg ${className}`} 
+        style={{ height: `${height}px`, minHeight: '400px' }}
+      >
+        <div className="text-center py-8">
+          <div className="w-8 h-8 border-2 border-tradeiq-blue/30 rounded-full mx-auto mb-3"></div>
+          <p className="text-gray-400 text-sm font-medium">Chart loading when visible...</p>
+          <p className="text-gray-500 text-xs mt-1">Performance optimized</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div 
+        ref={targetRef}
         className={`flex items-center justify-center bg-black/10 rounded-2xl border border-gray-700/20 shadow-lg ${className}`} 
         style={{ height: `${height}px`, minHeight: '400px' }}
       >
@@ -215,6 +251,7 @@ export const MarketOverview = ({
   if (error || !isLoaded) {
     return (
       <div 
+        ref={targetRef}
         className={`flex items-center justify-center bg-black/10 rounded-2xl border border-gray-700/20 shadow-lg ${className}`} 
         style={{ height: `${height}px`, minHeight: '400px' }}
       >
@@ -234,6 +271,7 @@ export const MarketOverview = ({
 
   return (
     <div 
+      ref={targetRef}
       className={`bg-black/5 rounded-2xl border border-gray-700/20 shadow-lg overflow-hidden w-full ${className}`}
       style={{ height: `${height}px`, minHeight: '400px' }}
     >
@@ -246,3 +284,22 @@ export const MarketOverview = ({
     </div>
   );
 };
+
+// Export memoized component that only re-renders when props actually change
+export const MarketOverview = memo(MarketOverviewComponent, (prevProps, nextProps) => {
+  // Only re-render if symbols, theme, height, or className change
+  const symbolsChanged = JSON.stringify(prevProps.symbols) !== JSON.stringify(nextProps.symbols);
+  const propsChanged = 
+    symbolsChanged ||
+    prevProps.theme !== nextProps.theme ||
+    prevProps.height !== nextProps.height ||
+    prevProps.className !== nextProps.className;
+  
+  if (!propsChanged) {
+    console.log('🎯 MarketOverview: Skipping re-render - props unchanged');
+  } else {
+    console.log('🔄 MarketOverview: Re-rendering - props changed');
+  }
+  
+  return !propsChanged;
+});

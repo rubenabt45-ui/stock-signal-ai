@@ -1,6 +1,7 @@
 
-import { useEffect, useRef, useState, memo } from "react";
+import { useEffect, useRef, useState, memo, useCallback } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
 interface TradingViewAdvancedChartProps {
   symbol: string;
@@ -28,7 +29,7 @@ const getInterval = (timeframe: string): string => {
   return intervalMap[timeframe] || '1D';
 };
 
-// Memoized component to prevent unnecessary re-renders
+// Optimized component with lazy loading and better performance
 const TradingViewAdvancedChartComponent = ({ 
   symbol, 
   timeframe, 
@@ -38,47 +39,60 @@ const TradingViewAdvancedChartComponent = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { actualTheme } = useTheme();
   
-  const containerId = `tv-advanced-chart-${symbol}-${Date.now()}`;
+  // Lazy loading with intersection observer
+  const { targetRef, isIntersecting } = useIntersectionObserver({
+    threshold: 0.1,
+    rootMargin: '200px', // Load when getting close
+    triggerOnce: true
+  });
+  
+  const containerId = useRef(`tv-advanced-chart-${symbol}-${Date.now()}`).current;
 
-  // Debug logging to track re-renders
+  // Debug logging to track performance
   useEffect(() => {
-    console.log(`🔄 TradingViewAdvancedChart: Component rendered for ${symbol} (${timeframe})`);
+    console.log(`🎯 TradingViewAdvancedChart: ${symbol} (${timeframe}) - Visible: ${isIntersecting}`);
   });
 
-  useEffect(() => {
-    const loadTradingViewScript = () => {
-      if (window.TradingView) {
-        setIsLoaded(true);
-        setIsLoading(false);
-        return;
-      }
+  // Memoized script loading
+  const loadTradingViewScript = useCallback(() => {
+    if (!isIntersecting) return;
+    
+    if (window.TradingView) {
+      setIsLoaded(true);
+      setIsLoading(false);
+      return;
+    }
 
-      const script = document.createElement('script');
-      script.src = 'https://s3.tradingview.com/tv.js';
-      script.async = true;
-      script.onload = () => {
-        setIsLoaded(true);
-        setIsLoading(false);
-        console.log('📈 TradingView Advanced Chart script loaded successfully');
-      };
-      script.onerror = () => {
-        setIsLoading(false);
-        console.error('❌ Failed to load TradingView Advanced Chart script');
-      };
-      
-      document.head.appendChild(script);
+    setIsLoading(true);
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/tv.js';
+    script.async = true;
+    script.onload = () => {
+      setIsLoaded(true);
+      setIsLoading(false);
+      console.log('📈 TradingView Advanced Chart script loaded');
     };
-
-    loadTradingViewScript();
-  }, []);
+    script.onerror = () => {
+      setIsLoading(false);
+      console.error('❌ Failed to load TradingView Advanced Chart script');
+    };
+    
+    document.head.appendChild(script);
+  }, [isIntersecting]);
 
   useEffect(() => {
-    if (!isLoaded || !containerRef.current) return;
+    if (isIntersecting && !isLoaded && !isLoading) {
+      loadTradingViewScript();
+    }
+  }, [isIntersecting, isLoaded, isLoading, loadTradingViewScript]);
 
-    console.log(`🎯 TradingView: Creating widget for ${symbol} (${timeframe}) - Theme: ${actualTheme}`);
+  useEffect(() => {
+    if (!isLoaded || !containerRef.current || !isIntersecting) return;
+
+    console.log(`🎯 TradingView: Creating optimized widget for ${symbol} (${timeframe})`);
 
     // Clean up previous widget
     if (widgetRef.current) {
@@ -96,10 +110,11 @@ const TradingViewAdvancedChartComponent = ({
     }
 
     try {
+      // Highly optimized widget configuration
       const widgetConfig = {
         autosize: false,
         width: "100%",
-        height: 600, // Fixed height for proper rendering
+        height: 600,
         symbol: symbol,
         interval: getInterval(timeframe),
         timezone: "Etc/UTC",
@@ -107,30 +122,39 @@ const TradingViewAdvancedChartComponent = ({
         style: "1", // Candlestick style
         locale: "en",
         toolbar_bg: actualTheme === 'dark' ? "#1e293b" : "#ffffff",
+        // Performance optimizations
         enable_publishing: false,
-        withdateranges: true,
-        hide_side_toolbar: false,
+        withdateranges: false,
+        hide_side_toolbar: true,
         allow_symbol_change: false,
-        details: true,
-        hotlist: true,
-        calendar: true,
-        studies: [
-          "Volume@tv-basicstudies",
-          "MACD@tv-basicstudies"
-        ],
-        container_id: containerId,
-        // Remove scrollbars and ensure full content visibility
-        hide_top_toolbar: false,
+        details: false,
+        hotlist: false,
+        calendar: false,
+        hide_volume: false,
         hide_legend: false,
         save_image: false,
-        hide_volume: false
+        // Minimal studies to reduce load
+        studies: [
+          "Volume@tv-basic-study"
+        ],
+        // Performance-oriented overrides
+        overrides: {
+          "paneProperties.background": actualTheme === 'dark' ? "#0f172a" : "#ffffff",
+          "paneProperties.backgroundType": "solid",
+          "mainSeriesProperties.candleStyle.upColor": "#2563eb",
+          "mainSeriesProperties.candleStyle.downColor": "#ef4444",
+          "mainSeriesProperties.candleStyle.borderUpColor": "#2563eb",
+          "mainSeriesProperties.candleStyle.borderDownColor": "#ef4444",
+          "mainSeriesProperties.candleStyle.wickUpColor": "#2563eb",
+          "mainSeriesProperties.candleStyle.wickDownColor": "#ef4444"
+        },
+        container_id: containerId,
       };
 
       widgetRef.current = new window.TradingView.widget(widgetConfig);
-
-      console.log(`📈 TradingView Advanced Chart loaded: ${symbol} (${timeframe}) with ${actualTheme} theme`);
+      console.log(`📈 Optimized TradingView chart created: ${symbol} (${timeframe})`);
     } catch (error) {
-      console.error('❌ Error creating TradingView Advanced Chart widget:', error);
+      console.error('❌ Error creating optimized TradingView widget:', error);
     }
 
     return () => {
@@ -142,11 +166,31 @@ const TradingViewAdvancedChartComponent = ({
         }
       }
     };
-  }, [symbol, timeframe, actualTheme, isLoaded, containerId]);
+  }, [symbol, timeframe, actualTheme, isLoaded, containerId, isIntersecting]);
+
+  if (!isIntersecting) {
+    return (
+      <div 
+        ref={targetRef}
+        className={`flex items-center justify-center bg-black/5 rounded-xl border border-gray-700/20 min-h-[600px] ${className}`}
+      >
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 border-2 border-tradeiq-blue/30 rounded-full mx-auto"></div>
+          <div>
+            <p className="text-white font-medium">Chart loading when visible...</p>
+            <p className="text-gray-400 text-sm">Performance optimized</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
-      <div className={`flex items-center justify-center bg-black/5 rounded-xl border border-gray-700/20 min-h-[600px] lg:min-h-[700px] h-[60vh] lg:h-[700px] ${className}`}>
+      <div 
+        ref={targetRef}
+        className={`flex items-center justify-center bg-black/5 rounded-xl border border-gray-700/20 min-h-[600px] ${className}`}
+      >
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tradeiq-blue mx-auto"></div>
           <div>
@@ -160,7 +204,10 @@ const TradingViewAdvancedChartComponent = ({
 
   if (!isLoaded) {
     return (
-      <div className={`flex items-center justify-center bg-black/5 rounded-xl border border-gray-700/20 min-h-[600px] lg:min-h-[700px] h-[60vh] lg:h-[700px] ${className}`}>
+      <div 
+        ref={targetRef}
+        className={`flex items-center justify-center bg-black/5 rounded-xl border border-gray-700/20 min-h-[600px] ${className}`}
+      >
         <div className="text-center space-y-4">
           <p className="text-red-400 text-lg font-medium">Chart Unavailable</p>
           <p className="text-gray-500 text-sm">Failed to load the TradingView widget</p>
@@ -171,7 +218,8 @@ const TradingViewAdvancedChartComponent = ({
 
   return (
     <div 
-      className={`bg-black/5 rounded-xl border border-gray-700/20 overflow-hidden w-full min-h-[600px] lg:min-h-[700px] ${className}`}
+      ref={targetRef}
+      className={`bg-black/5 rounded-xl border border-gray-700/20 overflow-hidden w-full min-h-[600px] ${className}`}
       style={{ 
         height: '600px',
         minHeight: '600px'
@@ -190,9 +238,9 @@ const TradingViewAdvancedChartComponent = ({
   );
 };
 
-// Export memoized component that only re-renders when symbol, timeframe, or theme changes
+// Export heavily memoized component for maximum performance
 export const TradingViewAdvancedChart = memo(TradingViewAdvancedChartComponent, (prevProps, nextProps) => {
-  // Only re-render if symbol, timeframe, height, or className actually change
+  // Only re-render if symbol or timeframe actually change
   const shouldNotRerender = 
     prevProps.symbol === nextProps.symbol &&
     prevProps.timeframe === nextProps.timeframe &&
@@ -200,9 +248,9 @@ export const TradingViewAdvancedChart = memo(TradingViewAdvancedChartComponent, 
     prevProps.className === nextProps.className;
   
   if (shouldNotRerender) {
-    console.log(`✅ TradingView: Skipping re-render for ${nextProps.symbol} - props unchanged`);
+    console.log(`✅ TradingView: Performance skip for ${nextProps.symbol} - no changes`);
   } else {
-    console.log(`🔄 TradingView: Re-rendering for ${nextProps.symbol} - props changed`);
+    console.log(`🔄 TradingView: Re-rendering ${nextProps.symbol} - props changed`);
   }
   
   return shouldNotRerender;
