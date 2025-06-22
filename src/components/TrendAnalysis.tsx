@@ -2,15 +2,15 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Minus, Activity } from "lucide-react";
-import { useGlobalMarketData, formatPrice, formatChangePercent } from "@/hooks/useGlobalMarketData";
+import { useTradingViewData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewData";
 
 interface TrendAnalysisProps {
   asset: string;
   timeframe: string;
 }
 
-const generateTrendData = (marketData: any) => {
-  if (!marketData || !marketData.price) {
+const generateTrendData = (tradingViewData: any) => {
+  if (!tradingViewData || !tradingViewData.price) {
     return {
       trend: 'Sideways' as const,
       strength: 50,
@@ -18,9 +18,9 @@ const generateTrendData = (marketData: any) => {
     };
   }
 
-  const { changePercent, high, low, price, open } = marketData;
+  const { changePercent, high, low, price, open } = tradingViewData;
   
-  // Determine trend based on price action
+  // Determine trend based on TradingView price action
   let trend: 'Bullish' | 'Bearish' | 'Sideways';
   if (changePercent > 1.5) {
     trend = 'Bullish';
@@ -34,19 +34,19 @@ const generateTrendData = (marketData: any) => {
   const pricePosition = high && low ? ((price - low) / (high - low)) * 100 : 50;
   const strength = Math.min(Math.max(pricePosition + Math.abs(changePercent) * 10, 0), 100);
   
-  // Calculate momentum based on change and volume indicators
+  // Calculate momentum based on TradingView change data
   const momentum = Math.min(Math.max(50 + (changePercent * 5) + Math.random() * 20, 0), 100);
   
   return { trend, strength, momentum };
 };
 
 export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
-  const marketData = useGlobalMarketData(asset);
-  const { trend, strength, momentum } = generateTrendData(marketData);
+  const tradingViewData = useTradingViewData(asset);
+  const { trend, strength, momentum } = generateTrendData(tradingViewData);
 
-  // Unified validation log for price sync checking
-  if (process.env.NODE_ENV === 'development' && marketData.price !== null) {
-    console.log(`📈 TrendAnalysis [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Updated: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
+  // TradingView data sync log
+  if (process.env.NODE_ENV === 'development' && tradingViewData.price !== null) {
+    console.log(`📈 TrendAnalysis [${asset}]: $${formatPrice(tradingViewData.price)} (${formatChangePercent(tradingViewData.changePercent)}) - TradingView sync: ${new Date(tradingViewData.lastUpdated || 0).toLocaleTimeString()}`);
   }
 
   const getTrendIcon = () => {
@@ -67,7 +67,7 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
 
   const TrendIcon = getTrendIcon();
 
-  if (marketData.isLoading) {
+  if (tradingViewData.isLoading) {
     return (
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex items-center space-x-3 mb-6">
@@ -87,6 +87,9 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
       <div className="flex items-center space-x-3 mb-6">
         <Activity className="h-6 w-6 text-tradeiq-blue" />
         <h3 className="text-xl font-bold text-white">Trend Analysis</h3>
+        <Badge className="bg-tradeiq-blue/20 text-tradeiq-blue border-tradeiq-blue/30 text-xs">
+          TradingView
+        </Badge>
       </div>
 
       <div className="space-y-6">
@@ -144,9 +147,9 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
               {trend} Trend
             </Badge>
           </div>
-          {marketData.price && (
+          {tradingViewData.price && (
             <div className="text-xs text-gray-500 mt-2">
-              Price: ${formatPrice(marketData.price)} | Change: {formatChangePercent(marketData.changePercent)}
+              TradingView: ${formatPrice(tradingViewData.price)} | Change: {formatChangePercent(tradingViewData.changePercent)}
             </div>
           )}
         </div>

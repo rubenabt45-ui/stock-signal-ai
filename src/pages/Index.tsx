@@ -17,9 +17,14 @@ const Index = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>("1D");
 
   const handleTimeframeSelect = useCallback((timeframe: string) => {
-    console.log(`🎯 Index: Timeframe changed to ${timeframe} for asset ${selectedAsset}`);
+    console.log(`🎯 Index: TradingView timeframe changed to ${timeframe} for asset ${selectedAsset}`);
     setSelectedTimeframe(timeframe as Timeframe);
   }, [selectedAsset]);
+
+  const handleAssetSelect = useCallback((asset: string) => {
+    console.log(`🎯 Index: TradingView asset changed to ${asset}`);
+    setSelectedAsset(asset);
+  }, []);
 
   return (
     <div className="min-h-screen bg-tradeiq-navy">
@@ -31,7 +36,7 @@ const Index = () => {
               <ChartCandlestick className="h-8 w-8 text-tradeiq-blue" />
               <div>
                 <h1 className="text-2xl font-bold text-white tracking-tight">TradeIQ</h1>
-                <p className="text-sm text-gray-400 font-medium">Chart IA</p>
+                <p className="text-sm text-gray-400 font-medium">Chart IA - TradingView Powered</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -43,7 +48,7 @@ const Index = () => {
               </Link>
               <div className="flex items-center space-x-2 text-gray-400">
                 <Brain className="h-5 w-5 text-tradeiq-blue" />
-                <span className="text-sm font-medium hidden sm:block">AI Analysis</span>
+                <span className="text-sm font-medium hidden sm:block">TradingView Analysis</span>
               </div>
             </div>
           </div>
@@ -55,17 +60,17 @@ const Index = () => {
         {/* Asset Selection */}
         <AssetSelection 
           selectedAsset={selectedAsset} 
-          onAssetSelect={setSelectedAsset} 
+          onAssetSelect={handleAssetSelect} 
         />
 
-        {/* Live Chart */}
+        {/* TradingView Live Chart - Single Source of Truth */}
         <LiveChart 
           asset={selectedAsset} 
           timeframe={selectedTimeframe}
-          key={`${selectedAsset}-${selectedTimeframe}`}
+          key={`tradingview-${selectedAsset}-${selectedTimeframe}`}
         />
 
-        {/* Analysis Grid */}
+        {/* TradingView-Powered Analysis Grid */}
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="space-y-6">
             <PatternDetection 

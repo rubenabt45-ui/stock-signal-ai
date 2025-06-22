@@ -1,15 +1,16 @@
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Zap, AlertCircle, Shield, TrendingUp as VolHigh } from "lucide-react";
-import { useGlobalMarketData, formatPrice, formatChangePercent } from "@/hooks/useGlobalMarketData";
+import { useTradingViewData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewData";
 
 interface VolatilityAnalysisProps {
   asset: string;
   timeframe: string;
 }
 
-const calculateVolatilityData = (marketData: any) => {
-  if (!marketData || !marketData.price) {
+const calculateVolatilityData = (tradingViewData: any) => {
+  if (!tradingViewData || !tradingViewData.price) {
     return {
       volatility: 0,
       level: 'Low' as const,
@@ -18,9 +19,9 @@ const calculateVolatilityData = (marketData: any) => {
     };
   }
 
-  const { high, low, price, changePercent } = marketData;
+  const { high, low, price, changePercent } = tradingViewData;
   
-  // Calculate true range volatility
+  // Calculate true range volatility using TradingView data
   const trueRange = high && low ? ((high - low) / price) * 100 : 0;
   const priceVolatility = Math.abs(changePercent || 0);
   
@@ -49,15 +50,15 @@ const calculateVolatilityData = (marketData: any) => {
 };
 
 export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps) => {
-  const marketData = useGlobalMarketData(asset);
-  const { volatility, level, icon: VolIcon, color } = calculateVolatilityData(marketData);
+  const tradingViewData = useTradingViewData(asset);
+  const { volatility, level, icon: VolIcon, color } = calculateVolatilityData(tradingViewData);
 
-  // Unified validation log for price sync checking
-  if (process.env.NODE_ENV === 'development' && marketData.price !== null) {
-    console.log(`⚡ VolatilityAnalysis [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Updated: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
+  // TradingView data sync log
+  if (process.env.NODE_ENV === 'development' && tradingViewData.price !== null) {
+    console.log(`⚡ VolatilityAnalysis [${asset}]: $${formatPrice(tradingViewData.price)} (${formatChangePercent(tradingViewData.changePercent)}) - TradingView sync: ${new Date(tradingViewData.lastUpdated || 0).toLocaleTimeString()}`);
   }
 
-  if (marketData.isLoading) {
+  if (tradingViewData.isLoading) {
     return (
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex items-center space-x-3 mb-6">
@@ -77,6 +78,9 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
       <div className="flex items-center space-x-3 mb-6">
         <Zap className="h-6 w-6 text-tradeiq-warning" />
         <h3 className="text-xl font-bold text-white">Volatility Analysis</h3>
+        <Badge className="bg-tradeiq-blue/20 text-tradeiq-blue border-tradeiq-blue/30 text-xs">
+          TradingView
+        </Badge>
       </div>
 
       <div className="space-y-6">
@@ -112,12 +116,12 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
             </div>
           </div>
           
-          {marketData.high && marketData.low && (
+          {tradingViewData.high && tradingViewData.low && (
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-gray-400 font-medium">Daily Range</span>
                 <span className="text-white font-bold">
-                  ${formatPrice(marketData.low)} - ${formatPrice(marketData.high)}
+                  ${formatPrice(tradingViewData.low)} - ${formatPrice(tradingViewData.high)}
                 </span>
               </div>
             </div>
@@ -145,9 +149,9 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
             {level === 'Medium' && 'Moderate price swings expected. Monitor for potential breakouts.'}
             {level === 'High' && 'Significant price movements likely. Exercise caution with position sizing.'}
           </p>
-          {marketData.price && (
+          {tradingViewData.price && (
             <p className="text-xs text-gray-500 mt-2">
-              Current: ${formatPrice(marketData.price)} ({formatChangePercent(marketData.changePercent)})
+              TradingView: ${formatPrice(tradingViewData.price)} ({formatChangePercent(tradingViewData.changePercent)})
             </p>
           )}
         </div>

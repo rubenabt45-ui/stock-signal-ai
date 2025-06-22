@@ -1,6 +1,6 @@
 
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { useGlobalMarketData, formatPrice, formatChangePercent } from "@/hooks/useGlobalMarketData";
+import { useTradingViewData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewData";
 import { Badge } from "@/components/ui/badge";
 
 interface LivePriceDisplayProps {
@@ -16,11 +16,11 @@ export const LivePriceDisplay = ({
   size = 'lg',
   className = ''
 }: LivePriceDisplayProps) => {
-  const { price, changePercent, isLoading, error, lastUpdated } = useGlobalMarketData(symbol);
+  const { price, changePercent, isLoading, error, lastUpdated } = useTradingViewData(symbol);
 
-  // Unified validation log for price sync checking
+  // TradingView data sync log
   if (process.env.NODE_ENV === 'development' && price !== null) {
-    console.log(`💰 LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - Updated: ${new Date(lastUpdated || 0).toLocaleTimeString()}`);
+    console.log(`💰 LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - TradingView sync: ${new Date(lastUpdated || 0).toLocaleTimeString()}`);
   }
 
   const getSizeClasses = () => {
@@ -96,7 +96,7 @@ export const LivePriceDisplay = ({
         <div className="flex items-center space-x-2">
           <span className={sizeClasses.symbol}>{symbol}</span>
           <Badge className="bg-tradeiq-blue/20 text-tradeiq-blue border-tradeiq-blue/30 text-xs">
-            LIVE
+            TradingView
           </Badge>
         </div>
       )}
@@ -125,7 +125,7 @@ export const LivePriceDisplay = ({
       
       {lastUpdated && (
         <div className={`${sizeClasses.time} text-gray-500 flex items-center space-x-1`}>
-          <span>Last update: {new Date(lastUpdated).toLocaleTimeString()}</span>
+          <span>TradingView sync: {new Date(lastUpdated).toLocaleTimeString()}</span>
         </div>
       )}
     </div>
