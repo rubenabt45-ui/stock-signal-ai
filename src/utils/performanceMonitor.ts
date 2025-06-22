@@ -1,4 +1,6 @@
+
 // Performance monitoring utilities for debugging and optimization
+import React from 'react';
 
 interface PerformanceMetrics {
   componentName: string;
