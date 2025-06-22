@@ -76,9 +76,9 @@ interface MarketDataContextType {
 
 const MarketDataContext = createContext<MarketDataContextType | undefined>(undefined);
 
-// Global update interval - matches TradingView's typical refresh rate
-const UPDATE_INTERVAL = 15000; // 15 seconds
-const CACHE_DURATION = 30000; // 30 seconds
+// Single global update interval
+const UPDATE_INTERVAL = 10000; // 10 seconds for better responsiveness
+const CACHE_DURATION = 15000; // 15 seconds cache
 
 export const MarketDataProvider = ({ children }: { children: React.ReactNode }) => {
   const [marketData, dispatch] = useReducer(marketDataReducer, initialState);
@@ -87,35 +87,10 @@ export const MarketDataProvider = ({ children }: { children: React.ReactNode }) 
   const lastFetchTimes = useRef<{ [symbol: string]: number }>({});
 
   const fetchMarketDataForSymbol = async (symbol: string): Promise<any> => {
-    console.log(`🔄 Fetching TradingView-aligned data for ${symbol}`);
+    console.log(`🔄 Unified MarketData: Fetching ${symbol}`);
     
     try {
-      // Primary: Try Finnhub (known to align well with TradingView)
-      try {
-        const response = await fetch(
-          `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=demo`
-        );
-        const data = await response.json();
-        
-        if (data.c && data.c > 0) { // c = current price
-          const marketData = {
-            symbol,
-            price: data.c,
-            change: data.d, // d = change
-            changePercent: data.dp, // dp = percent change
-            open: data.o, // o = open
-            high: data.h, // h = high
-            low: data.l, // l = low
-            volume: null, // Finnhub doesn't provide volume in quote endpoint
-          };
-          console.log(`✅ Finnhub data for ${symbol}:`, marketData);
-          return marketData;
-        }
-      } catch (error) {
-        console.warn(`⚠️ Finnhub failed for ${symbol}:`, error);
-      }
-
-      // Secondary: Try Twelve Data
+      // Primary: Try Twelve Data (most TradingView-aligned)
       try {
         const response = await fetch(
           `https://api.twelvedata.com/quote?symbol=${symbol}&apikey=demo`
@@ -131,17 +106,17 @@ export const MarketDataProvider = ({ children }: { children: React.ReactNode }) 
             open: parseFloat(data.open),
             high: parseFloat(data.high),
             low: parseFloat(data.low),
-            volume: parseInt(data.volume),
+            volume: parseInt(data.volume) || null,
           };
-          console.log(`✅ Twelve Data for ${symbol}:`, marketData);
+          console.log(`✅ Unified MarketData [${symbol}]: $${marketData.price.toFixed(2)} (${marketData.changePercent.toFixed(2)}%)`);
           return marketData;
         }
       } catch (error) {
         console.warn(`⚠️ Twelve Data failed for ${symbol}:`, error);
       }
 
-      // Fallback: Enhanced simulation aligned with TradingView patterns
-      console.log(`🎲 Using TradingView-aligned simulation for ${symbol}`);
+      // Fallback: Enhanced TradingView-aligned simulation
+      console.log(`🎲 Unified MarketData: Using simulation for ${symbol}`);
       return generateTradingViewAlignedData(symbol);
 
     } catch (error) {
@@ -150,13 +125,13 @@ export const MarketDataProvider = ({ children }: { children: React.ReactNode }) 
     }
   };
 
-  const fetchMarketData = async (symbol: string) => {
+  const fetchMarketData = async (symbol: string, forceRefresh = false) => {
     const now = Date.now();
     const lastFetch = lastFetchTimes.current[symbol] || 0;
     
-    // Skip if recently fetched (within cache duration)
-    if (now - lastFetch < CACHE_DURATION) {
-      console.log(`📋 Using cached data for ${symbol}`);
+    // Skip if recently fetched and not forced
+    if (!forceRefresh && now - lastFetch < CACHE_DURATION) {
+      console.log(`📋 Unified MarketData: Using cached data for ${symbol}`);
       return;
     }
 
@@ -166,39 +141,41 @@ export const MarketDataProvider = ({ children }: { children: React.ReactNode }) 
       const data = await fetchMarketDataForSymbol(symbol);
       dispatch({ type: 'SET_DATA', symbol, data });
       lastFetchTimes.current[symbol] = now;
+      console.log(`💾 Unified MarketData: Cached fresh data for ${symbol}`);
     } catch (error) {
       dispatch({ type: 'SET_ERROR', symbol, error: error instanceof Error ? error.message : 'Unknown error' });
     }
   };
 
   const subscribeToSymbol = (symbol: string) => {
+    const wasEmpty = subscribedSymbols.current.size === 0;
     subscribedSymbols.current.add(symbol);
-    console.log(`📡 Subscribed to ${symbol}. Active subscriptions:`, Array.from(subscribedSymbols.current));
+    console.log(`📡 Unified MarketData: Subscribed to ${symbol}. Active:`, Array.from(subscribedSymbols.current));
     
-    // Fetch immediately
-    fetchMarketData(symbol);
+    // Fetch immediately with force refresh to ensure fresh data
+    fetchMarketData(symbol, true);
     
     // Start global interval if not already running
-    if (!intervalRef.current && subscribedSymbols.current.size > 0) {
+    if (wasEmpty && !intervalRef.current) {
       intervalRef.current = setInterval(() => {
-        console.log(`⏰ Global market data update - ${subscribedSymbols.current.size} symbols`);
+        console.log(`⏰ Unified MarketData: Global update - ${subscribedSymbols.current.size} symbols`);
         Array.from(subscribedSymbols.current).forEach(sym => {
           fetchMarketData(sym);
         });
       }, UPDATE_INTERVAL);
-      console.log(`⏰ Started global market data polling (${UPDATE_INTERVAL}ms interval)`);
+      console.log(`⏰ Unified MarketData: Started polling (${UPDATE_INTERVAL}ms interval)`);
     }
   };
 
   const unsubscribeFromSymbol = (symbol: string) => {
     subscribedSymbols.current.delete(symbol);
-    console.log(`📡 Unsubscribed from ${symbol}. Active subscriptions:`, Array.from(subscribedSymbols.current));
+    console.log(`📡 Unified MarketData: Unsubscribed from ${symbol}. Active:`, Array.from(subscribedSymbols.current));
     
     // Stop global interval if no active subscriptions
     if (subscribedSymbols.current.size === 0 && intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = undefined;
-      console.log(`🛑 Stopped global market data polling`);
+      console.log(`🛑 Unified MarketData: Stopped polling`);
     }
   };
 
@@ -231,9 +208,8 @@ export const useMarketDataContext = () => {
   return context;
 };
 
-// Enhanced data generation that mimics TradingView patterns with higher accuracy
+// Enhanced TradingView-aligned data generation
 const generateTradingViewAlignedData = (symbol: string) => {
-  // TradingView-aligned base prices (closer to real market values)
   const basePrices: Record<string, number> = {
     'AAPL': 175.43,
     'MSFT': 384.52,
@@ -247,16 +223,14 @@ const generateTradingViewAlignedData = (symbol: string) => {
     'INTC': 43.25,
   };
 
-  // Market hours consideration for realistic volatility
   const now = new Date();
   const hour = now.getHours();
-  const isMarketHours = hour >= 9 && hour <= 16; // 9:30 AM - 4:00 PM EST
-  const volatilityMultiplier = isMarketHours ? 1.0 : 0.2;
+  const isMarketHours = hour >= 9 && hour <= 16;
+  const volatilityMultiplier = isMarketHours ? 1.0 : 0.3;
 
   const basePrice = basePrices[symbol] || (50 + Math.random() * 300);
-  const dailyVolatility = (0.008 + Math.random() * 0.015) * volatilityMultiplier; // Reduced volatility for realism
+  const dailyVolatility = (0.005 + Math.random() * 0.015) * volatilityMultiplier;
   
-  // Generate realistic OHLC with proper relationships
   const openVariation = (Math.random() - 0.5) * dailyVolatility;
   const open = basePrice * (1 + openVariation);
   
@@ -266,11 +240,9 @@ const generateTradingViewAlignedData = (symbol: string) => {
   const high = Math.max(open, basePrice * (1 + highVariation));
   const low = Math.min(open, basePrice * (1 + lowVariation));
   
-  // Current price within the day's range with bias toward recent direction
-  const pricePosition = 0.3 + Math.random() * 0.4; // 30-70% of range
+  const pricePosition = 0.3 + Math.random() * 0.4;
   const currentPrice = low + (high - low) * pricePosition;
   
-  // Calculate change from open (TradingView standard)
   const change = currentPrice - open;
   const changePercent = (change / open) * 100;
 
@@ -282,6 +254,6 @@ const generateTradingViewAlignedData = (symbol: string) => {
     open: Number(open.toFixed(2)),
     high: Number(high.toFixed(2)),
     low: Number(low.toFixed(2)),
-    volume: Math.floor(1000000 + Math.random() * 5000000),
+    volume: Math.floor(2000000 + Math.random() * 8000000),
   };
 };

@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Minus, Activity } from "lucide-react";
@@ -43,9 +44,9 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
   const marketData = useGlobalMarketData(asset);
   const { trend, strength, momentum } = generateTrendData(marketData);
 
-  // Console log for sync validation
-  if (process.env.NODE_ENV === 'development' && marketData.price) {
-    console.log(`📈 TrendAnalysis [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)})`);
+  // Unified validation log for price sync checking
+  if (process.env.NODE_ENV === 'development' && marketData.price !== null) {
+    console.log(`📈 TrendAnalysis [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Updated: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
   }
 
   const getTrendIcon = () => {

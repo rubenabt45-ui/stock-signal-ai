@@ -1,3 +1,4 @@
+
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useGlobalMarketData, formatPrice, formatChangePercent } from "@/hooks/useGlobalMarketData";
 import { Badge } from "@/components/ui/badge";
@@ -17,9 +18,9 @@ export const LivePriceDisplay = ({
 }: LivePriceDisplayProps) => {
   const { price, changePercent, isLoading, error, lastUpdated } = useGlobalMarketData(symbol);
 
-  // Console log for sync validation (can be removed in production)
-  if (process.env.NODE_ENV === 'development' && price) {
-    console.log(`💰 LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)})`);
+  // Unified validation log for price sync checking
+  if (process.env.NODE_ENV === 'development' && price !== null) {
+    console.log(`💰 LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - Updated: ${new Date(lastUpdated || 0).toLocaleTimeString()}`);
   }
 
   const getSizeClasses = () => {
@@ -79,7 +80,7 @@ export const LivePriceDisplay = ({
     );
   }
 
-  if (isLoading || !price) {
+  if (isLoading || price === null) {
     return (
       <div className={`${sizeClasses.container} ${className} animate-pulse`}>
         {showSymbol && <div className="h-6 bg-gray-700/50 rounded w-16"></div>}

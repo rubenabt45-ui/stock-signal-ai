@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Target, CheckCircle, AlertTriangle } from "lucide-react";
@@ -45,9 +46,9 @@ const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) 
     return generatePatterns(marketData);
   }, [marketData.price, marketData.changePercent, marketData.high, marketData.low, marketData.volume]);
 
-  // Console log for sync validation (only when price actually changes)
-  if (process.env.NODE_ENV === 'development' && marketData.price) {
-    console.log(`📊 PatternDetection [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)})`);
+  // Unified validation log for price sync checking
+  if (process.env.NODE_ENV === 'development' && marketData.price !== null) {
+    console.log(`📊 PatternDetection [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Updated: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
   }
 
   if (marketData.isLoading) {

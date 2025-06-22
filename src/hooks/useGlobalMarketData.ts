@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useMarketDataContext } from '@/contexts/MarketDataContext';
 
@@ -21,9 +22,11 @@ export const useGlobalMarketData = (symbol: string): GlobalMarketData => {
   useEffect(() => {
     if (!symbol) return;
 
+    console.log(`🔗 useGlobalMarketData: Subscribing to ${symbol}`);
     subscribeToSymbol(symbol);
 
     return () => {
+      console.log(`🔗 useGlobalMarketData: Unsubscribing from ${symbol}`);
       unsubscribeFromSymbol(symbol);
     };
   }, [symbol, subscribeToSymbol, unsubscribeFromSymbol]);
@@ -61,7 +64,6 @@ export const useGlobalMarketData = (symbol: string): GlobalMarketData => {
 export const formatPrice = (price: number | null): string => {
   if (price === null || price === undefined) return '--';
   
-  // TradingView-style formatting with 2 decimal places and thousands separators
   return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,

@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Zap, AlertCircle, Shield, TrendingUp as VolHigh } from "lucide-react";
@@ -52,9 +53,9 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
   const marketData = useGlobalMarketData(asset);
   const { volatility, level, icon: VolIcon, color } = calculateVolatilityData(marketData);
 
-  // Console log for sync validation
-  if (process.env.NODE_ENV === 'development' && marketData.price) {
-    console.log(`⚡ VolatilityAnalysis [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)})`);
+  // Unified validation log for price sync checking
+  if (process.env.NODE_ENV === 'development' && marketData.price !== null) {
+    console.log(`⚡ VolatilityAnalysis [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Updated: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
   }
 
   if (marketData.isLoading) {
@@ -87,7 +88,9 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
             level === 'Medium' ? 'bg-tradeiq-warning/10 border border-tradeiq-warning/30' :
             'bg-tradeiq-danger/10 border border-tradeiq-danger/30'
           }`}>
-            <VolIcon className={`h-8 w-8 ${color}`} />
+            <Vol
+
+onIcon className={`h-8 w-8 ${color}`} />
             <span className={`text-2xl font-bold ${color}`}>
               {level}
             </span>
