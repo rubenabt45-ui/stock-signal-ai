@@ -9,7 +9,6 @@ import { TrendAnalysis } from "@/components/TrendAnalysis";
 import { VolatilityAnalysis } from "@/components/VolatilityAnalysis";
 import { AISuggestions } from "@/components/AISuggestions";
 import { MarketOverview } from "@/components/MarketOverview";
-import { LivePriceDisplay } from "@/components/LivePriceDisplay";
 import { ChartCandlestick, Brain, Star, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,7 +80,7 @@ const Index = () => {
           onAssetSelect={setSelectedAsset} 
         />
 
-        {/* Timeframe Selector */}
+        {/* Timeframe Selector - Only for main chart */}
         <TimeframeSelector 
           selectedTimeframe={selectedTimeframe} 
           onTimeframeSelect={handleTimeframeSelect} 
@@ -94,18 +93,21 @@ const Index = () => {
           key={`${selectedAsset}-${selectedTimeframe}`}
         />
 
-        {/* Market Overview Section */}
+        {/* Optimized Market Overview Section - No timeframe selector */}
         <Card className="tradeiq-card">
           <CardHeader className="pb-4">
             <CardTitle className="text-white text-lg flex items-center space-x-2">
               <BarChart3 className="h-5 w-5 text-tradeiq-blue" />
               <span>📈 Related Market Overview</span>
+              <span className="text-xs text-gray-400 font-normal">
+                (Performance Optimized)
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <MarketOverview 
               symbols={getRelatedSymbols(selectedAsset)}
-              height={450}
+              height={400}
               className="w-full"
               key={`market-overview-${selectedAsset}`}
             />

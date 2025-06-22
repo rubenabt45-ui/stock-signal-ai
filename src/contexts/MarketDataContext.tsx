@@ -76,10 +76,10 @@ interface MarketDataContextType {
 
 const MarketDataContext = createContext<MarketDataContextType | undefined>(undefined);
 
-// Optimized intervals for better performance
-const UPDATE_INTERVAL = 15000; // 15 seconds for better performance
-const CACHE_DURATION = 20000; // 20 seconds cache
-const THROTTLE_DELAY = 2000; // 2 seconds throttle for rapid calls
+// Ultra-optimized intervals for smooth performance
+const UPDATE_INTERVAL = 15000; // 15 seconds as requested
+const CACHE_DURATION = 30000; // 30 seconds cache
+const THROTTLE_DELAY = 5000; // 5 seconds throttle for rapid calls
 
 export const MarketDataProvider = ({ children }: { children: React.ReactNode }) => {
   const [marketData, dispatch] = useReducer(marketDataReducer, initialState);
@@ -88,14 +88,12 @@ export const MarketDataProvider = ({ children }: { children: React.ReactNode }) 
   const lastFetchTimes = useRef<{ [symbol: string]: number }>({});
   const throttleTimers = useRef<{ [symbol: string]: NodeJS.Timeout }>({});
 
-  // Throttled fetch function to prevent excessive API calls
+  // Ultra-aggressive throttling to prevent excessive API calls
   const throttledFetch = useCallback((symbol: string, fetchFn: () => Promise<void>) => {
-    // Clear existing throttle timer
     if (throttleTimers.current[symbol]) {
       clearTimeout(throttleTimers.current[symbol]);
     }
 
-    // Set new throttle timer
     throttleTimers.current[symbol] = setTimeout(() => {
       fetchFn();
       delete throttleTimers.current[symbol];
@@ -103,30 +101,23 @@ export const MarketDataProvider = ({ children }: { children: React.ReactNode }) 
   }, []);
 
   const fetchMarketDataForSymbol = async (symbol: string): Promise<any> => {
-    console.log(`🔄 Optimized MarketData: Fetching ${symbol}`);
+    console.log(`🚀 Ultra-optimized MarketData: Fetching ${symbol}`);
     
-    try {
-      // Enhanced TradingView-aligned simulation for better performance
-      console.log(`🎲 Optimized MarketData: Using high-performance simulation for ${symbol}`);
-      return generateOptimizedMarketData(symbol);
-
-    } catch (error) {
-      console.error(`❌ Error in optimized fetch for ${symbol}:`, error);
-      return generateOptimizedMarketData(symbol);
-    }
+    // Use only simulation for maximum performance (no external API calls)
+    return generateUltraOptimizedMarketData(symbol);
   };
 
   const fetchMarketData = useCallback(async (symbol: string, forceRefresh = false) => {
     const now = Date.now();
     const lastFetch = lastFetchTimes.current[symbol] || 0;
     
-    // Skip if recently fetched and not forced
+    // Aggressive caching - skip if recently fetched
     if (!forceRefresh && now - lastFetch < CACHE_DURATION) {
-      console.log(`📋 Optimized MarketData: Using cached data for ${symbol}`);
+      console.log(`⚡ Ultra-optimized: Using cached data for ${symbol}`);
       return;
     }
 
-    // Use throttling for non-forced requests
+    // Use throttling for all non-forced requests
     if (!forceRefresh) {
       throttledFetch(symbol, async () => {
         dispatch({ type: 'SET_LOADING', symbol });
@@ -135,20 +126,20 @@ export const MarketDataProvider = ({ children }: { children: React.ReactNode }) 
           const data = await fetchMarketDataForSymbol(symbol);
           dispatch({ type: 'SET_DATA', symbol, data });
           lastFetchTimes.current[symbol] = Date.now();
-          console.log(`💾 Optimized MarketData: Cached data for ${symbol}`);
+          console.log(`⚡ Ultra-optimized: Cached data for ${symbol}`);
         } catch (error) {
           dispatch({ type: 'SET_ERROR', symbol, error: error instanceof Error ? error.message : 'Unknown error' });
         }
       });
     } else {
-      // Immediate fetch for forced requests
+      // Immediate fetch for forced requests only
       dispatch({ type: 'SET_LOADING', symbol });
       
       try {
         const data = await fetchMarketDataForSymbol(symbol);
         dispatch({ type: 'SET_DATA', symbol, data });
         lastFetchTimes.current[symbol] = now;
-        console.log(`💾 Optimized MarketData: Force-cached data for ${symbol}`);
+        console.log(`⚡ Ultra-optimized: Force-cached data for ${symbol}`);
       } catch (error) {
         dispatch({ type: 'SET_ERROR', symbol, error: error instanceof Error ? error.message : 'Unknown error' });
       }
@@ -158,59 +149,57 @@ export const MarketDataProvider = ({ children }: { children: React.ReactNode }) 
   const subscribeToSymbol = useCallback((symbol: string) => {
     const wasEmpty = subscribedSymbols.current.size === 0;
     subscribedSymbols.current.add(symbol);
-    console.log(`📡 Optimized MarketData: Subscribed to ${symbol}. Active:`, Array.from(subscribedSymbols.current));
+    console.log(`⚡ Ultra-optimized: Subscribed to ${symbol}. Active:`, Array.from(subscribedSymbols.current));
     
-    // Fetch immediately with force refresh for new subscriptions
+    // Fetch immediately for new subscriptions
     fetchMarketData(symbol, true);
     
-    // Start global interval if not already running
+    // Start ultra-efficient global interval
     if (wasEmpty && !intervalRef.current) {
       intervalRef.current = setInterval(() => {
         const activeSymbols = Array.from(subscribedSymbols.current);
-        console.log(`⏰ Optimized MarketData: Batch update - ${activeSymbols.length} symbols`);
+        console.log(`⏰ Ultra-optimized: Batch update - ${activeSymbols.length} symbols (15s interval)`);
         
-        // Batch update all symbols
+        // Batch update with aggressive throttling
         activeSymbols.forEach(sym => {
-          fetchMarketData(sym, false); // Use throttling for interval updates
+          fetchMarketData(sym, false);
         });
       }, UPDATE_INTERVAL);
-      console.log(`⏰ Optimized MarketData: Started efficient polling (${UPDATE_INTERVAL}ms interval)`);
+      console.log(`⏰ Ultra-optimized: Started 15-second polling for smooth performance`);
     }
   }, [fetchMarketData]);
 
   const unsubscribeFromSymbol = useCallback((symbol: string) => {
     subscribedSymbols.current.delete(symbol);
-    console.log(`📡 Optimized MarketData: Unsubscribed from ${symbol}. Active:`, Array.from(subscribedSymbols.current));
+    console.log(`⚡ Ultra-optimized: Unsubscribed from ${symbol}. Active:`, Array.from(subscribedSymbols.current));
     
-    // Clear any pending throttle timers for this symbol
+    // Clear throttle timers
     if (throttleTimers.current[symbol]) {
       clearTimeout(throttleTimers.current[symbol]);
       delete throttleTimers.current[symbol];
     }
     
-    // Stop global interval if no active subscriptions
+    // Stop polling if no active subscriptions
     if (subscribedSymbols.current.size === 0 && intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = undefined;
-      console.log(`🛑 Optimized MarketData: Stopped polling - no active subscriptions`);
+      console.log(`🛑 Ultra-optimized: Stopped polling - no active subscriptions`);
     }
   }, []);
 
-  // Comprehensive cleanup on unmount
+  // Comprehensive cleanup
   useEffect(() => {
     return () => {
-      // Clear main interval
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
       
-      // Clear all throttle timers
       Object.values(throttleTimers.current).forEach(timer => {
         clearTimeout(timer);
       });
       throttleTimers.current = {};
       
-      console.log('🧹 Optimized MarketData: Comprehensive cleanup completed');
+      console.log('🧹 Ultra-optimized: Complete cleanup');
     };
   }, []);
 
@@ -234,8 +223,8 @@ export const useMarketDataContext = () => {
   return context;
 };
 
-// Optimized data generation with reduced CPU overhead
-const generateOptimizedMarketData = (symbol: string) => {
+// Ultra-optimized data generation with minimal CPU overhead
+const generateUltraOptimizedMarketData = (symbol: string) => {
   const basePrices: Record<string, number> = {
     'AAPL': 175.43,
     'MSFT': 384.52,
@@ -249,18 +238,13 @@ const generateOptimizedMarketData = (symbol: string) => {
     'INTC': 43.25,
   };
 
-  // Simplified calculation for better performance
+  // Minimal calculations for maximum performance
   const basePrice = basePrices[symbol] || (50 + Math.random() * 300);
-  const volatility = 0.01 + Math.random() * 0.02; // 1-3% daily range
+  const volatility = 0.008; // Fixed low volatility for stability
   
-  const openVariation = (Math.random() - 0.5) * volatility;
-  const open = basePrice * (1 + openVariation);
-  
-  const range = basePrice * volatility;
-  const high = Math.max(open, basePrice + range * Math.random());
-  const low = Math.min(open, basePrice - range * Math.random());
-  
-  const currentPrice = low + Math.random() * (high - low);
+  const variation = (Math.random() - 0.5) * volatility;
+  const currentPrice = basePrice * (1 + variation);
+  const open = basePrice * (1 + (Math.random() - 0.5) * volatility * 0.5);
   const change = currentPrice - open;
   const changePercent = (change / open) * 100;
 
@@ -270,8 +254,8 @@ const generateOptimizedMarketData = (symbol: string) => {
     change: Number(change.toFixed(2)),
     changePercent: Number(changePercent.toFixed(2)),
     open: Number(open.toFixed(2)),
-    high: Number(high.toFixed(2)),
-    low: Number(low.toFixed(2)),
-    volume: Math.floor(1000000 + Math.random() * 5000000),
+    high: Number((Math.max(currentPrice, open) * 1.005).toFixed(2)),
+    low: Number((Math.min(currentPrice, open) * 0.995).toFixed(2)),
+    volume: Math.floor(1000000 + Math.random() * 2000000),
   };
 };
