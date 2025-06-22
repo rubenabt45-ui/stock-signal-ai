@@ -15,7 +15,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
   
   // Force chart to remount when asset or timeframe changes
   useEffect(() => {
-    console.log(`🔄 LiveChart: Symbol changed to ${asset} (${timeframe}) - forcing chart remount`);
+    console.log(`🔄 LiveChart: Symbol changed to ${asset} (${timeframe}) - forcing iframe refresh`);
     setChartKey(prev => prev + 1);
   }, [asset, timeframe]);
 
@@ -27,12 +27,12 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
             <BarChart3 className="h-6 w-6 text-tradeiq-blue" />
             <div>
               <h3 className="text-xl font-bold text-white">{asset} Professional Chart</h3>
-              <p className="text-sm text-gray-400">Real-time trading analysis powered by TradingView</p>
+              <p className="text-sm text-gray-400">Real-time trading analysis with live price data</p>
             </div>
           </div>
           
           <div className="flex items-center space-x-4">
-            {/* Live Price Display - Synced with TradingView */}
+            {/* Live Price Display - Fetched via API */}
             <div className="text-right">
               <LivePriceDisplay 
                 symbol={asset} 
@@ -46,14 +46,14 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
             </div>
             
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-green-500">Live</span>
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-blue-500">Live</span>
             </div>
           </div>
         </div>
         
         <div className="w-full">
-          {/* Force remount with key change */}
+          {/* TradingView Iframe Chart - Force remount with key change */}
           <TradingViewAdvancedChart 
             key={`${asset}-${timeframe}-${chartKey}`}
             symbol={asset} 

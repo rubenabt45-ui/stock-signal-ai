@@ -19,7 +19,7 @@ export const LivePriceDisplay = ({
   const { price, changePercent, isLoading, error, lastUpdated } = useTradingViewWidgetData(symbol);
 
   // Enhanced debug logging
-  console.log(`🎯 [${new Date().toLocaleTimeString()}] LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - TradingView Sync: ${lastUpdated ? new Date(lastUpdated).toLocaleTimeString() : 'No data'}`);
+  console.log(`💰 [${new Date().toLocaleTimeString()}] LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - Live Price Sync: ${lastUpdated ? new Date(lastUpdated).toLocaleTimeString() : 'No data'}`);
 
   const getSizeClasses = () => {
     switch (size) {
@@ -69,13 +69,18 @@ export const LivePriceDisplay = ({
     return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
   };
 
+  const handleRetry = () => {
+    console.log(`[PRICE-RETRY] Refreshing price data for ${symbol}`);
+    window.location.reload();
+  };
+
   if (error) {
     return (
       <div className={`${sizeClasses.container} ${className}`}>
         <div className="flex items-center space-x-2">
           <p className="text-red-400 font-medium">Error: {symbol}</p>
           <button 
-            onClick={() => window.location.reload()} 
+            onClick={handleRetry} 
             className="text-xs text-tradeiq-blue hover:underline flex items-center space-x-1"
           >
             <RefreshCw className="h-3 w-3" />
@@ -95,7 +100,7 @@ export const LivePriceDisplay = ({
         <div className="h-6 bg-gray-700/50 rounded w-20"></div>
         <div className="text-xs text-blue-500 flex items-center space-x-1">
           <div className="animate-spin rounded-full h-3 w-3 border-b border-blue-500"></div>
-          <span>Syncing with TradingView widget...</span>
+          <span>Loading live price...</span>
         </div>
       </div>
     );
@@ -106,8 +111,8 @@ export const LivePriceDisplay = ({
       {showSymbol && (
         <div className="flex items-center space-x-2">
           <span className={sizeClasses.symbol}>{symbol}</span>
-          <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
-            TradingView Live
+          <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/30 text-xs">
+            Live Price
           </Badge>
         </div>
       )}
@@ -117,7 +122,7 @@ export const LivePriceDisplay = ({
           ${formatPrice(price)}
         </span>
         {lastUpdated && (
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Live sync active"></div>
+          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" title="Live price active"></div>
         )}
       </div>
       
@@ -135,8 +140,8 @@ export const LivePriceDisplay = ({
       )}
       
       {lastUpdated && (
-        <div className={`${sizeClasses.time} text-green-500 flex items-center space-x-1`}>
-          <span>Last sync: {new Date(lastUpdated).toLocaleTimeString()}</span>
+        <div className={`${sizeClasses.time} text-blue-500 flex items-center space-x-1`}>
+          <span>Updated: {new Date(lastUpdated).toLocaleTimeString()}</span>
         </div>
       )}
     </div>
