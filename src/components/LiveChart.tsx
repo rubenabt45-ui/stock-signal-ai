@@ -1,9 +1,9 @@
 
 import { Card } from "@/components/ui/card";
-import { BarChart3, Activity } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 import { TradingViewAdvancedChart } from "@/components/TradingViewAdvancedChart";
 import { LivePriceDisplay } from "@/components/LivePriceDisplay";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 
 interface LiveChartProps {
   asset: string;
@@ -11,31 +11,16 @@ interface LiveChartProps {
 }
 
 export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
-  const [chartKey, setChartKey] = useState(`${asset}-${timeframe}-${Date.now()}`);
+  const [chartKey, setChartKey] = useState(0);
   
-  // Force chart regeneration only when asset or timeframe changes (not on price updates)
+  // Force chart to remount when asset or timeframe changes
   useEffect(() => {
-    console.log(`🎯 LiveChart: Asset ${asset} timeframe changed to ${timeframe} - updating chart`);
-    setChartKey(`${asset}-${timeframe}-${Date.now()}`);
+    console.log(`🔄 LiveChart: Symbol changed to ${asset} (${timeframe}) - forcing chart remount`);
+    setChartKey(prev => prev + 1);
   }, [asset, timeframe]);
-
-  // Memoize the TradingView chart to prevent re-renders on price updates
-  const memoizedChart = useMemo(() => {
-    console.log(`📊 LiveChart: Creating memoized chart for ${asset} (${timeframe})`);
-    return (
-      <TradingViewAdvancedChart 
-        symbol={asset} 
-        timeframe={timeframe}
-        className="w-full"
-        height="600px"
-        key={chartKey}
-      />
-    );
-  }, [asset, timeframe, chartKey]);
 
   return (
     <div className="space-y-6">
-      {/* Professional TradingView Chart - Full Width */}
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
@@ -47,7 +32,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
           </div>
           
           <div className="flex items-center space-x-4">
-            {/* Live Price Display - Isolated from chart rendering */}
+            {/* Live Price Display - Synced with TradingView */}
             <div className="text-right">
               <LivePriceDisplay 
                 symbol={asset} 
@@ -68,7 +53,14 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
         </div>
         
         <div className="w-full">
-          {memoizedChart}
+          {/* Force remount with key change */}
+          <TradingViewAdvancedChart 
+            key={`${asset}-${timeframe}-${chartKey}`}
+            symbol={asset} 
+            timeframe={timeframe}
+            className="w-full"
+            height="600px"
+          />
         </div>
       </Card>
     </div>

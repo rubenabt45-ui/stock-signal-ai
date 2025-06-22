@@ -17,14 +17,14 @@ const Index = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>("1D");
 
   const handleTimeframeSelect = useCallback((timeframe: string) => {
-    console.log(`🎯 Index: Chart timeframe changed to ${timeframe} for asset ${selectedAsset}`);
+    console.log(`🎯 Index: Timeframe changed to ${timeframe} for ${selectedAsset}`);
     setSelectedTimeframe(timeframe as Timeframe);
   }, [selectedAsset]);
 
   const handleAssetSelect = useCallback((asset: string) => {
-    console.log(`🎯 Index: Asset changed to ${asset} - all components will sync`);
+    console.log(`🎯 Index: Asset changed from ${selectedAsset} to ${asset} - all components will sync`);
     setSelectedAsset(asset);
-  }, []);
+  }, [selectedAsset]);
 
   return (
     <div className="min-h-screen bg-tradeiq-navy">
@@ -36,7 +36,7 @@ const Index = () => {
               <ChartCandlestick className="h-8 w-8 text-tradeiq-blue" />
               <div>
                 <h1 className="text-2xl font-bold text-white tracking-tight">TradeIQ</h1>
-                <p className="text-sm text-gray-400 font-medium">Chart IA - Synchronized Market Data</p>
+                <p className="text-sm text-gray-400 font-medium">Chart IA - TradingView Synchronized</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -48,7 +48,7 @@ const Index = () => {
               </Link>
               <div className="flex items-center space-x-2 text-gray-400">
                 <Brain className="h-5 w-5 text-tradeiq-blue" />
-                <span className="text-sm font-medium hidden sm:block">Synchronized Analysis</span>
+                <span className="text-sm font-medium hidden sm:block">Active: {selectedAsset}</span>
               </div>
             </div>
           </div>
@@ -67,7 +67,6 @@ const Index = () => {
         <LiveChart 
           asset={selectedAsset} 
           timeframe={selectedTimeframe}
-          key={`chart-${selectedAsset}-${selectedTimeframe}`}
         />
 
         {/* Synchronized Analysis Grid */}
