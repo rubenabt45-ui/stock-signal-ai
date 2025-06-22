@@ -80,7 +80,7 @@ const TradingViewAdvancedChartComponent = ({
     script.onerror = () => {
       setIsLoading(false);
       setError('Failed to load TradingView script');
-      console.error(`❌ [${new Date().toLocaleTimeTime()}] Failed to load TradingView script`);
+      console.error(`❌ [${new Date().toLocaleTimeString()}] Failed to load TradingView script`);
     };
     
     document.head.appendChild(script);
