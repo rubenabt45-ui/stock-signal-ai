@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Zap, AlertCircle, Shield, TrendingUp as VolHigh } from "lucide-react";
@@ -88,9 +87,7 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
             level === 'Medium' ? 'bg-tradeiq-warning/10 border border-tradeiq-warning/30' :
             'bg-tradeiq-danger/10 border border-tradeiq-danger/30'
           }`}>
-            <Vol
-
-onIcon className={`h-8 w-8 ${color}`} />
+            <VolIcon className={`h-8 w-8 ${color}`} />
             <span className={`text-2xl font-bold ${color}`}>
               {level}
             </span>
