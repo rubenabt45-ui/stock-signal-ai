@@ -1,8 +1,7 @@
-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Target, CheckCircle, AlertTriangle } from "lucide-react";
-import { useSyncedMarketData, formatPrice, formatChangePercent } from "@/hooks/useSyncedMarketData";
+import { useGlobalMarketData, formatPrice, formatChangePercent } from "@/hooks/useGlobalMarketData";
 
 interface PatternDetectionProps {
   asset: string;
@@ -38,8 +37,13 @@ const generatePatterns = (marketData: any) => {
 };
 
 export const PatternDetection = ({ asset, timeframe }: PatternDetectionProps) => {
-  const marketData = useSyncedMarketData(asset);
+  const marketData = useGlobalMarketData(asset);
   const detectedPatterns = generatePatterns(marketData);
+
+  // Console log for sync validation
+  if (process.env.NODE_ENV === 'development' && marketData.price) {
+    console.log(`📊 PatternDetection [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)})`);
+  }
 
   if (marketData.isLoading) {
     return (

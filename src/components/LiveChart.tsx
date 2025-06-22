@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { BarChart3, Activity } from "lucide-react";
 import { TradingViewAdvancedChart } from "@/components/TradingViewAdvancedChart";
 import { LivePriceDisplay } from "@/components/LivePriceDisplay";
+import { useGlobalMarketData } from "@/hooks/useGlobalMarketData";
 import { useEffect, useState } from "react";
 
 interface LiveChartProps {
@@ -12,12 +13,20 @@ interface LiveChartProps {
 
 export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
   const [chartKey, setChartKey] = useState(`${asset}-${timeframe}-${Date.now()}`);
+  const marketData = useGlobalMarketData(asset);
   
   // Force chart regeneration when timeframe changes
   useEffect(() => {
     console.log(`🎯 LiveChart: Asset ${asset} timeframe changed to ${timeframe} - updating chart`);
     setChartKey(`${asset}-${timeframe}-${Date.now()}`);
   }, [asset, timeframe]);
+
+  // Console log for sync validation
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && marketData.price) {
+      console.log(`📊 LiveChart [${asset}]: Synced with global data - $${marketData.price.toFixed(2)}`);
+    }
+  }, [asset, marketData.price]);
 
   return (
     <div className="space-y-6">
@@ -33,7 +42,7 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
           </div>
           
           <div className="flex items-center space-x-4">
-            {/* Live Price Display */}
+            {/* Live Price Display - Now using global synchronized data */}
             <div className="text-right">
               <LivePriceDisplay 
                 symbol={asset} 

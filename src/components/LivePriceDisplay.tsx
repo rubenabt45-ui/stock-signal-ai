@@ -1,6 +1,5 @@
-
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { useSyncedMarketData, formatPrice, formatChangePercent } from "@/hooks/useSyncedMarketData";
+import { useGlobalMarketData, formatPrice, formatChangePercent } from "@/hooks/useGlobalMarketData";
 import { Badge } from "@/components/ui/badge";
 
 interface LivePriceDisplayProps {
@@ -16,7 +15,12 @@ export const LivePriceDisplay = ({
   size = 'lg',
   className = ''
 }: LivePriceDisplayProps) => {
-  const { price, changePercent, isLoading, error, lastUpdated } = useSyncedMarketData(symbol);
+  const { price, changePercent, isLoading, error, lastUpdated } = useGlobalMarketData(symbol);
+
+  // Console log for sync validation (can be removed in production)
+  if (process.env.NODE_ENV === 'development' && price) {
+    console.log(`💰 LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)})`);
+  }
 
   const getSizeClasses = () => {
     switch (size) {

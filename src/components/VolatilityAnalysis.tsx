@@ -1,8 +1,7 @@
-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Zap, AlertCircle, Shield, TrendingUp as VolHigh } from "lucide-react";
-import { useSyncedMarketData, formatPrice, formatChangePercent } from "@/hooks/useSyncedMarketData";
+import { useGlobalMarketData, formatPrice, formatChangePercent } from "@/hooks/useGlobalMarketData";
 
 interface VolatilityAnalysisProps {
   asset: string;
@@ -50,8 +49,13 @@ const calculateVolatilityData = (marketData: any) => {
 };
 
 export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps) => {
-  const marketData = useSyncedMarketData(asset);
+  const marketData = useGlobalMarketData(asset);
   const { volatility, level, icon: VolIcon, color } = calculateVolatilityData(marketData);
+
+  // Console log for sync validation
+  if (process.env.NODE_ENV === 'development' && marketData.price) {
+    console.log(`⚡ VolatilityAnalysis [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)})`);
+  }
 
   if (marketData.isLoading) {
     return (
