@@ -1,8 +1,7 @@
-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Target, CheckCircle, AlertTriangle } from "lucide-react";
-import { useSyncedMarketData, formatPrice, formatChangePercent } from "@/hooks/useSyncedMarketData";
+import { useTradingViewWidgetData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewWidgetData";
 import { memo, useMemo } from "react";
 
 interface PatternDetectionProps {
@@ -18,7 +17,7 @@ const generatePatterns = (marketData: any) => {
   
   const patterns = [];
   
-  // Pattern detection based on real market data
+  // Pattern detection based on real TradingView data
   if (changePercent > 2 && volatility < 3) {
     patterns.push({ name: "Bull Flag", confidence: 85 + Math.random() * 10, type: "bullish" });
   }
@@ -39,16 +38,16 @@ const generatePatterns = (marketData: any) => {
 };
 
 const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) => {
-  const marketData = useSyncedMarketData(asset);
+  const marketData = useTradingViewWidgetData(asset);
   
   // Memoize patterns to prevent unnecessary recalculations
   const detectedPatterns = useMemo(() => {
     return generatePatterns(marketData);
   }, [marketData.price, marketData.changePercent, marketData.high, marketData.low, marketData.volume]);
 
-  // Synced market data log
+  // TradingView data logs
   if (process.env.NODE_ENV === 'development' && marketData.price !== null) {
-    console.log(`📊 PatternDetection [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Synced: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
+    console.log(`📊 PatternDetection [${asset}]: TradingView Price $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Synced: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
   }
 
   if (marketData.isLoading) {
@@ -71,8 +70,8 @@ const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) 
       <div className="flex items-center space-x-3 mb-6">
         <Target className="h-6 w-6 text-purple-400" />
         <h3 className="text-xl font-bold text-white">Pattern Detection</h3>
-        <Badge className="bg-tradeiq-blue/20 text-tradeiq-blue border-tradeiq-blue/30 text-xs">
-          Synced
+        <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
+          TradingView Synced
         </Badge>
       </div>
 
@@ -111,8 +110,8 @@ const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) 
             </div>
             
             {marketData.price && (
-              <div className="mt-2 text-xs text-gray-500">
-                Synced: ${formatPrice(marketData.price)} | Change {formatChangePercent(marketData.changePercent)}
+              <div className="mt-2 text-xs text-green-500">
+                TradingView: ${formatPrice(marketData.price)} | Change {formatChangePercent(marketData.changePercent)}
               </div>
             )}
           </div>

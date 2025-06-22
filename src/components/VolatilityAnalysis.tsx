@@ -1,8 +1,7 @@
-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Zap, AlertCircle, Shield, TrendingUp as VolHigh } from "lucide-react";
-import { useSyncedMarketData, formatPrice, formatChangePercent } from "@/hooks/useSyncedMarketData";
+import { useTradingViewWidgetData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewWidgetData";
 
 interface VolatilityAnalysisProps {
   asset: string;
@@ -21,7 +20,7 @@ const calculateVolatilityData = (marketData: any) => {
 
   const { high, low, price, changePercent } = marketData;
   
-  // Calculate true range volatility using market data
+  // Calculate true range volatility using TradingView data
   const trueRange = high && low ? ((high - low) / price) * 100 : 0;
   const priceVolatility = Math.abs(changePercent || 0);
   
@@ -50,12 +49,12 @@ const calculateVolatilityData = (marketData: any) => {
 };
 
 export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps) => {
-  const marketData = useSyncedMarketData(asset);
+  const marketData = useTradingViewWidgetData(asset);
   const { volatility, level, icon: VolIcon, color } = calculateVolatilityData(marketData);
 
-  // Synced market data log
+  // TradingView data logs
   if (process.env.NODE_ENV === 'development' && marketData.price !== null) {
-    console.log(`⚡ VolatilityAnalysis [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Synced: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
+    console.log(`⚡ VolatilityAnalysis [${asset}]: TradingView Price $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Synced: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
   }
 
   if (marketData.isLoading) {
@@ -78,8 +77,8 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
       <div className="flex items-center space-x-3 mb-6">
         <Zap className="h-6 w-6 text-tradeiq-warning" />
         <h3 className="text-xl font-bold text-white">Volatility Analysis</h3>
-        <Badge className="bg-tradeiq-blue/20 text-tradeiq-blue border-tradeiq-blue/30 text-xs">
-          Synced
+        <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
+          TradingView Synced
         </Badge>
       </div>
 
@@ -118,7 +117,7 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
           
           {marketData.high && marketData.low && (
             <div className="space-y-2">
-              <div className="flex justify-between items-center">
+              <div className="flex items-center justify-between">
                 <span className="text-gray-400 font-medium">Daily Range</span>
                 <span className="text-white font-bold">
                   ${formatPrice(marketData.low)} - ${formatPrice(marketData.high)}
@@ -150,8 +149,8 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
             {level === 'High' && 'Significant price movements likely. Exercise caution with position sizing.'}
           </p>
           {marketData.price && (
-            <p className="text-xs text-gray-500 mt-2">
-              Synced: ${formatPrice(marketData.price)} ({formatChangePercent(marketData.changePercent)})
+            <p className="text-xs text-green-500 mt-2">
+              TradingView: ${formatPrice(marketData.price)} ({formatChangePercent(marketData.changePercent)})
             </p>
           )}
         </div>

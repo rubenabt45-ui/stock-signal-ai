@@ -1,6 +1,5 @@
-
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { useSyncedMarketData, formatPrice, formatChangePercent } from "@/hooks/useSyncedMarketData";
+import { useTradingViewWidgetData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewWidgetData";
 import { Badge } from "@/components/ui/badge";
 
 interface LivePriceDisplayProps {
@@ -16,11 +15,11 @@ export const LivePriceDisplay = ({
   size = 'lg',
   className = ''
 }: LivePriceDisplayProps) => {
-  const { price, changePercent, isLoading, error, lastUpdated } = useSyncedMarketData(symbol);
+  const { price, changePercent, isLoading, error, lastUpdated } = useTradingViewWidgetData(symbol);
 
-  // Synced market data log
+  // Critical debug logs to verify synchronization
   if (process.env.NODE_ENV === 'development' && price !== null) {
-    console.log(`💰 LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - Synced: ${new Date(lastUpdated || 0).toLocaleTimeString()}`);
+    console.log(`🎯 LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - TradingView Synced: ${new Date(lastUpdated || 0).toLocaleTimeString()}`);
   }
 
   const getSizeClasses = () => {
@@ -95,8 +94,8 @@ export const LivePriceDisplay = ({
       {showSymbol && (
         <div className="flex items-center space-x-2">
           <span className={sizeClasses.symbol}>{symbol}</span>
-          <Badge className="bg-tradeiq-blue/20 text-tradeiq-blue border-tradeiq-blue/30 text-xs">
-            Synced
+          <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
+            TradingView Synced
           </Badge>
         </div>
       )}
@@ -125,7 +124,7 @@ export const LivePriceDisplay = ({
       
       {lastUpdated && (
         <div className={`${sizeClasses.time} text-gray-500 flex items-center space-x-1`}>
-          <span>Synced: {new Date(lastUpdated).toLocaleTimeString()}</span>
+          <span>TradingView: {new Date(lastUpdated).toLocaleTimeString()}</span>
         </div>
       )}
     </div>

@@ -1,8 +1,8 @@
-
 import { useEffect, useRef, useState, memo, useCallback } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { getTradingViewConfig } from "@/utils/tradingViewConfig";
+import { setTradingViewWidget } from "@/hooks/useTradingViewWidgetData";
 
 interface TradingViewAdvancedChartProps {
   symbol: string;
@@ -126,7 +126,15 @@ const TradingViewAdvancedChartComponent = ({
         }
       };
 
-      widgetRef.current = new window.TradingView.widget(widgetConfig);
+      const widget = new window.TradingView.widget(widgetConfig);
+      widgetRef.current = widget;
+
+      // 🎯 CRITICAL: Set the widget reference for data extraction
+      widget.onChartReady(() => {
+        console.log('🎯 TradingView widget ready - setting global reference');
+        setTradingViewWidget(widget);
+      });
+
       console.log(`✅ Ultra-optimized TradingView chart created: ${symbol} (${timeframe})`);
     } catch (error) {
       console.error('❌ Error creating ultra-optimized TradingView widget:', error);

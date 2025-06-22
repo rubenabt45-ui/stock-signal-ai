@@ -1,8 +1,7 @@
-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Minus, Activity } from "lucide-react";
-import { useSyncedMarketData, formatPrice, formatChangePercent } from "@/hooks/useSyncedMarketData";
+import { useTradingViewWidgetData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewWidgetData";
 
 interface TrendAnalysisProps {
   asset: string;
@@ -20,7 +19,7 @@ const generateTrendData = (marketData: any) => {
 
   const { changePercent, high, low, price, open } = marketData;
   
-  // Determine trend based on market data
+  // Determine trend based on TradingView data
   let trend: 'Bullish' | 'Bearish' | 'Sideways';
   if (changePercent > 1.5) {
     trend = 'Bullish';
@@ -41,12 +40,12 @@ const generateTrendData = (marketData: any) => {
 };
 
 export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
-  const marketData = useSyncedMarketData(asset);
+  const marketData = useTradingViewWidgetData(asset);
   const { trend, strength, momentum } = generateTrendData(marketData);
 
-  // Synced market data log
+  // TradingView data logs
   if (process.env.NODE_ENV === 'development' && marketData.price !== null) {
-    console.log(`📈 TrendAnalysis [${asset}]: $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Synced: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
+    console.log(`📈 TrendAnalysis [${asset}]: TradingView Price $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Synced: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
   }
 
   const getTrendIcon = () => {
@@ -87,8 +86,8 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
       <div className="flex items-center space-x-3 mb-6">
         <Activity className="h-6 w-6 text-tradeiq-blue" />
         <h3 className="text-xl font-bold text-white">Trend Analysis</h3>
-        <Badge className="bg-tradeiq-blue/20 text-tradeiq-blue border-tradeiq-blue/30 text-xs">
-          Synced
+        <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
+          TradingView Synced
         </Badge>
       </div>
 
@@ -148,8 +147,8 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
             </Badge>
           </div>
           {marketData.price && (
-            <div className="text-xs text-gray-500 mt-2">
-              Synced: ${formatPrice(marketData.price)} | Change: {formatChangePercent(marketData.changePercent)}
+            <div className="text-xs text-green-500 mt-2">
+              TradingView: ${formatPrice(marketData.price)} | Change: {formatChangePercent(marketData.changePercent)}
             </div>
           )}
         </div>
