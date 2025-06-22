@@ -1,7 +1,7 @@
 
-import { TrendingUp, TrendingDown, Minus, RefreshCw } from "lucide-react";
-import { useTradingViewWidgetData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewWidgetData";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useTradingViewData } from "@/contexts/TradingViewDataContext";
 
 interface LivePriceDisplayProps {
   symbol: string;
@@ -10,16 +10,31 @@ interface LivePriceDisplayProps {
   className?: string;
 }
 
+const formatPrice = (price: number | null): string => {
+  if (price === null) return "0.00";
+  if (price >= 1000) {
+    return price.toLocaleString(undefined, { 
+      minimumFractionDigits: 2, 
+      maximumFractionDigits: 2 
+    });
+  }
+  return price.toFixed(2);
+};
+
+const formatChangePercent = (changePercent: number | null): string => {
+  if (changePercent === null) return "0.00%";
+  const sign = changePercent >= 0 ? '+' : '';
+  return `${sign}${changePercent.toFixed(2)}%`;
+};
+
 export const LivePriceDisplay = ({ 
   symbol, 
   showSymbol = true, 
   size = 'lg',
   className = ''
 }: LivePriceDisplayProps) => {
-  const { price, changePercent, isLoading, error, lastUpdated } = useTradingViewWidgetData(symbol);
-
-  // Enhanced debug logging
-  console.log(`💰 [${new Date().toLocaleTimeString()}] LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - Live Price Sync: ${lastUpdated ? new Date(lastUpdated).toLocaleTimeString() : 'No data'}`);
+  const { getData } = useTradingViewData();
+  const { price, changePercent, lastUpdated } = getData(symbol);
 
   const getSizeClasses = () => {
     switch (size) {
@@ -69,30 +84,7 @@ export const LivePriceDisplay = ({
     return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
   };
 
-  const handleRetry = () => {
-    console.log(`[PRICE-RETRY] Refreshing price data for ${symbol}`);
-    window.location.reload();
-  };
-
-  if (error) {
-    return (
-      <div className={`${sizeClasses.container} ${className}`}>
-        <div className="flex items-center space-x-2">
-          <p className="text-red-400 font-medium">Error: {symbol}</p>
-          <button 
-            onClick={handleRetry} 
-            className="text-xs text-tradeiq-blue hover:underline flex items-center space-x-1"
-          >
-            <RefreshCw className="h-3 w-3" />
-            <span>Retry</span>
-          </button>
-        </div>
-        <p className="text-gray-500 text-sm">{error}</p>
-      </div>
-    );
-  }
-
-  if (isLoading || price === null) {
+  if (price === null) {
     return (
       <div className={`${sizeClasses.container} ${className} animate-pulse`}>
         {showSymbol && <div className="h-6 bg-gray-700/50 rounded w-16"></div>}
@@ -100,7 +92,7 @@ export const LivePriceDisplay = ({
         <div className="h-6 bg-gray-700/50 rounded w-20"></div>
         <div className="text-xs text-blue-500 flex items-center space-x-1">
           <div className="animate-spin rounded-full h-3 w-3 border-b border-blue-500"></div>
-          <span>Loading live price...</span>
+          <span>Syncing with TradingView...</span>
         </div>
       </div>
     );
@@ -112,7 +104,7 @@ export const LivePriceDisplay = ({
         <div className="flex items-center space-x-2">
           <span className={sizeClasses.symbol}>{symbol}</span>
           <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/30 text-xs">
-            Live Price
+            TradingView Synced
           </Badge>
         </div>
       )}
@@ -122,7 +114,7 @@ export const LivePriceDisplay = ({
           ${formatPrice(price)}
         </span>
         {lastUpdated && (
-          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" title="Live price active"></div>
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="TradingView synced"></div>
         )}
       </div>
       
@@ -140,8 +132,8 @@ export const LivePriceDisplay = ({
       )}
       
       {lastUpdated && (
-        <div className={`${sizeClasses.time} text-blue-500 flex items-center space-x-1`}>
-          <span>Updated: {new Date(lastUpdated).toLocaleTimeString()}</span>
+        <div className={`${sizeClasses.time} text-green-500 flex items-center space-x-1`}>
+          <span>TradingView: {new Date(lastUpdated).toLocaleTimeString()}</span>
         </div>
       )}
     </div>
