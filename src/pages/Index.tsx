@@ -2,16 +2,13 @@
 import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { AssetSelection } from "@/components/AssetSelection";
-import { TimeframeSelector } from "@/components/TimeframeSelector";
 import { LiveChart } from "@/components/LiveChart";
 import { PatternDetection } from "@/components/PatternDetection";
 import { TrendAnalysis } from "@/components/TrendAnalysis";
 import { VolatilityAnalysis } from "@/components/VolatilityAnalysis";
 import { AISuggestions } from "@/components/AISuggestions";
-import { MarketOverview } from "@/components/MarketOverview";
-import { ChartCandlestick, Brain, Star, BarChart3 } from "lucide-react";
+import { ChartCandlestick, Brain, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export type Timeframe = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y";
 
@@ -23,25 +20,6 @@ const Index = () => {
     console.log(`🎯 Index: Timeframe changed to ${timeframe} for asset ${selectedAsset}`);
     setSelectedTimeframe(timeframe as Timeframe);
   }, [selectedAsset]);
-
-  // Get related symbols for market overview
-  const getRelatedSymbols = (symbol: string) => {
-    const relatedMap: Record<string, string[]> = {
-      'AAPL': ['NASDAQ:AAPL', 'NASDAQ:MSFT', 'NASDAQ:GOOGL', 'NASDAQ:AMZN', 'NASDAQ:TSLA'],
-      'MSFT': ['NASDAQ:MSFT', 'NASDAQ:AAPL', 'NASDAQ:GOOGL', 'NASDAQ:AMZN', 'NASDAQ:ORCL'],
-      'GOOGL': ['NASDAQ:GOOGL', 'NASDAQ:MSFT', 'NASDAQ:AAPL', 'NASDAQ:META', 'NASDAQ:AMZN'],
-      'TSLA': ['NASDAQ:TSLA', 'NASDAQ:RIVN', 'NASDAQ:LCID', 'NYSE:F', 'NYSE:GM'],
-      'NVDA': ['NASDAQ:NVDA', 'NASDAQ:AMD', 'NASDAQ:INTC', 'NASDAQ:QCOM', 'NASDAQ:AVGO'],
-      'AMZN': ['NASDAQ:AMZN', 'NASDAQ:AAPL', 'NASDAQ:MSFT', 'NASDAQ:GOOGL', 'NASDAQ:META'],
-      'META': ['NASDAQ:META', 'NASDAQ:GOOGL', 'NASDAQ:SNAP', 'NYSE:TWTR', 'NASDAQ:PINS'],
-    };
-
-    const baseSymbol = symbol.replace('NASDAQ:', '').replace('NYSE:', '');
-    const relatedSymbols = relatedMap[baseSymbol] || [`NASDAQ:${baseSymbol}`, 'NASDAQ:AAPL', 'NASDAQ:MSFT', 'NASDAQ:GOOGL', 'NASDAQ:AMZN'];
-    
-    console.log(`🔗 Related symbols for ${symbol}:`, relatedSymbols);
-    return relatedSymbols;
-  };
 
   return (
     <div className="min-h-screen bg-tradeiq-navy">
@@ -80,39 +58,12 @@ const Index = () => {
           onAssetSelect={setSelectedAsset} 
         />
 
-        {/* Timeframe Selector - Only for main chart */}
-        <TimeframeSelector 
-          selectedTimeframe={selectedTimeframe} 
-          onTimeframeSelect={handleTimeframeSelect} 
-        />
-
         {/* Live Chart */}
         <LiveChart 
           asset={selectedAsset} 
           timeframe={selectedTimeframe}
           key={`${selectedAsset}-${selectedTimeframe}`}
         />
-
-        {/* Optimized Market Overview Section - No timeframe selector */}
-        <Card className="tradeiq-card">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-white text-lg flex items-center space-x-2">
-              <BarChart3 className="h-5 w-5 text-tradeiq-blue" />
-              <span>📈 Related Market Overview</span>
-              <span className="text-xs text-gray-400 font-normal">
-                (Performance Optimized)
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <MarketOverview 
-              symbols={getRelatedSymbols(selectedAsset)}
-              height={400}
-              className="w-full"
-              key={`market-overview-${selectedAsset}`}
-            />
-          </CardContent>
-        </Card>
 
         {/* Analysis Grid */}
         <div className="grid gap-6 lg:grid-cols-2">
