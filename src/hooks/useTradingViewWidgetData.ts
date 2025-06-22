@@ -21,8 +21,9 @@ declare global {
   }
 }
 
-// Global widget reference for direct price extraction
+// Global widget reference and ready state
 let globalTradingViewWidget: any = null;
+let isWidgetReady: boolean = false;
 const dataSubscribers = new Set<(data: TradingViewWidgetData) => void>();
 const currentWidgetData: TradingViewWidgetData = {
   symbol: '',
@@ -40,34 +41,48 @@ const currentWidgetData: TradingViewWidgetData = {
 
 export const setTradingViewWidget = (widget: any) => {
   globalTradingViewWidget = widget;
-  console.log('🎯 TradingView widget reference updated for direct price extraction');
+  isWidgetReady = false; // Reset ready state for new widget
+  console.log('🎯 TradingView widget reference set, waiting for onChartReady...');
   
-  // Extract price immediately when widget is set
-  if (widget) {
-    setTimeout(() => {
-      extractWidgetPrice();
-    }, 1000); // Give widget time to load data
+  if (widget && typeof widget.onChartReady === 'function') {
+    widget.onChartReady(() => {
+      isWidgetReady = true;
+      console.log('✅ TradingView widget is now ready for data extraction');
+      
+      // Start extracting data now that widget is ready
+      setTimeout(() => {
+        extractWidgetPrice();
+      }, 500);
+    });
+  } else {
+    console.warn('⚠️ Widget does not have onChartReady method');
   }
 };
 
 const extractWidgetPrice = () => {
-  if (!globalTradingViewWidget) {
-    console.log('⚠️ No TradingView widget available for price extraction');
-    return;
+  if (!globalTradingViewWidget || !isWidgetReady) {
+    console.log('⚠️ Widget not ready for price extraction');
+    return null;
   }
 
   try {
     const chart = globalTradingViewWidget.activeChart?.();
-    if (chart) {
-      // Get symbol info
-      const symbolInfo = chart.symbol();
-      console.log(`📊 TradingView active symbol: ${symbolInfo}`);
-      
-      // Try to get current price from chart
-      try {
-        const series = chart.getSeries();
-        if (series && series.length > 0) {
-          const lastBar = series[0].data()[series[0].data().length - 1];
+    if (!chart) {
+      console.log('⚠️ No active chart available');
+      return null;
+    }
+
+    // Get symbol info
+    const symbolInfo = chart.symbol();
+    console.log(`📊 TradingView active symbol: ${symbolInfo}`);
+    
+    // Try to get current price data
+    try {
+      const series = chart.getSeries();
+      if (series && series.length > 0) {
+        const seriesData = series[0].data();
+        if (seriesData && seriesData.length > 0) {
+          const lastBar = seriesData[seriesData.length - 1];
           if (lastBar) {
             const price = lastBar.close || lastBar.value;
             const open = lastBar.open;
@@ -92,7 +107,7 @@ const extractWidgetPrice = () => {
               error: null,
             };
             
-            console.log(`💎 Direct TradingView price extracted: $${formatPrice(widgetData.price)} for ${widgetData.symbol}`);
+            console.log(`💎 TradingView price extracted: $${formatPrice(widgetData.price)} for ${widgetData.symbol}`);
             
             // Update global data and notify subscribers
             Object.assign(currentWidgetData, widgetData);
@@ -107,9 +122,9 @@ const extractWidgetPrice = () => {
             return widgetData;
           }
         }
-      } catch (seriesError) {
-        console.log('📊 Series data extraction failed, trying alternative method:', seriesError);
       }
+    } catch (seriesError) {
+      console.log('📊 Series data extraction failed:', seriesError);
     }
   } catch (error) {
     console.log('⚠️ TradingView widget price extraction failed:', error);
@@ -134,6 +149,7 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
   });
 
   const intervalRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout>();
   const currentSymbolRef = useRef(symbol);
 
   // Update current symbol reference
@@ -146,36 +162,60 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
     if (!currentSymbolRef.current) return;
 
     const targetSymbol = currentSymbolRef.current;
-    console.log(`🔄 Extracting TradingView widget data for ${targetSymbol}`);
+    console.log(`🔄 Checking TradingView widget data for ${targetSymbol}`);
     
-    // Try to extract from TradingView widget first
+    // Only extract if widget is ready
+    if (!globalTradingViewWidget || !isWidgetReady) {
+      console.log(`⏳ TradingView widget not ready for ${targetSymbol}, waiting...`);
+      setWidgetData(prev => ({
+        ...prev,
+        symbol: targetSymbol,
+        isLoading: true,
+        error: null,
+      }));
+      return;
+    }
+    
+    // Try to extract from TradingView widget
     const extractedData = extractWidgetPrice();
     
     if (extractedData && extractedData.symbol.includes(targetSymbol)) {
       console.log(`✅ Using TradingView widget data for ${targetSymbol}: $${formatPrice(extractedData.price)}`);
       setWidgetData(extractedData);
-      return;
+    } else {
+      console.log(`⏳ No matching data for ${targetSymbol}, keeping loading state`);
     }
-    
-    // If no widget data available, show loading state
-    console.log(`⏳ TradingView widget not ready for ${targetSymbol}, waiting...`);
-    setWidgetData(prev => ({
-      ...prev,
-      symbol: targetSymbol,
-      isLoading: true,
-      error: null,
-    }));
   }, []);
 
   // Setup data extraction and polling
   useEffect(() => {
     console.log(`🎯 Setting up TradingView widget data extraction for ${symbol}`);
     
+    // Clear any existing intervals
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    
     // Initial extraction
     updateDataFromWidget();
     
-    // Setup frequent polling to catch widget updates (every 2 seconds)
+    // Setup polling every 2 seconds for live updates
     intervalRef.current = setInterval(updateDataFromWidget, 2000);
+    
+    // Add timeout fallback after 10 seconds
+    timeoutRef.current = setTimeout(() => {
+      if (widgetData.isLoading) {
+        console.log(`⚠️ TradingView widget timeout for ${symbol}`);
+        setWidgetData(prev => ({
+          ...prev,
+          isLoading: false,
+          error: 'TradingView widget failed to load within 10 seconds',
+        }));
+      }
+    }, 10000);
     
     // Subscribe to updates
     dataSubscribers.add(setWidgetData);
@@ -183,6 +223,9 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+      }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
       dataSubscribers.delete(setWidgetData);
       console.log(`🛑 Cleaned up TradingView widget data extraction for ${symbol}`);

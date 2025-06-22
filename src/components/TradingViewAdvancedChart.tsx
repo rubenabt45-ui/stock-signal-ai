@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState, memo, useCallback } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
@@ -40,6 +41,7 @@ const TradingViewAdvancedChartComponent = ({
   const widgetRef = useRef<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [chartReady, setChartReady] = useState(false);
   const { actualTheme } = useTheme();
   
   // Force chart to be visible for data extraction
@@ -52,7 +54,7 @@ const TradingViewAdvancedChartComponent = ({
   // Generate unique container ID for each symbol/timeframe combination
   const containerId = `tradingview-chart-${symbol}-${timeframe}-${Date.now()}`;
 
-  console.log(`🎯 TradingView Chart: ${symbol} (${timeframe}) - Visible: ${isIntersecting}`);
+  console.log(`🎯 TradingView Chart: ${symbol} (${timeframe}) - Visible: ${isIntersecting}, Ready: ${chartReady}`);
 
   // Load TradingView script
   const loadTradingViewScript = useCallback(() => {
@@ -91,6 +93,7 @@ const TradingViewAdvancedChartComponent = ({
     if (!isLoaded || !containerRef.current || !isIntersecting) return;
 
     console.log(`🔄 Creating TradingView widget for ${symbol} (${timeframe})`);
+    setChartReady(false); // Reset ready state
 
     // Clean up previous widget
     if (widgetRef.current) {
@@ -131,36 +134,52 @@ const TradingViewAdvancedChartComponent = ({
       const widget = new window.TradingView.widget(widgetConfig);
       widgetRef.current = widget;
 
-      // 🎯 CRITICAL: Set the widget reference and setup price extraction
-      widget.onChartReady(() => {
-        console.log(`✅ TradingView widget ready for ${symbol} - setting global reference for price extraction`);
-        setTradingViewWidget(widget);
-        
-        // Setup real-time price monitoring
-        try {
-          const chart = widget.activeChart();
-          if (chart) {
-            // Monitor symbol changes
-            chart.onSymbolChanged().subscribe(null, () => {
-              console.log(`📊 Symbol changed in TradingView: ${symbol}`);
-              // Trigger price extraction after symbol change
-              setTimeout(() => setTradingViewWidget(widget), 500);
-            });
-            
-            // Monitor data updates
-            chart.onDataLoaded().subscribe(null, () => {
-              console.log(`📈 Data loaded for ${symbol} - triggering price extraction`);
-              setTimeout(() => setTradingViewWidget(widget), 100);
-            });
+      // 🎯 CRITICAL: Properly handle widget ready state
+      if (typeof widget.onChartReady === 'function') {
+        widget.onChartReady(() => {
+          console.log(`✅ TradingView widget ready for ${symbol} - chart is fully initialized`);
+          setChartReady(true);
+          
+          // Set the global widget reference ONLY after chart is ready
+          setTradingViewWidget(widget);
+          
+          // Setup real-time monitoring
+          try {
+            const chart = widget.activeChart();
+            if (chart) {
+              // Monitor symbol changes
+              if (typeof chart.onSymbolChanged === 'function') {
+                chart.onSymbolChanged().subscribe(null, () => {
+                  console.log(`📊 Symbol changed in TradingView: ${symbol}`);
+                  setTimeout(() => setTradingViewWidget(widget), 500);
+                });
+              }
+              
+              // Monitor data updates
+              if (typeof chart.onDataLoaded === 'function') {
+                chart.onDataLoaded().subscribe(null, () => {
+                  console.log(`📈 Data loaded for ${symbol} - triggering price extraction`);
+                  setTimeout(() => setTradingViewWidget(widget), 100);
+                });
+              }
+            }
+          } catch (e) {
+            console.log('Chart event setup:', e);
           }
-        } catch (e) {
-          console.log('Chart event setup:', e);
-        }
-      });
+        });
+      } else {
+        console.warn('⚠️ Widget onChartReady method not available');
+        // Fallback timeout for widgets without onChartReady
+        setTimeout(() => {
+          setChartReady(true);
+          setTradingViewWidget(widget);
+        }, 3000);
+      }
 
-      console.log(`✅ TradingView chart created for ${symbol} (${timeframe})`);
+      console.log(`✅ TradingView widget created for ${symbol} (${timeframe})`);
     } catch (error) {
       console.error('❌ Error creating TradingView widget:', error);
+      setChartReady(false);
     }
 
     return () => {
@@ -171,6 +190,7 @@ const TradingViewAdvancedChartComponent = ({
           console.log('Widget cleanup on unmount:', e);
         }
       }
+      setChartReady(false);
     };
   }, [symbol, timeframe, actualTheme, isLoaded, containerId, isIntersecting]);
 
@@ -240,6 +260,17 @@ const TradingViewAdvancedChartComponent = ({
           overflow: 'hidden'
         }}
       />
+      
+      {/* Debug info overlay when chart is not ready */}
+      {!chartReady && isLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl">
+          <div className="text-center space-y-2">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-tradeiq-blue mx-auto"></div>
+            <p className="text-white text-sm">Initializing chart...</p>
+            <p className="text-gray-400 text-xs">{symbol} - {timeframe}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

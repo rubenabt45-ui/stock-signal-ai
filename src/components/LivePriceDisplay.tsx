@@ -1,3 +1,4 @@
+
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useTradingViewWidgetData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewWidgetData";
 import { Badge } from "@/components/ui/badge";
@@ -19,12 +20,6 @@ export const LivePriceDisplay = ({
 
   // 🎯 CRITICAL DEBUG: Log chart vs display price for verification
   console.log(`🎯 LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - TradingView Direct: ${new Date(lastUpdated || 0).toLocaleTimeString()}`);
-  
-  // Debug widget price extraction
-  if (price !== null) {
-    console.log(`💎 Chart Price: $${formatPrice(price)}`);
-    console.log(`💎 LivePriceDisplay: $${formatPrice(price)}`);
-  }
 
   const getSizeClasses = () => {
     switch (size) {
@@ -79,6 +74,12 @@ export const LivePriceDisplay = ({
       <div className={`${sizeClasses.container} ${className}`}>
         <p className="text-red-400 font-medium">Error loading {symbol}</p>
         <p className="text-gray-500 text-sm">{error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="text-xs text-tradeiq-blue hover:underline"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -89,7 +90,9 @@ export const LivePriceDisplay = ({
         {showSymbol && <div className="h-6 bg-gray-700/50 rounded w-16"></div>}
         <div className="h-10 bg-gray-700/50 rounded w-32"></div>
         <div className="h-6 bg-gray-700/50 rounded w-20"></div>
-        <div className="text-xs text-yellow-500">Waiting for TradingView widget...</div>
+        <div className="text-xs text-yellow-500">
+          {error ? 'Failed to load TradingView widget' : 'Waiting for TradingView widget...'}
+        </div>
       </div>
     );
   }
@@ -100,7 +103,7 @@ export const LivePriceDisplay = ({
         <div className="flex items-center space-x-2">
           <span className={sizeClasses.symbol}>{symbol}</span>
           <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
-            TradingView Direct
+            TradingView Live
           </Badge>
         </div>
       )}
@@ -129,7 +132,7 @@ export const LivePriceDisplay = ({
       
       {lastUpdated && (
         <div className={`${sizeClasses.time} text-gray-500 flex items-center space-x-1`}>
-          <span>Widget: {new Date(lastUpdated).toLocaleTimeString()}</span>
+          <span>Live: {new Date(lastUpdated).toLocaleTimeString()}</span>
         </div>
       )}
     </div>
