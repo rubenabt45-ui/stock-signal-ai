@@ -19,7 +19,7 @@ export const LivePriceDisplay = ({
   const { price, changePercent, isLoading, error, lastUpdated } = useTradingViewWidgetData(symbol);
 
   // Enhanced debug logging
-  console.log(`🎯 [${new Date().toLocaleTimeString()}] LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - TradingView Direct: ${lastUpdated ? new Date(lastUpdated).toLocaleTimeString() : 'No data'}`);
+  console.log(`🎯 [${new Date().toLocaleTimeString()}] LivePriceDisplay [${symbol}]: $${formatPrice(price)} (${formatChangePercent(changePercent)}) - TradingView Sync: ${lastUpdated ? new Date(lastUpdated).toLocaleTimeString() : 'No data'}`);
 
   const getSizeClasses = () => {
     switch (size) {
@@ -93,9 +93,9 @@ export const LivePriceDisplay = ({
         {showSymbol && <div className="h-6 bg-gray-700/50 rounded w-16"></div>}
         <div className="h-10 bg-gray-700/50 rounded w-32"></div>
         <div className="h-6 bg-gray-700/50 rounded w-20"></div>
-        <div className="text-xs text-yellow-500 flex items-center space-x-1">
-          <div className="animate-spin rounded-full h-3 w-3 border-b border-yellow-500"></div>
-          <span>Connecting to TradingView widget...</span>
+        <div className="text-xs text-blue-500 flex items-center space-x-1">
+          <div className="animate-spin rounded-full h-3 w-3 border-b border-blue-500"></div>
+          <span>Syncing with TradingView widget...</span>
         </div>
       </div>
     );
@@ -117,7 +117,7 @@ export const LivePriceDisplay = ({
           ${formatPrice(price)}
         </span>
         {lastUpdated && (
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Live data"></div>
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Live sync active"></div>
         )}
       </div>
       
@@ -135,8 +135,8 @@ export const LivePriceDisplay = ({
       )}
       
       {lastUpdated && (
-        <div className={`${sizeClasses.time} text-gray-500 flex items-center space-x-1`}>
-          <span>Synced: {new Date(lastUpdated).toLocaleTimeString()}</span>
+        <div className={`${sizeClasses.time} text-green-500 flex items-center space-x-1`}>
+          <span>Last sync: {new Date(lastUpdated).toLocaleTimeString()}</span>
         </div>
       )}
     </div>
