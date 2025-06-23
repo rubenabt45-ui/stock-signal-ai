@@ -1,12 +1,9 @@
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { AssetSelection } from "@/components/AssetSelection";
 import { LiveChart } from "@/components/LiveChart";
-import { PatternDetection } from "@/components/PatternDetection";
-import { TrendAnalysis } from "@/components/TrendAnalysis";
-import { VolatilityAnalysis } from "@/components/VolatilityAnalysis";
-import { AISuggestions } from "@/components/AISuggestions";
+import { LazyAnalysisComponents } from "@/components/LazyAnalysisComponents";
 import { ChartCandlestick, Brain, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TradingViewDataProvider } from "@/contexts/TradingViewDataContext";
@@ -16,21 +13,38 @@ export type Timeframe = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y";
 const Index = () => {
   const [selectedAsset, setSelectedAsset] = useState<string>("AAPL");
   const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>("1D");
-  const [remountKey, setRemountKey] = useState<number>(0);
+  const [chartLoaded, setChartLoaded] = useState(false);
 
   const handleTimeframeSelect = useCallback((timeframe: string) => {
     console.log(`🎯 [${new Date().toLocaleTimeString()}] Index: Timeframe changed to ${timeframe} for ${selectedAsset}`);
     setSelectedTimeframe(timeframe as Timeframe);
-    // Force complete remount
-    setRemountKey(prev => prev + 1);
   }, [selectedAsset]);
 
   const handleAssetSelect = useCallback((asset: string) => {
-    console.log(`🎯 [${new Date().toLocaleTimeString()}] Index: Asset changed from ${selectedAsset} to ${asset} - forcing TradingView sync`);
+    console.log(`🎯 [${new Date().toLocaleTimeString()}] Index: Asset changed from ${selectedAsset} to ${asset}`);
     setSelectedAsset(asset);
-    // Force complete remount on asset change
-    setRemountKey(prev => prev + 1);
+    setChartLoaded(false); // Reset chart loading state
   }, [selectedAsset]);
+
+  // Lazy load analysis components after chart initialization
+  useEffect(() => {
+    if (selectedAsset) {
+      const timer = setTimeout(() => {
+        setChartLoaded(true);
+      }, 1000); // Allow chart to start loading before analysis components
+      
+      return () => clearTimeout(timer);
+    }
+  }, [selectedAsset, selectedTimeframe]);
+
+  // Use requestIdleCallback for non-essential operations
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      window.requestIdleCallback(() => {
+        console.log(`💡 App optimized for ${selectedAsset} - all components ready`);
+      });
+    }
+  }, [selectedAsset, selectedTimeframe, chartLoaded]);
 
   return (
     <TradingViewDataProvider>
@@ -43,7 +57,7 @@ const Index = () => {
                 <ChartCandlestick className="h-8 w-8 text-tradeiq-blue" />
                 <div>
                   <h1 className="text-2xl font-bold text-white tracking-tight">TradeIQ</h1>
-                  <p className="text-sm text-gray-400 font-medium">Chart IA - TradingView Synchronized</p>
+                  <p className="text-sm text-gray-400 font-medium">TradingView Synchronized Analytics</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
@@ -70,41 +84,48 @@ const Index = () => {
             onAssetSelect={handleAssetSelect} 
           />
 
-          {/* TradingView Live Chart - Single Source of Truth */}
+          {/* Live Chart - Priority Load */}
           <LiveChart 
-            key={`chart-${selectedAsset}-${selectedTimeframe}-${remountKey}`}
             asset={selectedAsset} 
             timeframe={selectedTimeframe}
           />
 
-          {/* Synchronized Analysis Grid - All using TradingView data */}
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div className="space-y-6">
-              <PatternDetection 
-                key={`pattern-${selectedAsset}-${selectedTimeframe}-${remountKey}`}
-                asset={selectedAsset} 
-                timeframe={selectedTimeframe} 
-              />
-              <TrendAnalysis 
-                key={`trend-${selectedAsset}-${selectedTimeframe}-${remountKey}`}
-                asset={selectedAsset} 
-                timeframe={selectedTimeframe} 
-              />
-              <VolatilityAnalysis 
-                key={`volatility-${selectedAsset}-${selectedTimeframe}-${remountKey}`}
-                asset={selectedAsset} 
-                timeframe={selectedTimeframe} 
-              />
+          {/* Analysis Components - Lazy Loaded */}
+          {chartLoaded && (
+            <LazyAnalysisComponents 
+              asset={selectedAsset} 
+              timeframe={selectedTimeframe} 
+            />
+          )}
+          
+          {!chartLoaded && (
+            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="space-y-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="tradeiq-card p-6 rounded-2xl animate-pulse">
+                    <div className="flex items-center space-x-3 mb-6">
+                      <div className="h-6 w-6 bg-gray-700 rounded"></div>
+                      <div className="h-6 w-32 bg-gray-700 rounded"></div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="h-16 bg-gray-700/30 rounded-xl"></div>
+                      <div className="h-16 bg-gray-700/30 rounded-xl"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="tradeiq-card p-6 rounded-2xl animate-pulse">
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="h-6 w-6 bg-gray-700 rounded"></div>
+                  <div className="h-6 w-40 bg-gray-700 rounded"></div>
+                </div>
+                <div className="space-y-4">
+                  <div className="h-32 bg-gray-700/30 rounded-xl"></div>
+                  <div className="h-24 bg-gray-700/30 rounded-xl"></div>
+                </div>
+              </div>
             </div>
-            
-            <div>
-              <AISuggestions 
-                key={`ai-${selectedAsset}-${selectedTimeframe}-${remountKey}`}
-                asset={selectedAsset} 
-                timeframe={selectedTimeframe} 
-              />
-            </div>
-          </div>
+          )}
         </main>
       </div>
     </TradingViewDataProvider>

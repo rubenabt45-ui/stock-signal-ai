@@ -1,5 +1,6 @@
 
 import { useTradingViewData } from "@/contexts/TradingViewDataContext";
+import { useMemo } from "react";
 
 export const formatPrice = (price: number | null): string => {
   if (price === null) return "0.00";
@@ -20,21 +21,24 @@ export const formatChangePercent = (changePercent: number | null): string => {
 
 export const useTradingViewWidgetData = (symbol: string) => {
   const { getData } = useTradingViewData();
-  const data = getData(symbol);
   
-  // Log when data is successfully retrieved
-  if (data.price !== null && process.env.NODE_ENV === 'development') {
-    console.log(`📊 useTradingViewWidgetData [${symbol}]: Price $${formatPrice(data.price)} (${formatChangePercent(data.changePercent)}) - Last updated: ${data.lastUpdated ? new Date(data.lastUpdated).toLocaleTimeString() : 'Never'}`);
-  }
-  
-  return {
-    price: data.price,
-    changePercent: data.changePercent,
-    high: data.high,
-    low: data.low,
-    volume: data.volume,
-    lastUpdated: data.lastUpdated,
-    isLoading: data.price === null,
-    error: data.price === null && data.lastUpdated === null ? 'No TradingView data available' : null
-  };
+  return useMemo(() => {
+    const data = getData(symbol);
+    
+    // Log when data is successfully retrieved
+    if (data.price !== null && process.env.NODE_ENV === 'development') {
+      console.log(`📊 useTradingViewWidgetData [${symbol}]: Price $${formatPrice(data.price)} (${formatChangePercent(data.changePercent)}) - Synced: ${data.lastUpdated ? new Date(data.lastUpdated).toLocaleTimeString() : 'Never'}`);
+    }
+    
+    return {
+      price: data.price,
+      changePercent: data.changePercent,
+      high: data.high,
+      low: data.low,
+      volume: data.volume,
+      lastUpdated: data.lastUpdated,
+      isLoading: data.price === null && data.lastUpdated === null,
+      error: data.price === null && data.lastUpdated === null ? 'Waiting for TradingView data...' : null
+    };
+  }, [getData, symbol]);
 };
