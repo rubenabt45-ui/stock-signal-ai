@@ -4,7 +4,7 @@ import { ArrowLeft, Brain, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TradingViewAdvancedChart } from "@/components/TradingViewAdvancedChart";
+import { OptimizedTradingViewWidget } from "@/components/OptimizedTradingViewWidget";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AIAnalysis } from "@/components/AIAnalysis";
 import { MarketPrice } from "@/components/MarketPrice";
@@ -134,10 +134,11 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
               <h3 className="text-xl font-bold text-white">Price Chart</h3>
             </div>
             <div className="py-4">
-              <TradingViewAdvancedChart 
+              <OptimizedTradingViewWidget 
                 symbol={stockSymbol} 
                 timeframe="1D"
                 className="w-full"
+                height="600px"
               />
             </div>
           </Card>
