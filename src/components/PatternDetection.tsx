@@ -1,8 +1,8 @@
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Target, CheckCircle, AlertTriangle } from "lucide-react";
-import { useTradingViewWidgetData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewWidgetData";
-import { memo, useMemo } from "react";
+import { useExternalMarketData } from "@/hooks/useExternalMarketData";
 
 interface PatternDetectionProps {
   asset: string;
@@ -10,14 +10,14 @@ interface PatternDetectionProps {
 }
 
 const generatePatterns = (marketData: any) => {
-  if (!marketData || !marketData.price) return [];
+  if (!marketData) return [];
   
-  const { price, changePercent, high, low, volume } = marketData;
-  const volatility = high && low ? ((high - low) / price) * 100 : 0;
+  const { currentPrice, changePercent, high, low, volume } = marketData;
+  const volatility = ((high - low) / currentPrice) * 100;
   
   const patterns = [];
   
-  // Pattern detection based on real TradingView data
+  // Pattern detection based on real market data
   if (changePercent > 2 && volatility < 3) {
     patterns.push({ name: "Bull Flag", confidence: 85 + Math.random() * 10, type: "bullish" });
   }
@@ -37,20 +37,11 @@ const generatePatterns = (marketData: any) => {
   return patterns.slice(0, Math.floor(Math.random() * 3) + 1);
 };
 
-const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) => {
-  const marketData = useTradingViewWidgetData(asset);
-  
-  // Memoize patterns to prevent unnecessary recalculations
-  const detectedPatterns = useMemo(() => {
-    return generatePatterns(marketData);
-  }, [marketData.price, marketData.changePercent, marketData.high, marketData.low, marketData.volume]);
+export const PatternDetection = ({ asset, timeframe }: PatternDetectionProps) => {
+  const { data: marketData, isLoading } = useExternalMarketData(asset, timeframe);
+  const detectedPatterns = generatePatterns(marketData);
 
-  // TradingView data logs
-  if (process.env.NODE_ENV === 'development' && marketData.price !== null) {
-    console.log(`📊 PatternDetection [${asset}]: TradingView Price $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Synced: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
-  }
-
-  if (marketData.isLoading) {
+  if (isLoading) {
     return (
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex items-center space-x-3 mb-6">
@@ -70,9 +61,6 @@ const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) 
       <div className="flex items-center space-x-3 mb-6">
         <Target className="h-6 w-6 text-purple-400" />
         <h3 className="text-xl font-bold text-white">Pattern Detection</h3>
-        <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
-          TradingView Synced
-        </Badge>
       </div>
 
       <div className="space-y-4">
@@ -109,9 +97,9 @@ const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) 
               </div>
             </div>
             
-            {marketData.price && (
-              <div className="mt-2 text-xs text-green-500">
-                TradingView: ${formatPrice(marketData.price)} | Change {formatChangePercent(marketData.changePercent)}
+            {marketData && (
+              <div className="mt-2 text-xs text-gray-500">
+                Based on: Price ${marketData.currentPrice.toFixed(2)} | Change {marketData.changePercent.toFixed(2)}%
               </div>
             )}
           </div>
@@ -121,7 +109,7 @@ const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) 
           <div className="text-center py-8 text-gray-400">
             <Target className="h-12 w-12 mx-auto mb-3 opacity-50" />
             <p>No clear patterns detected</p>
-            {marketData.price && marketData.changePercent !== null && (
+            {marketData && (
               <p className="text-xs mt-2">Market conditions: {Math.abs(marketData.changePercent) < 1 ? 'Low volatility' : 'Active movement'}</p>
             )}
           </div>
@@ -130,8 +118,3 @@ const PatternDetectionComponent = ({ asset, timeframe }: PatternDetectionProps) 
     </Card>
   );
 };
-
-// Export memoized component to prevent unnecessary re-renders
-export const PatternDetection = memo(PatternDetectionComponent, (prevProps, nextProps) => {
-  return prevProps.asset === nextProps.asset && prevProps.timeframe === nextProps.timeframe;
-});

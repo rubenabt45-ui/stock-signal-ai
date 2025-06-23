@@ -1,8 +1,6 @@
 
-import { useEffect, useRef, useState, memo, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
-import { getMarketOverviewConfig } from "@/utils/tradingViewConfig";
 
 interface MarketOverviewProps {
   symbols?: string[];
@@ -17,7 +15,7 @@ declare global {
   }
 }
 
-const MarketOverviewComponent = ({ 
+export const MarketOverview = ({ 
   symbols = ['NASDAQ:AAPL', 'NASDAQ:MSFT', 'NASDAQ:TSLA', 'NASDAQ:NVDA', 'NASDAQ:AMZN'], 
   theme,
   height = 400, 
@@ -26,94 +24,133 @@ const MarketOverviewComponent = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { actualTheme } = useTheme();
   
-  // Ultra-aggressive lazy loading - only load when very close to viewport
-  const { targetRef, isIntersecting } = useIntersectionObserver({
-    threshold: 0.05,
-    rootMargin: '50px',
-    triggerOnce: true
-  });
-  
+  // Use provided theme or fall back to user's theme preference
   const widgetTheme = theme || actualTheme;
-  const containerId = useRef(`ultra-optimized-widget-${Date.now()}`).current;
+  
+  // Generate unique container ID
+  const containerId = `tradingview-widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-  console.log(`⚡ Ultra-optimized MarketOverview: Visible=${isIntersecting}, Symbols=${symbols.length}`);
+  console.log(`🔧 MarketOverview mounting with symbols:`, symbols);
+  console.log(`🎨 Theme: ${widgetTheme}`);
 
-  // Memoized script loading with aggressive optimization
-  const loadScript = useCallback(() => {
-    if (!isIntersecting) return;
-    
-    if (window.TradingView) {
-      console.log('⚡ TradingView already loaded - using existing instance');
-      setIsLoaded(true);
-      setIsLoading(false);
+  // Load TradingView script
+  useEffect(() => {
+    const loadScript = () => {
+      // Check if script already exists
+      const existingScript = document.querySelector('script[src*="market-overview"]');
+      if (existingScript) {
+        console.log('📊 TradingView script already loaded');
+        setIsLoaded(true);
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('📊 Loading TradingView market overview script...');
+      const script = document.createElement('script');
+      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+      script.async = true;
+      script.onload = () => {
+        console.log('✅ TradingView script loaded');
+        setIsLoaded(true);
+        setIsLoading(false);
+        setError(null);
+      };
+      script.onerror = () => {
+        console.error('❌ Failed to load TradingView script');
+        setIsLoading(false);
+        setError('Failed to load market overview');
+      };
+      
+      document.head.appendChild(script);
+    };
+
+    loadScript();
+
+    // Timeout fallback
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        console.warn('⏰ Script loading timeout');
+        setIsLoading(false);
+        setError('Loading timeout');
+      }
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [isLoading]);
+
+  // Create widget when script is loaded
+  useEffect(() => {
+    if (!isLoaded || !containerRef.current) {
       return;
     }
 
-    console.log('⚡ Loading ultra-optimized TradingView script...');
-    setIsLoading(true);
-    
-    const script = document.createElement('script');
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
-    script.async = true;
-    script.onload = () => {
-      console.log('✅ Ultra-optimized TradingView script loaded');
-      setIsLoaded(true);
-      setIsLoading(false);
-      setError(null);
-    };
-    script.onerror = () => {
-      console.error('❌ Failed to load ultra-optimized TradingView script');
-      setIsLoading(false);
-      setError('Failed to load market overview');
-    };
-    
-    document.head.appendChild(script);
-  }, [isIntersecting]);
-
-  // Load script only when visible
-  useEffect(() => {
-    if (isIntersecting && !isLoaded && !isLoading) {
-      loadScript();
-    }
-  }, [isIntersecting, isLoaded, isLoading, loadScript]);
-
-  // Create ultra-lightweight widget
-  useEffect(() => {
-    if (!isLoaded || !containerRef.current || !isIntersecting) {
-      return;
-    }
-
-    // Aggressive cleanup
+    // Clean up previous widget
     if (widgetRef.current) {
       try {
         widgetRef.current.remove();
       } catch (e) {
-        console.log('Ultra-optimized widget cleanup:', e);
+        console.log('Widget cleanup:', e);
       }
     }
 
+    // Clear container
     containerRef.current.innerHTML = '';
     containerRef.current.id = containerId;
 
     try {
-      console.log('⚡ Creating ultra-optimized widget with minimal features');
+      // Create symbol groups from provided symbols
+      const symbolsGroups = [
+        {
+          name: "Related Assets",
+          symbols: symbols.map(symbol => {
+            const displayName = symbol.replace('NASDAQ:', '').replace('NYSE:', '');
+            return {
+              name: symbol,
+              displayName: displayName
+            };
+          })
+        }
+      ];
 
-      // Use the ultra-optimized config
-      const config = getMarketOverviewConfig(widgetTheme, symbols);
+      console.log('📊 Creating widget with symbolsGroups:', symbolsGroups);
 
-      // Create widget with minimal overhead
+      // Widget configuration
+      const config = {
+        colorTheme: widgetTheme === 'dark' ? 'dark' : 'light',
+        dateRange: "12M",
+        showChart: true,
+        locale: "en",
+        width: "100%",
+        height: height,
+        largeChartUrl: "",
+        isTransparent: false,
+        showSymbolLogo: true,
+        showFloatingTooltip: false,
+        plotLineColorGrowing: "rgba(37, 99, 235, 1)",
+        plotLineColorFalling: "rgba(239, 68, 68, 1)",
+        gridLineColor: "rgba(240, 243, 250, 0.06)",
+        scaleFontColor: "rgba(120, 123, 134, 1)",
+        belowLineFillColorGrowing: "rgba(37, 99, 235, 0.12)",
+        belowLineFillColorFalling: "rgba(239, 68, 68, 0.12)",
+        belowLineFillColorGrowingBottom: "rgba(37, 99, 235, 0)",
+        belowLineFillColorFallingBottom: "rgba(239, 68, 68, 0)",
+        symbolActiveColor: "rgba(60, 120, 216, 0.12)",
+        symbolsGroups: symbolsGroups
+      };
+
+      // Create the widget using TradingView constructor
       if (window.TradingView) {
         widgetRef.current = new window.TradingView.widget({
           container_id: containerId,
           ...config
         });
-        console.log('✅ Ultra-optimized widget created successfully');
+        console.log('✅ TradingView widget created successfully');
       } else {
-        // Fallback with script injection
+        // Fallback: inject script directly
         const scriptContent = `
           new TradingView.widget({
             "container_id": "${containerId}",
@@ -126,16 +163,16 @@ const MarketOverviewComponent = ({
         const widgetScript = document.createElement('script');
         widgetScript.innerHTML = scriptContent;
         containerRef.current.appendChild(widgetScript);
-        console.log('⚡ Ultra-optimized widget script injected');
+        console.log('📊 Widget script injected as fallback');
       }
 
     } catch (error) {
-      console.error('❌ Error creating ultra-optimized widget:', error);
+      console.error('❌ Error creating widget:', error);
       setError('Failed to create widget');
     }
-  }, [symbols, widgetTheme, isLoaded, height, containerId, isIntersecting]);
+  }, [symbols, widgetTheme, isLoaded, height, containerId]);
 
-  // Aggressive cleanup on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (widgetRef.current) {
@@ -148,32 +185,15 @@ const MarketOverviewComponent = ({
     };
   }, []);
 
-  if (!isIntersecting) {
-    return (
-      <div 
-        ref={targetRef}
-        className={`flex items-center justify-center bg-black/5 rounded-2xl border border-gray-700/20 ${className}`} 
-        style={{ height: `${height}px`, minHeight: '400px' }}
-      >
-        <div className="text-center py-8">
-          <div className="w-6 h-6 border border-tradeiq-blue/40 rounded-full mx-auto mb-3"></div>
-          <p className="text-gray-400 text-sm font-medium">Chart loading when visible...</p>
-          <p className="text-gray-500 text-xs mt-1">Ultra-optimized for performance</p>
-        </div>
-      </div>
-    );
-  }
-
   if (isLoading) {
     return (
       <div 
-        ref={targetRef}
-        className={`flex items-center justify-center bg-black/5 rounded-2xl border border-gray-700/20 ${className}`} 
+        className={`flex items-center justify-center bg-black/10 rounded-2xl border border-gray-700/20 shadow-lg ${className}`} 
         style={{ height: `${height}px`, minHeight: '400px' }}
       >
         <div className="text-center py-8">
-          <div className="animate-pulse rounded-full h-6 w-6 bg-tradeiq-blue/40 mx-auto mb-3"></div>
-          <p className="text-gray-400 text-sm font-medium">Loading optimized chart...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tradeiq-blue mx-auto mb-3"></div>
+          <p className="text-gray-400 text-sm font-medium">Loading Market Overview...</p>
           <p className="text-gray-500 text-xs mt-1">Symbols: {symbols.length}</p>
         </div>
       </div>
@@ -183,13 +203,12 @@ const MarketOverviewComponent = ({
   if (error || !isLoaded) {
     return (
       <div 
-        ref={targetRef}
-        className={`flex items-center justify-center bg-black/5 rounded-2xl border border-gray-700/20 ${className}`} 
+        className={`flex items-center justify-center bg-black/10 rounded-2xl border border-gray-700/20 shadow-lg ${className}`} 
         style={{ height: `${height}px`, minHeight: '400px' }}
       >
         <div className="text-center py-8">
-          <p className="text-red-400 text-lg mb-2">⚠️ Chart unavailable</p>
-          <p className="text-gray-500 text-sm">Please refresh to retry</p>
+          <p className="text-red-400 text-lg mb-2">⚠️ Market data unavailable</p>
+          <p className="text-gray-500 text-sm">Please try refreshing the page</p>
           <button 
             onClick={() => window.location.reload()} 
             className="mt-3 px-4 py-2 bg-tradeiq-blue/20 text-tradeiq-blue rounded-lg text-sm hover:bg-tradeiq-blue/30 transition-colors"
@@ -203,8 +222,7 @@ const MarketOverviewComponent = ({
 
   return (
     <div 
-      ref={targetRef}
-      className={`bg-black/5 rounded-2xl border border-gray-700/20 overflow-hidden w-full ${className}`}
+      className={`bg-black/5 rounded-2xl border border-gray-700/20 shadow-lg overflow-hidden w-full ${className}`}
       style={{ height: `${height}px`, minHeight: '400px' }}
     >
       <div 
@@ -216,21 +234,3 @@ const MarketOverviewComponent = ({
     </div>
   );
 };
-
-// Ultra-aggressive memoization - only re-render when absolutely necessary
-export const MarketOverview = memo(MarketOverviewComponent, (prevProps, nextProps) => {
-  const symbolsChanged = JSON.stringify(prevProps.symbols) !== JSON.stringify(nextProps.symbols);
-  const propsChanged = 
-    symbolsChanged ||
-    prevProps.theme !== nextProps.theme ||
-    prevProps.height !== nextProps.height ||
-    prevProps.className !== nextProps.className;
-  
-  if (!propsChanged) {
-    console.log('⚡ Ultra-optimized MarketOverview: Skipping re-render - no changes');
-  } else {
-    console.log('🔄 Ultra-optimized MarketOverview: Re-rendering - props changed');
-  }
-  
-  return !propsChanged;
-});

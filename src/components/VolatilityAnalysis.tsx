@@ -1,7 +1,8 @@
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Zap, AlertCircle, Shield, TrendingUp as VolHigh } from "lucide-react";
-import { useTradingViewWidgetData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewWidgetData";
+import { useExternalMarketData } from "@/hooks/useExternalMarketData";
 
 interface VolatilityAnalysisProps {
   asset: string;
@@ -9,7 +10,7 @@ interface VolatilityAnalysisProps {
 }
 
 const calculateVolatilityData = (marketData: any) => {
-  if (!marketData || !marketData.price) {
+  if (!marketData) {
     return {
       volatility: 0,
       level: 'Low' as const,
@@ -18,11 +19,11 @@ const calculateVolatilityData = (marketData: any) => {
     };
   }
 
-  const { high, low, price, changePercent } = marketData;
+  const { high, low, currentPrice, changePercent } = marketData;
   
-  // Calculate true range volatility using TradingView data
-  const trueRange = high && low ? ((high - low) / price) * 100 : 0;
-  const priceVolatility = Math.abs(changePercent || 0);
+  // Calculate true range volatility
+  const trueRange = ((high - low) / currentPrice) * 100;
+  const priceVolatility = Math.abs(changePercent);
   
   // Combined volatility score
   const volatility = (trueRange * 0.6) + (priceVolatility * 0.4);
@@ -49,15 +50,10 @@ const calculateVolatilityData = (marketData: any) => {
 };
 
 export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps) => {
-  const marketData = useTradingViewWidgetData(asset);
+  const { data: marketData, isLoading } = useExternalMarketData(asset, timeframe);
   const { volatility, level, icon: VolIcon, color } = calculateVolatilityData(marketData);
 
-  // TradingView data logs
-  if (process.env.NODE_ENV === 'development' && marketData.price !== null) {
-    console.log(`⚡ VolatilityAnalysis [${asset}]: TradingView Price $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Synced: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
-  }
-
-  if (marketData.isLoading) {
+  if (isLoading) {
     return (
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex items-center space-x-3 mb-6">
@@ -77,9 +73,6 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
       <div className="flex items-center space-x-3 mb-6">
         <Zap className="h-6 w-6 text-tradeiq-warning" />
         <h3 className="text-xl font-bold text-white">Volatility Analysis</h3>
-        <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
-          TradingView Synced
-        </Badge>
       </div>
 
       <div className="space-y-6">
@@ -115,12 +108,12 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
             </div>
           </div>
           
-          {marketData.high && marketData.low && (
+          {marketData && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-gray-400 font-medium">Daily Range</span>
                 <span className="text-white font-bold">
-                  ${formatPrice(marketData.low)} - ${formatPrice(marketData.high)}
+                  ${marketData.low.toFixed(2)} - ${marketData.high.toFixed(2)}
                 </span>
               </div>
             </div>
@@ -148,9 +141,9 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
             {level === 'Medium' && 'Moderate price swings expected. Monitor for potential breakouts.'}
             {level === 'High' && 'Significant price movements likely. Exercise caution with position sizing.'}
           </p>
-          {marketData.price && (
-            <p className="text-xs text-green-500 mt-2">
-              TradingView: ${formatPrice(marketData.price)} ({formatChangePercent(marketData.changePercent)})
+          {marketData && (
+            <p className="text-xs text-gray-500 mt-2">
+              Current: ${marketData.currentPrice.toFixed(2)} ({marketData.changePercent > 0 ? '+' : ''}{marketData.changePercent.toFixed(2)}%)
             </p>
           )}
         </div>

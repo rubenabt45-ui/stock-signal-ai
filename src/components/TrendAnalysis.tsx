@@ -1,7 +1,8 @@
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Minus, Activity } from "lucide-react";
-import { useTradingViewWidgetData, formatPrice, formatChangePercent } from "@/hooks/useTradingViewWidgetData";
+import { useExternalMarketData } from "@/hooks/useExternalMarketData";
 
 interface TrendAnalysisProps {
   asset: string;
@@ -9,7 +10,7 @@ interface TrendAnalysisProps {
 }
 
 const generateTrendData = (marketData: any) => {
-  if (!marketData || !marketData.price) {
+  if (!marketData) {
     return {
       trend: 'Sideways' as const,
       strength: 50,
@@ -17,9 +18,9 @@ const generateTrendData = (marketData: any) => {
     };
   }
 
-  const { changePercent, high, low, price, open } = marketData;
+  const { changePercent, high, low, currentPrice, open } = marketData;
   
-  // Determine trend based on TradingView data
+  // Determine trend based on price action
   let trend: 'Bullish' | 'Bearish' | 'Sideways';
   if (changePercent > 1.5) {
     trend = 'Bullish';
@@ -30,23 +31,18 @@ const generateTrendData = (marketData: any) => {
   }
   
   // Calculate trend strength based on price position within range
-  const pricePosition = high && low ? ((price - low) / (high - low)) * 100 : 50;
+  const pricePosition = ((currentPrice - low) / (high - low)) * 100;
   const strength = Math.min(Math.max(pricePosition + Math.abs(changePercent) * 10, 0), 100);
   
-  // Calculate momentum based on change data
+  // Calculate momentum based on change and volume indicators
   const momentum = Math.min(Math.max(50 + (changePercent * 5) + Math.random() * 20, 0), 100);
   
   return { trend, strength, momentum };
 };
 
 export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
-  const marketData = useTradingViewWidgetData(asset);
+  const { data: marketData, isLoading } = useExternalMarketData(asset, timeframe);
   const { trend, strength, momentum } = generateTrendData(marketData);
-
-  // TradingView data logs
-  if (process.env.NODE_ENV === 'development' && marketData.price !== null) {
-    console.log(`📈 TrendAnalysis [${asset}]: TradingView Price $${formatPrice(marketData.price)} (${formatChangePercent(marketData.changePercent)}) - Synced: ${new Date(marketData.lastUpdated || 0).toLocaleTimeString()}`);
-  }
 
   const getTrendIcon = () => {
     switch (trend) {
@@ -66,7 +62,7 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
 
   const TrendIcon = getTrendIcon();
 
-  if (marketData.isLoading) {
+  if (isLoading) {
     return (
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex items-center space-x-3 mb-6">
@@ -86,9 +82,6 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
       <div className="flex items-center space-x-3 mb-6">
         <Activity className="h-6 w-6 text-tradeiq-blue" />
         <h3 className="text-xl font-bold text-white">Trend Analysis</h3>
-        <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
-          TradingView Synced
-        </Badge>
       </div>
 
       <div className="space-y-6">
@@ -146,9 +139,9 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
               {trend} Trend
             </Badge>
           </div>
-          {marketData.price && (
-            <div className="text-xs text-green-500 mt-2">
-              TradingView: ${formatPrice(marketData.price)} | Change: {formatChangePercent(marketData.changePercent)}
+          {marketData && (
+            <div className="text-xs text-gray-500 mt-2">
+              Price: ${marketData.currentPrice.toFixed(2)} | Change: {marketData.changePercent > 0 ? '+' : ''}{marketData.changePercent.toFixed(2)}%
             </div>
           )}
         </div>

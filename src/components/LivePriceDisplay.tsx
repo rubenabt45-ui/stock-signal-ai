@@ -1,8 +1,7 @@
 
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { useRealMarketData } from "@/hooks/useRealMarketData";
 import { Badge } from "@/components/ui/badge";
-import { useTradingViewData } from "@/contexts/TradingViewDataContext";
-import { memo } from "react";
 
 interface LivePriceDisplayProps {
   symbol: string;
@@ -11,31 +10,13 @@ interface LivePriceDisplayProps {
   className?: string;
 }
 
-const formatPrice = (price: number | null): string => {
-  if (price === null) return "0.00";
-  if (price >= 1000) {
-    return price.toLocaleString(undefined, { 
-      minimumFractionDigits: 2, 
-      maximumFractionDigits: 2 
-    });
-  }
-  return price.toFixed(2);
-};
-
-const formatChangePercent = (changePercent: number | null): string => {
-  if (changePercent === null) return "0.00%";
-  const sign = changePercent >= 0 ? '+' : '';
-  return `${sign}${changePercent.toFixed(2)}%`;
-};
-
-const LivePriceDisplayComponent = ({ 
+export const LivePriceDisplay = ({ 
   symbol, 
   showSymbol = true, 
   size = 'lg',
   className = ''
 }: LivePriceDisplayProps) => {
-  const { getData } = useTradingViewData();
-  const { price, changePercent, lastUpdated } = getData(symbol);
+  const { price, changePercent, isLoading, error, lastUpdated } = useRealMarketData(symbol);
 
   const getSizeClasses = () => {
     switch (size) {
@@ -85,23 +66,31 @@ const LivePriceDisplayComponent = ({
     return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
   };
 
-  // If no price data is available from TradingView, show chart reference instead
-  if (price === null) {
+  const formatPrice = (value: number) => {
+    if (value >= 1000) {
+      return value.toLocaleString(undefined, { 
+        minimumFractionDigits: 2, 
+        maximumFractionDigits: 2 
+      });
+    }
+    return value.toFixed(2);
+  };
+
+  if (error) {
     return (
       <div className={`${sizeClasses.container} ${className}`}>
-        {showSymbol && (
-          <div className="flex items-center space-x-2">
-            <span className={sizeClasses.symbol}>{symbol}</span>
-          </div>
-        )}
-        
-        <div className="text-center py-2">
-          <div className="text-blue-400 font-medium text-sm mb-1">Live Chart Data</div>
-          <div className="text-xs text-gray-500">Powered by TradingView</div>
-          <div className="text-xs text-gray-600 mt-1">
-            See chart above for real-time price
-          </div>
-        </div>
+        <p className="text-red-400 font-medium">Error loading {symbol}</p>
+        <p className="text-gray-500 text-sm">{error}</p>
+      </div>
+    );
+  }
+
+  if (isLoading || !price) {
+    return (
+      <div className={`${sizeClasses.container} ${className} animate-pulse`}>
+        {showSymbol && <div className="h-6 bg-gray-700/50 rounded w-16"></div>}
+        <div className="h-10 bg-gray-700/50 rounded w-32"></div>
+        <div className="h-6 bg-gray-700/50 rounded w-20"></div>
       </div>
     );
   }
@@ -111,8 +100,8 @@ const LivePriceDisplayComponent = ({
       {showSymbol && (
         <div className="flex items-center space-x-2">
           <span className={sizeClasses.symbol}>{symbol}</span>
-          <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
-            TradingView Synced
+          <Badge className="bg-tradeiq-blue/20 text-tradeiq-blue border-tradeiq-blue/30 text-xs">
+            LIVE
           </Badge>
         </div>
       )}
@@ -122,7 +111,7 @@ const LivePriceDisplayComponent = ({
           ${formatPrice(price)}
         </span>
         {lastUpdated && (
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="TradingView synchronized"></div>
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
         )}
       </div>
       
@@ -133,26 +122,17 @@ const LivePriceDisplayComponent = ({
             {isNegative && <TrendingDown className={sizeClasses.icon} />}
             {!isPositive && !isNegative && <Minus className={sizeClasses.icon} />}
             <span className={sizeClasses.change}>
-              {formatChangePercent(changePercent)}
+              {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
             </span>
           </div>
         </Badge>
       )}
       
       {lastUpdated && (
-        <div className={`${sizeClasses.time} text-green-500 flex items-center space-x-1`}>
-          <span>TradingView: {new Date(lastUpdated).toLocaleTimeString()}</span>
+        <div className={`${sizeClasses.time} text-gray-500 flex items-center space-x-1`}>
+          <span>Last update: {new Date(lastUpdated).toLocaleTimeString()}</span>
         </div>
       )}
     </div>
   );
 };
-
-export const LivePriceDisplay = memo(LivePriceDisplayComponent, (prevProps, nextProps) => {
-  return (
-    prevProps.symbol === nextProps.symbol &&
-    prevProps.showSymbol === nextProps.showSymbol &&
-    prevProps.size === nextProps.size &&
-    prevProps.className === nextProps.className
-  );
-});
