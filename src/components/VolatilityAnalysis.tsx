@@ -1,68 +1,80 @@
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Zap, AlertCircle, Shield, TrendingUp as VolHigh } from "lucide-react";
-import { useExternalMarketData } from "@/hooks/useExternalMarketData";
+import { Activity, AlertTriangle, CheckCircle } from "lucide-react";
+import { useTradingViewWidgetData } from "@/hooks/useTradingViewWidgetData";
 
 interface VolatilityAnalysisProps {
   asset: string;
   timeframe: string;
 }
 
-const calculateVolatilityData = (marketData: any) => {
-  if (!marketData) {
-    return {
-      volatility: 0,
-      level: 'Low' as const,
-      icon: Shield,
-      color: 'text-tradeiq-success'
-    };
+const analyzeVolatilityFromTradingView = (price: number | null, change: number | null) => {
+  if (!price || change === null) return null;
+  
+  const absChange = Math.abs(change);
+  
+  let level = "Low";
+  let color = "text-green-400";
+  let icon = <CheckCircle className="h-5 w-5" />;
+  let description = "Stable price movement";
+  
+  if (absChange > 5) {
+    level = "Very High";
+    color = "text-red-400";
+    icon = <AlertTriangle className="h-5 w-5" />;
+    description = "Extreme price fluctuation";
+  } else if (absChange > 3) {
+    level = "High";
+    color = "text-orange-400";
+    icon = <AlertTriangle className="h-5 w-5" />;
+    description = "Significant price movement";
+  } else if (absChange > 1.5) {
+    level = "Moderate";
+    color = "text-yellow-400";
+    icon = <Activity className="h-5 w-5" />;
+    description = "Normal market activity";
   }
-
-  const { high, low, currentPrice, changePercent } = marketData;
   
-  // Calculate true range volatility
-  const trueRange = ((high - low) / currentPrice) * 100;
-  const priceVolatility = Math.abs(changePercent);
-  
-  // Combined volatility score
-  const volatility = (trueRange * 0.6) + (priceVolatility * 0.4);
-  
-  let level: 'Low' | 'Medium' | 'High';
-  let icon;
-  let color;
-
-  if (volatility < 2) {
-    level = 'Low';
-    icon = Shield;
-    color = 'text-tradeiq-success';
-  } else if (volatility < 5) {
-    level = 'Medium';
-    icon = AlertCircle;
-    color = 'text-tradeiq-warning';
-  } else {
-    level = 'High';
-    icon = VolHigh;
-    color = 'text-tradeiq-danger';
-  }
-
-  return { volatility, level, icon, color };
+  return {
+    level,
+    color,
+    icon,
+    description,
+    riskScore: Math.min(100, absChange * 15),
+    intensity: absChange
+  };
 };
 
 export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps) => {
-  const { data: marketData, isLoading } = useExternalMarketData(asset, timeframe);
-  const { volatility, level, icon: VolIcon, color } = calculateVolatilityData(marketData);
+  const { price, change, isLoading } = useTradingViewWidgetData(asset);
+  const volatilityData = analyzeVolatilityFromTradingView(price, change);
 
   if (isLoading) {
     return (
       <Card className="tradeiq-card p-6 rounded-2xl">
         <div className="flex items-center space-x-3 mb-6">
-          <Zap className="h-6 w-6 text-tradeiq-warning" />
+          <Activity className="h-6 w-6 text-orange-400" />
           <h3 className="text-xl font-bold text-white">Volatility Analysis</h3>
         </div>
-        <div className="animate-pulse space-y-6">
-          <div className="h-20 bg-gray-700/30 rounded-2xl"></div>
-          <div className="h-16 bg-gray-700/30 rounded-xl"></div>
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-700/30 rounded w-1/2"></div>
+          <div className="h-4 bg-gray-700/30 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-700/30 rounded w-2/3"></div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (!volatilityData) {
+    return (
+      <Card className="tradeiq-card p-6 rounded-2xl">
+        <div className="flex items-center space-x-3 mb-6">
+          <Activity className="h-6 w-6 text-orange-400" />
+          <h3 className="text-xl font-bold text-white">Volatility Analysis</h3>
+        </div>
+        <div className="text-center py-8 text-gray-400">
+          <p>Waiting for TradingView data...</p>
         </div>
       </Card>
     );
@@ -70,82 +82,83 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
 
   return (
     <Card className="tradeiq-card p-6 rounded-2xl">
-      <div className="flex items-center space-x-3 mb-6">
-        <Zap className="h-6 w-6 text-tradeiq-warning" />
-        <h3 className="text-xl font-bold text-white">Volatility Analysis</h3>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-3">
+          <Activity className="h-6 w-6 text-orange-400" />
+          <h3 className="text-xl font-bold text-white">Volatility Analysis</h3>
+        </div>
+        <Badge variant="outline" className="text-xs text-tradeiq-blue border-tradeiq-blue/30">
+          Live Analysis
+        </Badge>
       </div>
 
       <div className="space-y-6">
         {/* Volatility Level */}
-        <div className="text-center space-y-4">
-          <div className={`inline-flex items-center space-x-3 p-4 rounded-2xl ${
-            level === 'Low' ? 'bg-tradeiq-success/10 border border-tradeiq-success/30' :
-            level === 'Medium' ? 'bg-tradeiq-warning/10 border border-tradeiq-warning/30' :
-            'bg-tradeiq-danger/10 border border-tradeiq-danger/30'
-          }`}>
-            <VolIcon className={`h-8 w-8 ${color}`} />
-            <span className={`text-2xl font-bold ${color}`}>
-              {level}
-            </span>
+        <div className="flex items-center justify-between p-4 bg-black/20 rounded-xl border border-gray-800/50">
+          <div className="flex items-center space-x-3">
+            <div className={volatilityData.color}>
+              {volatilityData.icon}
+            </div>
+            <div>
+              <span className="text-white font-semibold">Volatility Level</span>
+              <p className="text-sm text-gray-400">{volatilityData.description}</p>
+            </div>
+          </div>
+          <Badge variant="outline" className={`${volatilityData.color} border-current/30 font-bold`}>
+            {volatilityData.level}
+          </Badge>
+        </div>
+
+        {/* Risk Score */}
+        <div className="p-4 bg-black/20 rounded-xl border border-gray-800/50">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-white font-semibold">Risk Score</span>
+            <span className="text-white font-bold text-sm">{volatilityData.riskScore.toFixed(0)}/100</span>
+          </div>
+          <div className="w-full bg-gray-800 rounded-full h-2">
+            <div 
+              className={`h-2 rounded-full transition-all duration-500 ${
+                volatilityData.riskScore > 60 ? 'bg-red-400' :
+                volatilityData.riskScore > 30 ? 'bg-yellow-400' : 'bg-green-400'
+              }`}
+              style={{ width: `${Math.min(100, volatilityData.riskScore)}%` }}
+            ></div>
           </div>
         </div>
 
-        {/* Volatility Metrics */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400 font-medium">Volatility Index</span>
-              <span className="text-white font-bold">{volatility.toFixed(1)}%</span>
-            </div>
-            <div className="w-full bg-gray-800 rounded-full h-3">
-              <div 
-                className={`h-3 rounded-full transition-all duration-500 ${
-                  volatility > 5 ? 'bg-tradeiq-danger' : 
-                  volatility > 2 ? 'bg-tradeiq-warning' : 'bg-tradeiq-success'
-                }`}
-                style={{ width: `${Math.min(volatility * 10, 100)}%` }}
-              ></div>
-            </div>
-          </div>
-          
-          {marketData && (
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-400 font-medium">Daily Range</span>
-                <span className="text-white font-bold">
-                  ${marketData.low.toFixed(2)} - ${marketData.high.toFixed(2)}
-                </span>
+        {/* Current Metrics */}
+        {price && change !== null && (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-3 bg-black/20 rounded-xl border border-gray-800/50">
+              <div className="text-center">
+                <p className="text-gray-400 text-sm">Price Movement</p>
+                <p className={`text-lg font-bold ${change >= 0 ? 'text-tradeiq-success' : 'text-tradeiq-danger'}`}>
+                  {change > 0 ? '+' : ''}{change.toFixed(2)}%
+                </p>
               </div>
             </div>
-          )}
-        </div>
-
-        {/* Risk Assessment */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-3 bg-black/20 rounded-xl text-center">
-            <div className="text-gray-400 text-sm mb-1">Risk Level</div>
-            <Badge variant="outline" className={`border-gray-600 font-bold ${color} border-opacity-30`}>
-              {level}
-            </Badge>
+            <div className="p-3 bg-black/20 rounded-xl border border-gray-800/50">
+              <div className="text-center">
+                <p className="text-gray-400 text-sm">Current Price</p>
+                <p className="text-lg font-bold text-white">${price.toFixed(2)}</p>
+              </div>
+            </div>
           </div>
-          <div className="p-3 bg-black/20 rounded-xl text-center">
-            <div className="text-gray-400 text-sm mb-1">Timeframe</div>
-            <div className="text-white font-bold">{timeframe}</div>
-          </div>
-        </div>
+        )}
 
-        {/* Volatility Description */}
-        <div className="p-4 bg-black/20 rounded-xl">
-          <p className="text-gray-300 text-sm leading-relaxed">
-            {level === 'Low' && 'Price movements are relatively stable with minimal fluctuations expected.'}
-            {level === 'Medium' && 'Moderate price swings expected. Monitor for potential breakouts.'}
-            {level === 'High' && 'Significant price movements likely. Exercise caution with position sizing.'}
+        {/* Insights */}
+        <div className="p-4 bg-black/20 rounded-xl border border-gray-800/50">
+          <h4 className="text-white font-semibold mb-2">Market Insight</h4>
+          <p className="text-sm text-gray-300">
+            {volatilityData.level === "Very High" ? 
+              "Extreme price movements suggest high market uncertainty. Consider risk management strategies." :
+            volatilityData.level === "High" ?
+              "Significant price swings indicate active trading. Monitor closely for trend confirmation." :
+            volatilityData.level === "Moderate" ?
+              "Normal market activity with reasonable price movements." :
+              "Low volatility suggests stable market conditions with minimal price fluctuation."
+            }
           </p>
-          {marketData && (
-            <p className="text-xs text-gray-500 mt-2">
-              Current: ${marketData.currentPrice.toFixed(2)} ({marketData.changePercent > 0 ? '+' : ''}{marketData.changePercent.toFixed(2)}%)
-            </p>
-          )}
         </div>
       </div>
     </Card>
