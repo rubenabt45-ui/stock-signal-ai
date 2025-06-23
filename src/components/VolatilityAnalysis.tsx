@@ -6,7 +6,6 @@ import { useTradingViewWidgetData } from "@/hooks/useTradingViewWidgetData";
 
 interface VolatilityAnalysisProps {
   asset: string;
-  timeframe: string;
 }
 
 const analyzeVolatilityFromTradingView = (price: number | null, change: number | null) => {
@@ -46,7 +45,7 @@ const analyzeVolatilityFromTradingView = (price: number | null, change: number |
   };
 };
 
-export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps) => {
+export const VolatilityAnalysis = ({ asset }: VolatilityAnalysisProps) => {
   const { price, change, isLoading } = useTradingViewWidgetData(asset);
   const volatilityData = analyzeVolatilityFromTradingView(price, change);
 
@@ -88,7 +87,7 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
           <h3 className="text-xl font-bold text-white">Volatility Analysis</h3>
         </div>
         <Badge variant="outline" className="text-xs text-tradeiq-blue border-tradeiq-blue/30">
-          Live Analysis
+          TradingView Data
         </Badge>
       </div>
 
@@ -126,21 +125,15 @@ export const VolatilityAnalysis = ({ asset, timeframe }: VolatilityAnalysisProps
           </div>
         </div>
 
-        {/* Current Metrics */}
-        {price && change !== null && (
-          <div className="grid grid-cols-2 gap-4">
+        {/* Movement Metrics - Price field temporarily hidden */}
+        {change !== null && (
+          <div className="grid grid-cols-1 gap-4">
             <div className="p-3 bg-black/20 rounded-xl border border-gray-800/50">
               <div className="text-center">
                 <p className="text-gray-400 text-sm">Price Movement</p>
                 <p className={`text-lg font-bold ${change >= 0 ? 'text-tradeiq-success' : 'text-tradeiq-danger'}`}>
                   {change > 0 ? '+' : ''}{change.toFixed(2)}%
                 </p>
-              </div>
-            </div>
-            <div className="p-3 bg-black/20 rounded-xl border border-gray-800/50">
-              <div className="text-center">
-                <p className="text-gray-400 text-sm">Current Price</p>
-                <p className="text-lg font-bold text-white">${price.toFixed(2)}</p>
               </div>
             </div>
           </div>

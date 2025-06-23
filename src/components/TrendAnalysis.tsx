@@ -6,7 +6,6 @@ import { useTradingViewWidgetData } from "@/hooks/useTradingViewWidgetData";
 
 interface TrendAnalysisProps {
   asset: string;
-  timeframe: string;
 }
 
 const analyzeTrendFromTradingView = (price: number | null, change: number | null) => {
@@ -41,7 +40,7 @@ const analyzeTrendFromTradingView = (price: number | null, change: number | null
   };
 };
 
-export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
+export const TrendAnalysis = ({ asset }: TrendAnalysisProps) => {
   const { price, change, isLoading } = useTradingViewWidgetData(asset);
   const trendData = analyzeTrendFromTradingView(price, change);
 
@@ -83,7 +82,7 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
           <h3 className="text-xl font-bold text-white">Trend Analysis</h3>
         </div>
         <Badge variant="outline" className="text-xs text-tradeiq-blue border-tradeiq-blue/30">
-          Real-time
+          TradingView Data
         </Badge>
       </div>
 
@@ -130,12 +129,8 @@ export const TrendAnalysis = ({ asset, timeframe }: TrendAnalysisProps) => {
         </div>
 
         {/* Current Data */}
-        {price && change !== null && (
+        {change !== null && (
           <div className="pt-4 border-t border-gray-800">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">Current Price:</span>
-              <span className="text-white font-semibold">${price.toFixed(2)}</span>
-            </div>
             <div className="flex items-center justify-between text-sm mt-1">
               <span className="text-gray-400">Change:</span>
               <span className={change >= 0 ? "text-tradeiq-success" : "text-tradeiq-danger"}>

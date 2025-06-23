@@ -6,7 +6,6 @@ import { useTradingViewWidgetData } from "@/hooks/useTradingViewWidgetData";
 
 interface PatternDetectionProps {
   asset: string;
-  timeframe: string;
 }
 
 const generatePatternsFromTradingView = (price: number | null, change: number | null) => {
@@ -46,7 +45,7 @@ const generatePatternsFromTradingView = (price: number | null, change: number | 
   return patterns.slice(0, 2); // Limit to 2 patterns for clarity
 };
 
-export const PatternDetection = ({ asset, timeframe }: PatternDetectionProps) => {
+export const PatternDetection = ({ asset }: PatternDetectionProps) => {
   const { price, change, isLoading } = useTradingViewWidgetData(asset);
   const detectedPatterns = generatePatternsFromTradingView(price, change);
 
@@ -115,9 +114,9 @@ export const PatternDetection = ({ asset, timeframe }: PatternDetectionProps) =>
               </div>
             </div>
             
-            {price && change !== null && (
+            {change !== null && (
               <div className="mt-2 text-xs text-gray-500">
-                Live Price: ${price.toFixed(2)} | Change: {change > 0 ? '+' : ''}{change.toFixed(2)}%
+                Movement: {change > 0 ? '+' : ''}{change.toFixed(2)}%
               </div>
             )}
           </div>
@@ -127,9 +126,9 @@ export const PatternDetection = ({ asset, timeframe }: PatternDetectionProps) =>
           <div className="text-center py-8 text-gray-400">
             <Target className="h-12 w-12 mx-auto mb-3 opacity-50" />
             <p>No clear patterns detected</p>
-            {price && change !== null && (
+            {change !== null && (
               <p className="text-xs mt-2">
-                Current: ${price.toFixed(2)} ({change > 0 ? '+' : ''}{change.toFixed(2)}%)
+                Current movement: {change > 0 ? '+' : ''}{change.toFixed(2)}%
               </p>
             )}
           </div>

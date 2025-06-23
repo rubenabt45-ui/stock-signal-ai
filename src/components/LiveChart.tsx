@@ -1,22 +1,53 @@
 
 import { Card } from "@/components/ui/card";
 import { BarChart3, Activity } from "lucide-react";
-import { TradingViewAdvancedChart } from "@/components/TradingViewAdvancedChart";
-import { useEffect, useState } from "react";
+import { OptimizedTradingViewWidget } from "@/components/OptimizedTradingViewWidget";
+import { useEffect, useState, useRef } from "react";
 
 interface LiveChartProps {
   asset: string;
-  timeframe: string;
 }
 
-export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
-  const [chartKey, setChartKey] = useState(`${asset}-${timeframe}-${Date.now()}`);
-  
-  // Force chart regeneration when timeframe changes
+export const LiveChart = ({ asset }: LiveChartProps) => {
+  const [isChartReady, setIsChartReady] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+
+  // Reset states when asset changes
   useEffect(() => {
-    console.log(`🎯 LiveChart: Asset ${asset} timeframe changed to ${timeframe} - updating chart`);
-    setChartKey(`${asset}-${timeframe}-${Date.now()}`);
-  }, [asset, timeframe]);
+    console.log(`🎯 LiveChart: Asset changed to ${asset} - resetting chart`);
+    setIsChartReady(false);
+    setHasError(false);
+  }, [asset]);
+
+  const handleChartReady = () => {
+    console.log(`✅ LiveChart: Chart ready for ${asset}`);
+    setIsChartReady(true);
+    setHasError(false);
+  };
+
+  const handleChartError = (error: any) => {
+    console.error(`❌ LiveChart: Chart error for ${asset}:`, error);
+    setHasError(true);
+    setIsChartReady(false);
+  };
+
+  if (hasError) {
+    return (
+      <Card className="tradeiq-card p-6 rounded-2xl">
+        <div className="text-center py-8">
+          <p className="text-red-400 text-lg mb-2">⚠️ Chart data unavailable</p>
+          <p className="text-gray-500 text-sm">TradingView service temporarily unavailable</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-3 px-4 py-2 bg-tradeiq-blue/20 text-tradeiq-blue rounded-lg text-sm hover:bg-tradeiq-blue/30 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -32,23 +63,22 @@ export const LiveChart = ({ asset, timeframe }: LiveChartProps) => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="bg-tradeiq-blue/20 px-3 py-1.5 rounded-lg border border-tradeiq-blue/30">
-              <span className="text-sm font-bold text-tradeiq-blue">Timeframe: {timeframe}</span>
-            </div>
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-green-500">Live</span>
+              <div className={`w-2 h-2 rounded-full ${isChartReady ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`}></div>
+              <span className={`text-sm font-medium ${isChartReady ? 'text-green-500' : 'text-yellow-500'}`}>
+                {isChartReady ? 'Live' : 'Loading...'}
+              </span>
             </div>
           </div>
         </div>
         
-        <div className="w-full">
-          <TradingViewAdvancedChart 
+        <div className="w-full" ref={chartContainerRef}>
+          <OptimizedTradingViewWidget 
             symbol={asset} 
-            timeframe={timeframe}
             className="w-full"
             height="600px"
-            key={chartKey}
+            onReady={handleChartReady}
+            onError={handleChartError}
           />
         </div>
       </Card>

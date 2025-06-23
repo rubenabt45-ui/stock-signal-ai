@@ -2,28 +2,18 @@
 import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { AssetSelection } from "@/components/AssetSelection";
-import { TimeframeSelector } from "@/components/TimeframeSelector";
 import { LiveChart } from "@/components/LiveChart";
 import { PatternDetection } from "@/components/PatternDetection";
 import { TrendAnalysis } from "@/components/TrendAnalysis";
 import { VolatilityAnalysis } from "@/components/VolatilityAnalysis";
 import { AISuggestions } from "@/components/AISuggestions";
 import { MarketOverview } from "@/components/MarketOverview";
-import { LivePriceDisplay } from "@/components/LivePriceDisplay";
 import { ChartCandlestick, Brain, Star, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export type Timeframe = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y";
-
 const Index = () => {
   const [selectedAsset, setSelectedAsset] = useState<string>("AAPL");
-  const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>("1D");
-
-  const handleTimeframeSelect = useCallback((timeframe: string) => {
-    console.log(`🎯 Index: Timeframe changed to ${timeframe} for asset ${selectedAsset}`);
-    setSelectedTimeframe(timeframe as Timeframe);
-  }, [selectedAsset]);
 
   // Get related symbols for market overview
   const getRelatedSymbols = (symbol: string) => {
@@ -81,17 +71,10 @@ const Index = () => {
           onAssetSelect={setSelectedAsset} 
         />
 
-        {/* Timeframe Selector */}
-        <TimeframeSelector 
-          selectedTimeframe={selectedTimeframe} 
-          onTimeframeSelect={handleTimeframeSelect} 
-        />
-
-        {/* Live Chart */}
+        {/* Live Chart - Now uses TradingView's internal controls */}
         <LiveChart 
           asset={selectedAsset} 
-          timeframe={selectedTimeframe}
-          key={`${selectedAsset}-${selectedTimeframe}`}
+          key={selectedAsset}
         />
 
         {/* Market Overview Section */}
@@ -112,27 +95,23 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {/* Analysis Grid */}
+        {/* Analysis Grid - Lazy loaded after chart */}
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="space-y-6">
             <PatternDetection 
               asset={selectedAsset} 
-              timeframe={selectedTimeframe} 
             />
             <TrendAnalysis 
               asset={selectedAsset} 
-              timeframe={selectedTimeframe} 
             />
             <VolatilityAnalysis 
               asset={selectedAsset} 
-              timeframe={selectedTimeframe} 
             />
           </div>
           
           <div>
             <AISuggestions 
               asset={selectedAsset} 
-              timeframe={selectedTimeframe} 
             />
           </div>
         </div>
