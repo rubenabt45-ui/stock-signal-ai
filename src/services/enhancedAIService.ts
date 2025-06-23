@@ -1,6 +1,14 @@
 
 import { MessageContext } from './symbolDetectionService';
-import { UseMarketDataReturn } from '@/hooks/useMarketData';
+
+// Remove the useMarketData import and update the interface
+export interface UseMarketDataReturn {
+  price: number;
+  change: number;
+  isLoading: boolean;
+  error: string | null;
+  lastUpdated: number | null;
+}
 
 export interface EnhancedAIRequest {
   userMessage: string;

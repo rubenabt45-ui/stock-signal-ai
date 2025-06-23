@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ArrowLeft, Brain, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import { TradingViewAdvancedChart } from "@/components/TradingViewAdvancedChart"
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AIAnalysis } from "@/components/AIAnalysis";
 import { MarketPrice } from "@/components/MarketPrice";
-import { useMarketData } from "@/hooks/useMarketData";
+import { useTradingViewWidgetData } from "@/hooks/useTradingViewWidgetData";
 
 interface AnalysisDashboardProps {
   stockSymbol: string;
@@ -29,8 +28,8 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
   const [stockInfo, setStockInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
-  // Use the real-time market data hook
-  const { price, change, isLoading: priceLoading, error } = useMarketData(stockSymbol);
+  // Use the TradingView widget data hook
+  const { price, change, isLoading: priceLoading, error } = useTradingViewWidgetData(stockSymbol);
 
   useEffect(() => {
     // Simulate API call for additional stock info
@@ -147,7 +146,7 @@ export const AnalysisDashboard = ({ stockSymbol, onBackToSearch }: AnalysisDashb
 
         {/* Enhanced AI Analysis Sidebar */}
         <div className="space-y-6">
-          <AIAnalysis symbol={stockSymbol} stockData={{ price, change }} />
+          <AIAnalysis symbol={stockSymbol} stockData={{ price: price || 0, change: change || 0 }} />
         </div>
       </div>
     </div>

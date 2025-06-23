@@ -1,7 +1,15 @@
+import { MessageContext, detectSymbolsInMessage } from './symbolDetectionService';
+import { generateEnhancedTradingResponse, EnhancedAIRequest } from './enhancedAIService';
+import { analyzeUserIntent } from './intentDetectionService';
 
-import { IntentAnalysis, analyzeUserIntent, getProductFeatureInfo, searchProductFeatures } from './intentDetectionService';
-import { MessageContext, analyzeMessageContext } from './symbolDetectionService';
-import { UseMarketDataReturn } from '@/hooks/useMarketData';
+// Define the interface locally instead of importing
+interface UseMarketDataReturn {
+  price: number;
+  change: number;
+  isLoading: boolean;
+  error: string | null;
+  lastUpdated: number | null;
+}
 
 export interface DualModeAIRequest {
   userMessage: string;
@@ -185,7 +193,7 @@ const generateTradingResponse = (
   if (!activeSymbol && conversationHistory) {
     const lastMessages = conversationHistory.slice(-4);
     for (const msg of lastMessages.reverse()) {
-      const contextCheck = analyzeMessageContext(msg.content);
+      const contextCheck = detectSymbolsInMessage(msg.content);
       if (contextCheck.symbols.length > 0) {
         activeSymbol = contextCheck.symbols[0].symbol;
         break;
