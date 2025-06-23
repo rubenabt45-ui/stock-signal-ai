@@ -28,47 +28,77 @@ export const OptimizedTradingViewWidget = ({
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const initTimeoutRef = useRef<NodeJS.Timeout>();
+  const mountedRef = useRef(true);
   const { updateData } = useTradingViewData();
 
-  // Enhanced widget cleanup
+  // Generate unique container ID for each widget instance
+  const containerId = `tv_chart_container_${symbol}_${timeframe}_${Date.now()}`;
+
+  // Enhanced cleanup with proper DOM verification
   const cleanupWidget = useCallback(() => {
-    console.log(`🧹 Cleaning up TradingView widget for ${symbol}`);
+    console.log(`🧹 [${containerId}] Starting cleanup for ${symbol}`);
     
+    // Clear any pending timeouts
     if (initTimeoutRef.current) {
       clearTimeout(initTimeoutRef.current);
+      initTimeoutRef.current = undefined;
     }
     
+    // Destroy widget instance
     if (widgetRef.current) {
       try {
+        console.log(`🗑️ [${containerId}] Destroying widget instance`);
         if (typeof widgetRef.current.remove === 'function') {
           widgetRef.current.remove();
         }
       } catch (e) {
-        console.warn('Widget cleanup error:', e);
+        console.warn(`⚠️ [${containerId}] Widget cleanup error:`, e);
       }
       widgetRef.current = null;
     }
 
-    if (containerRef.current) {
-      containerRef.current.innerHTML = '';
-    }
-
+    // Clean global widget reference
     if (window.tvWidget) {
       window.tvWidget = undefined;
     }
-  }, [symbol]);
+
+    // Clear container DOM content if it exists
+    if (containerRef.current) {
+      console.log(`🧽 [${containerId}] Clearing container DOM`);
+      containerRef.current.innerHTML = '';
+    }
+
+    console.log(`✅ [${containerId}] Cleanup completed`);
+  }, [containerId, symbol]);
+
+  // Verify container exists in DOM
+  const verifyContainer = useCallback((): boolean => {
+    const container = containerRef.current;
+    const exists = container && container.parentNode && document.contains(container);
+    
+    console.log(`🔍 [${containerId}] Container verification:`, {
+      exists: !!container,
+      hasParent: !!(container?.parentNode),
+      inDocument: container ? document.contains(container) : false,
+      result: exists
+    });
+    
+    return !!exists;
+  }, [containerId]);
 
   // Enhanced price extraction with error handling
   const extractPriceData = useCallback(() => {
-    if (!widgetRef.current) return;
+    if (!widgetRef.current || !mountedRef.current) return;
 
     try {
-      console.log(`💰 Attempting price extraction for ${symbol}`);
+      console.log(`💰 [${containerId}] Extracting price data for ${symbol}`);
       const chart = widgetRef.current.activeChart?.();
       
       if (chart) {
         // Try to get current price from chart
         chart.onDataLoaded?.().subscribe?.(null, () => {
+          if (!mountedRef.current) return;
+          
           try {
             const studies = chart.getAllStudies?.() || [];
             if (studies.length > 0) {
@@ -85,24 +115,24 @@ export const OptimizedTradingViewWidget = ({
                   lastUpdated: Date.now()
                 };
                 
-                console.log(`✅ TradingView price extracted: ${symbol} $${lastBar.close.toFixed(2)} at ${new Date().toLocaleTimeString()}`);
+                console.log(`✅ [${containerId}] Price extracted: ${symbol} $${lastBar.close.toFixed(2)}`);
                 updateData(symbol, priceData);
               }
             }
           } catch (err) {
-            console.warn(`⚠️ Price extraction failed for ${symbol}:`, err);
+            console.warn(`⚠️ [${containerId}] Price extraction failed:`, err);
           }
         });
       }
     } catch (error) {
-      console.warn(`❌ Chart data extraction error for ${symbol}:`, error);
+      console.warn(`❌ [${containerId}] Chart data extraction error:`, error);
     }
-  }, [symbol, updateData]);
+  }, [containerId, symbol, updateData]);
 
-  // Robust widget initialization
+  // Robust widget initialization with proper DOM checks
   const initializeWidget = useCallback(async () => {
-    if (!containerRef.current) {
-      console.warn(`⚠️ Container not ready for ${symbol}`);
+    if (!mountedRef.current) {
+      console.log(`🚫 [${containerId}] Component unmounted, skipping initialization`);
       return;
     }
 
@@ -110,28 +140,37 @@ export const OptimizedTradingViewWidget = ({
       setIsLoading(true);
       setError(null);
       
-      console.log(`🚀 Initializing TradingView widget: ${symbol} (${timeframe})`);
+      console.log(`🚀 [${containerId}] Starting widget initialization for ${symbol} (${timeframe})`);
 
-      // Clean up first
-      cleanupWidget();
-
-      // Wait a tick for DOM cleanup
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // Verify container still exists after cleanup
-      if (!containerRef.current) {
-        throw new Error('Container disappeared during initialization');
+      // Step 1: Verify container exists
+      if (!verifyContainer()) {
+        throw new Error('Container not ready or not in DOM');
       }
 
-      // Load TradingView script if needed
+      // Step 2: Clean up any existing widget
+      cleanupWidget();
+
+      // Step 3: Wait for DOM to be ready (double-check after cleanup)
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => {
+          if (!mountedRef.current) return;
+          
+          if (!verifyContainer()) {
+            throw new Error('Container disappeared after cleanup');
+          }
+          resolve();
+        });
+      });
+
+      // Step 4: Load TradingView script if needed
       if (!window.TradingView) {
-        console.log('📦 Loading TradingView script...');
+        console.log(`📦 [${containerId}] Loading TradingView script...`);
         await new Promise<void>((resolve, reject) => {
           const script = document.createElement('script');
           script.src = 'https://s3.tradingview.com/tv.js';
           script.async = true;
           script.onload = () => {
-            console.log('✅ TradingView script loaded');
+            console.log(`✅ [${containerId}] TradingView script loaded`);
             resolve();
           };
           script.onerror = () => reject(new Error('Failed to load TradingView script'));
@@ -139,14 +178,23 @@ export const OptimizedTradingViewWidget = ({
         });
       }
 
-      // Set initialization timeout
+      // Step 5: Final container verification before widget creation
+      if (!mountedRef.current || !verifyContainer()) {
+        throw new Error('Container not available for widget creation');
+      }
+
+      // Step 6: Set timeout for initialization
       initTimeoutRef.current = setTimeout(() => {
-        setError('Chart initialization timeout');
-        setIsLoading(false);
-        console.error(`⏰ Widget initialization timeout for ${symbol}`);
+        if (mountedRef.current) {
+          setError('Chart initialization timeout (15s)');
+          setIsLoading(false);
+          console.error(`⏰ [${containerId}] Widget initialization timeout`);
+        }
       }, 15000);
 
-      // Create widget with enhanced error handling
+      // Step 7: Create widget with enhanced error handling
+      console.log(`🎯 [${containerId}] Creating TradingView widget...`);
+      
       const widget = new window.TradingView.widget({
         autosize: true,
         symbol: symbol,
@@ -163,19 +211,29 @@ export const OptimizedTradingViewWidget = ({
         theme: "dark",
         fullscreen: false,
         onChartReady: () => {
+          if (!mountedRef.current) return;
+          
           if (initTimeoutRef.current) {
             clearTimeout(initTimeoutRef.current);
+            initTimeoutRef.current = undefined;
           }
           
-          console.log(`✅ TradingView chart ready: ${symbol} at ${new Date().toLocaleTimeString()}`);
+          console.log(`✅ [${containerId}] TradingView chart ready for ${symbol}`);
           setIsLoading(false);
           
           // Start price extraction after chart is ready
           setTimeout(() => {
-            extractPriceData();
-            // Set up periodic extraction
-            const interval = setInterval(extractPriceData, 10000);
-            return () => clearInterval(interval);
+            if (mountedRef.current) {
+              extractPriceData();
+              // Set up periodic extraction
+              const interval = setInterval(() => {
+                if (mountedRef.current) {
+                  extractPriceData();
+                } else {
+                  clearInterval(interval);
+                }
+              }, 10000);
+            }
           }, 2000);
         }
       });
@@ -183,41 +241,67 @@ export const OptimizedTradingViewWidget = ({
       widgetRef.current = widget;
       window.tvWidget = widget;
 
-      console.log(`🎯 Widget created for ${symbol} (${timeframe})`);
+      console.log(`🎯 [${containerId}] Widget created successfully for ${symbol}`);
 
     } catch (error) {
-      console.error(`❌ Widget initialization failed for ${symbol}:`, error);
+      if (!mountedRef.current) return;
+      
+      console.error(`❌ [${containerId}] Widget initialization failed:`, error);
       setError(error instanceof Error ? error.message : 'Chart failed to load');
       setIsLoading(false);
       
       if (initTimeoutRef.current) {
         clearTimeout(initTimeoutRef.current);
+        initTimeoutRef.current = undefined;
       }
       
-      // Auto-retry once
+      // Auto-retry once on first failure
       if (retryCount === 0) {
+        console.log(`🔄 [${containerId}] Auto-retry scheduled`);
         setRetryCount(1);
-        setTimeout(() => initializeWidget(), 3000);
+        setTimeout(() => {
+          if (mountedRef.current) {
+            initializeWidget();
+          }
+        }, 3000);
       }
     }
-  }, [symbol, timeframe, extractPriceData, retryCount, cleanupWidget]);
+  }, [containerId, symbol, timeframe, extractPriceData, retryCount, cleanupWidget, verifyContainer]);
 
   const handleRetry = () => {
-    console.log(`🔄 Manual retry for ${symbol}`);
+    console.log(`🔄 [${containerId}] Manual retry triggered for ${symbol}`);
     setRetryCount(0);
+    setError(null);
     initializeWidget();
   };
 
-  // Initialize widget on mount and symbol/timeframe changes
+  // Initialize widget when container is ready and symbol/timeframe changes
   useEffect(() => {
-    console.log(`🔄 Effect triggered: ${symbol} (${timeframe})`);
-    initializeWidget();
+    console.log(`🔄 [${containerId}] Effect triggered: ${symbol} (${timeframe})`);
+    
+    // Use requestAnimationFrame to ensure container is in DOM
+    requestAnimationFrame(() => {
+      if (mountedRef.current && containerRef.current) {
+        initializeWidget();
+      }
+    });
     
     return () => {
-      console.log(`🧹 Cleanup effect for ${symbol}`);
+      console.log(`🧹 [${containerId}] Effect cleanup for ${symbol}`);
       cleanupWidget();
     };
-  }, [symbol, timeframe]);
+  }, [symbol, timeframe, initializeWidget, cleanupWidget, containerId]);
+
+  // Track component mount state
+  useEffect(() => {
+    mountedRef.current = true;
+    console.log(`🏗️ [${containerId}] Component mounted`);
+    
+    return () => {
+      mountedRef.current = false;
+      console.log(`🏗️ [${containerId}] Component will unmount`);
+    };
+  }, [containerId]);
 
   if (error) {
     return (
@@ -227,7 +311,7 @@ export const OptimizedTradingViewWidget = ({
       >
         <div className="text-center space-y-4">
           <p className="text-red-400 text-lg">Chart Error</p>
-          <p className="text-gray-400 text-sm">{error}</p>
+          <p className="text-gray-400 text-sm max-w-md">{error}</p>
           <button 
             onClick={handleRetry}
             className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
@@ -246,6 +330,7 @@ export const OptimizedTradingViewWidget = ({
     >
       <div
         ref={containerRef}
+        id={containerId}
         className="w-full h-full"
         style={{ display: isLoading ? 'none' : 'block' }}
       />
