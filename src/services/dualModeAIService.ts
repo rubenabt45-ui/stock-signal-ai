@@ -1,4 +1,3 @@
-
 import { MessageContext, detectSymbolsInMessage } from './symbolDetectionService';
 import { generateEnhancedTradingResponse, EnhancedAIRequest } from './enhancedAIService';
 import { analyzeUserIntent, IntentAnalysis, getProductFeatureInfo, searchProductFeatures } from './intentDetectionService';
@@ -195,8 +194,8 @@ const generateTradingResponse = (
     const lastMessages = conversationHistory.slice(-4);
     for (const msg of lastMessages.reverse()) {
       const contextCheck = detectSymbolsInMessage(msg.content);
-      if (contextCheck.symbols.length > 0) {
-        activeSymbol = contextCheck.symbols[0].symbol;
+      if (contextCheck.length > 0) {
+        activeSymbol = contextCheck[0].symbol;
         break;
       }
     }
