@@ -16,20 +16,6 @@ interface OptimizedTradingViewWidgetProps {
   className?: string;
 }
 
-const CHART_CONFIG = {
-  library_path: "/charting_library/",
-  locale: "en",
-  disabled_features: [
-    "use_localstorage_for_settings",
-    "volume_force_overlay",
-    "create_volume_indicator_by_default"
-  ],
-  enabled_features: ["study_templates"],
-  theme: "dark",
-  autosize: true,
-  fullscreen: false
-};
-
 export const OptimizedTradingViewWidget = ({ 
   symbol, 
   timeframe, 
@@ -41,137 +27,195 @@ export const OptimizedTradingViewWidget = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const initTimeoutRef = useRef<NodeJS.Timeout>();
   const { updateData } = useTradingViewData();
 
-  const extractPriceData = useCallback(async () => {
+  // Enhanced widget cleanup
+  const cleanupWidget = useCallback(() => {
+    console.log(`🧹 Cleaning up TradingView widget for ${symbol}`);
+    
+    if (initTimeoutRef.current) {
+      clearTimeout(initTimeoutRef.current);
+    }
+    
+    if (widgetRef.current) {
+      try {
+        if (typeof widgetRef.current.remove === 'function') {
+          widgetRef.current.remove();
+        }
+      } catch (e) {
+        console.warn('Widget cleanup error:', e);
+      }
+      widgetRef.current = null;
+    }
+
+    if (containerRef.current) {
+      containerRef.current.innerHTML = '';
+    }
+
+    if (window.tvWidget) {
+      window.tvWidget = undefined;
+    }
+  }, [symbol]);
+
+  // Enhanced price extraction with error handling
+  const extractPriceData = useCallback(() => {
     if (!widgetRef.current) return;
 
     try {
-      const chart = widgetRef.current.activeChart();
-      if (!chart) return;
-
-      // Try to get the latest bar data
-      chart.onDataLoaded().subscribe(null, () => {
-        try {
-          const study = chart.getAllStudies()[0];
-          if (study) {
-            const data = study.export();
-            const lastBar = data[data.length - 1];
-            
-            if (lastBar && lastBar.close) {
-              const priceData = {
-                price: lastBar.close,
-                changePercent: ((lastBar.close - lastBar.open) / lastBar.open) * 100,
-                high: lastBar.high,
-                low: lastBar.low,
-                volume: lastBar.volume || null,
-                lastUpdated: Date.now()
-              };
+      console.log(`💰 Attempting price extraction for ${symbol}`);
+      const chart = widgetRef.current.activeChart?.();
+      
+      if (chart) {
+        // Try to get current price from chart
+        chart.onDataLoaded?.().subscribe?.(null, () => {
+          try {
+            const studies = chart.getAllStudies?.() || [];
+            if (studies.length > 0) {
+              const data = studies[0].export?.();
+              const lastBar = data?.[data.length - 1];
               
-              console.log(`✅ TradingView price synced: ${symbol} $${lastBar.close.toFixed(2)} at ${new Date().toLocaleTimeString()}`);
-              updateData(symbol, priceData);
+              if (lastBar?.close) {
+                const priceData = {
+                  price: lastBar.close,
+                  changePercent: lastBar.open ? ((lastBar.close - lastBar.open) / lastBar.open) * 100 : 0,
+                  high: lastBar.high || lastBar.close,
+                  low: lastBar.low || lastBar.close,
+                  volume: lastBar.volume || null,
+                  lastUpdated: Date.now()
+                };
+                
+                console.log(`✅ TradingView price extracted: ${symbol} $${lastBar.close.toFixed(2)} at ${new Date().toLocaleTimeString()}`);
+                updateData(symbol, priceData);
+              }
             }
+          } catch (err) {
+            console.warn(`⚠️ Price extraction failed for ${symbol}:`, err);
           }
-        } catch (err) {
-          console.warn('Price extraction failed:', err);
-        }
-      });
+        });
+      }
     } catch (error) {
-      console.warn('Chart data extraction error:', error);
+      console.warn(`❌ Chart data extraction error for ${symbol}:`, error);
     }
   }, [symbol, updateData]);
 
+  // Robust widget initialization
   const initializeWidget = useCallback(async () => {
-    if (!containerRef.current) return;
+    if (!containerRef.current) {
+      console.warn(`⚠️ Container not ready for ${symbol}`);
+      return;
+    }
 
     try {
       setIsLoading(true);
       setError(null);
+      
+      console.log(`🚀 Initializing TradingView widget: ${symbol} (${timeframe})`);
 
-      // Clean up existing widget
-      if (widgetRef.current) {
-        try {
-          widgetRef.current.remove();
-        } catch (e) {
-          console.warn('Widget cleanup error:', e);
-        }
-        widgetRef.current = null;
+      // Clean up first
+      cleanupWidget();
+
+      // Wait a tick for DOM cleanup
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Verify container still exists after cleanup
+      if (!containerRef.current) {
+        throw new Error('Container disappeared during initialization');
       }
-
-      // Clear container
-      containerRef.current.innerHTML = '';
 
       // Load TradingView script if needed
       if (!window.TradingView) {
+        console.log('📦 Loading TradingView script...');
         await new Promise<void>((resolve, reject) => {
           const script = document.createElement('script');
           script.src = 'https://s3.tradingview.com/tv.js';
           script.async = true;
-          script.onload = () => resolve();
+          script.onload = () => {
+            console.log('✅ TradingView script loaded');
+            resolve();
+          };
           script.onerror = () => reject(new Error('Failed to load TradingView script'));
           document.head.appendChild(script);
         });
       }
 
-      // Create widget with timeout
-      const widgetPromise = new Promise<any>((resolve, reject) => {
-        const widget = new window.TradingView.widget({
-          ...CHART_CONFIG,
-          symbol: symbol,
-          interval: timeframe,
-          container: containerRef.current,
-          onChartReady: () => {
-            console.log(`✅ TradingView chart ready: ${symbol} at ${new Date().toLocaleTimeString()}`);
-            resolve(widget);
+      // Set initialization timeout
+      initTimeoutRef.current = setTimeout(() => {
+        setError('Chart initialization timeout');
+        setIsLoading(false);
+        console.error(`⏰ Widget initialization timeout for ${symbol}`);
+      }, 15000);
+
+      // Create widget with enhanced error handling
+      const widget = new window.TradingView.widget({
+        autosize: true,
+        symbol: symbol,
+        interval: timeframe,
+        container: containerRef.current,
+        library_path: "/charting_library/",
+        locale: "en",
+        disabled_features: [
+          "use_localstorage_for_settings",
+          "volume_force_overlay",
+          "create_volume_indicator_by_default"
+        ],
+        enabled_features: ["study_templates"],
+        theme: "dark",
+        fullscreen: false,
+        onChartReady: () => {
+          if (initTimeoutRef.current) {
+            clearTimeout(initTimeoutRef.current);
           }
-        });
+          
+          console.log(`✅ TradingView chart ready: ${symbol} at ${new Date().toLocaleTimeString()}`);
+          setIsLoading(false);
+          
+          // Start price extraction after chart is ready
+          setTimeout(() => {
+            extractPriceData();
+            // Set up periodic extraction
+            const interval = setInterval(extractPriceData, 10000);
+            return () => clearInterval(interval);
+          }, 2000);
+        }
       });
 
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Chart load timeout')), 10000);
-      });
-
-      const widget = await Promise.race([widgetPromise, timeoutPromise]);
       widgetRef.current = widget;
       window.tvWidget = widget;
 
-      // Start price extraction
-      setTimeout(() => {
-        extractPriceData();
-        setInterval(extractPriceData, 5000); // Extract every 5 seconds
-      }, 2000);
-
-      setIsLoading(false);
-      console.log(`🎯 Switched to symbol ${symbol} (${timeframe}) - chart loaded at ${new Date().toLocaleTimeString()}`);
+      console.log(`🎯 Widget created for ${symbol} (${timeframe})`);
 
     } catch (error) {
-      console.error('Widget initialization failed:', error);
+      console.error(`❌ Widget initialization failed for ${symbol}:`, error);
       setError(error instanceof Error ? error.message : 'Chart failed to load');
       setIsLoading(false);
+      
+      if (initTimeoutRef.current) {
+        clearTimeout(initTimeoutRef.current);
+      }
       
       // Auto-retry once
       if (retryCount === 0) {
         setRetryCount(1);
-        setTimeout(() => initializeWidget(), 2000);
+        setTimeout(() => initializeWidget(), 3000);
       }
     }
-  }, [symbol, timeframe, extractPriceData, retryCount]);
+  }, [symbol, timeframe, extractPriceData, retryCount, cleanupWidget]);
 
   const handleRetry = () => {
+    console.log(`🔄 Manual retry for ${symbol}`);
     setRetryCount(0);
     initializeWidget();
   };
 
+  // Initialize widget on mount and symbol/timeframe changes
   useEffect(() => {
+    console.log(`🔄 Effect triggered: ${symbol} (${timeframe})`);
     initializeWidget();
+    
     return () => {
-      if (widgetRef.current) {
-        try {
-          widgetRef.current.remove();
-        } catch (e) {
-          console.warn('Cleanup error:', e);
-        }
-      }
+      console.log(`🧹 Cleanup effect for ${symbol}`);
+      cleanupWidget();
     };
   }, [symbol, timeframe]);
 

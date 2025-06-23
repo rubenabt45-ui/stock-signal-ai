@@ -18,6 +18,7 @@ const Index = () => {
   const handleTimeframeSelect = useCallback((timeframe: string) => {
     console.log(`🎯 [${new Date().toLocaleTimeString()}] Index: Timeframe changed to ${timeframe} for ${selectedAsset}`);
     setSelectedTimeframe(timeframe as Timeframe);
+    setChartLoaded(false); // Reset chart loading state
   }, [selectedAsset]);
 
   const handleAssetSelect = useCallback((asset: string) => {
@@ -31,7 +32,8 @@ const Index = () => {
     if (selectedAsset) {
       const timer = setTimeout(() => {
         setChartLoaded(true);
-      }, 1000); // Allow chart to start loading before analysis components
+        console.log(`✅ Chart loaded, enabling analysis components for ${selectedAsset}`);
+      }, 2000); // Allow chart to start loading before analysis components
       
       return () => clearTimeout(timer);
     }
@@ -84,8 +86,9 @@ const Index = () => {
             onAssetSelect={handleAssetSelect} 
           />
 
-          {/* Live Chart - Priority Load */}
+          {/* Live Chart - Priority Load with unique key for remounting */}
           <LiveChart 
+            key={`${selectedAsset}-${selectedTimeframe}`}
             asset={selectedAsset} 
             timeframe={selectedTimeframe}
           />

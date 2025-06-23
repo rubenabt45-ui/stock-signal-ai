@@ -11,6 +11,11 @@ interface LiveChartProps {
 }
 
 const LiveChartComponent = ({ asset, timeframe }: LiveChartProps) => {
+  // Create a unique key to force remount when asset or timeframe changes
+  const chartKey = `${asset}-${timeframe}`;
+  
+  console.log(`🎯 LiveChart rendering: ${asset} (${timeframe}) - Key: ${chartKey}`);
+
   return (
     <div className="space-y-6">
       <Card className="tradeiq-card p-6 rounded-2xl">
@@ -40,6 +45,7 @@ const LiveChartComponent = ({ asset, timeframe }: LiveChartProps) => {
         
         <div className="w-full">
           <OptimizedTradingViewWidget 
+            key={chartKey}
             symbol={asset} 
             timeframe={timeframe}
             className="w-full"
