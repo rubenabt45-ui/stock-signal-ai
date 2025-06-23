@@ -1,6 +1,7 @@
+
 import { MessageContext, detectSymbolsInMessage } from './symbolDetectionService';
 import { generateEnhancedTradingResponse, EnhancedAIRequest } from './enhancedAIService';
-import { analyzeUserIntent } from './intentDetectionService';
+import { analyzeUserIntent, IntentAnalysis, getProductFeatureInfo, searchProductFeatures } from './intentDetectionService';
 
 // Define the interface locally instead of importing
 interface UseMarketDataReturn {
@@ -284,7 +285,7 @@ const generateTradingResponse = (
   }
   
   // Market data context analysis
-  else if (context?.symbols && marketData && Object.keys(marketData).length > 0) {
+  if (context?.symbols && marketData && Object.keys(marketData).length > 0) {
     const symbol = context.symbols[0];
     const data = marketData[symbol.symbol];
     
