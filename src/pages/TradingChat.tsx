@@ -1,6 +1,6 @@
 
 import { useState, useRef } from "react";
-import { Send, MessageSquare, Brain, Upload, Camera, TrendingUp } from "lucide-react";
+import { Send, MessageSquare, Brain, Upload, Camera, TrendingUp, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,11 +16,12 @@ interface Message {
 }
 
 interface TradingStrategy {
-  entry: string;
+  entryLow: string;
+  entryHigh: string;
   stopLoss: string;
   takeProfit: string[];
   timeframe: string;
-  explanation: string;
+  analysis: string;
 }
 
 const TradingChat = () => {
@@ -36,6 +37,7 @@ const TradingChat = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,9 +67,9 @@ const TradingChat = () => {
     setUploadedImage(null);
     setIsLoading(true);
 
-    // Simulate AI analysis
+    // Simulate AI analysis with realistic timing (under 2 seconds)
     setTimeout(() => {
-      const strategy = generateTradingStrategy(userMessage);
+      const strategy = generateAdvancedTradingStrategy(userMessage);
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
@@ -76,35 +78,47 @@ const TradingChat = () => {
       };
       setMessages(prev => [...prev, aiResponse]);
       setIsLoading(false);
-    }, 2000 + Math.random() * 2000);
+    }, 1500 + Math.random() * 500); // 1.5-2 seconds for ultra-fast response
   };
 
-  const generateTradingStrategy = (context: string): TradingStrategy => {
+  const generateAdvancedTradingStrategy = (context: string): TradingStrategy => {
     const isSwing = context.toLowerCase().includes('swing');
     const isScalping = context.toLowerCase().includes('scalp');
+    const isDay = context.toLowerCase().includes('day');
     
-    // Generate realistic strategy based on context
+    // Generate realistic strategies based on different market scenarios
     const strategies = [
       {
-        entry: '$156.50 - $157.20',
-        stopLoss: '$154.80',
-        takeProfit: ['$159.40', '$162.10'],
-        timeframe: isScalping ? '5m - 15m' : isSwing ? '4H - Daily' : '1H - 4H',
-        explanation: 'Bullish breakout above resistance with strong volume. RSI showing bullish divergence around 45 level.'
+        entryLow: '$2,845.20',
+        entryHigh: '$2,860.50',
+        stopLoss: '$2,810.00',
+        takeProfit: ['$2,920.00', '$2,985.00'],
+        timeframe: isScalping ? '5M - 15M' : isSwing ? '4H - 1D' : '1H - 4H',
+        analysis: 'Bullish breakout above key resistance with strong volume confirmation. RSI showing bullish divergence and MACD crossover signal.'
       },
       {
-        entry: '$2,845 - $2,860',
-        stopLoss: '$2,810',
-        takeProfit: ['$2,920', '$2,980'],
-        timeframe: isScalping ? '15m - 1H' : isSwing ? 'Daily - Weekly' : '4H - Daily',
-        explanation: 'EMA bounce with confluence at 0.618 Fibonacci level. MACD showing bullish crossover.'
+        entryLow: '$156.80',
+        entryHigh: '$158.20',
+        stopLoss: '$154.50',
+        takeProfit: ['$162.40', '$166.80'],
+        timeframe: isScalping ? '15M - 30M' : isSwing ? 'Daily - Weekly' : '4H - Daily',
+        analysis: 'Double bottom pattern completion with bounce off 200 EMA. Strong support holding at previous structural low.'
       },
       {
-        entry: '$0.6720 - $0.6750',
+        entryLow: '$0.6720',
+        entryHigh: '$0.6750',
         stopLoss: '$0.6680',
         takeProfit: ['$0.6820', '$0.6890'],
-        timeframe: isScalping ? '5m - 30m' : isSwing ? '4H - Daily' : '1H - 4H',
-        explanation: 'Double bottom pattern completion with volume confirmation. Support held at previous low.'
+        timeframe: isScalping ? '5M - 15M' : isSwing ? '4H - 1D' : '1H - 4H',
+        analysis: 'Ascending triangle breakout with volume spike. 0.618 Fibonacci retracement level acting as support.'
+      },
+      {
+        entryLow: '$42,850',
+        entryHigh: '$43,200',
+        stopLoss: '$42,100',
+        takeProfit: ['$44,500', '$45,800'],
+        timeframe: isScalping ? '15M - 1H' : isSwing ? 'Daily - Weekly' : '4H - Daily',
+        analysis: 'Falling wedge pattern breakout with bullish divergence on RSI. Strong momentum building above key support zone.'
       }
     ];
 
@@ -114,16 +128,16 @@ const TradingChat = () => {
   const formatStrategyResponse = (strategy: TradingStrategy): string => {
     return `📊 **Trading Strategy Analysis**
 
-🎯 **Entry Zone:** ${strategy.entry}
+💘 **Entry Zone:** ${strategy.entryLow} - ${strategy.entryHigh}
 🛡️ **Stop Loss:** ${strategy.stopLoss}
 💰 **Take Profit Targets:**
-   • TP1: ${strategy.takeProfit[0]}
-   • TP2: ${strategy.takeProfit[1]}
-⏰ **Suggested Timeframe:** ${strategy.timeframe}
+• TP1: ${strategy.takeProfit[0]}
+• TP2: ${strategy.takeProfit[1]}
+⏱ **Suggested Timeframe:** ${strategy.timeframe}
 
-💡 **Analysis:** ${strategy.explanation}
+💡 **Analysis:** ${strategy.analysis}
 
-⚠️ **Risk Management:** Always use proper position sizing and never risk more than 2% of your account per trade.`;
+⚠️ **Risk Management:** Use proper position sizing. Never risk more than 2% of your account per trade.`;
   };
 
   const handleSendMessage = async () => {
@@ -134,7 +148,7 @@ const TradingChat = () => {
       return;
     }
 
-    // Fallback to regular chat for non-image queries
+    // Enhanced fallback responses
     const userMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
@@ -150,34 +164,45 @@ const TradingChat = () => {
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: generateFallbackResponse(inputMessage),
+        content: generateEnhancedFallbackResponse(inputMessage),
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
       setIsLoading(false);
-    }, 1000 + Math.random() * 1500);
+    }, 800 + Math.random() * 400);
   };
 
-  const generateFallbackResponse = (question: string): string => {
+  const generateEnhancedFallbackResponse = (question: string): string => {
     const lowerQuestion = question.toLowerCase();
     
-    if (lowerQuestion.includes('chart') || lowerQuestion.includes('screenshot')) {
-      return "📷 For the best trading strategy analysis, please upload a screenshot of your chart. I can analyze price action, support/resistance levels, and technical patterns to give you specific entry and exit points!";
+    if (lowerQuestion.includes('chart') || lowerQuestion.includes('screenshot') || lowerQuestion.includes('image')) {
+      return "📷 Please upload a screenshot of your chart for detailed analysis. I'll generate a full trading plan with entry zones, stop losses, and take profit targets in seconds!";
     }
     
-    if (lowerQuestion.includes('strategy') || lowerQuestion.includes('trading')) {
-      return "🎯 I specialize in analyzing chart screenshots to provide personalized trading strategies. Upload your chart image and I'll give you:\n\n• Entry zones\n• Stop loss levels\n• Take profit targets\n• Timeframe recommendations\n• Technical analysis explanation\n\nThis gives you much more accurate and actionable trading advice!";
+    if (lowerQuestion.includes('strategy') || lowerQuestion.includes('trading') || lowerQuestion.includes('buy') || lowerQuestion.includes('sell')) {
+      return "🎯 For best results, upload a screenshot of your chart. I'll generate a complete trading strategy with:\n\n• Precise entry zones\n• Stop loss levels\n• Multiple take profit targets\n• Timeframe recommendations\n• Technical analysis explanation\n\nThis gives you actionable trading insights based on your specific chart!";
     }
     
-    return "I'm designed to analyze chart screenshots and provide trading strategies. While I can answer general questions, my main strength is visual chart analysis. Try uploading a chart screenshot for the best results! 📊";
+    if (lowerQuestion.includes('help') || lowerQuestion.includes('how')) {
+      return "🚀 I'm TradeIQ's flagship image-based trading assistant! Here's how to get the best results:\n\n1. Upload a clear screenshot of your trading chart\n2. Optionally mention your trading style (Swing, Scalping, Day Trading)\n3. Get a complete trading strategy in under 2 seconds\n\nTry it now - drag & drop your chart image or click the upload button!";
+    }
+    
+    return "💡 I specialize in analyzing chart screenshots to provide instant trading strategies. Upload a chart image and I'll give you a complete trading plan with entry zones, stop losses, and take profit targets!";
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragging(false);
     const files = e.dataTransfer.files;
     if (files.length > 0 && files[0].type.startsWith('image/')) {
       const reader = new FileReader();
@@ -198,7 +223,7 @@ const TradingChat = () => {
             <MessageSquare className="h-8 w-8 text-tradeiq-blue" />
             <div>
               <h1 className="text-2xl font-bold text-white tracking-tight">{t('navigation.tradingChat')}</h1>
-              <p className="text-sm text-gray-400 font-medium">Chart Analysis & Strategy Generator</p>
+              <p className="text-sm text-gray-400 font-medium">Flagship Image-Based Strategy Generator</p>
             </div>
           </div>
         </div>
@@ -211,11 +236,11 @@ const TradingChat = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <Brain className="h-5 w-5 text-tradeiq-blue" />
-                <CardTitle className="text-white">Chart Strategy Analyzer</CardTitle>
+                <CardTitle className="text-white">AI Chart Strategy Analyzer</CardTitle>
               </div>
               <div className="flex items-center space-x-2 text-xs text-gray-400">
-                <Camera className="h-4 w-4" />
-                <span>Image Analysis Ready</span>
+                <Clock className="h-4 w-4" />
+                <span>Ultra-Fast Analysis (&lt;2s)</span>
               </div>
             </div>
           </CardHeader>
@@ -237,13 +262,19 @@ const TradingChat = () => {
                       }`}
                     >
                       {message.image && (
-                        <img 
-                          src={message.image} 
-                          alt="Chart screenshot" 
-                          className="max-w-full h-auto rounded-lg mb-3"
-                        />
+                        <div className="mb-3">
+                          <img 
+                            src={message.image} 
+                            alt="Chart screenshot" 
+                            className="max-w-full h-auto rounded-lg"
+                          />
+                          <div className="flex items-center space-x-2 mt-2 text-xs opacity-70">
+                            <Camera className="h-3 w-3" />
+                            <span>Uploaded: {message.timestamp.toLocaleTimeString()}</span>
+                          </div>
+                        </div>
                       )}
-                      <p className="text-sm leading-relaxed whitespace-pre-line">{message.content}</p>
+                      <div className="text-sm leading-relaxed whitespace-pre-line">{message.content}</div>
                       <p className="text-xs opacity-70 mt-2">
                         {message.timestamp.toLocaleTimeString()}
                       </p>
@@ -256,7 +287,7 @@ const TradingChat = () => {
                     <div className="bg-black/30 text-gray-200 border border-gray-700/50 rounded-2xl px-4 py-3">
                       <div className="flex items-center space-x-2">
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-tradeiq-blue"></div>
-                        <span className="text-sm">Analyzing chart patterns...</span>
+                        <span className="text-sm">Analyzing chart patterns and generating strategy...</span>
                       </div>
                     </div>
                   </div>
@@ -264,50 +295,63 @@ const TradingChat = () => {
               </div>
             </ScrollArea>
 
-            {/* Image Upload Area */}
+            {/* Image Upload Preview */}
             {uploadedImage && (
-              <div className="relative">
-                <img 
-                  src={uploadedImage} 
-                  alt="Uploaded chart" 
-                  className="max-h-32 rounded-lg border border-gray-700"
-                />
-                <Button
-                  onClick={() => setUploadedImage(null)}
-                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 hover:bg-red-600 text-white text-xs p-0"
-                >
-                  ×
-                </Button>
+              <div className="relative p-2 bg-black/20 rounded-lg border border-gray-700">
+                <div className="flex items-center space-x-3">
+                  <img 
+                    src={uploadedImage} 
+                    alt="Chart to analyze" 
+                    className="h-16 w-20 object-cover rounded border border-gray-600"
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-300">Chart ready for analysis</p>
+                    <p className="text-xs text-gray-500">Click send to generate strategy</p>
+                  </div>
+                  <Button
+                    onClick={() => setUploadedImage(null)}
+                    className="h-8 w-8 rounded-full bg-red-500/20 hover:bg-red-500/40 text-red-400 text-xs p-0"
+                  >
+                    ×
+                  </Button>
+                </div>
               </div>
             )}
 
-            {/* Upload Suggestions */}
+            {/* Enhanced Upload Area */}
             {messages.length === 1 && (
               <div 
-                className="border-2 border-dashed border-gray-600 rounded-xl p-6 text-center hover:border-tradeiq-blue/50 transition-colors cursor-pointer"
+                className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 cursor-pointer ${
+                  isDragging 
+                    ? 'border-tradeiq-blue bg-tradeiq-blue/10' 
+                    : 'border-gray-600 hover:border-tradeiq-blue/50'
+                }`}
                 onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <TrendingUp className="h-12 w-12 mx-auto mb-3 text-tradeiq-blue opacity-70" />
-                <p className="text-gray-300 mb-2">Drop your chart screenshot here</p>
-                <p className="text-xs text-gray-500">or click to browse files</p>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
+                <TrendingUp className={`h-16 w-16 mx-auto mb-4 transition-colors ${
+                  isDragging ? 'text-tradeiq-blue' : 'text-tradeiq-blue opacity-70'
+                }`} />
+                <h3 className="text-lg font-semibold text-gray-200 mb-2">
+                  {isDragging ? 'Drop your chart here!' : 'Upload Chart Screenshot'}
+                </h3>
+                <p className="text-gray-400 mb-2">
+                  Get a complete trading strategy in under 2 seconds
+                </p>
+                <p className="text-xs text-gray-500">
+                  Drag & drop or click to browse • PNG, JPG supported
+                </p>
               </div>
             )}
 
-            {/* Input */}
+            {/* Input Area */}
             <div className="flex space-x-2">
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 variant="outline"
-                className="border-gray-700 hover:bg-gray-800 text-gray-300"
+                className="border-gray-700 hover:bg-gray-800 text-gray-300 px-3"
                 disabled={isLoading}
               >
                 <Upload className="h-4 w-4" />
@@ -316,14 +360,14 @@ const TradingChat = () => {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder={uploadedImage ? "Add trading style (Swing, Scalping) or ask questions..." : "Upload chart screenshot for strategy analysis or ask questions..."}
+                placeholder={uploadedImage ? "Add trading style (Swing, Scalping, Day) or press Enter to analyze..." : "Upload chart screenshot for instant strategy analysis..."}
                 className="flex-1 bg-black/20 border-gray-700 text-white placeholder:text-gray-500"
                 disabled={isLoading}
               />
               <Button
                 onClick={handleSendMessage}
                 disabled={(!inputMessage.trim() && !uploadedImage) || isLoading}
-                className="tradeiq-button-primary"
+                className="tradeiq-button-primary px-4"
               >
                 <Send className="h-4 w-4" />
               </Button>
