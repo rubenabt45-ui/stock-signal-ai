@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { ChartCandlestick, MessageSquare, Book, Settings, Newspaper } from "lucide-react";
+import { ChartCandlestick, Brain, Book, Settings, Newspaper } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
 const BottomNavigation = () => {
@@ -15,8 +15,8 @@ const BottomNavigation = () => {
     },
     {
       path: "/trading-chat",
-      icon: MessageSquare,
-      label: t('navigation.tradingChat'),
+      icon: Brain,
+      label: "StrategyAI",
     },
     {
       path: "/learn",
