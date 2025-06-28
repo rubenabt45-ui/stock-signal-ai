@@ -88,7 +88,16 @@ export class TradingAIService {
         });
       }
 
-      console.log('Sending request to OpenAI with messages:', messages.length);
+      const requestBody = {
+        model: 'gpt-4o',
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 1000
+      };
+
+      console.log('🚀 Sending request to OpenAI API:');
+      console.log('📋 Request body:', requestBody);
+      console.log('🔑 API Key (first 10 chars):', apiKey.substring(0, 10) + '...');
 
       const response = await fetch(this.OPENAI_API_URL, {
         method: 'POST',
@@ -96,46 +105,102 @@ export class TradingAIService {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          model: 'gpt-4o',
-          messages: messages,
-          temperature: 0.7,
-          max_tokens: 1000
-        })
+        body: JSON.stringify(requestBody)
       });
 
-      console.log('OpenAI API response status:', response.status);
+      console.log('📡 OpenAI API Response Details:');
+      console.log('📊 Status:', response.status);
+      console.log('📊 Status Text:', response.statusText);
+      console.log('📊 Headers:', Object.fromEntries(response.headers.entries()));
+
+      // Log specific rate limit headers if present
+      const retryAfter = response.headers.get('Retry-After');
+      const rateLimitLimit = response.headers.get('X-RateLimit-Limit');
+      const rateLimitRemaining = response.headers.get('X-RateLimit-Remaining');
+      const rateLimitReset = response.headers.get('X-RateLimit-Reset');
+
+      if (retryAfter || rateLimitLimit || rateLimitRemaining || rateLimitReset) {
+        console.log('⏱️ Rate Limit Headers:');
+        console.log('  Retry-After:', retryAfter);
+        console.log('  X-RateLimit-Limit:', rateLimitLimit);
+        console.log('  X-RateLimit-Remaining:', rateLimitRemaining);
+        console.log('  X-RateLimit-Reset:', rateLimitReset);
+      }
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('OpenAI API error:', response.status, errorData);
+        let errorData;
+        try {
+          errorData = await response.json();
+          console.log('❌ OpenAI API Error Response Body:', errorData);
+        } catch (parseError) {
+          console.log('❌ Could not parse error response as JSON:', parseError);
+          errorData = {};
+        }
+
+        // Enhanced 429 error logging
+        if (response.status === 429) {
+          console.log('🚫 RATE LIMIT ERROR DETAILS:');
+          console.log('📊 Status Code:', response.status);
+          console.log('📄 Error Message:', errorData?.error?.message || 'No message provided');
+          console.log('🔍 Error Type:', errorData?.error?.type || 'No type provided');
+          console.log('🔍 Error Code:', errorData?.error?.code || 'No code provided');
+          console.log('🔍 Error Param:', errorData?.error?.param || 'No param provided');
+          console.log('📋 Full Error Object:', errorData);
+          
+          // Check for quota vs rate limit
+          if (errorData?.error?.code === 'insufficient_quota') {
+            console.log('💰 QUOTA ISSUE: API key has exceeded its quota limit');
+          } else if (errorData?.error?.code === 'rate_limit_exceeded') {
+            console.log('⏰ RATE LIMIT: Too many requests per minute/hour');
+          }
+        }
         
         if (response.status === 401) {
+          console.log('🔑 AUTHENTICATION ERROR: Invalid API key');
           return "🔑 **Authentication Error**\n\nInvalid OpenAI API key. Please check your API key in Settings → API Configuration.";
         } else if (response.status === 429) {
-          return "⏰ **Rate Limit Exceeded**\n\nToo many requests. Please wait a moment and try again.";
+          // Throw error to trigger retry logic in TradingChat
+          const errorMessage = errorData?.error?.message || 'Rate limit exceeded';
+          throw new Error(`429: ${errorMessage}`);
         } else if (response.status === 400) {
+          console.log('❌ BAD REQUEST ERROR:', errorData);
           return "❌ **Bad Request**\n\nThere was an issue with your request. Please try again with a different message.";
         } else {
+          console.log('❌ UNKNOWN API ERROR:', response.status, errorData);
           return `❌ **API Error (${response.status})**\n\nSorry, there was an issue connecting to the AI service. Please try again.`;
         }
       }
 
       const data = await response.json();
-      console.log('OpenAI API response data:', data);
+      console.log('✅ OpenAI API Success Response:', data);
       
       if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-        console.error('Unexpected API response format:', data);
+        console.error('❌ Unexpected API response format:', data);
         return "⚠️ **Response Error**\n\nReceived an unexpected response format. Please try again.";
       }
 
+      console.log('✅ Successfully received response from OpenAI');
       return data.choices[0].message.content || "Sorry, I couldn't generate a response. Please try again.";
       
     } catch (error) {
-      console.error('Error calling OpenAI API:', error);
+      console.error('💥 Error in getGPTResponse:', error);
+      
+      // Enhanced error logging
+      if (error instanceof Error) {
+        console.log('🔍 Error Details:');
+        console.log('  Message:', error.message);
+        console.log('  Stack:', error.stack);
+        console.log('  Name:', error.name);
+      }
       
       if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.log('🌐 Network error detected');
         return "🌐 **Network Error**\n\nUnable to connect to the AI service. Please check your internet connection and try again.";
+      }
+      
+      // Re-throw 429 errors to be handled by retry logic
+      if (error instanceof Error && error.message.includes('429')) {
+        throw error;
       }
       
       return "🔧 **Connection Error**\n\nSorry, something went wrong while processing your request. Please check your internet connection and try again.";

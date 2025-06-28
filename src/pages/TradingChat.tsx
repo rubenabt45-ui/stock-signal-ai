@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Send, Camera, X, Settings, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -124,50 +125,76 @@ const TradingChat = () => {
 
   const sendMessageWithRetry = async (messageText: string, imageData: string | null, retryCount = 0): Promise<string> => {
     try {
-      console.log(`Attempting to send message (attempt ${retryCount + 1})`);
+      console.log(`🔄 Sending message attempt ${retryCount + 1}`);
+      console.log('📝 Message text:', messageText);
+      console.log('🖼️ Has image:', !!imageData);
+      
       const aiResponse = await TradingAIService.getGPTResponse(messageText, imageData);
+      console.log('✅ Message sent successfully on attempt', retryCount + 1);
       return aiResponse;
     } catch (error) {
-      console.error(`Error on attempt ${retryCount + 1}:`, error);
+      console.error('❌ Error on attempt', retryCount + 1, ':', error);
       
       // Check if it's a rate limit error and we haven't retried yet
       if (retryCount === 0 && error instanceof Error && error.message.includes('429')) {
-        console.log(`Rate limit hit, retrying in ${RETRY_DELAY / 1000} seconds...`);
+        console.log(`⏳ Rate limit detected, retrying in ${RETRY_DELAY / 1000} seconds...`);
+        console.log('🔄 Setting retry state to true');
         setIsRetrying(true);
         
         // Wait before retry
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        await new Promise(resolve => {
+          console.log('⏰ Starting retry delay...');
+          setTimeout(() => {
+            console.log('⏰ Retry delay complete');
+            resolve(undefined);
+          }, RETRY_DELAY);
+        });
         
+        console.log('🔄 Setting retry state to false, attempting retry');
         setIsRetrying(false);
         return sendMessageWithRetry(messageText, imageData, retryCount + 1);
       }
       
       // If it's still a rate limit error after retry, or any other error
       if (error instanceof Error && error.message.includes('429')) {
+        console.log('🚫 Final rate limit error after retry');
         throw new Error('Too many requests. Please try again later.');
       }
       
+      console.log('💥 Non-retryable error or final error:', error);
       throw error;
     }
   };
 
   const handleSendMessage = async () => {
-    if ((!inputMessage.trim() && !uploadedImage) || isLoading || isRetrying) return;
+    console.log('🚀 handleSendMessage called');
+    console.log('📋 Input message:', inputMessage);
+    console.log('🖼️ Uploaded image:', !!uploadedImage);
+    console.log('⏳ Is loading:', isLoading);
+    console.log('🔄 Is retrying:', isRetrying);
+    
+    if ((!inputMessage.trim() && !uploadedImage) || isLoading || isRetrying) {
+      console.log('🛑 Message send blocked - missing content or already processing');
+      return;
+    }
 
     // Check rate limiting
     if (!checkRateLimit()) {
+      console.log('🛑 Message send blocked - rate limit');
       return;
     }
 
     // Check API key
     const apiKey = localStorage.getItem('openai_api_key');
     if (!apiKey) {
+      console.log('🛑 Message send blocked - no API key');
       setShowApiKeyPrompt(true);
       return;
     }
 
     // Update last message time
     setLastMessageTime(Date.now());
+    console.log('⏰ Updated last message time:', Date.now());
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -177,6 +204,7 @@ const TradingChat = () => {
       timestamp: new Date()
     };
 
+    console.log('📨 Adding user message to chat:', userMessage);
     setMessages(prev => [...prev, userMessage]);
     const messageText = inputMessage;
     const imageData = uploadedImage;
@@ -184,8 +212,10 @@ const TradingChat = () => {
     setInputMessage('');
     setUploadedImage(null);
     setIsLoading(true);
+    console.log('⏳ Set loading state to true');
 
     try {
+      console.log('🔄 Starting message send with retry logic');
       const aiResponse = await sendMessageWithRetry(messageText, imageData);
       
       const assistantMsg: Message = {
@@ -195,10 +225,11 @@ const TradingChat = () => {
         timestamp: new Date()
       };
       
+      console.log('✅ Adding assistant response to chat');
       setMessages(prev => [...prev, assistantMsg]);
       
     } catch (error) {
-      console.error('Final error after retries:', error);
+      console.error('💥 Final error after all retries:', error);
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
@@ -207,6 +238,7 @@ const TradingChat = () => {
       };
       setMessages(prev => [...prev, errorMsg]);
     } finally {
+      console.log('🏁 Message send complete, resetting states');
       setIsLoading(false);
       setIsRetrying(false);
     }
