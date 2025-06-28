@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Camera, X, Settings, AlertCircle } from "lucide-react";
+import { Send, Camera, X, Settings, AlertCircle, Key } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -299,14 +299,25 @@ const TradingChat = () => {
                 <p className="text-xs text-gray-400 font-medium">Powered by GPT-4o</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowApiKeyPrompt(true)}
-              className="text-gray-400 hover:text-white"
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowApiKeyPrompt(true)}
+                className="text-gray-400 hover:text-white hover:bg-tradeiq-blue/20 border border-tradeiq-blue/30"
+              >
+                <Key className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">API Key</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowApiKeyPrompt(true)}
+                className="text-gray-400 hover:text-white hover:bg-gray-800/60"
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -317,19 +328,19 @@ const TradingChat = () => {
           <Card className="w-full max-w-md tradeiq-card">
             <CardHeader>
               <CardTitle className="text-white flex items-center space-x-2">
-                <AlertCircle className="h-5 w-5 text-tradeiq-blue" />
+                <Key className="h-5 w-5 text-tradeiq-blue" />
                 <span>OpenAI API Key Required</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-gray-300 text-sm">
-                To use StrategyAI, please enter your OpenAI API key:
+                To use StrategyAI, please enter your OpenAI API key. You can get one from the OpenAI platform.
               </p>
               <Textarea
                 value={tempApiKey}
                 onChange={(e) => setTempApiKey(e.target.value)}
                 placeholder="sk-..."
-                className="bg-black/20 border-gray-700 text-white"
+                className="bg-black/20 border-gray-700 text-white placeholder:text-gray-500"
               />
               <div className="flex space-x-2">
                 <Button
@@ -346,6 +357,19 @@ const TradingChat = () => {
                 >
                   Cancel
                 </Button>
+              </div>
+              <div className="pt-2">
+                <p className="text-xs text-gray-500">
+                  Get your API key from:{' '}
+                  <a 
+                    href="https://platform.openai.com/api-keys" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-tradeiq-blue hover:underline"
+                  >
+                    OpenAI Platform
+                  </a>
+                </p>
               </div>
             </CardContent>
           </Card>
