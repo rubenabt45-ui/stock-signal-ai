@@ -29,12 +29,17 @@ const TradingChat = () => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [showApiKeyPrompt, setShowApiKeyPrompt] = useState(false);
   const [tempApiKey, setTempApiKey] = useState('');
+  const [lastMessageTime, setLastMessageTime] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const RATE_LIMIT_DELAY = 3000; // 3 seconds between messages
+  const RETRY_DELAY = 5000; // 5 seconds before retry
 
   // Auto-scroll to bottom after each message
   useEffect(() => {
@@ -103,8 +108,56 @@ const TradingChat = () => {
     }
   };
 
+  const checkRateLimit = (): boolean => {
+    const now = Date.now();
+    if (now - lastMessageTime < RATE_LIMIT_DELAY) {
+      const remainingTime = Math.ceil((RATE_LIMIT_DELAY - (now - lastMessageTime)) / 1000);
+      toast({
+        title: "Please wait",
+        description: `Please wait ${remainingTime} seconds before sending another message.`,
+        variant: "destructive"
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const sendMessageWithRetry = async (messageText: string, imageData: string | null, retryCount = 0): Promise<string> => {
+    try {
+      console.log(`Attempting to send message (attempt ${retryCount + 1})`);
+      const aiResponse = await TradingAIService.getGPTResponse(messageText, imageData);
+      return aiResponse;
+    } catch (error) {
+      console.error(`Error on attempt ${retryCount + 1}:`, error);
+      
+      // Check if it's a rate limit error and we haven't retried yet
+      if (retryCount === 0 && error instanceof Error && error.message.includes('429')) {
+        console.log(`Rate limit hit, retrying in ${RETRY_DELAY / 1000} seconds...`);
+        setIsRetrying(true);
+        
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        
+        setIsRetrying(false);
+        return sendMessageWithRetry(messageText, imageData, retryCount + 1);
+      }
+      
+      // If it's still a rate limit error after retry, or any other error
+      if (error instanceof Error && error.message.includes('429')) {
+        throw new Error('Too many requests. Please try again later.');
+      }
+      
+      throw error;
+    }
+  };
+
   const handleSendMessage = async () => {
-    if ((!inputMessage.trim() && !uploadedImage) || isLoading) return;
+    if ((!inputMessage.trim() && !uploadedImage) || isLoading || isRetrying) return;
+
+    // Check rate limiting
+    if (!checkRateLimit()) {
+      return;
+    }
 
     // Check API key
     const apiKey = localStorage.getItem('openai_api_key');
@@ -112,6 +165,9 @@ const TradingChat = () => {
       setShowApiKeyPrompt(true);
       return;
     }
+
+    // Update last message time
+    setLastMessageTime(Date.now());
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -130,7 +186,7 @@ const TradingChat = () => {
     setIsLoading(true);
 
     try {
-      const aiResponse = await TradingAIService.getGPTResponse(messageText, imageData);
+      const aiResponse = await sendMessageWithRetry(messageText, imageData);
       
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
@@ -142,16 +198,17 @@ const TradingChat = () => {
       setMessages(prev => [...prev, assistantMsg]);
       
     } catch (error) {
-      console.error('Error getting AI response:', error);
+      console.error('Final error after retries:', error);
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: 'Connection Error\n\nSorry, I couldn\'t process your request right now. Please check your internet connection and try again.',
+        content: error instanceof Error ? error.message : 'Connection Error\n\nSorry, I couldn\'t process your request right now. Please check your internet connection and try again.',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
+      setIsRetrying(false);
     }
   };
 
@@ -192,6 +249,8 @@ const TradingChat = () => {
         return <p key={index} className="mb-1">{line}</p>;
       });
   };
+
+  const isInputDisabled = isLoading || isRetrying;
 
   return (
     <div className="min-h-screen bg-tradeiq-navy flex flex-col">
@@ -312,7 +371,7 @@ const TradingChat = () => {
                 </div>
               ))}
               
-              {isLoading && (
+              {(isLoading || isRetrying) && (
                 <div className="flex justify-start">
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2 mb-2">
@@ -323,7 +382,9 @@ const TradingChat = () => {
                     </div>
                     <div className="flex items-center space-x-2 text-gray-400">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-tradeiq-blue"></div>
-                      <span className="text-sm">Analyzing with GPT-4o...</span>
+                      <span className="text-sm">
+                        {isRetrying ? 'Retrying request...' : 'Analyzing with GPT-4o...'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -354,6 +415,7 @@ const TradingChat = () => {
                   size="sm"
                   variant="ghost"
                   className="text-red-400 hover:text-red-300 h-8 w-8 p-0"
+                  disabled={isInputDisabled}
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -362,7 +424,7 @@ const TradingChat = () => {
           )}
           
           {/* Input Container - ChatGPT Style with proper spacing */}
-          <div className="relative bg-white/5 rounded-2xl border border-gray-700/50 shadow-lg backdrop-blur-sm">
+          <div className={`relative bg-white/5 rounded-2xl border border-gray-700/50 shadow-lg backdrop-blur-sm ${isInputDisabled ? 'opacity-50' : ''}`}>
             <div className="flex items-end p-3">
               {/* Image Upload Button */}
               <Button
@@ -370,7 +432,7 @@ const TradingChat = () => {
                 variant="ghost"
                 size="sm"
                 className="text-gray-400 hover:text-gray-300 h-10 w-10 p-0 shrink-0"
-                disabled={isLoading}
+                disabled={isInputDisabled}
               >
                 <Camera className="h-5 w-5" />
               </Button>
@@ -384,7 +446,7 @@ const TradingChat = () => {
                   onKeyDown={handleKeyPress}
                   placeholder={uploadedImage ? "Optional: Add context or press Enter..." : "Ask about trading strategies, upload charts, or get market analysis..."}
                   className="min-h-[40px] max-h-24 resize-none bg-transparent border-0 text-white placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 p-2"
-                  disabled={isLoading}
+                  disabled={isInputDisabled}
                   rows={1}
                 />
               </div>
@@ -392,7 +454,7 @@ const TradingChat = () => {
               {/* Send Button */}
               <Button
                 onClick={handleSendMessage}
-                disabled={(!inputMessage.trim() && !uploadedImage) || isLoading}
+                disabled={(!inputMessage.trim() && !uploadedImage) || isInputDisabled}
                 size="sm"
                 className="h-10 w-10 p-0 bg-tradeiq-blue hover:bg-tradeiq-blue-light disabled:opacity-50 shrink-0"
               >
@@ -403,7 +465,10 @@ const TradingChat = () => {
           
           {/* Helper Text */}
           <p className="text-xs text-gray-500 text-center mt-3">
-            Press Enter to send • Shift+Enter for new line • Upload charts for AI analysis
+            {isRetrying 
+              ? 'Retrying due to rate limit...' 
+              : 'Press Enter to send • Shift+Enter for new line • Upload charts for AI analysis'
+            }
           </p>
         </div>
       </div>
