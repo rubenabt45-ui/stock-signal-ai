@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Send, Camera, X, Settings, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +23,7 @@ const TradingChat = () => {
     {
       id: '1',
       type: 'assistant',
-      content: '🧠 **StrategyAI – Powered by GPT-4o**\n\nI\'m your intelligent trading assistant, powered by real AI. I can:\n\n📊 **Analyze chart screenshots** - Upload any chart for detailed strategy analysis\n💬 **Answer trading questions** - Ask about indicators, strategies, risk management\n📈 **Generate trade setups** - Get complete entry/exit strategies\n\n**Try asking:** "What is RSI divergence?" or "How do I manage risk?" or upload a chart screenshot!',
+      content: 'Welcome to StrategyAI – Your Trading Assistant powered by GPT-4o.\n\nYou can ask questions about trading strategies, risk management, or technical indicators like RSI and MACD.\n\n📊 Upload a chart screenshot and ask for a detailed analysis, including entry points, stop loss, and take profits.\n\nTry asking:\n• What is RSI divergence?\n• How should I manage risk?\n• Analyze this chart and suggest a trade setup.',
       timestamp: new Date()
     }
   ]);
@@ -181,6 +180,9 @@ const TradingChat = () => {
         if (line.startsWith('**') && line.endsWith('**')) {
           return <p key={index} className="font-semibold mb-1">{line.slice(2, -2)}</p>;
         }
+        if (line.startsWith('• ')) {
+          return <p key={index} className="mb-1 ml-2">{line}</p>;
+        }
         if (line.trim() === '') {
           return <br key={index} />;
         }
@@ -256,8 +258,8 @@ const TradingChat = () => {
         </div>
       )}
 
-      {/* Chat Area - with bottom padding for input */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 py-6 pb-32">
+      {/* Chat Area - with proper bottom padding for input */}
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 py-6 pb-40">
         <Card className="flex-1 flex flex-col tradeiq-card">
           {/* Messages */}
           <ScrollArea className="flex-1 p-6" ref={scrollAreaRef}>
@@ -328,12 +330,12 @@ const TradingChat = () => {
         </Card>
       </div>
 
-      {/* Fixed ChatGPT-Style Input Area */}
+      {/* Fixed ChatGPT-Style Input Area with proper spacing */}
       <div className="fixed bottom-0 left-0 right-0 bg-tradeiq-navy/95 backdrop-blur-sm border-t border-gray-800/50 pb-safe">
-        <div className="max-w-4xl mx-auto p-4">
+        <div className="max-w-4xl mx-auto p-6 pb-8">
           {/* Image Preview */}
           {uploadedImage && (
-            <div className="mb-3 p-3 bg-black/20 rounded-xl border border-gray-700">
+            <div className="mb-4 p-3 bg-black/20 rounded-xl border border-gray-700">
               <div className="flex items-center space-x-3">
                 <img 
                   src={uploadedImage} 
@@ -356,9 +358,9 @@ const TradingChat = () => {
             </div>
           )}
           
-          {/* Input Container - ChatGPT Style */}
+          {/* Input Container - ChatGPT Style with proper spacing */}
           <div className="relative bg-white/5 rounded-2xl border border-gray-700/50 shadow-lg backdrop-blur-sm">
-            <div className="flex items-end p-2">
+            <div className="flex items-end p-3">
               {/* Image Upload Button */}
               <Button
                 onClick={() => fileInputRef.current?.click()}
@@ -371,7 +373,7 @@ const TradingChat = () => {
               </Button>
               
               {/* Text Input */}
-              <div className="flex-1 mx-2">
+              <div className="flex-1 mx-3">
                 <Textarea
                   ref={textareaRef}
                   value={inputMessage}
@@ -397,7 +399,7 @@ const TradingChat = () => {
           </div>
           
           {/* Helper Text */}
-          <p className="text-xs text-gray-500 text-center mt-2">
+          <p className="text-xs text-gray-500 text-center mt-3">
             Press Enter to send • Shift+Enter for new line • Upload charts for AI analysis
           </p>
         </div>
