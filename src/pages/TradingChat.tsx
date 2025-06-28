@@ -47,11 +47,12 @@ const TradingChat = () => {
     }
   }, [messages, isLoading]);
 
-  // Auto-resize textarea
+  // Auto-resize textarea with max 4 lines
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + 'px';
+      const maxHeight = 24 * 4; // ~4 lines max
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, maxHeight) + 'px';
     }
   }, [inputMessage]);
 
@@ -96,6 +97,10 @@ const TradingChat = () => {
         };
         reader.readAsDataURL(file);
       }
+    }
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -164,7 +169,6 @@ const TradingChat = () => {
 
   // Render markdown-like content
   const renderMessage = (content: string) => {
-    // Simple markdown rendering for better formatting
     return content
       .split('\n')
       .map((line, index) => {
@@ -252,8 +256,8 @@ const TradingChat = () => {
         </div>
       )}
 
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 py-6">
+      {/* Chat Area - with bottom padding for input */}
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 py-6 pb-32">
         <Card className="flex-1 flex flex-col tradeiq-card">
           {/* Messages */}
           <ScrollArea className="flex-1 p-6" ref={scrollAreaRef}>
@@ -324,26 +328,27 @@ const TradingChat = () => {
         </Card>
       </div>
 
-      {/* Fixed Input Area */}
-      <div className="border-t border-gray-800/50 bg-black/20 backdrop-blur-sm">
+      {/* Fixed ChatGPT-Style Input Area */}
+      <div className="fixed bottom-0 left-0 right-0 bg-tradeiq-navy/95 backdrop-blur-sm border-t border-gray-800/50 pb-safe">
         <div className="max-w-4xl mx-auto p-4">
           {/* Image Preview */}
           {uploadedImage && (
-            <div className="mb-3 p-3 bg-black/20 rounded-lg border border-gray-700">
+            <div className="mb-3 p-3 bg-black/20 rounded-xl border border-gray-700">
               <div className="flex items-center space-x-3">
                 <img 
                   src={uploadedImage} 
                   alt="Chart to analyze" 
-                  className="h-12 w-16 object-cover rounded border border-gray-600"
+                  className="h-16 w-20 object-cover rounded-lg border border-gray-600"
                 />
                 <div className="flex-1">
-                  <p className="text-sm text-gray-300">Chart ready for analysis</p>
+                  <p className="text-sm text-gray-300 font-medium">Chart ready for analysis</p>
+                  <p className="text-xs text-gray-500">Click send to analyze with GPT-4o</p>
                 </div>
                 <Button
                   onClick={removeUploadedImage}
                   size="sm"
                   variant="ghost"
-                  className="text-red-400 hover:text-red-300"
+                  className="text-red-400 hover:text-red-300 h-8 w-8 p-0"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -351,46 +356,58 @@ const TradingChat = () => {
             </div>
           )}
           
-          {/* Input Bar */}
-          <div className="flex items-end space-x-2">
-            <Button
-              onClick={() => fileInputRef.current?.click()}
-              variant="ghost"
-              size="sm"
-              className="text-gray-400 hover:text-gray-300 px-2"
-              disabled={isLoading}
-            >
-              <Camera className="h-5 w-5" />
-            </Button>
-            
-            <div className="flex-1 relative">
-              <Textarea
-                ref={textareaRef}
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={uploadedImage ? "Optional: Add context or press Enter for analysis..." : "Ask about trading strategies, upload charts, or get market analysis..."}
-                className="min-h-[44px] max-h-[120px] resize-none bg-black/20 border-gray-700 text-white placeholder:text-gray-500 rounded-xl pr-12"
+          {/* Input Container - ChatGPT Style */}
+          <div className="relative bg-white/5 rounded-2xl border border-gray-700/50 shadow-lg backdrop-blur-sm">
+            <div className="flex items-end p-2">
+              {/* Image Upload Button */}
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-gray-300 h-10 w-10 p-0 shrink-0"
                 disabled={isLoading}
-                rows={1}
-              />
+              >
+                <Camera className="h-5 w-5" />
+              </Button>
+              
+              {/* Text Input */}
+              <div className="flex-1 mx-2">
+                <Textarea
+                  ref={textareaRef}
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder={uploadedImage ? "Optional: Add context or press Enter..." : "Ask about trading strategies, upload charts, or get market analysis..."}
+                  className="min-h-[40px] max-h-24 resize-none bg-transparent border-0 text-white placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 p-2"
+                  disabled={isLoading}
+                  rows={1}
+                />
+              </div>
+              
+              {/* Send Button */}
               <Button
                 onClick={handleSendMessage}
                 disabled={(!inputMessage.trim() && !uploadedImage) || isLoading}
                 size="sm"
-                className="absolute right-2 bottom-2 h-8 w-8 p-0 tradeiq-button-primary"
+                className="h-10 w-10 p-0 bg-tradeiq-blue hover:bg-tradeiq-blue-light disabled:opacity-50 shrink-0"
               >
                 <Send className="h-4 w-4" />
               </Button>
             </div>
           </div>
+          
+          {/* Helper Text */}
+          <p className="text-xs text-gray-500 text-center mt-2">
+            Press Enter to send • Shift+Enter for new line • Upload charts for AI analysis
+          </p>
         </div>
       </div>
       
+      {/* Hidden File Input */}
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp"
         onChange={handleImageUpload}
         className="hidden"
       />
