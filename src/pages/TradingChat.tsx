@@ -1,5 +1,6 @@
+
 import { useState, useRef, useEffect } from "react";
-import { Send, Camera, X, Settings, AlertCircle, Key, RefreshCw } from "lucide-react";
+import { Send, Camera, X, Settings, AlertCircle, Key, RefreshCw, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,26 +8,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from 'react-i18next';
 import { TradingAIService } from '@/services/tradingAIService';
 import { useToast } from "@/hooks/use-toast";
-
-interface Message {
-  id: string;
-  type: 'user' | 'assistant';
-  content: string;
-  image?: string;
-  timestamp: Date;
-}
+import { useConversationHistory, ChatMessage } from "@/hooks/useConversationHistory";
 
 const TradingChat = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      type: 'assistant',
-      content: 'Welcome to StrategyAI – Your Trading Assistant powered by AI.\n\nYou can:\n- Ask questions about trading strategies, indicators (like RSI or MACD), and risk management.\n- Upload a chart screenshot and request a full trade setup with entry, stop loss, and take profits.\n\nTry asking:\n- What is RSI divergence?\n- How should I manage risk on a swing trade?\n- Analyze this chart and give me a trade setup.',
-      timestamp: new Date()
-    }
-  ]);
+  const { messages, addMessage, clearHistory, isLoading: isLoadingHistory } = useConversationHistory();
+  
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
@@ -220,6 +208,14 @@ const TradingChat = () => {
     });
   };
 
+  const handleClearChat = () => {
+    clearHistory();
+    toast({
+      title: "Chat Cleared",
+      description: "Conversation history has been cleared and reset.",
+    });
+  };
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -340,7 +336,7 @@ const TradingChat = () => {
     // Update last message time
     setLastMessageTime(Date.now());
 
-    const userMessage: Message = {
+    const userMessage: ChatMessage = {
       id: Date.now().toString(),
       type: 'user',
       content: inputMessage || 'Please analyze this chart.',
@@ -349,7 +345,7 @@ const TradingChat = () => {
     };
 
     console.log('📨 Adding user message to chat:', userMessage);
-    setMessages(prev => [...prev, userMessage]);
+    addMessage(userMessage);
     const messageText = inputMessage;
     const imageData = uploadedImage;
     
@@ -361,7 +357,7 @@ const TradingChat = () => {
       console.log('🔄 Starting message send with enhanced retry logic');
       const aiResponse = await sendMessageWithRetry(messageText, imageData);
       
-      const assistantMsg: Message = {
+      const assistantMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
         content: aiResponse,
@@ -369,17 +365,17 @@ const TradingChat = () => {
       };
       
       console.log('✅ Adding assistant response to chat');
-      setMessages(prev => [...prev, assistantMsg]);
+      addMessage(assistantMsg);
       
     } catch (error) {
       console.error('💥 Final error after all retries:', error);
-      const errorMsg: Message = {
+      const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
         content: error instanceof Error ? error.message : 'Connection Error\n\nSorry, I couldn\'t process your request right now. Please check your internet connection and try again.',
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, errorMsg]);
+      addMessage(errorMsg);
     } finally {
       console.log('🏁 Message send complete, resetting states');
       setIsLoading(false);
@@ -425,7 +421,23 @@ const TradingChat = () => {
       });
   };
 
+  const formatTimestamp = (timestamp: Date) => {
+    return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
   const isInputDisabled = isLoading || isRetrying || !isApiKeyValid || isValidatingKey;
+
+  // Show loading state while history is being loaded
+  if (isLoadingHistory) {
+    return (
+      <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center">
+        <div className="flex items-center space-x-3">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tradeiq-blue"></div>
+          <span className="text-white">Loading conversation history...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-tradeiq-navy flex flex-col">
@@ -460,6 +472,16 @@ const TradingChat = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              <Button
+                onClick={handleClearChat}
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 border border-gray-700/50"
+                title="Clear chat history"
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Clear</span>
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -593,7 +615,7 @@ const TradingChat = () => {
                     </div>
                     
                     <p className="text-xs opacity-70 mt-2">
-                      {message.timestamp.toLocaleTimeString()}
+                      {formatTimestamp(message.timestamp)}
                     </p>
                   </div>
                 </div>
