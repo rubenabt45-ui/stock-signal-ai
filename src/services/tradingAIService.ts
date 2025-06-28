@@ -12,6 +12,7 @@ interface TradingAnswer {
 
 export class TradingAIService {
   private static readonly OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+  private static readonly OPENAI_MODELS_URL = 'https://api.openai.com/v1/models';
   private static readonly SYSTEM_PROMPT = `You are StrategyAI, a professional trading assistant and mentor. You specialize in:
 
 📊 **Technical Analysis**: Chart patterns, indicators (RSI, MACD, Bollinger Bands, Fibonacci), support/resistance levels
@@ -44,6 +45,69 @@ export class TradingAIService {
 
   static setApiKey(apiKey: string): void {
     localStorage.setItem('openai_api_key', apiKey);
+  }
+
+  static async validateApiKey(): Promise<{isValid: boolean, error?: string}> {
+    try {
+      const apiKey = this.getApiKey();
+      
+      if (!apiKey) {
+        console.log('🔑 No API key found for validation');
+        return { isValid: false, error: 'No API key found' };
+      }
+
+      console.log('🔍 Validating OpenAI API key...');
+      console.log('🔑 API Key (first 10 chars):', apiKey.substring(0, 10) + '...');
+
+      const response = await fetch(this.OPENAI_MODELS_URL, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('📡 API Key Validation Response:');
+      console.log('📊 Status:', response.status);
+      console.log('📊 Status Text:', response.statusText);
+      console.log('📊 Headers:', Object.fromEntries(response.headers.entries()));
+
+      if (response.ok) {
+        console.log('✅ API key validation successful');
+        return { isValid: true };
+      }
+
+      // Handle specific error cases
+      let errorData;
+      try {
+        errorData = await response.json();
+        console.log('❌ API Key Validation Error Response:', errorData);
+      } catch (parseError) {
+        console.log('❌ Could not parse validation error response:', parseError);
+        errorData = {};
+      }
+
+      if (response.status === 401) {
+        console.log('🔑 AUTHENTICATION ERROR: Invalid API key');
+        return { isValid: false, error: 'Invalid API key' };
+      } else if (response.status === 403) {
+        console.log('🚫 AUTHORIZATION ERROR: API key unauthorized or billing issue');
+        return { isValid: false, error: 'API key unauthorized or billing not enabled' };
+      } else {
+        console.log('❌ UNKNOWN VALIDATION ERROR:', response.status, errorData);
+        return { isValid: false, error: `Validation failed with status ${response.status}` };
+      }
+
+    } catch (error) {
+      console.error('💥 Error validating API key:', error);
+      
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.log('🌐 Network error during validation');
+        return { isValid: false, error: 'Network error during validation' };
+      }
+      
+      return { isValid: false, error: 'Validation request failed' };
+    }
   }
 
   static async getGPTResponse(userMessage: string, imageBase64?: string): Promise<string> {
@@ -137,8 +201,15 @@ export class TradingAIService {
           errorData = {};
         }
 
-        // Enhanced 429 error logging
-        if (response.status === 429) {
+        // Handle specific error cases
+        if (response.status === 401) {
+          console.log('🔑 AUTHENTICATION ERROR: Invalid API key');
+          return "🔑 **Authentication Error**\n\nInvalid OpenAI API key. Please check your API key in Settings → API Configuration.";
+        } else if (response.status === 403) {
+          console.log('🚫 AUTHORIZATION ERROR: API key unauthorized or billing issue');
+          return "🚫 **Authorization Error**\n\nYour API key is unauthorized or your OpenAI account billing is not enabled. Please check your OpenAI account settings.";
+        } else if (response.status === 429) {
+          // Enhanced 429 error logging
           console.log('🚫 RATE LIMIT ERROR DETAILS:');
           console.log('📊 Status Code:', response.status);
           console.log('📄 Error Message:', errorData?.error?.message || 'No message provided');
@@ -153,12 +224,7 @@ export class TradingAIService {
           } else if (errorData?.error?.code === 'rate_limit_exceeded') {
             console.log('⏰ RATE LIMIT: Too many requests per minute/hour');
           }
-        }
-        
-        if (response.status === 401) {
-          console.log('🔑 AUTHENTICATION ERROR: Invalid API key');
-          return "🔑 **Authentication Error**\n\nInvalid OpenAI API key. Please check your API key in Settings → API Configuration.";
-        } else if (response.status === 429) {
+
           // Throw error to trigger retry logic in TradingChat
           const errorMessage = errorData?.error?.message || 'Rate limit exceeded';
           throw new Error(`429: ${errorMessage}`);

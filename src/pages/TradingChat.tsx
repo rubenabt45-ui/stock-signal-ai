@@ -35,6 +35,8 @@ const TradingChat = () => {
   const [showApiKeyPrompt, setShowApiKeyPrompt] = useState(false);
   const [tempApiKey, setTempApiKey] = useState('');
   const [lastMessageTime, setLastMessageTime] = useState<number>(0);
+  const [isApiKeyValid, setIsApiKeyValid] = useState<boolean>(false);
+  const [isValidatingKey, setIsValidatingKey] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -61,23 +63,92 @@ const TradingChat = () => {
     }
   }, [inputMessage]);
 
-  // Check for API key on mount
+  // Validate API key on mount and when key changes
   useEffect(() => {
-    const apiKey = localStorage.getItem('openai_api_key');
-    if (!apiKey) {
-      setShowApiKeyPrompt(true);
-    }
-  }, []);
+    const validateApiKey = async () => {
+      const apiKey = localStorage.getItem('openai_api_key');
+      if (!apiKey) {
+        console.log('🔑 No API key found, showing prompt');
+        setIsApiKeyValid(false);
+        setShowApiKeyPrompt(true);
+        return;
+      }
 
-  const handleApiKeySubmit = () => {
+      console.log('🔍 Validating API key on mount...');
+      setIsValidatingKey(true);
+      
+      try {
+        const validation = await TradingAIService.validateApiKey();
+        
+        if (validation.isValid) {
+          console.log('✅ API key is valid');
+          setIsApiKeyValid(true);
+          setShowApiKeyPrompt(false);
+        } else {
+          console.log('❌ API key validation failed:', validation.error);
+          setIsApiKeyValid(false);
+          
+          // Show user-friendly error message
+          toast({
+            title: "API Key Issue",
+            description: "Your OpenAI API key is missing, invalid, or unauthorized. Please check your key and ensure your OpenAI account has billing enabled.",
+            variant: "destructive"
+          });
+          
+          setShowApiKeyPrompt(true);
+        }
+      } catch (error) {
+        console.error('💥 Error during API key validation:', error);
+        setIsApiKeyValid(false);
+        
+        toast({
+          title: "Validation Error",
+          description: "Could not validate your API key. Please check your internet connection and try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsValidatingKey(false);
+      }
+    };
+
+    validateApiKey();
+  }, [toast]);
+
+  const handleApiKeySubmit = async () => {
     if (tempApiKey.trim()) {
+      console.log('💾 Saving new API key and validating...');
       TradingAIService.setApiKey(tempApiKey.trim());
-      setShowApiKeyPrompt(false);
-      setTempApiKey('');
-      toast({
-        title: "API Key Saved",
-        description: "Your OpenAI API key has been saved successfully!",
-      });
+      setIsValidatingKey(true);
+      
+      try {
+        const validation = await TradingAIService.validateApiKey();
+        
+        if (validation.isValid) {
+          setIsApiKeyValid(true);
+          setShowApiKeyPrompt(false);
+          setTempApiKey('');
+          toast({
+            title: "API Key Saved",
+            description: "Your OpenAI API key has been saved and validated successfully!",
+          });
+        } else {
+          console.log('❌ New API key validation failed:', validation.error);
+          toast({
+            title: "Invalid API Key",
+            description: "The API key you entered is invalid or unauthorized. Please check your key and ensure billing is enabled on your OpenAI account.",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error('💥 Error validating new API key:', error);
+        toast({
+          title: "Validation Error",
+          description: "Could not validate your API key. Please check your internet connection and try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsValidatingKey(false);
+      }
     }
   };
 
@@ -135,7 +206,7 @@ const TradingChat = () => {
     } catch (error) {
       console.error('❌ Error on attempt', retryCount + 1, ':', error);
       
-      // Check if it's a rate limit error and we haven't retried yet
+      // Check if it's specifically a 429 rate limit error and we haven't retried yet
       if (retryCount === 0 && error instanceof Error && error.message.includes('429')) {
         console.log(`⏳ Rate limit detected, retrying in ${RETRY_DELAY / 1000} seconds...`);
         console.log('🔄 Setting retry state to true');
@@ -155,10 +226,10 @@ const TradingChat = () => {
         return sendMessageWithRetry(messageText, imageData, retryCount + 1);
       }
       
-      // If it's still a rate limit error after retry, or any other error
+      // If it's still a 429 rate limit error after retry, or any other error
       if (error instanceof Error && error.message.includes('429')) {
         console.log('🚫 Final rate limit error after retry');
-        throw new Error('Too many requests. Please try again later.');
+        throw new Error('Rate limit exceeded. Please try again later.');
       }
       
       console.log('💥 Non-retryable error or final error:', error);
@@ -172,23 +243,28 @@ const TradingChat = () => {
     console.log('🖼️ Uploaded image:', !!uploadedImage);
     console.log('⏳ Is loading:', isLoading);
     console.log('🔄 Is retrying:', isRetrying);
+    console.log('🔑 API key valid:', isApiKeyValid);
     
     if ((!inputMessage.trim() && !uploadedImage) || isLoading || isRetrying) {
       console.log('🛑 Message send blocked - missing content or already processing');
       return;
     }
 
-    // Check rate limiting
-    if (!checkRateLimit()) {
-      console.log('🛑 Message send blocked - rate limit');
+    // Check if API key is valid
+    if (!isApiKeyValid) {
+      console.log('🛑 Message send blocked - invalid API key');
+      toast({
+        title: "API Key Required",
+        description: "Please enter a valid OpenAI API key to use StrategyAI.",
+        variant: "destructive"
+      });
+      setShowApiKeyPrompt(true);
       return;
     }
 
-    // Check API key
-    const apiKey = localStorage.getItem('openai_api_key');
-    if (!apiKey) {
-      console.log('🛑 Message send blocked - no API key');
-      setShowApiKeyPrompt(true);
+    // Check rate limiting
+    if (!checkRateLimit()) {
+      console.log('🛑 Message send blocked - rate limit');
       return;
     }
 
@@ -282,7 +358,7 @@ const TradingChat = () => {
       });
   };
 
-  const isInputDisabled = isLoading || isRetrying;
+  const isInputDisabled = isLoading || isRetrying || !isApiKeyValid || isValidatingKey;
 
   return (
     <div className="min-h-screen bg-tradeiq-navy flex flex-col">
@@ -296,7 +372,11 @@ const TradingChat = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white tracking-tight">StrategyAI</h1>
-                <p className="text-xs text-gray-400 font-medium">Powered by GPT-4o</p>
+                <p className="text-xs text-gray-400 font-medium">
+                  Powered by GPT-4o {isValidatingKey && '• Validating key...'}
+                  {!isApiKeyValid && !isValidatingKey && '• API key required'}
+                  {isApiKeyValid && !isValidatingKey && '• Ready'}
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
@@ -341,19 +421,21 @@ const TradingChat = () => {
                 onChange={(e) => setTempApiKey(e.target.value)}
                 placeholder="sk-..."
                 className="bg-black/20 border-gray-700 text-white placeholder:text-gray-500"
+                disabled={isValidatingKey}
               />
               <div className="flex space-x-2">
                 <Button
                   onClick={handleApiKeySubmit}
                   className="tradeiq-button-primary flex-1"
-                  disabled={!tempApiKey.trim()}
+                  disabled={!tempApiKey.trim() || isValidatingKey}
                 >
-                  Save API Key
+                  {isValidatingKey ? 'Validating...' : 'Save API Key'}
                 </Button>
                 <Button
                   onClick={() => setShowApiKeyPrompt(false)}
                   variant="ghost"
                   className="text-gray-400"
+                  disabled={isValidatingKey}
                 >
                   Cancel
                 </Button>
@@ -500,7 +582,13 @@ const TradingChat = () => {
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  placeholder={uploadedImage ? "Optional: Add context or press Enter..." : "Ask about trading strategies, upload charts, or get market analysis..."}
+                  placeholder={
+                    !isApiKeyValid 
+                      ? "Please enter your OpenAI API key to start chatting..."
+                      : uploadedImage 
+                        ? "Optional: Add context or press Enter..." 
+                        : "Ask about trading strategies, upload charts, or get market analysis..."
+                  }
                   className="min-h-[40px] max-h-24 resize-none bg-transparent border-0 text-white placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 p-2"
                   disabled={isInputDisabled}
                   rows={1}
@@ -521,9 +609,13 @@ const TradingChat = () => {
           
           {/* Helper Text */}
           <p className="text-xs text-gray-500 text-center mt-3">
-            {isRetrying 
-              ? 'Retrying due to rate limit...' 
-              : 'Press Enter to send • Shift+Enter for new line • Upload charts for AI analysis'
+            {!isApiKeyValid 
+              ? 'Enter a valid OpenAI API key to start using StrategyAI'
+              : isValidatingKey
+                ? 'Validating your API key...'
+                : isRetrying 
+                  ? 'Retrying due to rate limit...' 
+                  : 'Press Enter to send • Shift+Enter for new line • Upload charts for AI analysis'
             }
           </p>
         </div>
