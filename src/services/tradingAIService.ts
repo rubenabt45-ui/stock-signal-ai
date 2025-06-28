@@ -1,3 +1,4 @@
+
 interface TradingQuestion {
   question: string;
   context?: string;
@@ -7,6 +8,12 @@ interface TradingAnswer {
   answer: string;
   examples?: string[];
   relatedTopics?: string[];
+}
+
+interface ModelFallbackConfig {
+  primary: string;
+  fallbacks: string[];
+  current: string;
 }
 
 export class TradingAIService {
@@ -36,14 +43,34 @@ export class TradingAIService {
 📈 **Analysis:** [technical reasoning]
 ⚠️ **Risk Management:** [specific advice]`;
 
+  // Model fallback configuration
+  private static modelConfig: ModelFallbackConfig = {
+    primary: 'gpt-4.1-2025-04-14',
+    fallbacks: ['gpt-4o', 'gpt-4o-mini', 'gpt-3.5-turbo'],
+    current: 'gpt-4.1-2025-04-14'
+  };
+
   private static getApiKey(): string | null {
-    // For frontend apps, we'll need to store the API key in localStorage
-    // This is not ideal for production but works for development
     return localStorage.getItem('openai_api_key') || null;
   }
 
   static setApiKey(apiKey: string): void {
     localStorage.setItem('openai_api_key', apiKey);
+  }
+
+  private static getCurrentModel(): string {
+    const savedModel = localStorage.getItem('current_ai_model');
+    if (savedModel) {
+      this.modelConfig.current = savedModel;
+      console.log('🤖 Using saved model from localStorage:', savedModel);
+    }
+    return this.modelConfig.current;
+  }
+
+  private static setCurrentModel(model: string): void {
+    this.modelConfig.current = model;
+    localStorage.setItem('current_ai_model', model);
+    console.log('💾 Saved current model to localStorage:', model);
   }
 
   static async validateApiKey(): Promise<{isValid: boolean, error?: string}> {
@@ -73,10 +100,13 @@ export class TradingAIService {
 
       if (response.ok) {
         console.log('✅ API key validation successful');
+        
+        // Test the current model with a lightweight request
+        await this.testCurrentModel();
+        
         return { isValid: true };
       }
 
-      // Handle specific error cases
       let errorData;
       try {
         errorData = await response.json();
@@ -92,6 +122,9 @@ export class TradingAIService {
       } else if (response.status === 403) {
         console.log('🚫 AUTHORIZATION ERROR: API key unauthorized or billing issue');
         return { isValid: false, error: 'API key unauthorized or billing not enabled' };
+      } else if (response.status === 429) {
+        console.log('⏰ RATE LIMIT ERROR during validation');
+        return { isValid: false, error: 'Rate limit exceeded during validation' };
       } else {
         console.log('❌ UNKNOWN VALIDATION ERROR:', response.status, errorData);
         return { isValid: false, error: `Validation failed with status ${response.status}` };
@@ -109,9 +142,144 @@ export class TradingAIService {
     }
   }
 
+  private static async testCurrentModel(): Promise<void> {
+    try {
+      const currentModel = this.getCurrentModel();
+      console.log('🧪 Testing current model:', currentModel);
+      
+      const apiKey = this.getApiKey();
+      if (!apiKey) return;
+
+      const testResponse = await fetch(this.OPENAI_API_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: currentModel,
+          messages: [{ role: 'user', content: 'Test' }],
+          max_tokens: 1
+        })
+      });
+
+      if (testResponse.ok) {
+        console.log('✅ Current model test successful:', currentModel);
+      } else {
+        console.log('⚠️ Current model test failed, may need fallback:', currentModel);
+        const errorData = await testResponse.json().catch(() => ({}));
+        console.log('🔍 Model test error details:', errorData);
+      }
+    } catch (error) {
+      console.log('🧪 Model test error (non-critical):', error);
+    }
+  }
+
+  private static detectQuotaOrBillingIssue(status: number, errorData: any): boolean {
+    // Check for quota exceeded
+    if (errorData?.error?.code === 'insufficient_quota') {
+      console.log('💰 QUOTA ISSUE DETECTED: insufficient_quota');
+      return true;
+    }
+
+    // Check for billing issues
+    if (status === 403 && errorData?.error?.message?.toLowerCase().includes('billing')) {
+      console.log('💳 BILLING ISSUE DETECTED: billing related 403 error');
+      return true;
+    }
+
+    // Check for rate limit due to no credits
+    if (status === 429 && errorData?.error?.code === 'insufficient_quota') {
+      console.log('💰 QUOTA RATE LIMIT DETECTED: 429 with insufficient_quota');
+      return true;
+    }
+
+    return false;
+  }
+
+  private static async tryModelFallback(userMessage: string, imageBase64?: string): Promise<string> {
+    const apiKey = this.getApiKey();
+    if (!apiKey) {
+      throw new Error('No API key available for fallback');
+    }
+
+    console.log('🔄 Starting model fallback sequence...');
+    console.log('🎯 Available fallback models:', this.modelConfig.fallbacks);
+
+    for (const fallbackModel of this.modelConfig.fallbacks) {
+      try {
+        console.log(`🧪 Attempting fallback model: ${fallbackModel}`);
+
+        const messages: any[] = [
+          {
+            role: 'system',
+            content: this.SYSTEM_PROMPT
+          }
+        ];
+
+        if (imageBase64) {
+          messages.push({
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: userMessage || 'Please analyze this trading chart and provide a complete strategy analysis.'
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: imageBase64
+                }
+              }
+            ]
+          });
+        } else {
+          messages.push({
+            role: 'user',
+            content: userMessage
+          });
+        }
+
+        const response = await fetch(this.OPENAI_API_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: fallbackModel,
+            messages: messages,
+            temperature: 0.7,
+            max_tokens: 1000
+          })
+        });
+
+        console.log(`📡 Fallback model ${fallbackModel} response:`, response.status);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`✅ SUCCESS: Fallback model ${fallbackModel} worked!`);
+          
+          // Update current model to the working fallback
+          this.setCurrentModel(fallbackModel);
+          
+          return data.choices[0].message?.content || "Sorry, I couldn't generate a response. Please try again.";
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          console.log(`❌ Fallback model ${fallbackModel} failed:`, response.status, errorData);
+        }
+
+      } catch (error) {
+        console.log(`💥 Exception with fallback model ${fallbackModel}:`, error);
+      }
+    }
+
+    console.log('🚫 All fallback models failed');
+    throw new Error('All models failed including fallbacks');
+  }
+
   static async getGPTResponse(userMessage: string, imageBase64?: string): Promise<string> {
     try {
-      // Get API key from localStorage
       const apiKey = this.getApiKey();
       
       if (!apiKey) {
@@ -119,7 +287,9 @@ export class TradingAIService {
         return "⚠️ **API Key Missing**\n\nPlease set your OpenAI API key in the settings to use StrategyAI. Go to Settings → API Configuration.";
       }
 
-      // Prepare messages array
+      const currentModel = this.getCurrentModel();
+      console.log('🤖 Using model:', currentModel);
+
       const messages: any[] = [
         {
           role: 'system',
@@ -127,7 +297,6 @@ export class TradingAIService {
         }
       ];
 
-      // Add user message with optional image
       if (imageBase64) {
         messages.push({
           role: 'user',
@@ -152,14 +321,14 @@ export class TradingAIService {
       }
 
       const requestBody = {
-        model: 'gpt-4.1-2025-04-14',
+        model: currentModel,
         messages: messages,
         temperature: 0.7,
         max_tokens: 1000
       };
 
       console.log('🚀 Sending request to OpenAI API:');
-      console.log('📋 Request body:', requestBody);
+      console.log('📋 Model:', currentModel);
       console.log('🔑 API Key (first 10 chars):', apiKey.substring(0, 10) + '...');
 
       const response = await fetch(this.OPENAI_API_URL, {
@@ -174,21 +343,6 @@ export class TradingAIService {
       console.log('📡 OpenAI API Response Details:');
       console.log('📊 Status:', response.status);
       console.log('📊 Status Text:', response.statusText);
-      console.log('📊 Headers:', Object.fromEntries(response.headers.entries()));
-
-      // Log specific rate limit headers if present
-      const retryAfter = response.headers.get('Retry-After');
-      const rateLimitLimit = response.headers.get('X-RateLimit-Limit');
-      const rateLimitRemaining = response.headers.get('X-RateLimit-Remaining');
-      const rateLimitReset = response.headers.get('X-RateLimit-Reset');
-
-      if (retryAfter || rateLimitLimit || rateLimitRemaining || rateLimitReset) {
-        console.log('⏱️ Rate Limit Headers:');
-        console.log('  Retry-After:', retryAfter);
-        console.log('  X-RateLimit-Limit:', rateLimitLimit);
-        console.log('  X-RateLimit-Remaining:', rateLimitRemaining);
-        console.log('  X-RateLimit-Reset:', rateLimitReset);
-      }
 
       if (!response.ok) {
         let errorData;
@@ -200,31 +354,44 @@ export class TradingAIService {
           errorData = {};
         }
 
-        // Handle specific error cases with improved messaging
+        // Handle specific error cases with enhanced messaging and fallback logic
         if (response.status === 401) {
           console.log('🔑 AUTHENTICATION ERROR: Invalid API key');
           return "🔑 **Invalid API Key**\n\nYour OpenAI API key is invalid. Please check your API key in Settings.";
         } else if (response.status === 403) {
           console.log('🚫 AUTHORIZATION ERROR: API key unauthorized or billing issue');
+          
+          if (this.detectQuotaOrBillingIssue(response.status, errorData)) {
+            console.log('💰 Attempting model fallback due to quota/billing issue...');
+            try {
+              const fallbackResponse = await this.tryModelFallback(userMessage, imageBase64);
+              return `🔄 **Fallback Model Activated**\n\nYour primary model hit quota limits. Switched to: ${this.getCurrentModel()}\n\n${fallbackResponse}`;
+            } catch (fallbackError) {
+              console.log('💥 All fallback attempts failed:', fallbackError);
+              return "💰 **Quota Exceeded**\n\nYou've reached your API quota limit. Please check your OpenAI billing settings and add credits to continue.";
+            }
+          }
+          
           return "🚫 **Unauthorized API Key**\n\nYour API key is unauthorized or your OpenAI account billing is not enabled. Please check your OpenAI account settings.";
         } else if (response.status === 429) {
-          // Enhanced 429 error logging - only show "Rate Limit Exceeded" for 429
           console.log('🚫 RATE LIMIT ERROR DETAILS:');
           console.log('📊 Status Code:', response.status);
           console.log('📄 Error Message:', errorData?.error?.message || 'No message provided');
           console.log('🔍 Error Type:', errorData?.error?.type || 'No type provided');
           console.log('🔍 Error Code:', errorData?.error?.code || 'No code provided');
-          console.log('🔍 Error Param:', errorData?.error?.param || 'No param provided');
-          console.log('📋 Full Error Object:', errorData);
           
-          // Check for quota vs rate limit
-          if (errorData?.error?.code === 'insufficient_quota') {
-            console.log('💰 QUOTA ISSUE: API key has exceeded its quota limit');
-          } else if (errorData?.error?.code === 'rate_limit_exceeded') {
-            console.log('⏰ RATE LIMIT: Too many requests per minute/hour');
+          if (this.detectQuotaOrBillingIssue(response.status, errorData)) {
+            console.log('💰 429 due to quota issue, attempting fallback...');
+            try {
+              const fallbackResponse = await this.tryModelFallback(userMessage, imageBase64);
+              return `🔄 **Fallback Model Activated**\n\nYour primary model hit quota limits. Switched to: ${this.getCurrentModel()}\n\n${fallbackResponse}`;
+            } catch (fallbackError) {
+              console.log('💥 All fallback attempts failed:', fallbackError);
+              return "💰 **Quota Exceeded**\n\nYou've reached your API quota limit. Please check your OpenAI billing settings and add credits to continue.";
+            }
           }
-
-          // Throw error to trigger retry logic in TradingChat
+          
+          // Regular rate limit - throw error to trigger retry logic
           const errorMessage = errorData?.error?.message || 'Rate limit exceeded';
           throw new Error(`429: ${errorMessage}`);
         } else if (response.status === 400) {
@@ -240,7 +407,7 @@ export class TradingAIService {
       }
 
       const data = await response.json();
-      console.log('✅ OpenAI API Success Response:', data);
+      console.log('✅ OpenAI API Success Response with model:', currentModel);
       
       if (!data.choices || !data.choices[0] || !data.choices[0].message) {
         console.error('❌ Unexpected API response format:', data);
@@ -253,7 +420,6 @@ export class TradingAIService {
     } catch (error) {
       console.error('💥 Error in getGPTResponse:', error);
       
-      // Enhanced error logging
       if (error instanceof Error) {
         console.log('🔍 Error Details:');
         console.log('  Message:', error.message);
@@ -287,5 +453,20 @@ export class TradingAIService {
       : `Please provide trading analysis for: ${userMessage}`;
       
     return this.getGPTResponse(contextualMessage, imageBase64);
+  }
+
+  // Get current model info for UI display
+  static getCurrentModelInfo(): { model: string; isPrimary: boolean } {
+    const current = this.getCurrentModel();
+    return {
+      model: current,
+      isPrimary: current === this.modelConfig.primary
+    };
+  }
+
+  // Reset to primary model (useful for testing after credits are added)
+  static resetToPrimaryModel(): void {
+    this.setCurrentModel(this.modelConfig.primary);
+    console.log('🔄 Reset to primary model:', this.modelConfig.primary);
   }
 }
