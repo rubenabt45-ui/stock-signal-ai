@@ -63,70 +63,61 @@ const TradingChat = () => {
     }
   }, [inputMessage]);
 
-  // Enhanced API key validation on mount
+  // Enhanced API key validation on mount - only prompt if key is missing or invalid
   useEffect(() => {
     const validateApiKey = async () => {
-      console.log('🔍 Starting comprehensive API key validation on mount...');
+      console.log('🔍 Starting API key validation on mount...');
       
-      const apiKey = localStorage.getItem('openai_api_key');
-      if (!apiKey) {
-        console.log('🔑 No API key found in localStorage');
+      const existingApiKey = localStorage.getItem('openai_api_key');
+      if (!existingApiKey) {
+        console.log('🔑 No API key found in localStorage - prompting user');
         setIsApiKeyValid(false);
         setShowApiKeyPrompt(true);
-        toast({
-          title: "API Key Required",
-          description: "Please enter your OpenAI API key to use StrategyAI.",
-          variant: "destructive"
-        });
         return;
       }
 
-      console.log('🔍 Found API key, validating with comprehensive checks...');
+      console.log('🔍 Found existing API key, validating silently...');
       setIsValidatingKey(true);
       
       try {
         const validation = await TradingAIService.validateApiKey();
         
         if (validation.isValid) {
-          console.log('✅ API key validation successful');
+          console.log('✅ Existing API key validation successful');
           setIsApiKeyValid(true);
-          setShowApiKeyPrompt(false);
+          // Don't show API key prompt since we have a valid key
           
           // Get current model info
           const modelInfo = TradingAIService.getCurrentModelInfo();
           setCurrentModelInfo(modelInfo);
           console.log('🤖 Current model info:', modelInfo);
           
-          // Show different messages based on model status
+          // Only show toast if using fallback model
           if (!modelInfo.isPrimary) {
             toast({
               title: "Using Fallback Model",
               description: `Currently using: ${modelInfo.model}. This may be due to quota limits on your primary model.`,
             });
-          } else {
-            toast({
-              title: "API Key Valid",
-              description: `Your OpenAI API key is working correctly with ${modelInfo.model}!`,
-            });
           }
         } else {
-          console.log('❌ API key validation failed:', validation.error);
+          console.log('❌ Existing API key validation failed:', validation.error);
+          
+          // Clear the invalid key from localStorage
+          localStorage.removeItem('openai_api_key');
+          
           setIsApiKeyValid(false);
           setShowApiKeyPrompt(true);
           
           // Enhanced error messaging
           let title = "API Key Invalid";
-          let description = validation.error || "Please check your API key.";
+          let description = "Your saved API key is no longer valid. Please enter a new one.";
           
           if (validation.error?.includes('billing')) {
             title = "Billing Issue";
-            description = "Your OpenAI account billing is not enabled or you've reached your quota.";
+            description = "Your OpenAI account billing is not enabled or you've reached your quota. Please check your OpenAI account.";
           } else if (validation.error?.includes('unauthorized')) {
             title = "Unauthorized Key";
-            description = "Your API key is unauthorized. Please check your OpenAI account.";
-          } else if (validation.error?.includes('Rate limit')) {
-            title = "Rate Limited";
-            description = "Too many validation requests. Please wait a moment and try again.";
+            description = "Your API key is unauthorized. Please enter a valid API key.";
           }
           
           toast({
@@ -136,18 +127,22 @@ const TradingChat = () => {
           });
         }
       } catch (error) {
-        console.error('💥 Error during comprehensive API key validation:', error);
-        setIsApiKeyValid(false);
-        setShowApiKeyPrompt(true);
+        console.error('💥 Error during API key validation:', error);
+        
+        // Don't clear the key on network errors - assume it might be valid
+        setIsApiKeyValid(true);
+        
+        // Get current model info even if validation failed due to network
+        const modelInfo = TradingAIService.getCurrentModelInfo();
+        setCurrentModelInfo(modelInfo);
         
         toast({
-          title: "Validation Error",
-          description: "Could not validate your API key. Please check your connection and try again.",
-          variant: "destructive"
+          title: "Validation Failed",
+          description: "Could not validate your API key due to network issues. Proceeding with saved key.",
         });
       } finally {
         setIsValidatingKey(false);
-        console.log('🏁 Comprehensive API key validation complete');
+        console.log('🏁 API key validation complete');
       }
     };
 
@@ -156,7 +151,7 @@ const TradingChat = () => {
 
   const handleApiKeySubmit = async () => {
     if (tempApiKey.trim()) {
-      console.log('💾 Saving new API key and performing comprehensive validation...');
+      console.log('💾 Saving new API key and validating...');
       TradingAIService.setApiKey(tempApiKey.trim());
       setIsValidatingKey(true);
       
@@ -174,10 +169,13 @@ const TradingChat = () => {
           
           toast({
             title: "API Key Saved",
-            description: `Your OpenAI API key has been validated successfully with ${modelInfo.model}!`,
+            description: `Your OpenAI API key has been validated and saved successfully with ${modelInfo.model}!`,
           });
         } else {
           console.log('❌ New API key validation failed:', validation.error);
+          
+          // Clear the invalid key
+          localStorage.removeItem('openai_api_key');
           
           // Enhanced error messaging for new keys
           let title = "Invalid API Key";
@@ -521,7 +519,10 @@ const TradingChat = () => {
                   {isValidatingKey ? 'Validating...' : 'Save API Key'}
                 </Button>
                 <Button
-                  onClick={() => setShowApiKeyPrompt(false)}
+                  onClick={() => {
+                    setShowApiKeyPrompt(false);
+                    setTempApiKey('');
+                  }}
                   variant="ghost"
                   className="text-gray-400"
                   disabled={isValidatingKey}
