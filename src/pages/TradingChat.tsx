@@ -23,7 +23,7 @@ const TradingChat = () => {
     {
       id: '1',
       type: 'assistant',
-      content: 'Welcome to StrategyAI – Your Trading Assistant powered by GPT-4o.\n\nYou can ask questions about trading strategies, risk management, or technical indicators like RSI and MACD.\n\n📊 Upload a chart screenshot and ask for a detailed analysis, including entry points, stop loss, and take profits.\n\nTry asking:\n• What is RSI divergence?\n• How should I manage risk?\n• Analyze this chart and suggest a trade setup.',
+      content: 'Welcome to StrategyAI – Your Trading Assistant powered by GPT-4o.\n\nYou can:\n- Ask questions about trading strategies, indicators (like RSI or MACD), and risk management.\n- Upload a chart screenshot and request a full trade setup with entry, stop loss, and take profits.\n\nTry asking:\n- What is RSI divergence?\n- How should I manage risk on a swing trade?\n- Analyze this chart and give me a trade setup.',
       timestamp: new Date()
     }
   ]);
@@ -146,7 +146,7 @@ const TradingChat = () => {
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: '❌ **Connection Error**\n\nSorry, I couldn\'t process your request right now. Please check your internet connection and try again.',
+        content: 'Connection Error\n\nSorry, I couldn\'t process your request right now. Please check your internet connection and try again.',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMsg]);
@@ -181,6 +181,9 @@ const TradingChat = () => {
           return <p key={index} className="font-semibold mb-1">{line.slice(2, -2)}</p>;
         }
         if (line.startsWith('• ')) {
+          return <p key={index} className="mb-1 ml-2">{line}</p>;
+        }
+        if (line.startsWith('- ')) {
           return <p key={index} className="mb-1 ml-2">{line}</p>;
         }
         if (line.trim() === '') {
