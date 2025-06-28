@@ -1,4 +1,3 @@
-
 interface TradingQuestion {
   question: string;
   context?: string;
@@ -153,7 +152,7 @@ export class TradingAIService {
       }
 
       const requestBody = {
-        model: 'gpt-4o',
+        model: 'gpt-4.1-2025-04-14',
         messages: messages,
         temperature: 0.7,
         max_tokens: 1000
@@ -201,15 +200,15 @@ export class TradingAIService {
           errorData = {};
         }
 
-        // Handle specific error cases
+        // Handle specific error cases with improved messaging
         if (response.status === 401) {
           console.log('🔑 AUTHENTICATION ERROR: Invalid API key');
-          return "🔑 **Authentication Error**\n\nInvalid OpenAI API key. Please check your API key in Settings → API Configuration.";
+          return "🔑 **Invalid API Key**\n\nYour OpenAI API key is invalid. Please check your API key in Settings.";
         } else if (response.status === 403) {
           console.log('🚫 AUTHORIZATION ERROR: API key unauthorized or billing issue');
-          return "🚫 **Authorization Error**\n\nYour API key is unauthorized or your OpenAI account billing is not enabled. Please check your OpenAI account settings.";
+          return "🚫 **Unauthorized API Key**\n\nYour API key is unauthorized or your OpenAI account billing is not enabled. Please check your OpenAI account settings.";
         } else if (response.status === 429) {
-          // Enhanced 429 error logging
+          // Enhanced 429 error logging - only show "Rate Limit Exceeded" for 429
           console.log('🚫 RATE LIMIT ERROR DETAILS:');
           console.log('📊 Status Code:', response.status);
           console.log('📄 Error Message:', errorData?.error?.message || 'No message provided');
@@ -231,6 +230,9 @@ export class TradingAIService {
         } else if (response.status === 400) {
           console.log('❌ BAD REQUEST ERROR:', errorData);
           return "❌ **Bad Request**\n\nThere was an issue with your request. Please try again with a different message.";
+        } else if (response.status === 406) {
+          console.log('🔧 406 CONFIGURATION ERROR:', errorData);
+          return "🔧 **Configuration Error**\n\nConfiguration error. Please reset theme/language or check your API settings.";
         } else {
           console.log('❌ UNKNOWN API ERROR:', response.status, errorData);
           return `❌ **API Error (${response.status})**\n\nSorry, there was an issue connecting to the AI service. Please try again.`;
@@ -273,7 +275,7 @@ export class TradingAIService {
     }
   }
 
-  // Keep the legacy method for backward compatibility but make it use GPT-4o
+  // Keep the legacy method for backward compatibility but make it use GPT-4.1
   static async answerTradingQuestion(question: string): Promise<string> {
     return this.getGPTResponse(question);
   }

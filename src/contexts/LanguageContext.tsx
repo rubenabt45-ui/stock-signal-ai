@@ -23,35 +23,56 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     { code: 'es', name: 'Español' }
   ];
 
-  // Load language from user_profiles on mount
+  // Load language from user_profiles on mount with proper error handling
   useEffect(() => {
     const loadUserLanguage = async () => {
+      // Always start with default language
+      const defaultLanguage = 'en';
+      
       if (!user?.id) {
-        // If no user, check localStorage for fallback
+        console.log('🌐 No user found, using default language:', defaultLanguage);
+        // Check localStorage for fallback
         const savedLanguage = localStorage.getItem('i18nextLng');
         if (savedLanguage && availableLanguages.some(lang => lang.code === savedLanguage)) {
+          console.log('🌐 Using saved language from localStorage:', savedLanguage);
           i18n.changeLanguage(savedLanguage);
+        } else {
+          console.log('🌐 Setting default language:', defaultLanguage);
+          i18n.changeLanguage(defaultLanguage);
         }
         return;
       }
 
       try {
+        console.log('🌐 Loading user language for user:', user.id);
+        
+        // Use .maybeSingle() instead of .single() to handle missing records gracefully
         const { data, error } = await supabase
           .from('user_profiles')
           .select('language')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error) {
-          console.error('Error loading user language:', error);
+          console.log('🌐 Error loading user language (non-critical):', error);
+          // Fallback to default language
+          console.log('🌐 Using fallback language:', defaultLanguage);
+          i18n.changeLanguage(defaultLanguage);
           return;
         }
 
         if (data?.language && availableLanguages.some(lang => lang.code === data.language)) {
+          console.log('🌐 Loaded user language successfully:', data.language);
           i18n.changeLanguage(data.language);
+        } else {
+          console.log('🌐 No user language found or invalid, using default:', defaultLanguage);
+          i18n.changeLanguage(defaultLanguage);
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.log('🌐 Exception loading user language (non-critical):', error);
+        // Fallback to default language
+        console.log('🌐 Using fallback language due to exception:', defaultLanguage);
+        i18n.changeLanguage(defaultLanguage);
       }
     };
 
@@ -65,30 +86,35 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       
       // Save to localStorage
       localStorage.setItem('i18nextLng', language);
+      console.log('🌐 Language changed to:', language);
 
       if (user?.id) {
-        // Save to database
-        const { error } = await supabase
-          .from('user_profiles')
-          .update({ language })
-          .eq('id', user.id);
+        // Try to save to database, but don't fail if it doesn't work
+        try {
+          const { error } = await supabase
+            .from('user_profiles')
+            .upsert({ 
+              id: user.id, 
+              language 
+            }, {
+              onConflict: 'id'
+            });
 
-        if (error) {
-          console.error('Error updating language:', error);
-          toast({
-            title: t('toasts.languageUpdateFailed'),
-            description: t('toasts.languageUpdateFailed'),
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: t('toasts.languageUpdated'),
-            description: t('toasts.languageUpdated'),
-          });
+          if (error) {
+            console.log('🌐 Could not save language to database (non-critical):', error);
+          } else {
+            console.log('🌐 Language saved to database successfully');
+            toast({
+              title: t('toasts.languageUpdated'),
+              description: t('toasts.languageUpdated'),
+            });
+          }
+        } catch (dbError) {
+          console.log('🌐 Database save failed (non-critical):', dbError);
         }
       }
     } catch (error) {
-      console.error('Error changing language:', error);
+      console.error('🌐 Error changing language:', error);
       toast({
         title: t('toasts.languageUpdateFailed'),
         description: t('toasts.languageUpdateFailed'),

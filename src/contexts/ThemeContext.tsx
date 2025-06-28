@@ -20,36 +20,60 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Load theme from user_profiles on mount
+  // Load theme from user_profiles on mount with proper error handling
   useEffect(() => {
     const loadUserTheme = async () => {
+      // Always start with default theme
+      const defaultTheme: Theme = 'dark';
+      
       if (!user?.id) {
-        // If no user, check localStorage for fallback
+        console.log('🎨 No user found, using default theme:', defaultTheme);
+        // Check localStorage for fallback
         const savedTheme = localStorage.getItem('theme') as Theme;
         if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
+          console.log('🎨 Using saved theme from localStorage:', savedTheme);
           setThemeState(savedTheme);
+        } else {
+          console.log('🎨 Setting default theme:', defaultTheme);
+          setThemeState(defaultTheme);
         }
         return;
       }
 
       try {
+        console.log('🎨 Loading user theme for user:', user.id);
+        
+        // Use .maybeSingle() instead of .single() to handle missing records gracefully
         const { data, error } = await supabase
           .from('user_profiles')
           .select('theme')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error) {
-          console.error('Error loading user theme:', error);
+          console.log('🎨 Error loading user theme (non-critical):', error);
+          // Fallback to default theme
+          console.log('🎨 Using fallback theme:', defaultTheme);
+          setThemeState(defaultTheme);
+          localStorage.setItem('theme', defaultTheme);
           return;
         }
 
         if (data?.theme && ['light', 'dark', 'system'].includes(data.theme)) {
+          console.log('🎨 Loaded user theme successfully:', data.theme);
           setThemeState(data.theme as Theme);
           localStorage.setItem('theme', data.theme);
+        } else {
+          console.log('🎨 No user theme found or invalid, using default:', defaultTheme);
+          setThemeState(defaultTheme);
+          localStorage.setItem('theme', defaultTheme);
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.log('🎨 Exception loading user theme (non-critical):', error);
+        // Fallback to default theme
+        console.log('🎨 Using fallback theme due to exception:', defaultTheme);
+        setThemeState(defaultTheme);
+        localStorage.setItem('theme', defaultTheme);
       }
     };
 
@@ -81,6 +105,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
       // Save to localStorage for persistence
       localStorage.setItem('theme', theme);
+      console.log('🎨 Theme applied:', resolvedTheme, '(from setting:', theme + ')');
     };
 
     applyTheme();
@@ -99,29 +124,31 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     // Save to localStorage immediately
     localStorage.setItem('theme', newTheme);
+    console.log('🎨 Theme changed to:', newTheme);
 
     if (user?.id) {
       try {
+        // Try to save to database, but don't fail if it doesn't work
         const { error } = await supabase
           .from('user_profiles')
-          .update({ theme: newTheme })
-          .eq('id', user.id);
+          .upsert({ 
+            id: user.id, 
+            theme: newTheme 
+          }, {
+            onConflict: 'id'
+          });
 
         if (error) {
-          console.error('Error updating theme:', error);
-          toast({
-            title: "Failed to save theme",
-            description: "Theme applied locally but couldn't save to profile.",
-            variant: "destructive",
-          });
+          console.log('🎨 Could not save theme to database (non-critical):', error);
         } else {
+          console.log('🎨 Theme saved to database successfully');
           toast({
             title: "Theme updated",
             description: `Theme changed to ${newTheme}`,
           });
         }
-      } catch (error) {
-        console.error('Error:', error);
+      } catch (dbError) {
+        console.log('🎨 Database save failed (non-critical):', dbError);
       }
     }
   };

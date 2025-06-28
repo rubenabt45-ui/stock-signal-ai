@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Send, Camera, X, Settings, AlertCircle, Key } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,37 +62,95 @@ const TradingChat = () => {
     }
   }, [inputMessage]);
 
-  // Validate API key on mount and when key changes
+  // Enhanced API key validation on mount
   useEffect(() => {
     const validateApiKey = async () => {
+      console.log('🔍 Starting API key validation on mount...');
+      
       const apiKey = localStorage.getItem('openai_api_key');
       if (!apiKey) {
-        console.log('🔑 No API key found, showing prompt');
+        console.log('🔑 No API key found in localStorage');
         setIsApiKeyValid(false);
         setShowApiKeyPrompt(true);
+        toast({
+          title: "API Key Required",
+          description: "Please enter your OpenAI API key to use StrategyAI.",
+          variant: "destructive"
+        });
         return;
       }
 
-      console.log('🔍 Validating API key on mount...');
+      console.log('🔍 Found API key, validating with OpenAI...');
+      console.log('🔑 API Key (first 10 chars):', apiKey.substring(0, 10) + '...');
       setIsValidatingKey(true);
       
       try {
-        const validation = await TradingAIService.validateApiKey();
-        
-        if (validation.isValid) {
-          console.log('✅ API key is valid');
+        // Send lightweight test request to OpenAI
+        const response = await fetch('https://api.openai.com/v1/models', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('📡 OpenAI Models API Response:');
+        console.log('📊 Status:', response.status);
+        console.log('📊 Status Text:', response.statusText);
+        console.log('📊 Headers:', Object.fromEntries(response.headers.entries()));
+
+        // Log response body for debugging
+        let responseBody = '';
+        try {
+          const clonedResponse = response.clone();
+          responseBody = await clonedResponse.text();
+          console.log('📄 Response Body:', responseBody);
+        } catch (bodyError) {
+          console.log('❌ Could not read response body:', bodyError);
+        }
+
+        if (response.ok) {
+          console.log('✅ API key validation successful');
           setIsApiKeyValid(true);
           setShowApiKeyPrompt(false);
+          toast({
+            title: "API Key Valid",
+            description: "Your OpenAI API key is working correctly!",
+          });
         } else {
-          console.log('❌ API key validation failed:', validation.error);
+          console.log('❌ API key validation failed');
           setIsApiKeyValid(false);
           
-          // Show user-friendly error message
-          toast({
-            title: "API Key Issue",
-            description: "Your OpenAI API key is missing, invalid, or unauthorized. Please check your key and ensure your OpenAI account has billing enabled.",
-            variant: "destructive"
-          });
+          // Handle specific error cases
+          if (response.status === 401) {
+            console.log('🔑 401 - Invalid API key');
+            toast({
+              title: "Invalid API Key",
+              description: "Your OpenAI API key is invalid. Please check your key.",
+              variant: "destructive"
+            });
+          } else if (response.status === 403) {
+            console.log('🚫 403 - Unauthorized or billing issue');
+            toast({
+              title: "Unauthorized API Key",
+              description: "Your OpenAI API key is unauthorized or your account billing is not enabled.",
+              variant: "destructive"
+            });
+          } else if (response.status === 406) {
+            console.log('🔧 406 - Configuration error');
+            toast({
+              title: "Configuration Error",
+              description: "Configuration error. Please reset theme/language or check your API key.",
+              variant: "destructive"
+            });
+          } else {
+            console.log('❌ Other error:', response.status);
+            toast({
+              title: "API Error",
+              description: `API validation failed with status ${response.status}. Please check your key.`,
+              variant: "destructive"
+            });
+          }
           
           setShowApiKeyPrompt(true);
         }
@@ -101,13 +158,24 @@ const TradingChat = () => {
         console.error('💥 Error during API key validation:', error);
         setIsApiKeyValid(false);
         
-        toast({
-          title: "Validation Error",
-          description: "Could not validate your API key. Please check your internet connection and try again.",
-          variant: "destructive"
-        });
+        if (error instanceof TypeError && error.message.includes('fetch')) {
+          console.log('🌐 Network error during validation');
+          toast({
+            title: "Network Error",
+            description: "Could not validate API key due to network issues. Please check your connection.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Validation Error",
+            description: "Could not validate your API key. Please try again.",
+            variant: "destructive"
+          });
+        }
+        setShowApiKeyPrompt(true);
       } finally {
         setIsValidatingKey(false);
+        console.log('🏁 API key validation complete');
       }
     };
 
@@ -212,6 +280,13 @@ const TradingChat = () => {
         console.log('🔄 Setting retry state to true');
         setIsRetrying(true);
         
+        // Show rate limit specific message
+        toast({
+          title: "Rate Limit Exceeded",
+          description: "Too many requests. Retrying in 5 seconds...",
+          variant: "destructive"
+        });
+        
         // Wait before retry
         await new Promise(resolve => {
           console.log('⏰ Starting retry delay...');
@@ -229,7 +304,7 @@ const TradingChat = () => {
       // If it's still a 429 rate limit error after retry, or any other error
       if (error instanceof Error && error.message.includes('429')) {
         console.log('🚫 Final rate limit error after retry');
-        throw new Error('Rate limit exceeded. Please try again later.');
+        throw new Error('Rate Limit Exceeded. Please try again later.');
       }
       
       console.log('💥 Non-retryable error or final error:', error);
