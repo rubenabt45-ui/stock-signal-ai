@@ -1,4 +1,3 @@
-
 interface TradingQuestion {
   question: string;
   context?: string;
@@ -19,29 +18,29 @@ interface ModelFallbackConfig {
 export class TradingAIService {
   private static readonly OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
   private static readonly OPENAI_MODELS_URL = 'https://api.openai.com/v1/models';
-  private static readonly SYSTEM_PROMPT = `You are StrategyAI, a professional trading assistant and mentor. You specialize in:
+  private static readonly SYSTEM_PROMPT = `You are StrategyAI, a professional trading assistant and mentor. You specialize in technical analysis, trading strategies, market education, and risk management.
 
-📊 **Technical Analysis**: Chart patterns, indicators (RSI, MACD, Bollinger Bands, Fibonacci), support/resistance levels
-📈 **Trading Strategies**: Entry zones, stop losses, take profit targets, risk management
-🎓 **Education**: Clear explanations for beginners and advanced traders
-💡 **Market Psychology**: Trading discipline, emotional control, position sizing
+CRITICAL FORMATTING RULES - FOLLOW THESE EXACTLY:
+1. Never use any emojis or symbols in your responses
+2. Never use markdown formatting including asterisks, hashtags, hyphens, bullets, or horizontal lines
+3. Never use headings, subtitles, or section dividers
+4. Write all responses in clear, professional full-text paragraphs
+5. Use smooth transitions between ideas instead of lists or bullet points
+6. Maintain a professional but friendly tone suitable for beginners
+7. Structure explanations as coherent educational content
 
-**Response Style:**
-- Use structured markdown with emojis for readability
-- Provide actionable trading advice with specific levels when possible
-- Include risk management tips
-- Be professional but conversational
-- For chart analysis requests, provide: Entry Zone, Stop Loss, Take Profit targets, Pattern detected, Timeframe suggestion, Technical reasoning
+TRADING EXPERTISE AREAS:
+- Technical Analysis: Chart patterns, indicators like RSI and MACD, support and resistance levels, Fibonacci retracements
+- Trading Strategies: Entry and exit points, stop loss placement, take profit targets, position sizing
+- Risk Management: Portfolio protection, money management, trading discipline
+- Market Psychology: Emotional control, trading mindset, avoiding common mistakes
 
-**Format example for trade setups:**
-📊 **Trade Analysis**
-💥 **Entry Zone:** [specific levels]
-🛡️ **Stop Loss:** [level]
-🎯 **Take Profits:** TP1: [level], TP2: [level]
-🔍 **Pattern:** [pattern name]
-🕒 **Timeframe:** [suggestion]
-📈 **Analysis:** [technical reasoning]
-⚠️ **Risk Management:** [specific advice]`;
+RESPONSE STYLE:
+When providing trade analysis, always include specific entry zones, stop loss levels, take profit targets, the pattern or setup identified, recommended timeframe, technical reasoning behind the analysis, and risk management advice. Structure this information in flowing paragraphs rather than lists.
+
+For educational content, explain concepts clearly with practical examples, always considering that your audience may be new to trading. Use analogies and real-world comparisons when helpful.
+
+Remember to always provide actionable advice while emphasizing the importance of proper risk management in every trading decision.`;
 
   // Model fallback configuration
   private static modelConfig: ModelFallbackConfig = {
@@ -284,7 +283,7 @@ export class TradingAIService {
       
       if (!apiKey) {
         console.error('OpenAI API key not found in localStorage');
-        return "⚠️ **API Key Missing**\n\nPlease set your OpenAI API key in the settings to use StrategyAI. Go to Settings → API Configuration.";
+        return "API Key Missing. Please set your OpenAI API key in the settings to use StrategyAI. Go to Settings and API Configuration.";
       }
 
       const currentModel = this.getCurrentModel();
@@ -357,7 +356,7 @@ export class TradingAIService {
         // Handle specific error cases with enhanced messaging and fallback logic
         if (response.status === 401) {
           console.log('🔑 AUTHENTICATION ERROR: Invalid API key');
-          return "🔑 **Invalid API Key**\n\nYour OpenAI API key is invalid. Please check your API key in Settings.";
+          return "Invalid API Key. Your OpenAI API key is invalid. Please check your API key in Settings.";
         } else if (response.status === 403) {
           console.log('🚫 AUTHORIZATION ERROR: API key unauthorized or billing issue');
           
@@ -365,14 +364,14 @@ export class TradingAIService {
             console.log('💰 Attempting model fallback due to quota/billing issue...');
             try {
               const fallbackResponse = await this.tryModelFallback(userMessage, imageBase64);
-              return `🔄 **Fallback Model Activated**\n\nYour primary model hit quota limits. Switched to: ${this.getCurrentModel()}\n\n${fallbackResponse}`;
+              return `Fallback Model Activated. Your primary model hit quota limits. Switched to: ${this.getCurrentModel()}. ${fallbackResponse}`;
             } catch (fallbackError) {
               console.log('💥 All fallback attempts failed:', fallbackError);
-              return "💰 **Quota Exceeded**\n\nYou've reached your API quota limit. Please check your OpenAI billing settings and add credits to continue.";
+              return "Quota Exceeded. You've reached your API quota limit. Please check your OpenAI billing settings and add credits to continue.";
             }
           }
           
-          return "🚫 **Unauthorized API Key**\n\nYour API key is unauthorized or your OpenAI account billing is not enabled. Please check your OpenAI account settings.";
+          return "Unauthorized API Key. Your API key is unauthorized or your OpenAI account billing is not enabled. Please check your OpenAI account settings.";
         } else if (response.status === 429) {
           console.log('🚫 RATE LIMIT ERROR DETAILS:');
           console.log('📊 Status Code:', response.status);
@@ -384,10 +383,10 @@ export class TradingAIService {
             console.log('💰 429 due to quota issue, attempting fallback...');
             try {
               const fallbackResponse = await this.tryModelFallback(userMessage, imageBase64);
-              return `🔄 **Fallback Model Activated**\n\nYour primary model hit quota limits. Switched to: ${this.getCurrentModel()}\n\n${fallbackResponse}`;
+              return `Fallback Model Activated. Your primary model hit quota limits. Switched to: ${this.getCurrentModel()}. ${fallbackResponse}`;
             } catch (fallbackError) {
               console.log('💥 All fallback attempts failed:', fallbackError);
-              return "💰 **Quota Exceeded**\n\nYou've reached your API quota limit. Please check your OpenAI billing settings and add credits to continue.";
+              return "Quota Exceeded. You've reached your API quota limit. Please check your OpenAI billing settings and add credits to continue.";
             }
           }
           
@@ -396,13 +395,13 @@ export class TradingAIService {
           throw new Error(`429: ${errorMessage}`);
         } else if (response.status === 400) {
           console.log('❌ BAD REQUEST ERROR:', errorData);
-          return "❌ **Bad Request**\n\nThere was an issue with your request. Please try again with a different message.";
+          return "Bad Request. There was an issue with your request. Please try again with a different message.";
         } else if (response.status === 406) {
           console.log('🔧 406 CONFIGURATION ERROR:', errorData);
-          return "🔧 **Configuration Error**\n\nConfiguration error. Please reset theme/language or check your API settings.";
+          return "Configuration Error. Configuration error. Please reset theme or language or check your API settings.";
         } else {
           console.log('❌ UNKNOWN API ERROR:', response.status, errorData);
-          return `❌ **API Error (${response.status})**\n\nSorry, there was an issue connecting to the AI service. Please try again.`;
+          return `API Error ${response.status}. Sorry, there was an issue connecting to the AI service. Please try again.`;
         }
       }
 
@@ -411,7 +410,7 @@ export class TradingAIService {
       
       if (!data.choices || !data.choices[0] || !data.choices[0].message) {
         console.error('❌ Unexpected API response format:', data);
-        return "⚠️ **Response Error**\n\nReceived an unexpected response format. Please try again.";
+        return "Response Error. Received an unexpected response format. Please try again.";
       }
 
       console.log('✅ Successfully received response from OpenAI');
@@ -429,7 +428,7 @@ export class TradingAIService {
       
       if (error instanceof TypeError && error.message.includes('fetch')) {
         console.log('🌐 Network error detected');
-        return "🌐 **Network Error**\n\nUnable to connect to the AI service. Please check your internet connection and try again.";
+        return "Network Error. Unable to connect to the AI service. Please check your internet connection and try again.";
       }
       
       // Re-throw 429 errors to be handled by retry logic
@@ -437,7 +436,7 @@ export class TradingAIService {
         throw error;
       }
       
-      return "🔧 **Connection Error**\n\nSorry, something went wrong while processing your request. Please check your internet connection and try again.";
+      return "Connection Error. Sorry, something went wrong while processing your request. Please check your internet connection and try again.";
     }
   }
 
