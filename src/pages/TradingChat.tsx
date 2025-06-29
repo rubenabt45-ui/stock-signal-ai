@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Send, Camera, X, Settings, AlertCircle, Key, RefreshCw, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -571,7 +570,7 @@ const TradingChat = () => {
       )}
 
       {/* Chat Area - with proper bottom padding for input */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 py-6 pb-40">
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 py-6 pb-48">
         <Card className="flex-1 flex flex-col tradeiq-card">
           {/* Messages */}
           <ScrollArea className="flex-1 p-6" ref={scrollAreaRef}>
@@ -644,9 +643,9 @@ const TradingChat = () => {
         </Card>
       </div>
 
-      {/* Fixed ChatGPT-Style Input Area with proper spacing */}
+      {/* Fixed ChatGPT-Style Input Area with improved spacing */}
       <div className="fixed bottom-0 left-0 right-0 bg-tradeiq-navy/95 backdrop-blur-sm border-t border-gray-800/50 pb-safe">
-        <div className="max-w-4xl mx-auto p-6 pb-8">
+        <div className="max-w-4xl mx-auto p-6 pb-6">
           {/* Image Preview */}
           {uploadedImage && (
             <div className="mb-4 p-3 bg-black/20 rounded-xl border border-gray-700">
@@ -673,8 +672,8 @@ const TradingChat = () => {
             </div>
           )}
           
-          {/* Input Container - ChatGPT Style with proper spacing */}
-          <div className={`relative bg-white/5 rounded-2xl border border-gray-700/50 shadow-lg backdrop-blur-sm ${isInputDisabled ? 'opacity-50' : ''}`}>
+          {/* Input Container - ChatGPT Style with improved spacing */}
+          <div className={`relative bg-white/5 rounded-2xl border border-gray-700/50 shadow-lg backdrop-blur-sm mb-4 ${isInputDisabled ? 'opacity-50' : ''}`}>
             <div className="flex items-end p-3">
               {/* Image Upload Button */}
               <Button
@@ -720,7 +719,7 @@ const TradingChat = () => {
           </div>
           
           {/* Helper Text */}
-          <p className="text-xs text-gray-500 text-center mt-3">
+          <p className="text-xs text-gray-500 text-center">
             {!isApiKeyValid 
               ? 'Enter a valid OpenAI API key to start using StrategyAI'
               : isValidatingKey
