@@ -8,8 +8,9 @@ interface SourceButtonProps {
 }
 
 export const SourceButton = ({ url, className = "" }: SourceButtonProps) => {
-  const handleViewSource = () => {
-    // Check if URL is valid and accessible
+  const handleViewSource = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering parent click events
+    
     if (url && isValidUrl(url)) {
       window.open(url, '_blank', 'noopener,noreferrer');
     } else {
@@ -18,6 +19,8 @@ export const SourceButton = ({ url, className = "" }: SourceButtonProps) => {
   };
 
   const isValidUrl = (urlString: string): boolean => {
+    if (!urlString || urlString.trim() === '') return false;
+    
     try {
       const urlObj = new URL(urlString);
       return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
@@ -35,6 +38,7 @@ export const SourceButton = ({ url, className = "" }: SourceButtonProps) => {
       className={`tradeiq-button-primary ${className}`}
       variant={hasValidUrl ? "default" : "outline"}
       disabled={!hasValidUrl}
+      size="sm"
     >
       <ExternalLink className="h-4 w-4 mr-2" />
       {hasValidUrl ? 'Read Full Article' : 'Source Unavailable'}

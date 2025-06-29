@@ -73,8 +73,23 @@ const NewsAI = () => {
     return 'stocks';
   };
 
-  // Helper function to get sentiment from AI analysis
+  // Helper function to get sentiment badge color
+  const getSentimentColor = (sentiment?: string) => {
+    switch (sentiment) {
+      case 'Bullish': return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'Bearish': return 'bg-red-500/20 text-red-400 border-red-500/30';
+      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    }
+  };
+
+  // Helper function to get sentiment from AI analysis or article data
   const getArticleSentiment = (article: NewsArticle): string => {
+    // Use API sentiment if available
+    if (article.sentiment) {
+      return article.sentiment;
+    }
+    
+    // Fallback to keyword analysis
     const text = `${article.headline} ${article.summary || ''}`.toLowerCase();
     
     const bullishKeywords = ['beats', 'exceeds', 'growth', 'upgrade', 'partnership', 'expansion', 'strong', 'positive', 'rises', 'gains', 'profit', 'revenue'];
@@ -194,7 +209,7 @@ const NewsAI = () => {
                 </h1>
                 <p className="text-sm text-gray-400 font-medium">
                   {activeTab === "live" 
-                    ? "Real-time financial news from trusted sources"
+                    ? "Real-time financial news powered by Marketaux API"
                     : "Personalized news digest based on your alert preferences"
                   }
                 </p>
@@ -297,7 +312,7 @@ const NewsAI = () => {
                         <span className="font-medium">Failed to load news</span>
                       </div>
                       <p className="text-sm text-gray-400">
-                        Unable to fetch latest news from financial sources. Showing fallback content.
+                        Unable to fetch latest news from Marketaux API. Please try again later.
                       </p>
                     </CardHeader>
                   </Card>
@@ -318,11 +333,53 @@ const NewsAI = () => {
                 ) : filteredNewsArticles && filteredNewsArticles.length > 0 ? (
                   <div className="space-y-4">
                     {filteredNewsArticles.map((article) => (
-                      <NewsCard
-                        key={article.id}
-                        article={article}
-                        onClick={handleArticleClick}
-                      />
+                      <Card key={article.id} className="tradeiq-card hover:bg-gray-800/30 transition-colors cursor-pointer">
+                        <CardHeader className="pb-4" onClick={() => handleArticleClick(article)}>
+                          <div className="space-y-3">
+                            <h3 className="text-white font-semibold text-lg leading-tight hover:text-tradeiq-blue transition-colors">
+                              {article.headline}
+                            </h3>
+                            
+                            <div className="flex items-center justify-between flex-wrap gap-2 text-sm text-gray-400">
+                              <div className="flex items-center space-x-3">
+                                <span className="font-medium">{article.source}</span>
+                                <span>{new Date(article.datetime).toLocaleDateString()}</span>
+                              </div>
+                              
+                              <div className="flex items-center space-x-2">
+                                {article.sentiment && (
+                                  <Badge className={`text-xs ${getSentimentColor(article.sentiment)}`}>
+                                    {article.sentiment}
+                                  </Badge>
+                                )}
+                                {article.relatedSymbols?.map(symbol => (
+                                  <Badge key={symbol} variant="outline" className="text-xs text-tradeiq-blue border-tradeiq-blue/30">
+                                    {symbol}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                            
+                            {article.summary && (
+                              <p className="text-gray-300 text-sm leading-relaxed">
+                                {article.summary}
+                              </p>
+                            )}
+                            
+                            <div className="flex justify-between items-center pt-2">
+                              <div className="flex items-center space-x-2 text-xs text-gray-500">
+                                <TrendingUp className="h-3 w-3" />
+                                <span>Click for AI analysis</span>
+                              </div>
+                              
+                              <SourceButton 
+                                url={article.url}
+                                className="text-xs"
+                              />
+                            </div>
+                          </div>
+                        </CardHeader>
+                      </Card>
                     ))}
                   </div>
                 ) : (
@@ -334,7 +391,7 @@ const NewsAI = () => {
                           ? "No Favorite Assets"
                           : newsArticles && newsArticles.length > 0 
                             ? "No Articles Match Filters" 
-                            : "No News Available at This Time"
+                            : "No News Available"
                         }
                       </h3>
                       <p className="text-gray-400">
@@ -342,7 +399,7 @@ const NewsAI = () => {
                           ? "Add some favorite assets to see personalized news updates."
                           : newsArticles && newsArticles.length > 0 
                             ? "Try adjusting your filters to see more articles."
-                            : `No recent financial news found for ${selectedAsset}. This may be due to API limitations or no recent news coverage.`
+                            : `No recent financial news found for ${selectedAsset} from Marketaux API.`
                         }
                       </p>
                       {(!newsArticles || newsArticles.length === 0) && (
