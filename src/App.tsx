@@ -11,7 +11,6 @@ import { RealTimePriceProvider } from "@/components/RealTimePriceProvider";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PublicRoute from "@/components/PublicRoute";
 import BottomNavigation from "@/components/BottomNavigation";
-import Index from "./pages/Index";
 import Favorites from "./pages/Favorites";
 import TradingChat from "./pages/TradingChat";
 import Learn from "./pages/Learn";
@@ -54,7 +53,7 @@ const App = () => (
                     } />
                     <Route path="/" element={
                       <ProtectedRoute>
-                        <Index />
+                        <TradingChat />
                       </ProtectedRoute>
                     } />
                     <Route path="/favorites" element={
