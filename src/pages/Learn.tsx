@@ -1,9 +1,9 @@
-
 import { Book, PlayCircle, FileText, TrendingUp, Shield, Brain } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const lessons = [
   {
@@ -67,6 +67,7 @@ const resources = [
 
 const Learn = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const getLevelColor = (level: string) => {
     switch (level) {
@@ -75,6 +76,10 @@ const Learn = () => {
       case 'Advanced': return 'bg-red-500/10 text-red-400 border-red-500/20';
       default: return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
     }
+  };
+
+  const handleGoToTradingChat = () => {
+    navigate('/trading-chat');
   };
 
   return (
@@ -212,8 +217,8 @@ const Learn = () => {
             <p className="text-gray-400 mb-4">
               Apply what you've learned with our AI-powered trading tools and real-time market analysis.
             </p>
-            <Button className="tradeiq-button-primary">
-              Go to ChartIA
+            <Button className="tradeiq-button-primary" onClick={handleGoToTradingChat}>
+              Go to Trading Chat
             </Button>
           </CardContent>
         </Card>
