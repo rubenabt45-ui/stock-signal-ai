@@ -569,8 +569,8 @@ const TradingChat = () => {
         </div>
       )}
 
-      {/* Chat Area - with proper bottom padding for input */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 py-6 pb-48">
+      {/* Chat Area - with much more bottom padding for elevated input */}
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 py-6 pb-64">
         <Card className="flex-1 flex flex-col tradeiq-card">
           {/* Messages */}
           <ScrollArea className="flex-1 p-6" ref={scrollAreaRef}>
@@ -643,12 +643,12 @@ const TradingChat = () => {
         </Card>
       </div>
 
-      {/* Fixed ChatGPT-Style Input Area with improved spacing */}
+      {/* Fixed ChatGPT-Style Input Area with significant elevation from bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-tradeiq-navy/95 backdrop-blur-sm border-t border-gray-800/50 pb-safe">
-        <div className="max-w-4xl mx-auto p-6 pb-6">
+        <div className="max-w-4xl mx-auto p-6 pb-12">
           {/* Image Preview */}
           {uploadedImage && (
-            <div className="mb-4 p-3 bg-black/20 rounded-xl border border-gray-700">
+            <div className="mb-6 p-3 bg-black/20 rounded-xl border border-gray-700">
               <div className="flex items-center space-x-3">
                 <img 
                   src={uploadedImage} 
@@ -672,8 +672,8 @@ const TradingChat = () => {
             </div>
           )}
           
-          {/* Input Container - ChatGPT Style with improved spacing */}
-          <div className={`relative bg-white/5 rounded-2xl border border-gray-700/50 shadow-lg backdrop-blur-sm mb-4 ${isInputDisabled ? 'opacity-50' : ''}`}>
+          {/* Input Container - ChatGPT Style with elevated spacing */}
+          <div className={`relative bg-white/5 rounded-2xl border border-gray-700/50 shadow-lg backdrop-blur-sm mb-6 ${isInputDisabled ? 'opacity-50' : ''}`}>
             <div className="flex items-end p-3">
               {/* Image Upload Button */}
               <Button
