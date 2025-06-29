@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useMemo } from "react";
-import { Newspaper, TrendingUp, X, AlertCircle } from "lucide-react";
+import { Newspaper, TrendingUp, X, AlertCircle, RefreshCw } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AssetSelection } from "@/components/AssetSelection";
 import { useQuery } from "@tanstack/react-query";
-import { fetchNewsForAsset, NewsArticle } from "@/services/newsService";
+import { fetchNewsForAsset, NewsArticle, refreshNewsForAsset } from "@/services/newsService";
 import { analyzeNewsArticle, AIAnalysis } from "@/services/aiAnalysisService";
 import { NewsCard } from "@/components/NewsAI/NewsCard";
 import { AIInsights } from "@/components/NewsAI/AIInsights";
@@ -17,6 +17,7 @@ import { NewsFilters, FilterState } from "@/components/NewsAI/NewsFilters";
 import { NewsDigest } from "@/components/NewsAI/NewsDigest";
 import { DigestArticle } from "@/hooks/useNewsDigest";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useToast } from "@/hooks/use-toast";
 
 const NewsAI = () => {
   const [selectedAsset, setSelectedAsset] = useState("AAPL");
@@ -25,37 +26,60 @@ const NewsAI = () => {
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [activeTab, setActiveTab] = useState("live");
+  const [refreshing, setRefreshing] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
     sentiments: [],
     newsTypes: []
   });
 
-  // Get user's favorites
+  const { toast } = useToast();
   const { favorites, loading: favoritesLoading } = useFavorites();
 
-  // Fetch news for selected asset
+  // Fetch news for selected asset with auto-refresh
   const { data: newsArticles, isLoading, error, refetch } = useQuery({
     queryKey: ['news', selectedAsset],
     queryFn: () => fetchNewsForAsset(selectedAsset),
     enabled: !!selectedAsset && activeTab === "live",
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes for real-time updates
+    refetchInterval: 15 * 60 * 1000, // Auto refresh every 15 minutes
+    staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
   });
+
+  // Manual refresh function
+  const handleManualRefresh = async () => {
+    if (refreshing) return;
+    
+    setRefreshing(true);
+    try {
+      await refetch();
+      toast({
+        title: "News Updated",
+        description: `Latest news for ${selectedAsset} has been refreshed.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Refresh Failed",
+        description: "Unable to fetch latest news. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   // Helper function to determine article category
   const getArticleCategory = (symbol: string): string => {
     if (symbol.includes('USD') || symbol.includes('BTC') || symbol.includes('ETH')) return 'crypto';
     if (symbol.includes('EUR') || symbol.includes('JPY') || symbol.includes('GBP')) return 'forex';
-    return 'stocks'; // Default to stocks for most symbols
+    return 'stocks';
   };
 
-  // Helper function to get sentiment from AI analysis (mock for now)
+  // Helper function to get sentiment from AI analysis
   const getArticleSentiment = (article: NewsArticle): string => {
     const text = `${article.headline} ${article.summary || ''}`.toLowerCase();
     
-    // Simple keyword-based sentiment analysis
-    const bullishKeywords = ['beats', 'exceeds', 'growth', 'upgrade', 'partnership', 'expansion', 'strong', 'positive', 'rises', 'gains'];
-    const bearishKeywords = ['misses', 'declines', 'downgrade', 'concerns', 'falls', 'drops', 'weak', 'losses', 'challenges'];
+    const bullishKeywords = ['beats', 'exceeds', 'growth', 'upgrade', 'partnership', 'expansion', 'strong', 'positive', 'rises', 'gains', 'profit', 'revenue'];
+    const bearishKeywords = ['misses', 'declines', 'downgrade', 'concerns', 'falls', 'drops', 'weak', 'losses', 'challenges', 'cut', 'layoffs'];
     
     const bullishScore = bullishKeywords.filter(word => text.includes(word)).length;
     const bearishScore = bearishKeywords.filter(word => text.includes(word)).length;
@@ -71,12 +95,10 @@ const NewsAI = () => {
     
     const favoriteSymbols = favorites.map(fav => fav.symbol);
     
-    // Check if any of the article's related symbols are in favorites
     if (article.relatedSymbols && article.relatedSymbols.length > 0) {
       return article.relatedSymbols.some(symbol => favoriteSymbols.includes(symbol));
     }
     
-    // Fallback: check if the selected asset is in favorites
     return favoriteSymbols.includes(selectedAsset);
   };
 
@@ -91,7 +113,7 @@ const NewsAI = () => {
     }
 
     return newsArticles.filter(article => {
-      // Favorites filter (applies first if enabled)
+      // Favorites filter
       if (showOnlyFavorites && !isArticleInFavorites(article)) {
         return false;
       }
@@ -99,7 +121,6 @@ const NewsAI = () => {
       // Category filter
       if (filters.categories.length > 0) {
         const articleCategory = getArticleCategory(article.relatedSymbols?.[0] || selectedAsset);
-        console.log('Article category:', articleCategory, 'Selected categories:', filters.categories);
         if (!filters.categories.includes(articleCategory)) {
           return false;
         }
@@ -108,7 +129,6 @@ const NewsAI = () => {
       // Sentiment filter
       if (filters.sentiments.length > 0) {
         const articleSentiment = getArticleSentiment(article);
-        console.log('Article sentiment:', articleSentiment, 'Selected sentiments:', filters.sentiments);
         if (!filters.sentiments.includes(articleSentiment)) {
           return false;
         }
@@ -117,7 +137,6 @@ const NewsAI = () => {
       // News type filter
       if (filters.newsTypes.length > 0) {
         const articleType = article.category || 'market';
-        console.log('Article type:', articleType, 'Selected types:', filters.newsTypes);
         if (!filters.newsTypes.includes(articleType)) {
           return false;
         }
@@ -127,10 +146,7 @@ const NewsAI = () => {
     });
   }, [newsArticles, filters.categories, filters.sentiments, filters.newsTypes, selectedAsset, showOnlyFavorites, favorites]);
 
-  console.log('Filtered articles count:', filteredNewsArticles.length);
-
   const handleArticleClick = async (article: NewsArticle | DigestArticle) => {
-    // Convert DigestArticle to NewsArticle for compatibility
     const newsArticle: NewsArticle = {
       id: article.id,
       headline: article.headline,
@@ -179,22 +195,25 @@ const NewsAI = () => {
                 </h1>
                 <p className="text-sm text-gray-400 font-medium">
                   {activeTab === "live" 
-                    ? "Real-time news insights and sentiment powered by AI"
+                    ? "Real-time financial news from trusted sources"
                     : "Personalized news digest based on your alert preferences"
                   }
                 </p>
               </div>
             </div>
             {activeTab === "live" && (
-              <Button
-                onClick={() => refetch()}
-                variant="outline"
-                size="sm"
-                className="border-gray-700 hover:bg-gray-800 text-gray-300"
-              >
-                <TrendingUp className="h-4 w-4 mr-2" />
-                Refresh
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Button
+                  onClick={handleManualRefresh}
+                  variant="outline"
+                  size="sm"
+                  disabled={refreshing}
+                  className="border-gray-700 hover:bg-gray-800 text-gray-300"
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                  {refreshing ? 'Refreshing...' : 'Refresh'}
+                </Button>
+              </div>
             )}
           </div>
         </div>
@@ -248,7 +267,7 @@ const NewsAI = () => {
                   </div>
                   {showOnlyFavorites && (!favorites || favorites.length === 0) && (
                     <p className="text-sm text-gray-400">
-                      You haven't added any favorite assets yet. Add favorites to filter news more effectively.
+                      You haven't added any favorite assets yet.
                     </p>
                   )}
                 </div>
@@ -264,10 +283,10 @@ const NewsAI = () => {
               {/* News Feed */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-white">Latest News</h2>
+                  <h2 className="text-xl font-semibold text-white">Latest Financial News</h2>
                   <div className="flex items-center space-x-2 text-sm text-gray-400">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span>Live Updates</span>
+                    <span>Auto-refresh every 15min</span>
                   </div>
                 </div>
 
@@ -279,7 +298,7 @@ const NewsAI = () => {
                         <span className="font-medium">Failed to load news</span>
                       </div>
                       <p className="text-sm text-gray-400">
-                        Unable to fetch latest news. Please check your connection and try again.
+                        Unable to fetch latest news from financial sources. Showing fallback content.
                       </p>
                     </CardHeader>
                   </Card>
@@ -316,7 +335,7 @@ const NewsAI = () => {
                           ? "No Favorite Assets"
                           : newsArticles && newsArticles.length > 0 
                             ? "No Articles Match Filters" 
-                            : "No News Found"
+                            : "No News Available"
                         }
                       </h3>
                       <p className="text-gray-400">
@@ -324,7 +343,7 @@ const NewsAI = () => {
                           ? "Add some favorite assets to see personalized news updates."
                           : newsArticles && newsArticles.length > 0 
                             ? "Try adjusting your filters to see more articles."
-                            : `No recent news articles found for ${selectedAsset}. Try selecting a different asset or check back later.`
+                            : `No recent financial news found for ${selectedAsset} at this time.`
                         }
                       </p>
                     </CardHeader>
@@ -340,11 +359,10 @@ const NewsAI = () => {
         </div>
       </main>
 
-      {/* AI Analysis Modal/Panel */}
+      {/* AI Analysis Modal */}
       {selectedArticle && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end md:items-center justify-center">
           <div className="w-full max-w-4xl mx-4 bg-tradeiq-navy border border-gray-800 rounded-t-2xl md:rounded-2xl max-h-[90vh] overflow-hidden animate-slide-in-right">
-            {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-800">
               <div className="flex items-center space-x-3">
                 <Newspaper className="h-6 w-6 text-tradeiq-blue" />
@@ -360,10 +378,8 @@ const NewsAI = () => {
               </Button>
             </div>
 
-            {/* Modal Content */}
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
               <div className="space-y-6">
-                {/* Article Info */}
                 <div>
                   <h4 className="text-white font-semibold mb-2 leading-tight">
                     {selectedArticle.headline}
@@ -381,13 +397,11 @@ const NewsAI = () => {
                   </div>
                 </div>
 
-                {/* AI Analysis Content */}
                 <AIInsights 
                   analysis={aiAnalysis}
                   loading={loadingAnalysis}
                 />
 
-                {/* Actions */}
                 <div className="flex space-x-3 pt-4 border-t border-gray-800">
                   <SourceButton 
                     url={selectedArticle.url}

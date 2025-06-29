@@ -9,21 +9,26 @@ interface SourceButtonProps {
 
 export const SourceButton = ({ url, className = "" }: SourceButtonProps) => {
   const handleViewSource = () => {
-    if (url && url.startsWith('http')) {
+    // Check if URL is valid and not a placeholder
+    if (url && url.startsWith('http') && !url.includes('example.com')) {
       window.open(url, '_blank', 'noopener,noreferrer');
     } else {
-      alert('Original article not available.');
+      // For demo/mock articles, show a message
+      alert('This is a demo article. In production, this would open the original news source.');
     }
   };
+
+  const isValidUrl = url && url.startsWith('http') && !url.includes('example.com');
 
   return (
     <Button
       data-testid="source-button"
       onClick={handleViewSource}
       className={`tradeiq-button-primary ${className}`}
+      variant={isValidUrl ? "default" : "outline"}
     >
       <ExternalLink className="h-4 w-4 mr-2" />
-      View Source
+      {isValidUrl ? 'Read Full Article' : 'View Source (Demo)'}
     </Button>
   );
 };
