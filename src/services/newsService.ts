@@ -28,6 +28,20 @@ interface AlphaVantageNewsResponse {
   }>;
 }
 
+interface MarketauxResponse {
+  data: Array<{
+    title: string;
+    url: string;
+    published_at: string;
+    source: string;
+    description: string;
+    entities: Array<{
+      symbol: string;
+      name: string;
+    }>;
+  }>;
+}
+
 export interface NewsArticle {
   id: string;
   headline: string;
@@ -41,42 +55,73 @@ export interface NewsArticle {
 }
 
 export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> => {
-  console.log(`Fetching news for ${symbol}`);
+  console.log(`Fetching real news for ${symbol}`);
   
   try {
-    // Try Alpha Vantage News API first (free tier available)
+    // Try Marketaux API first (good for financial news)
+    const marketauxResult = await fetchFromMarketaux(symbol);
+    if (marketauxResult.length > 0) {
+      console.log(`Found ${marketauxResult.length} articles from Marketaux`);
+      return marketauxResult;
+    }
+
+    // Try Alpha Vantage News API
     const alphaVantageResult = await fetchFromAlphaVantage(symbol);
     if (alphaVantageResult.length > 0) {
       console.log(`Found ${alphaVantageResult.length} articles from Alpha Vantage`);
       return alphaVantageResult;
     }
 
-    // Try NewsAPI as backup (requires API key)
+    // Try NewsAPI as backup
     const newsAPIResult = await fetchFromNewsAPI(symbol);
     if (newsAPIResult.length > 0) {
       console.log(`Found ${newsAPIResult.length} articles from NewsAPI`);
       return newsAPIResult;
     }
 
-    // Try Yahoo Finance RSS as final backup
-    const yahooResult = await fetchFromYahooFinance(symbol);
-    if (yahooResult.length > 0) {
-      console.log(`Found ${yahooResult.length} articles from Yahoo Finance`);
-      return yahooResult;
-    }
-
-    console.log('No news found from any source, using enhanced mock data');
-    return generateEnhancedMockNews(symbol);
+    console.log('No news found from any API source');
+    return [];
   } catch (error) {
     console.error('Error fetching news:', error);
-    return generateEnhancedMockNews(symbol);
+    return [];
+  }
+};
+
+const fetchFromMarketaux = async (symbol: string): Promise<NewsArticle[]> => {
+  try {
+    // Marketaux API - replace 'demo' with your actual API key
+    const apiKey = process.env.REACT_APP_MARKETAUX_API_KEY || 'demo';
+    const url = `https://api.marketaux.com/v1/news/all?symbols=${symbol}&filter_entities=true&limit=5&api_token=${apiKey}`;
+    
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Marketaux API failed');
+    
+    const data: MarketauxResponse = await response.json();
+    
+    if (!data.data || data.data.length === 0) {
+      return [];
+    }
+
+    return data.data.map((article, index) => ({
+      id: `marketaux-${symbol}-${index}`,
+      headline: article.title,
+      source: article.source || 'Financial News',
+      datetime: new Date(article.published_at).getTime(),
+      url: article.url,
+      summary: article.description?.substring(0, 200) + '...' || 'No summary available',
+      category: 'market',
+      relatedSymbols: article.entities?.map(e => e.symbol) || [symbol]
+    }));
+  } catch (error) {
+    console.error('Marketaux fetch failed:', error);
+    return [];
   }
 };
 
 const fetchFromAlphaVantage = async (symbol: string): Promise<NewsArticle[]> => {
   try {
-    // Alpha Vantage demo API key - replace with your own for production
-    const apiKey = 'demo';
+    // Alpha Vantage API - replace 'demo' with your actual API key
+    const apiKey = process.env.REACT_APP_ALPHA_VANTAGE_API_KEY || 'demo';
     const url = `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=${symbol}&apikey=${apiKey}&limit=5`;
     
     const response = await fetch(url);
@@ -106,8 +151,13 @@ const fetchFromAlphaVantage = async (symbol: string): Promise<NewsArticle[]> => 
 
 const fetchFromNewsAPI = async (symbol: string): Promise<NewsArticle[]> => {
   try {
-    // Note: NewsAPI requires a valid API key for production use
-    const apiKey = process.env.REACT_APP_NEWS_API_KEY || 'demo';
+    // NewsAPI - replace with your actual API key
+    const apiKey = process.env.REACT_APP_NEWS_API_KEY;
+    if (!apiKey || apiKey === 'demo') {
+      console.log('NewsAPI key not available, skipping');
+      return [];
+    }
+    
     const query = getCompanyQuery(symbol);
     const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&domains=reuters.com,bloomberg.com,cnbc.com,marketwatch.com,wsj.com&sortBy=publishedAt&pageSize=5&apiKey=${apiKey}`;
     
@@ -137,22 +187,6 @@ const fetchFromNewsAPI = async (symbol: string): Promise<NewsArticle[]> => {
   }
 };
 
-const fetchFromYahooFinance = async (symbol: string): Promise<NewsArticle[]> => {
-  try {
-    // Yahoo Finance has CORS restrictions, but we can try their public endpoints
-    // This is a simplified approach - in production, you'd use a proxy server
-    const query = getCompanyQuery(symbol);
-    
-    // Mock implementation since direct Yahoo Finance API calls are restricted
-    // In production, implement this through your backend or use a CORS proxy
-    console.log(`Would fetch Yahoo Finance news for: ${query}`);
-    return [];
-  } catch (error) {
-    console.error('Yahoo Finance fetch failed:', error);
-    return [];
-  }
-};
-
 const getCompanyQuery = (symbol: string): string => {
   const companyMap: Record<string, string> = {
     'AAPL': 'Apple Inc stock earnings',
@@ -169,78 +203,6 @@ const getCompanyQuery = (symbol: string): string => {
   };
   
   return companyMap[symbol] || `${symbol} stock market news`;
-};
-
-const generateEnhancedMockNews = (symbol: string): NewsArticle[] => {
-  const baseTime = Date.now();
-  const companyName = getCompanyName(symbol);
-  
-  const newsTemplates = [
-    {
-      headline: `${companyName} Reports Strong Q4 Results, Beats Wall Street Expectations`,
-      source: "Reuters",
-      summary: `${companyName} exceeded analyst forecasts with robust quarterly performance, driving investor confidence and market momentum.`,
-      category: "earnings",
-      timeOffset: 2 * 60 * 60 * 1000 // 2 hours ago
-    },
-    {
-      headline: `Goldman Sachs Upgrades ${symbol} with $250 Price Target`,
-      source: "Bloomberg",
-      summary: `Investment banking giant raises price target citing strong fundamentals and positive growth outlook for the company.`,
-      category: "analyst",
-      timeOffset: 4 * 60 * 60 * 1000 // 4 hours ago
-    },
-    {
-      headline: `${companyName} Announces Strategic Partnership in AI Technology`,
-      source: "MarketWatch",
-      summary: `New collaboration aims to accelerate innovation and expand market presence in artificial intelligence sector.`,
-      category: "corporate",
-      timeOffset: 8 * 60 * 60 * 1000 // 8 hours ago
-    },
-    {
-      headline: `${symbol} Trading Volume Surges 40% on Market Volatility`,
-      source: "Financial Times",
-      summary: `Increased trading activity reflects heightened investor interest amid broader market fluctuations and sector rotation.`,
-      category: "market",
-      timeOffset: 12 * 60 * 60 * 1000 // 12 hours ago
-    },
-    {
-      headline: `Technical Analysis: ${symbol} Breaks Key Resistance Level`,
-      source: "TradingView",
-      summary: `Chart patterns indicate potential bullish momentum as stock price breaks above critical technical resistance zone.`,
-      category: "technical",
-      timeOffset: 18 * 60 * 60 * 1000 // 18 hours ago
-    }
-  ];
-
-  return newsTemplates.map((template, index) => ({
-    id: `mock-${symbol}-${index}`,
-    headline: template.headline,
-    source: template.source,
-    datetime: baseTime - template.timeOffset,
-    url: `https://example.com/news/${symbol.toLowerCase()}-${index}`,
-    summary: template.summary,
-    category: template.category,
-    relatedSymbols: [symbol]
-  }));
-};
-
-const getCompanyName = (symbol: string): string => {
-  const companyNames: Record<string, string> = {
-    'AAPL': 'Apple Inc.',
-    'MSFT': 'Microsoft',
-    'GOOGL': 'Alphabet Inc.',
-    'TSLA': 'Tesla Inc.',
-    'NVDA': 'NVIDIA Corp.',
-    'AMZN': 'Amazon',
-    'META': 'Meta Platforms',
-    'BTCUSD': 'Bitcoin',
-    'ETHUSD': 'Ethereum',
-    'NFLX': 'Netflix',
-    'BABA': 'Alibaba Group'
-  };
-  
-  return companyNames[symbol] || symbol;
 };
 
 // Refresh news function for auto-update feature

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from "react";
 import { Newspaper, TrendingUp, X, AlertCircle, RefreshCw } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/card";
@@ -335,7 +334,7 @@ const NewsAI = () => {
                           ? "No Favorite Assets"
                           : newsArticles && newsArticles.length > 0 
                             ? "No Articles Match Filters" 
-                            : "No News Available"
+                            : "No News Available at This Time"
                         }
                       </h3>
                       <p className="text-gray-400">
@@ -343,9 +342,22 @@ const NewsAI = () => {
                           ? "Add some favorite assets to see personalized news updates."
                           : newsArticles && newsArticles.length > 0 
                             ? "Try adjusting your filters to see more articles."
-                            : `No recent financial news found for ${selectedAsset} at this time.`
+                            : `No recent financial news found for ${selectedAsset}. This may be due to API limitations or no recent news coverage.`
                         }
                       </p>
+                      {(!newsArticles || newsArticles.length === 0) && (
+                        <div className="mt-4">
+                          <Button
+                            onClick={handleManualRefresh}
+                            variant="outline"
+                            disabled={refreshing}
+                            className="border-gray-700 hover:bg-gray-800 text-gray-300"
+                          >
+                            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                            Try Again
+                          </Button>
+                        </div>
+                      )}
                     </CardHeader>
                   </Card>
                 )}
