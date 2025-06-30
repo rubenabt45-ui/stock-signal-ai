@@ -28,8 +28,8 @@ export interface NewsArticle {
   sentiment?: 'Bullish' | 'Bearish' | 'Neutral';
 }
 
-// GNews API key - replace with your actual key
-const GNEWS_API_KEY = 'YOUR_GNEWS_API_KEY_HERE';
+// GNews API key - real key provided
+const GNEWS_API_KEY = 'cd750c0e64d47967b4fcdd0ab0674328';
 
 export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> => {
   console.log(`🔍 [DEBUG] Starting fetchNewsForAsset for symbol: ${symbol}`);
