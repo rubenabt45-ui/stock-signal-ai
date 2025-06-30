@@ -39,13 +39,15 @@ export interface NewsArticle {
 const MARKETAUX_API_KEY = 'qflpF00L3Ui07FOjQImcLaRURUJc2UMI5tPiiRE1';
 
 export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> => {
-  console.log(`🔍 Fetching news for ${symbol} using Marketaux API`);
+  console.log(`🔍 [DEBUG] Starting fetchNewsForAsset for symbol: ${symbol}`);
+  console.log(`🔑 [DEBUG] API Key being used: ${MARKETAUX_API_KEY ? MARKETAUX_API_KEY.substring(0, 8) + '...' : 'MISSING'}`);
+  console.log(`📏 [DEBUG] API Key length: ${MARKETAUX_API_KEY?.length || 0} characters`);
   
   try {
     // Build URL with minimal, essential parameters only
     const baseUrl = 'https://api.marketaux.com/v1/news/all';
     const params = new URLSearchParams({
-      symbols: symbol, // Use 'symbols' not 'symbol'
+      symbols: symbol,
       language: 'en',
       limit: '20',
       api_token: MARKETAUX_API_KEY
@@ -53,108 +55,136 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
     
     const fullUrl = `${baseUrl}?${params.toString()}`;
     
-    // Log the complete URL (with API key hidden for security)
-    console.log(`🌐 API Request URL: ${fullUrl.replace(MARKETAUX_API_KEY, '[API_KEY_HIDDEN]')}`);
-    console.log(`🔑 API Key length: ${MARKETAUX_API_KEY.length} characters`);
-    console.log(`📋 Request parameters:`, {
+    console.log(`🌐 [DEBUG] Full API Request URL: ${fullUrl}`);
+    console.log(`📋 [DEBUG] Request parameters breakdown:`, {
+      baseUrl,
       symbols: symbol,
       language: 'en',
-      limit: '20'
+      limit: '20',
+      api_token: MARKETAUX_API_KEY ? '[PRESENT]' : '[MISSING]'
     });
     
-    const response = await fetch(fullUrl);
+    console.log(`📡 [DEBUG] About to make fetch request...`);
     
-    // Log response status and headers
-    console.log(`📡 Response status: ${response.status} ${response.statusText}`);
-    console.log(`📄 Response headers:`, Object.fromEntries(response.headers.entries()));
+    const response = await fetch(fullUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'TradeIQ-NewsApp/1.0'
+      }
+    });
     
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`❌ Marketaux API error: ${response.status} ${response.statusText}`);
-      console.error(`💥 Error response body:`, errorBody);
-      
-      // Parse error response if it's JSON
-      try {
-        const errorJson = JSON.parse(errorBody);
-        console.error(`🔍 Parsed error:`, errorJson);
-        
-        if (errorJson.error) {
-          console.error(`🚨 API Error: ${errorJson.error.code} - ${errorJson.error.message}`);
-        }
-      } catch (parseError) {
-        console.error(`📝 Raw error text:`, errorBody);
-      }
-      
-      // Specific error handling
-      switch (response.status) {
-        case 401:
-          console.error('🔒 Authentication failed - API key may be invalid');
-          break;
-        case 403:
-          console.error('🚫 Access forbidden - check API subscription/plan');
-          break;
-        case 429:
-          console.error('⏰ Rate limit exceeded - too many requests');
-          break;
-        case 500:
-          console.error('🏥 Server error - API service may be down');
-          break;
-        default:
-          console.error(`❓ Unexpected error: ${response.status}`);
-      }
-      
-      throw new Error(`API request failed: ${response.status}`);
+    console.log(`📡 [DEBUG] Fetch completed. Response received:`);
+    console.log(`📊 [DEBUG] Response status: ${response.status}`);
+    console.log(`📊 [DEBUG] Response statusText: ${response.statusText}`);
+    console.log(`📊 [DEBUG] Response ok: ${response.ok}`);
+    console.log(`📊 [DEBUG] Response headers:`, Object.fromEntries(response.headers.entries()));
+    
+    // Clone response to read body twice (once for logging, once for processing)
+    const responseClone = response.clone();
+    
+    let responseText;
+    try {
+      responseText = await responseClone.text();
+      console.log(`📄 [DEBUG] Raw response body:`, responseText);
+    } catch (textError) {
+      console.error(`❌ [DEBUG] Error reading response text:`, textError);
     }
     
-    const data: MarketauxResponse = await response.json();
+    if (!response.ok) {
+      console.error(`❌ [DEBUG] Response not OK. Status: ${response.status} ${response.statusText}`);
+      
+      let errorDetails;
+      try {
+        errorDetails = JSON.parse(responseText || '{}');
+        console.error(`💥 [DEBUG] Parsed error response:`, errorDetails);
+      } catch (parseError) {
+        console.error(`💥 [DEBUG] Could not parse error response as JSON:`, parseError);
+        console.error(`💥 [DEBUG] Raw error text:`, responseText);
+      }
+      
+      // Specific error handling with detailed logging
+      switch (response.status) {
+        case 401:
+          console.error('🔒 [DEBUG] 401 Unauthorized - API key may be invalid or missing');
+          break;
+        case 403:
+          console.error('🚫 [DEBUG] 403 Forbidden - API key may lack permissions or plan limits exceeded');
+          break;
+        case 429:
+          console.error('⏰ [DEBUG] 429 Rate Limited - too many requests, need to wait');
+          break;
+        case 500:
+          console.error('🏥 [DEBUG] 500 Server Error - Marketaux API is having issues');
+          break;
+        default:
+          console.error(`❓ [DEBUG] Unexpected HTTP status: ${response.status}`);
+      }
+      
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    }
     
-    // Log complete API response for debugging
-    console.log(`📊 Full API Response:`, data);
-    console.log(`📈 Response meta:`, data.meta);
-    console.log(`📰 Articles found: ${data.meta?.found || 0}, returned: ${data.meta?.returned || 0}`);
+    console.log(`✅ [DEBUG] Response OK, parsing JSON...`);
+    
+    let data: MarketauxResponse;
+    try {
+      data = await response.json();
+      console.log(`📊 [DEBUG] Successfully parsed JSON response:`, data);
+      console.log(`📈 [DEBUG] Response meta information:`, data.meta);
+      console.log(`📰 [DEBUG] Number of articles in data array:`, data.data?.length || 0);
+    } catch (jsonError) {
+      console.error(`💥 [DEBUG] Failed to parse response as JSON:`, jsonError);
+      console.error(`💥 [DEBUG] Response text that failed to parse:`, responseText);
+      throw new Error(`Failed to parse API response as JSON: ${jsonError.message}`);
+    }
     
     // Check for API-level errors in response
     if (data.error) {
-      console.error(`🚨 API returned error:`, data.error);
+      console.error(`🚨 [DEBUG] API returned error in response:`, data.error);
       throw new Error(`API Error: ${data.error.code} - ${data.error.message}`);
     }
     
     if (!data.data || !Array.isArray(data.data)) {
-      console.warn(`⚠️ No data array in response for ${symbol}`);
+      console.warn(`⚠️ [DEBUG] No data array in response or data is not an array`);
+      console.warn(`⚠️ [DEBUG] Data structure received:`, typeof data.data, data.data);
       return [];
     }
     
     if (data.data.length === 0) {
-      console.log(`📭 No articles found for ${symbol}. This might indicate:`);
-      console.log(`   - Symbol not available in free tier`);
+      console.log(`📭 [DEBUG] No articles found for ${symbol}. Possible reasons:`);
+      console.log(`   - Symbol not covered in current API plan`);
       console.log(`   - No recent news for this symbol`);
+      console.log(`   - API rate limits or restrictions`);
       console.log(`   - Try popular symbols: AAPL, MSFT, TSLA, GOOGL, AMZN`);
       return [];
     }
 
-    console.log(`✅ Processing ${data.data.length} articles for ${symbol}:`);
+    console.log(`✅ [DEBUG] Processing ${data.data.length} articles for ${symbol}:`);
     
     // Log each article for debugging
     data.data.forEach((article, index) => {
-      console.log(`📰 Article ${index + 1}:`, {
-        title: article.title?.substring(0, 60) + '...',
+      console.log(`📰 [DEBUG] Article ${index + 1}:`, {
+        title: article.title?.substring(0, 80) + (article.title?.length > 80 ? '...' : ''),
         source: article.source,
-        url: article.url ? 'Valid URL' : 'Missing URL',
+        url: article.url ? 'Has URL' : 'NO URL',
+        urlValid: article.url && (article.url.startsWith('http://') || article.url.startsWith('https://')),
         published: article.published_at,
-        hasDescription: !!article.description
+        hasDescription: !!article.description,
+        descriptionLength: article.description?.length || 0
       });
     });
 
     const processedArticles = data.data
       .filter(article => {
-        if (!article.title || !article.source) {
-          console.warn(`⚠️ Skipping article with missing title or source:`, {
-            title: !!article.title,
-            source: !!article.source
+        const isValid = article.title && article.source;
+        if (!isValid) {
+          console.warn(`⚠️ [DEBUG] Skipping article with missing required fields:`, {
+            hasTitle: !!article.title,
+            hasSource: !!article.source,
+            article: article
           });
-          return false;
         }
-        return true;
+        return isValid;
       })
       .map((article, index) => {
         // Determine sentiment
@@ -177,7 +207,7 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
                           (article.url.startsWith('http://') || article.url.startsWith('https://'));
         
         if (!isValidUrl && article.url) {
-          console.warn(`🔗 Invalid URL for article: "${article.title?.substring(0, 50)}..." - URL: ${article.url}`);
+          console.warn(`🔗 [DEBUG] Invalid URL for article: "${article.title?.substring(0, 50)}..." - URL: ${article.url}`);
         }
 
         const processedArticle = {
@@ -185,7 +215,7 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
           headline: article.title,
           source: article.source || 'Financial News',
           datetime: new Date(article.published_at).getTime(),
-          url: isValidUrl ? article.url : '', // Only keep valid URLs
+          url: isValidUrl ? article.url : '',
           summary: article.description?.length > 200 
             ? article.description.substring(0, 200) + '...' 
             : article.description || 'No summary available',
@@ -194,43 +224,58 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
           sentiment
         };
 
-        console.log(`✅ Processed article ${index + 1}:`, {
-          headline: processedArticle.headline.substring(0, 50) + '...',
+        console.log(`✅ [DEBUG] Processed article ${index + 1}:`, {
+          id: processedArticle.id,
+          headline: processedArticle.headline.substring(0, 60) + '...',
           hasValidUrl: !!processedArticle.url,
-          sentiment: processedArticle.sentiment
+          sentiment: processedArticle.sentiment,
+          source: processedArticle.source
         });
 
         return processedArticle;
       });
 
-    console.log(`🎉 Successfully processed ${processedArticles.length} articles for ${symbol}`);
-    console.log(`🔗 Articles with valid URLs: ${processedArticles.filter(a => a.url).length}`);
+    console.log(`🎉 [DEBUG] Successfully processed ${processedArticles.length} articles for ${symbol}`);
+    console.log(`🔗 [DEBUG] Articles with valid URLs: ${processedArticles.filter(a => a.url).length}`);
+    console.log(`📊 [DEBUG] Final processed articles:`, processedArticles);
     
     return processedArticles;
     
   } catch (error) {
-    console.error('💥 Error fetching news from Marketaux:', error);
+    console.error('💥 [DEBUG] CRITICAL ERROR in fetchNewsForAsset:', error);
     
     // Enhanced error logging
     if (error instanceof TypeError && error.message.includes('fetch')) {
-      console.error('🌐 Network error - check internet connection or API endpoint accessibility');
+      console.error('🌐 [DEBUG] Network/Fetch Error Details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      console.error('🌐 [DEBUG] This could indicate network connectivity issues or CORS problems');
     } else if (error instanceof SyntaxError) {
-      console.error('📝 Invalid JSON response from API - API may be returning HTML error page');
+      console.error('📝 [DEBUG] JSON Parse Error Details:', {
+        message: error.message,
+        stack: error.stack
+      });
+      console.error('📝 [DEBUG] API may be returning HTML error page instead of JSON');
     } else if (error instanceof Error) {
-      console.error('🚨 Error details:', {
+      console.error('🚨 [DEBUG] General Error Details:', {
         name: error.name,
         message: error.message,
-        stack: error.stack?.substring(0, 200)
+        stack: error.stack
       });
+    } else {
+      console.error('❓ [DEBUG] Unknown error type:', typeof error, error);
     }
     
     // Return empty array instead of throwing to prevent app crash
+    console.log('🔄 [DEBUG] Returning empty array due to error');
     return [];
   }
 };
 
 // Refresh news function for auto-update feature
 export const refreshNewsForAsset = async (symbol: string): Promise<NewsArticle[]> => {
-  console.log(`🔄 Refreshing news for ${symbol}`);
+  console.log(`🔄 [DEBUG] Refreshing news for ${symbol}`);
   return fetchNewsForAsset(symbol);
 };

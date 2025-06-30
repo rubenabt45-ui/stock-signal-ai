@@ -26,7 +26,7 @@ const NewsAI = () => {
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [activeTab, setActiveTab] = useState("live");
   const [refreshing, setRefreshing] = useState(false);
-  const [hasArticles, setHasArticles] = useState(true); // Track if we have articles for auto-refresh
+  const [hasArticles, setHasArticles] = useState(true);
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
     sentiments: [],
@@ -36,25 +36,50 @@ const NewsAI = () => {
   const { toast } = useToast();
   const { favorites, loading: favoritesLoading } = useFavorites();
 
+  console.log(`🎯 [DEBUG] NewsAI Component State:`, {
+    selectedAsset,
+    activeTab,
+    hasArticles,
+    showOnlyFavorites,
+    filtersActive: Object.values(filters).some(arr => arr.length > 0)
+  });
+
   // Fetch news for selected asset with conditional auto-refresh
   const { data: newsArticles, isLoading, error, refetch } = useQuery({
     queryKey: ['news', selectedAsset],
-    queryFn: () => fetchNewsForAsset(selectedAsset),
+    queryFn: () => {
+      console.log(`🔄 [DEBUG] useQuery queryFn triggered for symbol: ${selectedAsset}`);
+      console.log(`📊 [DEBUG] Query conditions - enabled: ${!!selectedAsset && activeTab === "live"}, activeTab: ${activeTab}`);
+      return fetchNewsForAsset(selectedAsset);
+    },
     enabled: !!selectedAsset && activeTab === "live",
-    refetchInterval: hasArticles ? 15 * 60 * 1000 : false, // Only auto-refresh if we have articles
+    refetchInterval: hasArticles ? 15 * 60 * 1000 : false,
     staleTime: 5 * 60 * 1000,
+  });
+
+  console.log(`📰 [DEBUG] useQuery results:`, {
+    newsArticlesLength: newsArticles?.length || 0,
+    isLoading,
+    hasError: !!error,
+    errorMessage: error?.message
   });
 
   // Update hasArticles when newsArticles changes
   useEffect(() => {
+    console.log(`🔄 [DEBUG] newsArticles useEffect triggered:`, {
+      newsArticlesDefined: newsArticles !== undefined,
+      newsArticlesLength: newsArticles?.length || 0,
+      selectedAsset
+    });
+    
     if (newsArticles !== undefined) {
       const articlesExist = newsArticles.length > 0;
       setHasArticles(articlesExist);
       
       if (!articlesExist) {
-        console.log(`🚫 Auto-refresh disabled for ${selectedAsset} - no articles found`);
+        console.log(`🚫 [DEBUG] Auto-refresh disabled for ${selectedAsset} - no articles found`);
       } else {
-        console.log(`✅ Auto-refresh enabled for ${selectedAsset} - ${newsArticles.length} articles found`);
+        console.log(`✅ [DEBUG] Auto-refresh enabled for ${selectedAsset} - ${newsArticles.length} articles found`);
       }
     }
   }, [newsArticles, selectedAsset]);
@@ -63,16 +88,20 @@ const NewsAI = () => {
   const handleManualRefresh = async () => {
     if (refreshing) return;
     
-    console.log(`🔄 Manual refresh triggered for ${selectedAsset}`);
+    console.log(`🔄 [DEBUG] Manual refresh triggered for ${selectedAsset}`);
     setRefreshing(true);
     try {
-      await refetch();
+      const result = await refetch();
+      console.log(`✅ [DEBUG] Manual refresh completed:`, {
+        dataLength: result.data?.length || 0,
+        isError: result.isError
+      });
       toast({
         title: "News Updated",
         description: `Latest news for ${selectedAsset} has been refreshed.`,
       });
     } catch (error) {
-      console.error('❌ Manual refresh failed:', error);
+      console.error('❌ [DEBUG] Manual refresh failed:', error);
       toast({
         title: "Refresh Failed",
         description: "Unable to fetch latest news. Please try again.",
@@ -85,8 +114,8 @@ const NewsAI = () => {
 
   // Reset hasArticles when asset changes to allow fresh API call
   useEffect(() => {
+    console.log(`🔄 [DEBUG] selectedAsset changed to: ${selectedAsset}, resetting hasArticles to true`);
     setHasArticles(true);
-    console.log(`🔄 Asset changed to ${selectedAsset}, enabling API calls`);
   }, [selectedAsset]);
 
   // Helper function to determine article category
@@ -141,21 +170,22 @@ const NewsAI = () => {
 
   // Filter news articles based on selected filters and favorites toggle
   const filteredNewsArticles = useMemo(() => {
-    console.log('Filtering articles with filters:', filters);
-    console.log('Show only favorites:', showOnlyFavorites);
-    console.log('Total articles:', newsArticles?.length || 0);
+    console.log('🔍 [DEBUG] Filtering articles with filters:', filters);
+    console.log('👤 [DEBUG] Show only favorites:', showOnlyFavorites);
+    console.log('📊 [DEBUG] Total articles before filtering:', newsArticles?.length || 0);
 
     if (!newsArticles || newsArticles.length === 0) {
+      console.log('📭 [DEBUG] No articles to filter');
       return [];
     }
 
-    return newsArticles.filter(article => {
+    const filtered = newsArticles.filter(article => {
       // Favorites filter
       if (showOnlyFavorites && !isArticleInFavorites(article)) {
         return false;
       }
 
-      // Apply filters only if they are specifically set (to allow broader results)
+      // Apply filters only if they are specifically set
       if (filters.categories.length > 0) {
         const articleCategory = getArticleCategory(article.relatedSymbols?.[0] || selectedAsset);
         if (!filters.categories.includes(articleCategory)) {
@@ -179,6 +209,9 @@ const NewsAI = () => {
       
       return true;
     });
+
+    console.log('✅ [DEBUG] Articles after filtering:', filtered.length);
+    return filtered;
   }, [newsArticles, filters.categories, filters.sentiments, filters.newsTypes, selectedAsset, showOnlyFavorites, favorites]);
 
   const handleArticleClick = async (article: NewsArticle | DigestArticle) => {
