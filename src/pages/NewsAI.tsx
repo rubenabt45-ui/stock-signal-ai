@@ -132,7 +132,7 @@ const NewsAI = () => {
         return false;
       }
 
-      // Category filter
+      // Apply filters only if they are specifically set (to allow broader results)
       if (filters.categories.length > 0) {
         const articleCategory = getArticleCategory(article.relatedSymbols?.[0] || selectedAsset);
         if (!filters.categories.includes(articleCategory)) {
@@ -140,7 +140,6 @@ const NewsAI = () => {
         }
       }
 
-      // Sentiment filter
       if (filters.sentiments.length > 0) {
         const articleSentiment = getArticleSentiment(article);
         if (!filters.sentiments.includes(articleSentiment)) {
@@ -148,7 +147,6 @@ const NewsAI = () => {
         }
       }
 
-      // News type filter
       if (filters.newsTypes.length > 0) {
         const articleType = article.category || 'market';
         if (!filters.newsTypes.includes(articleType)) {
@@ -312,8 +310,20 @@ const NewsAI = () => {
                         <span className="font-medium">Failed to load news</span>
                       </div>
                       <p className="text-sm text-gray-400">
-                        Unable to fetch latest news from Marketaux API. Please try again later.
+                        Unable to fetch latest news from Marketaux API. This might be due to rate limits or network issues. Please try again later.
                       </p>
+                      <div className="mt-2">
+                        <Button
+                          onClick={handleManualRefresh}
+                          variant="outline"
+                          size="sm"
+                          disabled={refreshing}
+                          className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                        >
+                          <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                          Try Again
+                        </Button>
+                      </div>
                     </CardHeader>
                   </Card>
                 )}
@@ -391,7 +401,7 @@ const NewsAI = () => {
                           ? "No Favorite Assets"
                           : newsArticles && newsArticles.length > 0 
                             ? "No Articles Match Filters" 
-                            : "No News Available"
+                            : "No Recent Articles Found"
                         }
                       </h3>
                       <p className="text-gray-400">
@@ -399,11 +409,11 @@ const NewsAI = () => {
                           ? "Add some favorite assets to see personalized news updates."
                           : newsArticles && newsArticles.length > 0 
                             ? "Try adjusting your filters to see more articles."
-                            : `No recent financial news found for ${selectedAsset} from Marketaux API.`
+                            : `No recent articles found for ${selectedAsset}. Please try a different asset or wait for new news updates.`
                         }
                       </p>
                       {(!newsArticles || newsArticles.length === 0) && (
-                        <div className="mt-4">
+                        <div className="mt-4 space-y-2">
                           <Button
                             onClick={handleManualRefresh}
                             variant="outline"
@@ -413,6 +423,9 @@ const NewsAI = () => {
                             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
                             Try Again
                           </Button>
+                          <p className="text-xs text-gray-500 mt-2">
+                            Try popular assets like AAPL, MSFT, TSLA, GOOGL, or AMZN for better results
+                          </p>
                         </div>
                       )}
                     </CardHeader>

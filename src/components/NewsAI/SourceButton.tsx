@@ -31,17 +31,25 @@ export const SourceButton = ({ url, className = "" }: SourceButtonProps) => {
 
   const hasValidUrl = url && isValidUrl(url);
 
+  // Don't render the button if there's no valid URL
+  if (!hasValidUrl) {
+    return (
+      <div className={`text-xs text-gray-500 ${className}`}>
+        Link unavailable
+      </div>
+    );
+  }
+
   return (
     <Button
       data-testid="source-button"
       onClick={handleViewSource}
       className={`tradeiq-button-primary ${className}`}
-      variant={hasValidUrl ? "default" : "outline"}
-      disabled={!hasValidUrl}
+      variant="default"
       size="sm"
     >
       <ExternalLink className="h-4 w-4 mr-2" />
-      {hasValidUrl ? 'Read Full Article' : 'Source Unavailable'}
+      Read Full Article
     </Button>
   );
 };
