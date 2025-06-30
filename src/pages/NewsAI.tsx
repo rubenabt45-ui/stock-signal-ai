@@ -26,7 +26,6 @@ const NewsAI = () => {
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [activeTab, setActiveTab] = useState("live");
   const [refreshing, setRefreshing] = useState(false);
-  const [hasArticles, setHasArticles] = useState(true);
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
     sentiments: [],
@@ -39,22 +38,20 @@ const NewsAI = () => {
   console.log(`🎯 [DEBUG] NewsAI Component State:`, {
     selectedAsset,
     activeTab,
-    hasArticles,
     showOnlyFavorites,
     filtersActive: Object.values(filters).some(arr => arr.length > 0)
   });
 
-  // Fetch news for selected asset with conditional auto-refresh
+  // Fetch news for selected asset - AUTO-REFRESH DISABLED to avoid API quota waste
   const { data: newsArticles, isLoading, error, refetch } = useQuery({
     queryKey: ['news', selectedAsset],
     queryFn: () => {
       console.log(`🔄 [DEBUG] useQuery queryFn triggered for symbol: ${selectedAsset}`);
-      console.log(`📊 [DEBUG] Query conditions - enabled: ${!!selectedAsset && activeTab === "live"}, activeTab: ${activeTab}`);
       return fetchNewsForAsset(selectedAsset);
     },
     enabled: !!selectedAsset && activeTab === "live",
-    refetchInterval: hasArticles ? 15 * 60 * 1000 : false,
-    staleTime: 5 * 60 * 1000,
+    refetchInterval: false, // Disabled auto-refresh to avoid API quota waste
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
   console.log(`📰 [DEBUG] useQuery results:`, {
@@ -63,26 +60,6 @@ const NewsAI = () => {
     hasError: !!error,
     errorMessage: error?.message
   });
-
-  // Update hasArticles when newsArticles changes
-  useEffect(() => {
-    console.log(`🔄 [DEBUG] newsArticles useEffect triggered:`, {
-      newsArticlesDefined: newsArticles !== undefined,
-      newsArticlesLength: newsArticles?.length || 0,
-      selectedAsset
-    });
-    
-    if (newsArticles !== undefined) {
-      const articlesExist = newsArticles.length > 0;
-      setHasArticles(articlesExist);
-      
-      if (!articlesExist) {
-        console.log(`🚫 [DEBUG] Auto-refresh disabled for ${selectedAsset} - no articles found`);
-      } else {
-        console.log(`✅ [DEBUG] Auto-refresh enabled for ${selectedAsset} - ${newsArticles.length} articles found`);
-      }
-    }
-  }, [newsArticles, selectedAsset]);
 
   // Manual refresh function
   const handleManualRefresh = async () => {
@@ -111,12 +88,6 @@ const NewsAI = () => {
       setRefreshing(false);
     }
   };
-
-  // Reset hasArticles when asset changes to allow fresh API call
-  useEffect(() => {
-    console.log(`🔄 [DEBUG] selectedAsset changed to: ${selectedAsset}, resetting hasArticles to true`);
-    setHasArticles(true);
-  }, [selectedAsset]);
 
   // Helper function to determine article category
   const getArticleCategory = (symbol: string): string => {
@@ -263,7 +234,7 @@ const NewsAI = () => {
                 </h1>
                 <p className="text-sm text-gray-400 font-medium">
                   {activeTab === "live" 
-                    ? "Real-time financial news powered by Marketaux API"
+                    ? "Real-time financial news powered by GNews API"
                     : "Personalized news digest based on your alert preferences"
                   }
                 </p>
@@ -333,11 +304,10 @@ const NewsAI = () => {
                       </Badge>
                     )}
                   </div>
-                  {showOnlyFavorites && (!favorites || favorites.length === 0) && (
-                    <p className="text-sm text-gray-400">
-                      You haven't added any favorite assets yet.
-                    </p>
-                  )}
+                  <div className="flex items-center space-x-2 text-sm text-gray-400">
+                    <div className="w-2 h-2 rounded-full bg-gray-500"></div>
+                    <span>Auto-refresh disabled</span>
+                  </div>
                 </div>
               </div>
 
@@ -352,10 +322,6 @@ const NewsAI = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold text-white">Latest Financial News</h2>
-                  <div className="flex items-center space-x-2 text-sm text-gray-400">
-                    <div className={`w-2 h-2 rounded-full ${hasArticles ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`}></div>
-                    <span>{hasArticles ? 'Auto-refresh every 15min' : 'Auto-refresh disabled'}</span>
-                  </div>
                 </div>
 
                 {error && (
@@ -366,7 +332,7 @@ const NewsAI = () => {
                         <span className="font-medium">Failed to load news</span>
                       </div>
                       <p className="text-sm text-gray-400">
-                        Unable to fetch latest news from Marketaux API. This might be due to rate limits, network issues, or invalid API token. Check the console for detailed error logs.
+                        Unable to fetch latest news from GNews API. This might be due to rate limits, network issues, or invalid API token. Check the console for detailed error logs.
                       </p>
                       <div className="mt-2">
                         <Button
@@ -457,7 +423,7 @@ const NewsAI = () => {
                           ? "No Favorite Assets"
                           : newsArticles && newsArticles.length > 0 
                             ? "No Articles Match Filters" 
-                            : "No Recent Articles Found"
+                            : "No News Found"
                         }
                       </h3>
                       <p className="text-gray-400 mb-4">
@@ -465,7 +431,7 @@ const NewsAI = () => {
                           ? "Add some favorite assets to see personalized news updates."
                           : newsArticles && newsArticles.length > 0 
                             ? "Try adjusting your filters to see more articles."
-                            : `No recent articles found for ${selectedAsset}. Try again later or try popular symbols like AAPL, MSFT, TSLA, GOOGL, or AMZN.`
+                            : `No recent news found for "${selectedAsset}". Try again later or try popular symbols like AAPL, MSFT, TSLA, GOOGL, or AMZN.`
                         }
                       </p>
                       {(!newsArticles || newsArticles.length === 0) && (

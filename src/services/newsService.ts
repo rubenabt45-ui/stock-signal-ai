@@ -1,26 +1,18 @@
 
-interface MarketauxResponse {
-  data: Array<{
+interface GNewsResponse {
+  totalArticles: number;
+  articles: Array<{
     title: string;
-    url: string;
-    published_at: string;
-    source: string;
     description: string;
-    entities: Array<{
-      symbol: string;
+    content: string;
+    url: string;
+    image: string;
+    publishedAt: string;
+    source: {
       name: string;
-      sentiment_score?: number;
-    }>;
-    sentiment?: number;
+      url: string;
+    };
   }>;
-  meta: {
-    found: number;
-    returned: number;
-  };
-  error?: {
-    code: string;
-    message: string;
-  };
 }
 
 export interface NewsArticle {
@@ -36,32 +28,32 @@ export interface NewsArticle {
   sentiment?: 'Bullish' | 'Bearish' | 'Neutral';
 }
 
-const MARKETAUX_API_KEY = 'qflpF00L3Ui07FOjQImcLaRURUJc2UMI5tPiiRE1';
+// GNews API key - replace with your actual key
+const GNEWS_API_KEY = 'YOUR_GNEWS_API_KEY_HERE';
 
 export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> => {
   console.log(`🔍 [DEBUG] Starting fetchNewsForAsset for symbol: ${symbol}`);
-  console.log(`🔑 [DEBUG] API Key being used: ${MARKETAUX_API_KEY ? MARKETAUX_API_KEY.substring(0, 8) + '...' : 'MISSING'}`);
-  console.log(`📏 [DEBUG] API Key length: ${MARKETAUX_API_KEY?.length || 0} characters`);
+  console.log(`🔑 [DEBUG] API Key being used: ${GNEWS_API_KEY ? GNEWS_API_KEY.substring(0, 8) + '...' : 'MISSING'}`);
   
   try {
-    // Build URL with minimal, essential parameters only
-    const baseUrl = 'https://api.marketaux.com/v1/news/all';
+    // Build GNews API URL
+    const baseUrl = 'https://gnews.io/api/v4/search';
     const params = new URLSearchParams({
-      symbols: symbol,
-      language: 'en',
-      limit: '20',
-      api_token: MARKETAUX_API_KEY
+      q: symbol,
+      lang: 'en',
+      max: '20',
+      token: GNEWS_API_KEY
     });
     
     const fullUrl = `${baseUrl}?${params.toString()}`;
     
-    console.log(`🌐 [DEBUG] Full API Request URL: ${fullUrl}`);
+    console.log(`🌐 [DEBUG] Full GNews API Request URL: ${fullUrl}`);
     console.log(`📋 [DEBUG] Request parameters breakdown:`, {
       baseUrl,
-      symbols: symbol,
-      language: 'en',
-      limit: '20',
-      api_token: MARKETAUX_API_KEY ? '[PRESENT]' : '[MISSING]'
+      q: symbol,
+      lang: 'en',
+      max: '20',
+      token: GNEWS_API_KEY ? '[PRESENT]' : '[MISSING]'
     });
     
     console.log(`📡 [DEBUG] About to make fetch request...`);
@@ -103,124 +95,116 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
         console.error(`💥 [DEBUG] Raw error text:`, responseText);
       }
       
-      // Specific error handling with detailed logging
+      // Specific error handling for GNews API
       switch (response.status) {
         case 401:
-          console.error('🔒 [DEBUG] 401 Unauthorized - API key may be invalid or missing');
+          console.error('🔒 [DEBUG] 401 Unauthorized - GNews API key may be invalid or missing');
           break;
         case 403:
-          console.error('🚫 [DEBUG] 403 Forbidden - API key may lack permissions or plan limits exceeded');
+          console.error('🚫 [DEBUG] 403 Forbidden - GNews API key may lack permissions or plan limits exceeded');
           break;
         case 429:
           console.error('⏰ [DEBUG] 429 Rate Limited - too many requests, need to wait');
           break;
         case 500:
-          console.error('🏥 [DEBUG] 500 Server Error - Marketaux API is having issues');
+          console.error('🏥 [DEBUG] 500 Server Error - GNews API is having issues');
           break;
         default:
           console.error(`❓ [DEBUG] Unexpected HTTP status: ${response.status}`);
       }
       
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      throw new Error(`GNews API request failed: ${response.status} ${response.statusText}`);
     }
     
     console.log(`✅ [DEBUG] Response OK, parsing JSON...`);
     
-    let data: MarketauxResponse;
+    let data: GNewsResponse;
     try {
       data = await response.json();
       console.log(`📊 [DEBUG] Successfully parsed JSON response:`, data);
-      console.log(`📈 [DEBUG] Response meta information:`, data.meta);
-      console.log(`📰 [DEBUG] Number of articles in data array:`, data.data?.length || 0);
+      console.log(`📈 [DEBUG] Total articles available:`, data.totalArticles);
+      console.log(`📰 [DEBUG] Number of articles in response:`, data.articles?.length || 0);
     } catch (jsonError) {
       console.error(`💥 [DEBUG] Failed to parse response as JSON:`, jsonError);
       console.error(`💥 [DEBUG] Response text that failed to parse:`, responseText);
-      throw new Error(`Failed to parse API response as JSON: ${jsonError.message}`);
+      throw new Error(`Failed to parse GNews API response as JSON: ${jsonError.message}`);
     }
     
-    // Check for API-level errors in response
-    if (data.error) {
-      console.error(`🚨 [DEBUG] API returned error in response:`, data.error);
-      throw new Error(`API Error: ${data.error.code} - ${data.error.message}`);
-    }
-    
-    if (!data.data || !Array.isArray(data.data)) {
-      console.warn(`⚠️ [DEBUG] No data array in response or data is not an array`);
-      console.warn(`⚠️ [DEBUG] Data structure received:`, typeof data.data, data.data);
+    if (!data.articles || !Array.isArray(data.articles)) {
+      console.warn(`⚠️ [DEBUG] No articles array in response or articles is not an array`);
+      console.warn(`⚠️ [DEBUG] Data structure received:`, typeof data.articles, data.articles);
       return [];
     }
     
-    if (data.data.length === 0) {
+    if (data.articles.length === 0) {
       console.log(`📭 [DEBUG] No articles found for ${symbol}. Possible reasons:`);
-      console.log(`   - Symbol not covered in current API plan`);
-      console.log(`   - No recent news for this symbol`);
-      console.log(`   - API rate limits or restrictions`);
+      console.log(`   - Symbol not found in recent news`);
+      console.log(`   - No relevant articles for this search term`);
       console.log(`   - Try popular symbols: AAPL, MSFT, TSLA, GOOGL, AMZN`);
       return [];
     }
 
-    console.log(`✅ [DEBUG] Processing ${data.data.length} articles for ${symbol}:`);
+    console.log(`✅ [DEBUG] Processing ${data.articles.length} articles for ${symbol}:`);
     
     // Log each article for debugging
-    data.data.forEach((article, index) => {
+    data.articles.forEach((article, index) => {
       console.log(`📰 [DEBUG] Article ${index + 1}:`, {
         title: article.title?.substring(0, 80) + (article.title?.length > 80 ? '...' : ''),
-        source: article.source,
+        source: article.source?.name,
         url: article.url ? 'Has URL' : 'NO URL',
         urlValid: article.url && (article.url.startsWith('http://') || article.url.startsWith('https://')),
-        published: article.published_at,
+        published: article.publishedAt,
         hasDescription: !!article.description,
         descriptionLength: article.description?.length || 0
       });
     });
 
-    const processedArticles = data.data
+    const processedArticles = data.articles
       .filter(article => {
-        const isValid = article.title && article.source;
+        const isValid = article.title && article.source?.name && article.url;
         if (!isValid) {
           console.warn(`⚠️ [DEBUG] Skipping article with missing required fields:`, {
             hasTitle: !!article.title,
-            hasSource: !!article.source,
+            hasSource: !!article.source?.name,
+            hasUrl: !!article.url,
             article: article
           });
         }
         return isValid;
       })
       .map((article, index) => {
-        // Determine sentiment
+        // Simple sentiment analysis based on keywords
         let sentiment: 'Bullish' | 'Bearish' | 'Neutral' = 'Neutral';
         
-        if (article.sentiment) {
-          if (article.sentiment > 0.1) sentiment = 'Bullish';
-          else if (article.sentiment < -0.1) sentiment = 'Bearish';
-        } else if (article.entities && article.entities.length > 0) {
-          const entitySentiment = article.entities[0].sentiment_score;
-          if (entitySentiment) {
-            if (entitySentiment > 0.1) sentiment = 'Bullish';
-            else if (entitySentiment < -0.1) sentiment = 'Bearish';
-          }
-        }
+        const text = `${article.title} ${article.description || ''}`.toLowerCase();
+        const bullishKeywords = ['beats', 'exceeds', 'growth', 'upgrade', 'partnership', 'expansion', 'strong', 'positive', 'rises', 'gains', 'profit', 'revenue'];
+        const bearishKeywords = ['misses', 'declines', 'downgrade', 'concerns', 'falls', 'drops', 'weak', 'losses', 'challenges', 'cut', 'layoffs'];
+        
+        const bullishScore = bullishKeywords.filter(word => text.includes(word)).length;
+        const bearishScore = bearishKeywords.filter(word => text.includes(word)).length;
+        
+        if (bullishScore > bearishScore) sentiment = 'Bullish';
+        else if (bearishScore > bullishScore) sentiment = 'Bearish';
 
-        // Validate and clean URL
+        // Validate URL
         const isValidUrl = article.url && 
                           article.url.trim() !== '' && 
                           (article.url.startsWith('http://') || article.url.startsWith('https://'));
         
-        if (!isValidUrl && article.url) {
+        if (!isValidUrl) {
           console.warn(`🔗 [DEBUG] Invalid URL for article: "${article.title?.substring(0, 50)}..." - URL: ${article.url}`);
         }
 
         const processedArticle = {
-          id: `marketaux-${symbol}-${index}`,
+          id: `gnews-${symbol}-${index}`,
           headline: article.title,
-          source: article.source || 'Financial News',
-          datetime: new Date(article.published_at).getTime(),
+          source: article.source.name || 'GNews',
+          datetime: new Date(article.publishedAt).getTime(),
           url: isValidUrl ? article.url : '',
-          summary: article.description?.length > 200 
-            ? article.description.substring(0, 200) + '...' 
-            : article.description || 'No summary available',
+          summary: article.description || 'No summary available',
           category: 'market',
-          relatedSymbols: article.entities?.map(e => e.symbol) || [symbol],
+          relatedSymbols: [symbol],
+          imageUrl: article.image || undefined,
           sentiment
         };
 
@@ -257,7 +241,7 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
         message: error.message,
         stack: error.stack
       });
-      console.error('📝 [DEBUG] API may be returning HTML error page instead of JSON');
+      console.error('📝 [DEBUG] GNews API may be returning HTML error page instead of JSON');
     } else if (error instanceof Error) {
       console.error('🚨 [DEBUG] General Error Details:', {
         name: error.name,
@@ -274,7 +258,7 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
   }
 };
 
-// Refresh news function for auto-update feature
+// Refresh news function for manual refresh feature
 export const refreshNewsForAsset = async (symbol: string): Promise<NewsArticle[]> => {
   console.log(`🔄 [DEBUG] Refreshing news for ${symbol}`);
   return fetchNewsForAsset(symbol);
