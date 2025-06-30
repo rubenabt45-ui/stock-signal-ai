@@ -17,6 +17,10 @@ interface MarketauxResponse {
     found: number;
     returned: number;
   };
+  error?: {
+    code: string;
+    message: string;
+  };
 }
 
 export interface NewsArticle {
@@ -35,54 +39,125 @@ export interface NewsArticle {
 const MARKETAUX_API_KEY = 'qflpF00L3Ui07FOjQImcLaRURUJc2UMI5tPiiRE1';
 
 export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> => {
-  console.log(`Fetching real news for ${symbol} using Marketaux API`);
+  console.log(`🔍 Fetching news for ${symbol} using Marketaux API`);
   
   try {
-    // Use broader filters to get more results - remove strict filtering
-    const url = `https://api.marketaux.com/v1/news/all?symbols=${symbol}&language=en&limit=20&api_token=${MARKETAUX_API_KEY}`;
+    // Build URL with minimal, essential parameters only
+    const baseUrl = 'https://api.marketaux.com/v1/news/all';
+    const params = new URLSearchParams({
+      symbols: symbol, // Use 'symbols' not 'symbol'
+      language: 'en',
+      limit: '20',
+      api_token: MARKETAUX_API_KEY
+    });
     
-    console.log(`API Request URL: ${url.replace(MARKETAUX_API_KEY, '[API_KEY_HIDDEN]')}`);
+    const fullUrl = `${baseUrl}?${params.toString()}`;
     
-    const response = await fetch(url);
+    // Log the complete URL (with API key hidden for security)
+    console.log(`🌐 API Request URL: ${fullUrl.replace(MARKETAUX_API_KEY, '[API_KEY_HIDDEN]')}`);
+    console.log(`🔑 API Key length: ${MARKETAUX_API_KEY.length} characters`);
+    console.log(`📋 Request parameters:`, {
+      symbols: symbol,
+      language: 'en',
+      limit: '20'
+    });
+    
+    const response = await fetch(fullUrl);
+    
+    // Log response status and headers
+    console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+    console.log(`📄 Response headers:`, Object.fromEntries(response.headers.entries()));
     
     if (!response.ok) {
-      console.error(`Marketaux API error: ${response.status} ${response.statusText}`);
       const errorBody = await response.text();
-      console.error(`Error response body:`, errorBody);
+      console.error(`❌ Marketaux API error: ${response.status} ${response.statusText}`);
+      console.error(`💥 Error response body:`, errorBody);
       
-      // Log specific error codes for debugging
-      if (response.status === 429) {
-        console.warn('Rate limit exceeded for Marketaux API');
-      } else if (response.status === 401) {
-        console.error('API key authentication failed');
-      } else if (response.status === 403) {
-        console.error('API access forbidden - check subscription');
+      // Parse error response if it's JSON
+      try {
+        const errorJson = JSON.parse(errorBody);
+        console.error(`🔍 Parsed error:`, errorJson);
+        
+        if (errorJson.error) {
+          console.error(`🚨 API Error: ${errorJson.error.code} - ${errorJson.error.message}`);
+        }
+      } catch (parseError) {
+        console.error(`📝 Raw error text:`, errorBody);
+      }
+      
+      // Specific error handling
+      switch (response.status) {
+        case 401:
+          console.error('🔒 Authentication failed - API key may be invalid');
+          break;
+        case 403:
+          console.error('🚫 Access forbidden - check API subscription/plan');
+          break;
+        case 429:
+          console.error('⏰ Rate limit exceeded - too many requests');
+          break;
+        case 500:
+          console.error('🏥 Server error - API service may be down');
+          break;
+        default:
+          console.error(`❓ Unexpected error: ${response.status}`);
       }
       
       throw new Error(`API request failed: ${response.status}`);
     }
     
     const data: MarketauxResponse = await response.json();
-    console.log(`API Response meta:`, data.meta);
     
-    if (!data.data || data.data.length === 0) {
-      console.log(`No news found for ${symbol}. API returned ${data.meta?.found || 0} total articles, ${data.meta?.returned || 0} returned.`);
+    // Log complete API response for debugging
+    console.log(`📊 Full API Response:`, data);
+    console.log(`📈 Response meta:`, data.meta);
+    console.log(`📰 Articles found: ${data.meta?.found || 0}, returned: ${data.meta?.returned || 0}`);
+    
+    // Check for API-level errors in response
+    if (data.error) {
+      console.error(`🚨 API returned error:`, data.error);
+      throw new Error(`API Error: ${data.error.code} - ${data.error.message}`);
+    }
+    
+    if (!data.data || !Array.isArray(data.data)) {
+      console.warn(`⚠️ No data array in response for ${symbol}`);
+      return [];
+    }
+    
+    if (data.data.length === 0) {
+      console.log(`📭 No articles found for ${symbol}. This might indicate:`);
+      console.log(`   - Symbol not available in free tier`);
+      console.log(`   - No recent news for this symbol`);
+      console.log(`   - Try popular symbols: AAPL, MSFT, TSLA, GOOGL, AMZN`);
       return [];
     }
 
-    console.log(`Found ${data.data.length} articles for ${symbol}. Processing articles...`);
+    console.log(`✅ Processing ${data.data.length} articles for ${symbol}:`);
+    
+    // Log each article for debugging
+    data.data.forEach((article, index) => {
+      console.log(`📰 Article ${index + 1}:`, {
+        title: article.title?.substring(0, 60) + '...',
+        source: article.source,
+        url: article.url ? 'Valid URL' : 'Missing URL',
+        published: article.published_at,
+        hasDescription: !!article.description
+      });
+    });
 
     const processedArticles = data.data
       .filter(article => {
-        // Filter out articles with missing essential data
         if (!article.title || !article.source) {
-          console.warn('Skipping article with missing title or source:', article);
+          console.warn(`⚠️ Skipping article with missing title or source:`, {
+            title: !!article.title,
+            source: !!article.source
+          });
           return false;
         }
         return true;
       })
       .map((article, index) => {
-        // Determine sentiment based on API data
+        // Determine sentiment
         let sentiment: 'Bullish' | 'Bearish' | 'Neutral' = 'Neutral';
         
         if (article.sentiment) {
@@ -96,18 +171,21 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
           }
         }
 
-        // Validate URL
-        const isValidUrl = article.url && article.url.trim() !== '' && article.url.startsWith('http');
-        if (!isValidUrl) {
-          console.warn(`Invalid URL for article: ${article.title}`, article.url);
+        // Validate and clean URL
+        const isValidUrl = article.url && 
+                          article.url.trim() !== '' && 
+                          (article.url.startsWith('http://') || article.url.startsWith('https://'));
+        
+        if (!isValidUrl && article.url) {
+          console.warn(`🔗 Invalid URL for article: "${article.title?.substring(0, 50)}..." - URL: ${article.url}`);
         }
 
-        return {
+        const processedArticle = {
           id: `marketaux-${symbol}-${index}`,
           headline: article.title,
           source: article.source || 'Financial News',
           datetime: new Date(article.published_at).getTime(),
-          url: article.url || '', // Keep empty string for invalid URLs
+          url: isValidUrl ? article.url : '', // Only keep valid URLs
           summary: article.description?.length > 200 
             ? article.description.substring(0, 200) + '...' 
             : article.description || 'No summary available',
@@ -115,27 +193,44 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
           relatedSymbols: article.entities?.map(e => e.symbol) || [symbol],
           sentiment
         };
+
+        console.log(`✅ Processed article ${index + 1}:`, {
+          headline: processedArticle.headline.substring(0, 50) + '...',
+          hasValidUrl: !!processedArticle.url,
+          sentiment: processedArticle.sentiment
+        });
+
+        return processedArticle;
       });
 
-    console.log(`Successfully processed ${processedArticles.length} articles for ${symbol}`);
+    console.log(`🎉 Successfully processed ${processedArticles.length} articles for ${symbol}`);
+    console.log(`🔗 Articles with valid URLs: ${processedArticles.filter(a => a.url).length}`);
+    
     return processedArticles;
     
   } catch (error) {
-    console.error('Error fetching news from Marketaux:', error);
+    console.error('💥 Error fetching news from Marketaux:', error);
     
-    // Log additional debugging information
+    // Enhanced error logging
     if (error instanceof TypeError && error.message.includes('fetch')) {
-      console.error('Network error - check internet connection or API endpoint');
+      console.error('🌐 Network error - check internet connection or API endpoint accessibility');
     } else if (error instanceof SyntaxError) {
-      console.error('Invalid JSON response from API');
+      console.error('📝 Invalid JSON response from API - API may be returning HTML error page');
+    } else if (error instanceof Error) {
+      console.error('🚨 Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack?.substring(0, 200)
+      });
     }
     
+    // Return empty array instead of throwing to prevent app crash
     return [];
   }
 };
 
 // Refresh news function for auto-update feature
 export const refreshNewsForAsset = async (symbol: string): Promise<NewsArticle[]> => {
-  console.log(`Refreshing news for ${symbol}`);
+  console.log(`🔄 Refreshing news for ${symbol}`);
   return fetchNewsForAsset(symbol);
 };

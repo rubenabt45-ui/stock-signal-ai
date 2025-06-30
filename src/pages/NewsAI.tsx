@@ -26,6 +26,7 @@ const NewsAI = () => {
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [activeTab, setActiveTab] = useState("live");
   const [refreshing, setRefreshing] = useState(false);
+  const [hasArticles, setHasArticles] = useState(true); // Track if we have articles for auto-refresh
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
     sentiments: [],
@@ -35,19 +36,34 @@ const NewsAI = () => {
   const { toast } = useToast();
   const { favorites, loading: favoritesLoading } = useFavorites();
 
-  // Fetch news for selected asset with auto-refresh
+  // Fetch news for selected asset with conditional auto-refresh
   const { data: newsArticles, isLoading, error, refetch } = useQuery({
     queryKey: ['news', selectedAsset],
     queryFn: () => fetchNewsForAsset(selectedAsset),
     enabled: !!selectedAsset && activeTab === "live",
-    refetchInterval: 15 * 60 * 1000, // Auto refresh every 15 minutes
-    staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
+    refetchInterval: hasArticles ? 15 * 60 * 1000 : false, // Only auto-refresh if we have articles
+    staleTime: 5 * 60 * 1000,
   });
+
+  // Update hasArticles when newsArticles changes
+  useEffect(() => {
+    if (newsArticles !== undefined) {
+      const articlesExist = newsArticles.length > 0;
+      setHasArticles(articlesExist);
+      
+      if (!articlesExist) {
+        console.log(`🚫 Auto-refresh disabled for ${selectedAsset} - no articles found`);
+      } else {
+        console.log(`✅ Auto-refresh enabled for ${selectedAsset} - ${newsArticles.length} articles found`);
+      }
+    }
+  }, [newsArticles, selectedAsset]);
 
   // Manual refresh function
   const handleManualRefresh = async () => {
     if (refreshing) return;
     
+    console.log(`🔄 Manual refresh triggered for ${selectedAsset}`);
     setRefreshing(true);
     try {
       await refetch();
@@ -56,6 +72,7 @@ const NewsAI = () => {
         description: `Latest news for ${selectedAsset} has been refreshed.`,
       });
     } catch (error) {
+      console.error('❌ Manual refresh failed:', error);
       toast({
         title: "Refresh Failed",
         description: "Unable to fetch latest news. Please try again.",
@@ -65,6 +82,12 @@ const NewsAI = () => {
       setRefreshing(false);
     }
   };
+
+  // Reset hasArticles when asset changes to allow fresh API call
+  useEffect(() => {
+    setHasArticles(true);
+    console.log(`🔄 Asset changed to ${selectedAsset}, enabling API calls`);
+  }, [selectedAsset]);
 
   // Helper function to determine article category
   const getArticleCategory = (symbol: string): string => {
@@ -297,8 +320,8 @@ const NewsAI = () => {
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold text-white">Latest Financial News</h2>
                   <div className="flex items-center space-x-2 text-sm text-gray-400">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span>Auto-refresh every 15min</span>
+                    <div className={`w-2 h-2 rounded-full ${hasArticles ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`}></div>
+                    <span>{hasArticles ? 'Auto-refresh every 15min' : 'Auto-refresh disabled'}</span>
                   </div>
                 </div>
 
@@ -310,7 +333,7 @@ const NewsAI = () => {
                         <span className="font-medium">Failed to load news</span>
                       </div>
                       <p className="text-sm text-gray-400">
-                        Unable to fetch latest news from Marketaux API. This might be due to rate limits or network issues. Please try again later.
+                        Unable to fetch latest news from Marketaux API. This might be due to rate limits, network issues, or invalid API token. Check the console for detailed error logs.
                       </p>
                       <div className="mt-2">
                         <Button
@@ -404,16 +427,16 @@ const NewsAI = () => {
                             : "No Recent Articles Found"
                         }
                       </h3>
-                      <p className="text-gray-400">
+                      <p className="text-gray-400 mb-4">
                         {showOnlyFavorites && (!favorites || favorites.length === 0)
                           ? "Add some favorite assets to see personalized news updates."
                           : newsArticles && newsArticles.length > 0 
                             ? "Try adjusting your filters to see more articles."
-                            : `No recent articles found for ${selectedAsset}. Please try a different asset or wait for new news updates.`
+                            : `No recent articles found for ${selectedAsset}. Try again later or try popular symbols like AAPL, MSFT, TSLA, GOOGL, or AMZN.`
                         }
                       </p>
                       {(!newsArticles || newsArticles.length === 0) && (
-                        <div className="mt-4 space-y-2">
+                        <div className="space-y-2">
                           <Button
                             onClick={handleManualRefresh}
                             variant="outline"
@@ -423,8 +446,8 @@ const NewsAI = () => {
                             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
                             Try Again
                           </Button>
-                          <p className="text-xs text-gray-500 mt-2">
-                            Try popular assets like AAPL, MSFT, TSLA, GOOGL, or AMZN for better results
+                          <p className="text-xs text-gray-500">
+                            Popular symbols with good coverage: AAPL, MSFT, TSLA, GOOGL, AMZN
                           </p>
                         </div>
                       )}
