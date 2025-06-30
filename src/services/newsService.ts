@@ -31,15 +31,44 @@ export interface NewsArticle {
 // GNews API key - real key provided
 const GNEWS_API_KEY = 'cd750c0e64d47967b4fcdd0ab0674328';
 
+// Smart keyword mapping for better GNews search results
+const SYMBOL_TO_KEYWORD_MAP: Record<string, string> = {
+  'AAPL': 'Apple stock',
+  'TSLA': 'Tesla stock',
+  'MSFT': 'Microsoft stock',
+  'GOOGL': 'Google stock',
+  'AMZN': 'Amazon stock',
+  'NVDA': 'Nvidia stock',
+  'META': 'Meta stock',
+  'NFLX': 'Netflix stock',
+  'AMD': 'AMD stock',
+  'INTC': 'Intel stock',
+  'BTCUSD': 'Bitcoin cryptocurrency',
+  'ETHUSD': 'Ethereum cryptocurrency',
+  'SOLUSD': 'Solana cryptocurrency',
+  'EURUSD': 'Euro USD forex',
+  'GBPUSD': 'GBP USD forex',
+  'SPX': 'S&P 500 index',
+  'QQQ': 'Nasdaq index'
+};
+
+// Helper function to get search keyword for symbol
+const getSearchKeyword = (symbol: string): string => {
+  return SYMBOL_TO_KEYWORD_MAP[symbol] || `${symbol} stock`;
+};
+
 export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> => {
+  const searchKeyword = getSearchKeyword(symbol);
+  
   console.log(`🔍 [DEBUG] Starting fetchNewsForAsset for symbol: ${symbol}`);
+  console.log(`🔍 [DEBUG] Using search keyword: "${searchKeyword}"`);
   console.log(`🔑 [DEBUG] API Key being used: ${GNEWS_API_KEY ? GNEWS_API_KEY.substring(0, 8) + '...' : 'MISSING'}`);
   
   try {
     // Build GNews API URL
     const baseUrl = 'https://gnews.io/api/v4/search';
     const params = new URLSearchParams({
-      q: symbol,
+      q: searchKeyword,
       lang: 'en',
       max: '20',
       token: GNEWS_API_KEY
@@ -50,7 +79,7 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
     console.log(`🌐 [DEBUG] Full GNews API Request URL: ${fullUrl}`);
     console.log(`📋 [DEBUG] Request parameters breakdown:`, {
       baseUrl,
-      q: symbol,
+      q: searchKeyword,
       lang: 'en',
       max: '20',
       token: GNEWS_API_KEY ? '[PRESENT]' : '[MISSING]'
@@ -137,14 +166,14 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
     }
     
     if (data.articles.length === 0) {
-      console.log(`📭 [DEBUG] No articles found for ${symbol}. Possible reasons:`);
-      console.log(`   - Symbol not found in recent news`);
+      console.log(`📭 [DEBUG] No articles found for ${symbol} (searched: "${searchKeyword}"). Possible reasons:`);
+      console.log(`   - Keyword not found in recent news`);
       console.log(`   - No relevant articles for this search term`);
       console.log(`   - Try popular symbols: AAPL, MSFT, TSLA, GOOGL, AMZN`);
       return [];
     }
 
-    console.log(`✅ [DEBUG] Processing ${data.articles.length} articles for ${symbol}:`);
+    console.log(`✅ [DEBUG] Processing ${data.articles.length} articles for ${symbol} (searched: "${searchKeyword}"):`);
     
     // Log each article for debugging
     data.articles.forEach((article, index) => {
@@ -219,7 +248,7 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
         return processedArticle;
       });
 
-    console.log(`🎉 [DEBUG] Successfully processed ${processedArticles.length} articles for ${symbol}`);
+    console.log(`🎉 [DEBUG] Successfully processed ${processedArticles.length} articles for ${symbol} (searched: "${searchKeyword}")`);
     console.log(`🔗 [DEBUG] Articles with valid URLs: ${processedArticles.filter(a => a.url).length}`);
     console.log(`📊 [DEBUG] Final processed articles:`, processedArticles);
     
