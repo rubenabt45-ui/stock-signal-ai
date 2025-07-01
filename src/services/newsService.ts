@@ -1,18 +1,13 @@
 
-interface GNewsResponse {
-  totalArticles: number;
-  articles: Array<{
-    title: string;
-    description: string;
-    content: string;
-    url: string;
-    image: string;
-    publishedAt: string;
-    source: {
-      name: string;
-      url: string;
-    };
-  }>;
+
+interface FMPNewsResponse {
+  symbol: string;
+  publishedDate: string;
+  title: string;
+  image: string;
+  site: string;
+  text: string;
+  url: string;
 }
 
 export interface NewsArticle {
@@ -28,61 +23,30 @@ export interface NewsArticle {
   sentiment?: 'Bullish' | 'Bearish' | 'Neutral';
 }
 
-// GNews API key - real key provided
-const GNEWS_API_KEY = 'cd750c0e64d47967b4fcdd0ab0674328';
-
-// Smart keyword mapping for better GNews search results
-const SYMBOL_TO_KEYWORD_MAP: Record<string, string> = {
-  'AAPL': 'Apple stock',
-  'TSLA': 'Tesla stock',
-  'MSFT': 'Microsoft stock',
-  'GOOGL': 'Google stock',
-  'AMZN': 'Amazon stock',
-  'NVDA': 'Nvidia stock',
-  'META': 'Meta stock',
-  'NFLX': 'Netflix stock',
-  'AMD': 'AMD stock',
-  'INTC': 'Intel stock',
-  'BTCUSD': 'Bitcoin cryptocurrency',
-  'ETHUSD': 'Ethereum cryptocurrency',
-  'SOLUSD': 'Solana cryptocurrency',
-  'EURUSD': 'Euro USD forex',
-  'GBPUSD': 'GBP USD forex',
-  'SPX': 'S&P 500 index',
-  'QQQ': 'Nasdaq index'
-};
-
-// Helper function to get search keyword for symbol
-const getSearchKeyword = (symbol: string): string => {
-  return SYMBOL_TO_KEYWORD_MAP[symbol] || `${symbol} stock`;
-};
+// Financial Modeling Prep API key - real key provided
+const FMP_API_KEY = 'cd750c0e64d47967b4fcdd0ab0674328';
 
 export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> => {
-  const searchKeyword = getSearchKeyword(symbol);
-  
   console.log(`🔍 [DEBUG] Starting fetchNewsForAsset for symbol: ${symbol}`);
-  console.log(`🔍 [DEBUG] Using search keyword: "${searchKeyword}"`);
-  console.log(`🔑 [DEBUG] API Key being used: ${GNEWS_API_KEY ? GNEWS_API_KEY.substring(0, 8) + '...' : 'MISSING'}`);
+  console.log(`🔑 [DEBUG] API Key being used: ${FMP_API_KEY ? FMP_API_KEY.substring(0, 8) + '...' : 'MISSING'}`);
   
   try {
-    // Build GNews API URL
-    const baseUrl = 'https://gnews.io/api/v4/search';
+    // Build FMP API URL
+    const baseUrl = 'https://financialmodelingprep.com/api/v3/stock_news';
     const params = new URLSearchParams({
-      q: searchKeyword,
-      lang: 'en',
-      max: '20',
-      token: GNEWS_API_KEY
+      tickers: symbol,
+      limit: '20',
+      apikey: FMP_API_KEY
     });
     
     const fullUrl = `${baseUrl}?${params.toString()}`;
     
-    console.log(`🌐 [DEBUG] Full GNews API Request URL: ${fullUrl}`);
+    console.log(`🌐 [DEBUG] Full FMP API Request URL: ${fullUrl}`);
     console.log(`📋 [DEBUG] Request parameters breakdown:`, {
       baseUrl,
-      q: searchKeyword,
-      lang: 'en',
-      max: '20',
-      token: GNEWS_API_KEY ? '[PRESENT]' : '[MISSING]'
+      tickers: symbol,
+      limit: '20',
+      apikey: FMP_API_KEY ? '[PRESENT]' : '[MISSING]'
     });
     
     console.log(`📡 [DEBUG] About to make fetch request...`);
@@ -124,77 +88,76 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
         console.error(`💥 [DEBUG] Raw error text:`, responseText);
       }
       
-      // Specific error handling for GNews API
+      // Specific error handling for FMP API
       switch (response.status) {
         case 401:
-          console.error('🔒 [DEBUG] 401 Unauthorized - GNews API key may be invalid or missing');
+          console.error('🔒 [DEBUG] 401 Unauthorized - FMP API key may be invalid or missing');
           break;
         case 403:
-          console.error('🚫 [DEBUG] 403 Forbidden - GNews API key may lack permissions or plan limits exceeded');
+          console.error('🚫 [DEBUG] 403 Forbidden - FMP API key may lack permissions or plan limits exceeded');
           break;
         case 429:
           console.error('⏰ [DEBUG] 429 Rate Limited - too many requests, need to wait');
           break;
         case 500:
-          console.error('🏥 [DEBUG] 500 Server Error - GNews API is having issues');
+          console.error('🏥 [DEBUG] 500 Server Error - FMP API is having issues');
           break;
         default:
           console.error(`❓ [DEBUG] Unexpected HTTP status: ${response.status}`);
       }
       
-      throw new Error(`GNews API request failed: ${response.status} ${response.statusText}`);
+      throw new Error(`FMP API request failed: ${response.status} ${response.statusText}`);
     }
     
     console.log(`✅ [DEBUG] Response OK, parsing JSON...`);
     
-    let data: GNewsResponse;
+    let data: FMPNewsResponse[];
     try {
       data = await response.json();
       console.log(`📊 [DEBUG] Successfully parsed JSON response:`, data);
-      console.log(`📈 [DEBUG] Total articles available:`, data.totalArticles);
-      console.log(`📰 [DEBUG] Number of articles in response:`, data.articles?.length || 0);
+      console.log(`📰 [DEBUG] Number of articles in response:`, data?.length || 0);
     } catch (jsonError) {
       console.error(`💥 [DEBUG] Failed to parse response as JSON:`, jsonError);
       console.error(`💥 [DEBUG] Response text that failed to parse:`, responseText);
-      throw new Error(`Failed to parse GNews API response as JSON: ${jsonError.message}`);
+      throw new Error(`Failed to parse FMP API response as JSON: ${jsonError.message}`);
     }
     
-    if (!data.articles || !Array.isArray(data.articles)) {
-      console.warn(`⚠️ [DEBUG] No articles array in response or articles is not an array`);
-      console.warn(`⚠️ [DEBUG] Data structure received:`, typeof data.articles, data.articles);
+    if (!data || !Array.isArray(data)) {
+      console.warn(`⚠️ [DEBUG] No data array in response or data is not an array`);
+      console.warn(`⚠️ [DEBUG] Data structure received:`, typeof data, data);
       return [];
     }
     
-    if (data.articles.length === 0) {
-      console.log(`📭 [DEBUG] No articles found for ${symbol} (searched: "${searchKeyword}"). Possible reasons:`);
-      console.log(`   - Keyword not found in recent news`);
-      console.log(`   - No relevant articles for this search term`);
+    if (data.length === 0) {
+      console.log(`📭 [DEBUG] No articles found for ${symbol}. Possible reasons:`);
+      console.log(`   - Symbol not found in recent news`);
+      console.log(`   - No relevant articles for this ticker`);
       console.log(`   - Try popular symbols: AAPL, MSFT, TSLA, GOOGL, AMZN`);
       return [];
     }
 
-    console.log(`✅ [DEBUG] Processing ${data.articles.length} articles for ${symbol} (searched: "${searchKeyword}"):`);
+    console.log(`✅ [DEBUG] Processing ${data.length} articles for ${symbol}:`);
     
     // Log each article for debugging
-    data.articles.forEach((article, index) => {
+    data.forEach((article, index) => {
       console.log(`📰 [DEBUG] Article ${index + 1}:`, {
         title: article.title?.substring(0, 80) + (article.title?.length > 80 ? '...' : ''),
-        source: article.source?.name,
+        source: article.site,
         url: article.url ? 'Has URL' : 'NO URL',
         urlValid: article.url && (article.url.startsWith('http://') || article.url.startsWith('https://')),
-        published: article.publishedAt,
-        hasDescription: !!article.description,
-        descriptionLength: article.description?.length || 0
+        published: article.publishedDate,
+        hasText: !!article.text,
+        textLength: article.text?.length || 0
       });
     });
 
-    const processedArticles = data.articles
+    const processedArticles = data
       .filter(article => {
-        const isValid = article.title && article.source?.name && article.url;
+        const isValid = article.title && article.site && article.url;
         if (!isValid) {
           console.warn(`⚠️ [DEBUG] Skipping article with missing required fields:`, {
             hasTitle: !!article.title,
-            hasSource: !!article.source?.name,
+            hasSite: !!article.site,
             hasUrl: !!article.url,
             article: article
           });
@@ -205,7 +168,7 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
         // Simple sentiment analysis based on keywords
         let sentiment: 'Bullish' | 'Bearish' | 'Neutral' = 'Neutral';
         
-        const text = `${article.title} ${article.description || ''}`.toLowerCase();
+        const text = `${article.title} ${article.text || ''}`.toLowerCase();
         const bullishKeywords = ['beats', 'exceeds', 'growth', 'upgrade', 'partnership', 'expansion', 'strong', 'positive', 'rises', 'gains', 'profit', 'revenue'];
         const bearishKeywords = ['misses', 'declines', 'downgrade', 'concerns', 'falls', 'drops', 'weak', 'losses', 'challenges', 'cut', 'layoffs'];
         
@@ -225,12 +188,12 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
         }
 
         const processedArticle = {
-          id: `gnews-${symbol}-${index}`,
+          id: `fmp-${symbol}-${index}`,
           headline: article.title,
-          source: article.source.name || 'GNews',
-          datetime: new Date(article.publishedAt).getTime(),
+          source: article.site || 'FMP',
+          datetime: new Date(article.publishedDate).getTime(),
           url: isValidUrl ? article.url : '',
-          summary: article.description || 'No summary available',
+          summary: article.text || 'No summary available',
           category: 'market',
           relatedSymbols: [symbol],
           imageUrl: article.image || undefined,
@@ -248,7 +211,7 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
         return processedArticle;
       });
 
-    console.log(`🎉 [DEBUG] Successfully processed ${processedArticles.length} articles for ${symbol} (searched: "${searchKeyword}")`);
+    console.log(`🎉 [DEBUG] Successfully processed ${processedArticles.length} articles for ${symbol}`);
     console.log(`🔗 [DEBUG] Articles with valid URLs: ${processedArticles.filter(a => a.url).length}`);
     console.log(`📊 [DEBUG] Final processed articles:`, processedArticles);
     
@@ -270,7 +233,7 @@ export const fetchNewsForAsset = async (symbol: string): Promise<NewsArticle[]> 
         message: error.message,
         stack: error.stack
       });
-      console.error('📝 [DEBUG] GNews API may be returning HTML error page instead of JSON');
+      console.error('📝 [DEBUG] FMP API may be returning HTML error page instead of JSON');
     } else if (error instanceof Error) {
       console.error('🚨 [DEBUG] General Error Details:', {
         name: error.name,
@@ -292,3 +255,4 @@ export const refreshNewsForAsset = async (symbol: string): Promise<NewsArticle[]
   console.log(`🔄 [DEBUG] Refreshing news for ${symbol}`);
   return fetchNewsForAsset(symbol);
 };
+
