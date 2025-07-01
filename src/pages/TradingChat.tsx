@@ -9,6 +9,12 @@ import { TradingAIService } from '@/services/tradingAIService';
 import { useToast } from "@/hooks/use-toast";
 import { useConversationHistory, ChatMessage } from "@/hooks/useConversationHistory";
 
+interface UploadedImage {
+  id: string;
+  data: string;
+  file: File;
+}
+
 const TradingChat = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -17,7 +23,8 @@ const TradingChat = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [processingImageIndex, setProcessingImageIndex] = useState<number | null>(null);
   const [showApiKeyPrompt, setShowApiKeyPrompt] = useState(false);
   const [tempApiKey, setTempApiKey] = useState('');
   const [lastMessageTime, setLastMessageTime] = useState<number>(0);
@@ -72,14 +79,11 @@ const TradingChat = () => {
         if (validation.isValid) {
           console.log('✅ Existing API key validation successful');
           setIsApiKeyValid(true);
-          // Don't show API key prompt since we have a valid key
           
-          // Get current model info
           const modelInfo = TradingAIService.getCurrentModelInfo();
           setCurrentModelInfo(modelInfo);
           console.log('🤖 Current model info:', modelInfo);
           
-          // Only show toast if using fallback model
           if (!modelInfo.isPrimary) {
             toast({
               title: "Using Fallback Model",
@@ -89,13 +93,11 @@ const TradingChat = () => {
         } else {
           console.log('❌ Existing API key validation failed:', validation.error);
           
-          // Clear the invalid key from localStorage
           localStorage.removeItem('openai_api_key');
           
           setIsApiKeyValid(false);
           setShowApiKeyPrompt(true);
           
-          // Enhanced error messaging
           let title = "API Key Invalid";
           let description = "Your saved API key is no longer valid. Please enter a new one.";
           
@@ -116,10 +118,8 @@ const TradingChat = () => {
       } catch (error) {
         console.error('💥 Error during API key validation:', error);
         
-        // Don't clear the key on network errors - assume it might be valid
         setIsApiKeyValid(true);
         
-        // Get current model info even if validation failed due to network
         const modelInfo = TradingAIService.getCurrentModelInfo();
         setCurrentModelInfo(modelInfo);
         
@@ -150,7 +150,6 @@ const TradingChat = () => {
           setShowApiKeyPrompt(false);
           setTempApiKey('');
           
-          // Get updated model info
           const modelInfo = TradingAIService.getCurrentModelInfo();
           setCurrentModelInfo(modelInfo);
           
@@ -161,10 +160,8 @@ const TradingChat = () => {
         } else {
           console.log('❌ New API key validation failed:', validation.error);
           
-          // Clear the invalid key
           localStorage.removeItem('openai_api_key');
           
-          // Enhanced error messaging for new keys
           let title = "Invalid API Key";
           let description = "The API key you entered is invalid.";
           
@@ -209,6 +206,8 @@ const TradingChat = () => {
 
   const handleClearChat = () => {
     clearHistory();
+    setUploadedImages([]);
+    setProcessingImageIndex(null);
     toast({
       title: "Chat Cleared",
       description: "Conversation history has been cleared and reset.",
@@ -216,15 +215,35 @@ const TradingChat = () => {
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Limit image size to 5MB for vision API
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const newImages: UploadedImage[] = [];
+    let processedCount = 0;
+    const totalFiles = files.length;
+
+    // Check total image count limit
+    if (uploadedImages.length + totalFiles > 5) {
+      toast({
+        title: "Too Many Images",
+        description: "You can upload a maximum of 5 images at once.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    Array.from(files).forEach((file, index) => {
+      // Check individual file size
       if (file.size > 5 * 1024 * 1024) {
         toast({
           title: "Image too large",
-          description: "Please upload an image smaller than 5MB.",
+          description: `${file.name} is larger than 5MB. Please choose a smaller image.`,
           variant: "destructive"
         });
+        processedCount++;
+        if (processedCount === totalFiles && newImages.length > 0) {
+          setUploadedImages(prev => [...prev, ...newImages]);
+        }
         return;
       }
       
@@ -232,11 +251,33 @@ const TradingChat = () => {
         const reader = new FileReader();
         reader.onload = (e) => {
           const imageData = e.target?.result as string;
-          setUploadedImage(imageData);
+          newImages.push({
+            id: `${Date.now()}-${index}`,
+            data: imageData,
+            file: file
+          });
+          
+          processedCount++;
+          if (processedCount === totalFiles) {
+            setUploadedImages(prev => [...prev, ...newImages]);
+            
+            if (newImages.length > 0) {
+              toast({
+                title: "Images Uploaded",
+                description: `${newImages.length} image${newImages.length > 1 ? 's' : ''} ready for analysis.`,
+              });
+            }
+          }
         };
         reader.readAsDataURL(file);
+      } else {
+        processedCount++;
+        if (processedCount === totalFiles && newImages.length > 0) {
+          setUploadedImages(prev => [...prev, ...newImages]);
+        }
       }
-    }
+    });
+
     // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -266,7 +307,6 @@ const TradingChat = () => {
       const aiResponse = await TradingAIService.getGPTResponse(messageText, imageData);
       console.log('✅ Message sent successfully on attempt', retryCount + 1);
       
-      // Update model info after successful request (in case it changed due to fallback)
       const modelInfo = TradingAIService.getCurrentModelInfo();
       setCurrentModelInfo(modelInfo);
       
@@ -274,19 +314,16 @@ const TradingChat = () => {
     } catch (error) {
       console.error('❌ Error on attempt', retryCount + 1, ':', error);
       
-      // Check if it's specifically a 429 rate limit error and we haven't retried yet
       if (retryCount === 0 && error instanceof Error && error.message.includes('429')) {
         console.log(`⏳ Standard rate limit detected, retrying in ${RETRY_DELAY / 1000} seconds...`);
         setIsRetrying(true);
         
-        // Show rate limit specific message
         toast({
           title: "Rate Limit Exceeded",
           description: "Too many requests. Retrying in 5 seconds...",
           variant: "destructive"
         });
         
-        // Wait before retry
         await new Promise(resolve => {
           setTimeout(resolve, RETRY_DELAY);
         });
@@ -295,7 +332,6 @@ const TradingChat = () => {
         return sendMessageWithRetry(messageText, imageData, retryCount + 1);
       }
       
-      // If it's still a 429 rate limit error after retry, or any other error
       if (error instanceof Error && error.message.includes('429')) {
         console.log('🚫 Final rate limit error after retry');
         throw new Error('Rate Limit Exceeded. Please try again later.');
@@ -309,12 +345,11 @@ const TradingChat = () => {
   const handleSendMessage = async () => {
     console.log('🚀 handleSendMessage called');
     
-    if ((!inputMessage.trim() && !uploadedImage) || isLoading || isRetrying) {
+    if ((!inputMessage.trim() && uploadedImages.length === 0) || isLoading || isRetrying) {
       console.log('🛑 Message send blocked - missing content or already processing');
       return;
     }
 
-    // Check if API key is valid
     if (!isApiKeyValid) {
       console.log('🛑 Message send blocked - invalid API key');
       toast({
@@ -326,48 +361,91 @@ const TradingChat = () => {
       return;
     }
 
-    // Check rate limiting
     if (!checkRateLimit()) {
       console.log('🛑 Message send blocked - rate limit');
       return;
     }
 
-    // Update last message time
     setLastMessageTime(Date.now());
-
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: inputMessage || 'Please analyze this chart.',
-      image: uploadedImage || undefined,
-      timestamp: new Date()
-    };
-
-    console.log('📨 Adding user message to chat:', userMessage);
-    addMessage(userMessage);
-    const messageText = inputMessage;
-    const imageData = uploadedImage;
-    
-    setInputMessage('');
-    setUploadedImage(null);
     setIsLoading(true);
 
+    const messageText = inputMessage || 'Please analyze these charts.';
+    const imagesToProcess = [...uploadedImages];
+    
+    setInputMessage('');
+    setUploadedImages([]);
+
     try {
-      console.log('🔄 Starting message send with enhanced retry logic');
-      const aiResponse = await sendMessageWithRetry(messageText, imageData);
-      
-      const assistantMsg: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        type: 'assistant',
-        content: aiResponse,
-        timestamp: new Date()
-      };
-      
-      console.log('✅ Adding assistant response to chat');
-      addMessage(assistantMsg);
-      
+      if (imagesToProcess.length === 0) {
+        // Handle text-only message
+        const userMessage: ChatMessage = {
+          id: Date.now().toString(),
+          type: 'user',
+          content: messageText,
+          timestamp: new Date()
+        };
+        
+        addMessage(userMessage);
+        
+        const aiResponse = await sendMessageWithRetry(messageText, null);
+        
+        const assistantMsg: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          type: 'assistant',
+          content: aiResponse,
+          timestamp: new Date()
+        };
+        
+        addMessage(assistantMsg);
+      } else {
+        // Process multiple images sequentially
+        for (let i = 0; i < imagesToProcess.length; i++) {
+          setProcessingImageIndex(i);
+          const image = imagesToProcess[i];
+          
+          const userMessage: ChatMessage = {
+            id: `${Date.now()}-${i}`,
+            type: 'user',
+            content: imagesToProcess.length > 1 ? `${messageText} (Image ${i + 1}/${imagesToProcess.length})` : messageText,
+            image: image.data,
+            timestamp: new Date()
+          };
+          
+          addMessage(userMessage);
+          
+          try {
+            const aiResponse = await sendMessageWithRetry(
+              imagesToProcess.length > 1 ? `${messageText} (Analyzing image ${i + 1} of ${imagesToProcess.length})` : messageText,
+              image.data
+            );
+            
+            const assistantMsg: ChatMessage = {
+              id: `${Date.now()}-${i}-response`,
+              type: 'assistant',
+              content: aiResponse,
+              timestamp: new Date()
+            };
+            
+            addMessage(assistantMsg);
+            
+            // Add small delay between images to respect rate limits
+            if (i < imagesToProcess.length - 1) {
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+          } catch (error) {
+            console.error(`💥 Error processing image ${i + 1}:`, error);
+            const errorMsg: ChatMessage = {
+              id: `${Date.now()}-${i}-error`,
+              type: 'assistant',
+              content: `Error processing image ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
+              timestamp: new Date()
+            };
+            addMessage(errorMsg);
+          }
+        }
+      }
     } catch (error) {
-      console.error('💥 Final error after all retries:', error);
+      console.error('💥 Final error:', error);
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
@@ -379,6 +457,7 @@ const TradingChat = () => {
       console.log('🏁 Message send complete, resetting states');
       setIsLoading(false);
       setIsRetrying(false);
+      setProcessingImageIndex(null);
     }
   };
 
@@ -389,11 +468,18 @@ const TradingChat = () => {
     }
   };
 
-  const removeUploadedImage = () => {
-    setUploadedImage(null);
+  const removeUploadedImage = (imageId: string) => {
+    setUploadedImages(prev => prev.filter(img => img.id !== imageId));
   };
 
-  // Render markdown-like content
+  const removeAllImages = () => {
+    setUploadedImages([]);
+    toast({
+      title: "Images Cleared",
+      description: "All uploaded images have been removed.",
+    });
+  };
+
   const renderMessage = (content: string) => {
     return content
       .split('\n')
@@ -426,7 +512,6 @@ const TradingChat = () => {
 
   const isInputDisabled = isLoading || isRetrying || !isApiKeyValid || isValidatingKey;
 
-  // Show loading state while history is being loaded
   if (isLoadingHistory) {
     return (
       <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center">
@@ -632,7 +717,9 @@ const TradingChat = () => {
                     <div className="flex items-center space-x-2 text-gray-400">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-tradeiq-blue"></div>
                       <span className="text-sm">
-                        {isRetrying ? 'Retrying request...' : `Analyzing with ${currentModelInfo.model}...`}
+                        {isRetrying ? 'Retrying request...' : 
+                         processingImageIndex !== null ? `Analyzing image ${processingImageIndex + 1}...` :
+                         `Analyzing with ${currentModelInfo.model}...`}
                       </span>
                     </div>
                   </div>
@@ -643,36 +730,66 @@ const TradingChat = () => {
         </Card>
       </div>
 
-      {/* Fixed ChatGPT-Style Input Area with significant elevation from bottom */}
+      {/* Fixed ChatGPT-Style Input Area */}
       <div className="fixed bottom-0 left-0 right-0 bg-tradeiq-navy/95 backdrop-blur-sm border-t border-gray-800/50 pb-safe">
         <div className="max-w-4xl mx-auto p-6 pb-12">
-          {/* Image Preview */}
-          {uploadedImage && (
-            <div className="mb-6 p-3 bg-black/20 rounded-xl border border-gray-700">
-              <div className="flex items-center space-x-3">
-                <img 
-                  src={uploadedImage} 
-                  alt="Chart to analyze" 
-                  className="h-16 w-20 object-cover rounded-lg border border-gray-600"
-                />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-300 font-medium">Chart ready for analysis</p>
-                  <p className="text-xs text-gray-500">Click send to analyze with {currentModelInfo.model}</p>
+          {/* Multiple Images Preview */}
+          {uploadedImages.length > 0 && (
+            <div className="mb-6 p-4 bg-black/20 rounded-xl border border-gray-700">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-300 font-medium">
+                    {uploadedImages.length} image{uploadedImages.length > 1 ? 's' : ''} ready for analysis
+                  </span>
+                  {processingImageIndex !== null && (
+                    <span className="text-xs text-tradeiq-blue">
+                      Processing {processingImageIndex + 1}/{uploadedImages.length}
+                    </span>
+                  )}
                 </div>
                 <Button
-                  onClick={removeUploadedImage}
+                  onClick={removeAllImages}
                   size="sm"
                   variant="ghost"
-                  className="text-red-400 hover:text-red-300 h-8 w-8 p-0"
+                  className="text-red-400 hover:text-red-300 text-xs"
                   disabled={isInputDisabled}
                 >
-                  <X className="h-4 w-4" />
+                  Clear All
                 </Button>
+              </div>
+              
+              <div className="flex space-x-3 overflow-x-auto pb-2">
+                {uploadedImages.map((image, index) => (
+                  <div 
+                    key={image.id} 
+                    className={`relative flex-shrink-0 ${processingImageIndex === index ? 'ring-2 ring-tradeiq-blue' : ''}`}
+                  >
+                    <img 
+                      src={image.data} 
+                      alt={`Chart ${index + 1}`} 
+                      className="h-20 w-24 object-cover rounded-lg border border-gray-600"
+                    />
+                    <Button
+                      onClick={() => removeUploadedImage(image.id)}
+                      size="sm"
+                      variant="ghost"
+                      className="absolute -top-2 -right-2 h-6 w-6 p-0 bg-red-500 hover:bg-red-600 text-white rounded-full"
+                      disabled={isInputDisabled}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                    {processingImageIndex === index && (
+                      <div className="absolute inset-0 bg-tradeiq-blue/20 rounded-lg flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-tradeiq-blue"></div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           )}
           
-          {/* Input Container - ChatGPT Style with elevated spacing */}
+          {/* Input Container */}
           <div className={`relative bg-white/5 rounded-2xl border border-gray-700/50 shadow-lg backdrop-blur-sm mb-6 ${isInputDisabled ? 'opacity-50' : ''}`}>
             <div className="flex items-end p-3">
               {/* Image Upload Button */}
@@ -696,7 +813,7 @@ const TradingChat = () => {
                   placeholder={
                     !isApiKeyValid 
                       ? "Please enter your OpenAI API key to start chatting..."
-                      : uploadedImage 
+                      : uploadedImages.length > 0
                         ? "Optional: Add context or press Enter..." 
                         : "Ask about trading strategies, upload charts, or get market analysis..."
                   }
@@ -709,7 +826,7 @@ const TradingChat = () => {
               {/* Send Button */}
               <Button
                 onClick={handleSendMessage}
-                disabled={(!inputMessage.trim() && !uploadedImage) || isInputDisabled}
+                disabled={(!inputMessage.trim() && uploadedImages.length === 0) || isInputDisabled}
                 size="sm"
                 className="h-10 w-10 p-0 bg-tradeiq-blue hover:bg-tradeiq-blue-light disabled:opacity-50 shrink-0"
               >
@@ -726,7 +843,7 @@ const TradingChat = () => {
                 ? 'Validating your API key...'
                 : isRetrying 
                   ? 'Retrying due to rate limit...' 
-                  : `Press Enter to send • Using ${currentModelInfo.model} • Upload charts for AI analysis`
+                  : `Press Enter to send • Using ${currentModelInfo.model} • Upload multiple charts for AI analysis`
             }
             {!currentModelInfo.isPrimary && isApiKeyValid && (
               <span className="text-yellow-400"> • Fallback model active</span>
@@ -735,11 +852,12 @@ const TradingChat = () => {
         </div>
       </div>
       
-      {/* Hidden File Input */}
+      {/* Hidden File Input - Modified to accept multiple files */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp"
+        multiple
         onChange={handleImageUpload}
         className="hidden"
       />
