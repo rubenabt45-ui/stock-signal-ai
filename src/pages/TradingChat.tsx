@@ -142,7 +142,7 @@ const TradingChat = () => {
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">
       {/* Header */}
-      <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
+      <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between flex-shrink-0">
         <h1 className="text-xl font-semibold flex items-center gap-2">
           <Bot className="h-6 w-6 text-blue-400" />
           Strategy AI
@@ -157,14 +157,14 @@ const TradingChat = () => {
         </Button>
       </div>
 
-      {/* Chat Messages - Scrollable */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      {/* Chat Messages - Scrollable with bottom padding for input */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-32">
         {messages.map(message => (
           <div key={message.id} className={`flex items-start gap-3 ${
             message.type === 'user' ? 'flex-row-reverse' : ''
           }`}>
             {/* Avatar */}
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
               message.type === 'user' 
                 ? 'bg-blue-600 text-white' 
                 : 'bg-gray-700 text-gray-300'
@@ -198,7 +198,7 @@ const TradingChat = () => {
         {/* Loading Indicator */}
         {isLoading && (
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
               <Bot className="h-4 w-4 text-gray-300" />
             </div>
             <div className="bg-gray-800 rounded-lg p-3 flex items-center gap-2">
@@ -212,7 +212,7 @@ const TradingChat = () => {
       </div>
 
       {/* Input Bar - Fixed at Bottom */}
-      <div className="bg-gray-800 border-t border-gray-700 p-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-4 z-10">
         {/* Image Previews */}
         {uploadedImages.length > 0 && (
           <div className="mb-3 flex gap-2 flex-wrap">
@@ -272,7 +272,7 @@ const TradingChat = () => {
             size="icon"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploadedImages.length >= 3 || isLoading}
-            className="border-gray-600 hover:bg-gray-700 text-gray-300"
+            className="border-gray-600 hover:bg-gray-700 text-gray-300 flex-shrink-0"
           >
             <Paperclip className="h-4 w-4" />
           </Button>
@@ -282,7 +282,7 @@ const TradingChat = () => {
             variant="outline"
             size="icon"
             disabled={isLoading}
-            className="border-gray-600 hover:bg-gray-700 text-gray-300"
+            className="border-gray-600 hover:bg-gray-700 text-gray-300 flex-shrink-0"
           >
             <Mic className="h-4 w-4" />
           </Button>
@@ -291,7 +291,7 @@ const TradingChat = () => {
           <Button
             onClick={handleSendMessage}
             disabled={isLoading || (!inputMessage.trim() && uploadedImages.length === 0)}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white flex-shrink-0"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
