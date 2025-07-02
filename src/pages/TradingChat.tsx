@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, X, Bot, User, Loader2 } from 'lucide-react';
+import { Send, Paperclip, X, Bot, User, Loader2, Mic } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -244,7 +244,7 @@ const TradingChat = () => {
           <div className="flex-1">
             <Input
               type="text"
-              placeholder="Ask about trading strategies, upload charts..."
+              placeholder="Ask something..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => {
@@ -275,6 +275,16 @@ const TradingChat = () => {
             className="border-gray-600 hover:bg-gray-700 text-gray-300"
           >
             <Paperclip className="h-4 w-4" />
+          </Button>
+
+          {/* Microphone Button */}
+          <Button
+            variant="outline"
+            size="icon"
+            disabled={isLoading}
+            className="border-gray-600 hover:bg-gray-700 text-gray-300"
+          >
+            <Mic className="h-4 w-4" />
           </Button>
 
           {/* Send Button */}
