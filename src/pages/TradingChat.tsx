@@ -141,6 +141,11 @@ const TradingChat = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">
+      {/* VISUAL CONFIRMATION - Component is mounted and rendering */}
+      <div className="bg-red-600 text-white px-4 py-3 text-center font-bold text-lg border-4 border-yellow-400">
+        ✅ COMPONENT MOUNTED HERE - TradingChat is LIVE and ACTIVE
+      </div>
+
       {/* Confirmation Banner */}
       <div className="bg-green-600 text-white px-4 py-2 text-center font-medium">
         📸 Image upload and text input now ACTIVE
@@ -216,8 +221,13 @@ const TradingChat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Fixed Input Bar at Bottom */}
-      <div className="bg-gray-800 border-t border-gray-700 p-4">
+      {/* FIXED INPUT BAR - Always visible at bottom */}
+      <div className="bg-gray-800 border-t-4 border-yellow-400 p-4 sticky bottom-0">
+        {/* VISUAL CONFIRMATION for input bar */}
+        <div className="bg-yellow-400 text-black px-2 py-1 text-xs font-bold mb-2 text-center">
+          🔥 INPUT BAR IS HERE - FULLY VISIBLE AND ACTIVE 🔥
+        </div>
+
         {/* Image Previews */}
         {uploadedImages.length > 0 && (
           <div className="mb-3 flex gap-2 flex-wrap">
@@ -245,11 +255,11 @@ const TradingChat = () => {
         )}
 
         {/* Input Row */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-gray-700 p-2 rounded-lg border-2 border-blue-400">
           <div className="flex-1">
             <Input
               type="text"
-              placeholder="Test input active... Ask about trading strategies, upload charts..."
+              placeholder="✅ TEST INPUT ACTIVE - Type your message here..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => {
@@ -258,7 +268,7 @@ const TradingChat = () => {
                   handleSendMessage();
                 }
               }}
-              className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
+              className="bg-white text-black placeholder-gray-600 focus:border-blue-500 border-2 border-green-400"
               disabled={isLoading}
             />
           </div>
@@ -277,7 +287,7 @@ const TradingChat = () => {
             size="icon"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploadedImages.length >= 3 || isLoading}
-            className="border-gray-600 hover:bg-gray-700 text-gray-300"
+            className="border-2 border-green-400 bg-green-600 hover:bg-green-700 text-white h-10 w-10"
           >
             <Paperclip className="h-4 w-4" />
           </Button>
@@ -286,7 +296,7 @@ const TradingChat = () => {
           <Button
             onClick={handleSendMessage}
             disabled={isLoading || (!inputMessage.trim() && uploadedImages.length === 0)}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white h-10 px-4 border-2 border-blue-400"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
