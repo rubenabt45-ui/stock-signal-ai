@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, X, Bot, User, Loader2, Mic } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -226,7 +227,6 @@ const TradingChat = () => {
               <div className="text-sm">
                 {message.type === 'assistant' ? (
                   <ReactMarkdown
-                    className="prose prose-invert prose-sm max-w-none"
                     components={{
                       p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
                       strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
