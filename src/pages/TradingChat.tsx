@@ -1,9 +1,11 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, X, Bot, User, Loader2, Mic } from 'lucide-react';
+import { Send, Paperclip, X, Bot, User, Loader2, Mic, RotateCcw } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { TradingAIService } from "@/services/tradingAIService";
+import { useConversationMemory } from "@/hooks/useConversationMemory";
 import ReactMarkdown from 'react-markdown';
 
 interface ChatMessage {
@@ -44,9 +46,21 @@ const TradingChat = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showMemoryNotification, setShowMemoryNotification] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Initialize conversation memory
+  const { 
+    context: memoryContext, 
+    addMessage: addToMemory, 
+    getContextForAI, 
+    resetMemory, 
+    activateMemory,
+    isMemoryActive,
+    messageCount 
+  } = useConversationMemory();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -55,6 +69,15 @@ const TradingChat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Show memory activation notification on first message
+  useEffect(() => {
+    if (!isMemoryActive && messages.length > 3) {
+      activateMemory();
+      setShowMemoryNotification(true);
+      setTimeout(() => setShowMemoryNotification(false), 4000);
+    }
+  }, [messages.length, isMemoryActive, activateMemory]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() && uploadedImages.length === 0) return;
@@ -68,6 +91,16 @@ const TradingChat = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    
+    // Add to conversation memory
+    addToMemory({
+      id: userMessage.id,
+      type: userMessage.type,
+      content: userMessage.content,
+      timestamp: userMessage.timestamp,
+      images: userMessage.images
+    });
+
     const currentMessage = inputMessage;
     const currentImages = [...uploadedImages];
     
@@ -78,6 +111,9 @@ const TradingChat = () => {
 
     try {
       let aiResponse: string;
+      
+      // Get conversation context for AI
+      const conversationContext = getContextForAI();
       
       // If there are images, process each one
       if (currentImages.length > 0) {
@@ -91,7 +127,8 @@ const TradingChat = () => {
           
           const chartAnalysis = await TradingAIService.analyzeChartWithAI(
             currentMessage || `Please analyze this trading chart ${i + 1} and provide a complete strategy analysis.`,
-            image.preview
+            image.preview,
+            conversationContext
           );
           
           // Format each analysis with clear labeling
@@ -105,8 +142,8 @@ const TradingChat = () => {
         
         aiResponse = combinedAnalysis;
       } else {
-        console.log('💬 Sending text message to GPT...');
-        aiResponse = await TradingAIService.getGPTResponse(currentMessage);
+        console.log('💬 Sending text message to GPT with conversation context...');
+        aiResponse = await TradingAIService.getGPTResponse(currentMessage, undefined, conversationContext);
       }
 
       console.log('✅ Received AI response:', aiResponse);
@@ -119,6 +156,14 @@ const TradingChat = () => {
       };
       
       setMessages(prev => [...prev, assistantMessage]);
+      
+      // Add assistant response to memory
+      addToMemory({
+        id: assistantMessage.id,
+        type: assistantMessage.type,
+        content: assistantMessage.content,
+        timestamp: assistantMessage.timestamp
+      });
       
     } catch (error) {
       console.error('💥 Error getting AI response:', error);
@@ -194,6 +239,16 @@ const TradingChat = () => {
     }
   };
 
+  const handleResetMemory = () => {
+    if (window.confirm('Reset conversation memory? This will clear all stored context but keep visible messages.')) {
+      resetMemory();
+      toast({
+        title: "Memory Reset",
+        description: "Conversation memory has been cleared.",
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">
       {/* Header */}
@@ -201,16 +256,39 @@ const TradingChat = () => {
         <h1 className="text-xl font-semibold flex items-center gap-2">
           <Bot className="h-6 w-6 text-blue-400" />
           Strategy AI
+          {isMemoryActive && (
+            <span className="text-xs bg-green-600 px-2 py-1 rounded-full">
+              🧠 Memory: {messageCount}
+            </span>
+          )}
         </h1>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={clearChat}
-          className="text-gray-400 hover:text-white"
-        >
-          Clear Chat
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleResetMemory}
+            className="text-gray-400 hover:text-white"
+            title="Reset Memory"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={clearChat}
+            className="text-gray-400 hover:text-white"
+          >
+            Clear Chat
+          </Button>
+        </div>
       </div>
+
+      {/* Memory Activation Notification */}
+      {showMemoryNotification && (
+        <div className="bg-green-600 text-white px-4 py-2 text-center text-sm animate-pulse">
+          🧠 Memory activated: I'll remember everything we discuss here!
+        </div>
+      )}
 
       {/* Chat Messages - Scrollable with bottom padding for input and navigation */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-48">

@@ -18,7 +18,7 @@ interface ModelFallbackConfig {
 export class TradingAIService {
   private static readonly OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
   private static readonly OPENAI_MODELS_URL = 'https://api.openai.com/v1/models';
-  private static readonly SYSTEM_PROMPT = `You are a trading assistant. Always respond clearly, using 2-5 short paragraphs max. Avoid repeating the user's input. If the user uploads an image, return a quick actionable trading suggestion with entry, stop loss, and take profit. Only give longer explanations if explicitly requested.
+  private static readonly SYSTEM_PROMPT = `You are a trading assistant with conversational memory. Always respond clearly, using 2-5 short paragraphs max. Avoid repeating the user's input. If the user uploads an image, return a quick actionable trading suggestion with entry, stop loss, and take profit. Only give longer explanations if explicitly requested.
 
 TRADING EXPERTISE AREAS:
 - Technical Analysis: Chart patterns, indicators like RSI and MACD, support and resistance levels, Fibonacci retracements
@@ -30,6 +30,9 @@ RESPONSE STYLE:
 When providing trade analysis, always include specific entry zones, stop loss levels, take profit targets, the pattern or setup identified, recommended timeframe, technical reasoning behind the analysis, and risk management advice. Keep responses concise and actionable.
 
 For educational content, explain concepts clearly with practical examples, always considering that your audience may be new to trading. Use analogies and real-world comparisons when helpful but keep explanations brief.
+
+CONVERSATIONAL MEMORY:
+You have access to previous conversation context. Reference earlier messages when relevant to maintain consistency and provide follow-up responses. If users ask about "this" or "that" or use similar references, use the conversation history to understand what they're referring to.
 
 Remember to always provide actionable advice while emphasizing the importance of proper risk management in every trading decision.`;
 
@@ -187,7 +190,7 @@ Remember to always provide actionable advice while emphasizing the importance of
     return false;
   }
 
-  private static async tryModelFallback(userMessage: string, imageBase64?: string): Promise<string> {
+  private static async tryModelFallback(userMessage: string, imageBase64?: string, conversationContext?: string): Promise<string> {
     const apiKey = this.getApiKey();
     if (!apiKey) {
       throw new Error('No API key available for fallback');
@@ -200,10 +203,11 @@ Remember to always provide actionable advice while emphasizing the importance of
       try {
         console.log(`🧪 Attempting fallback model: ${fallbackModel}`);
 
+        const systemPrompt = this.SYSTEM_PROMPT + (conversationContext || '');
         const messages: any[] = [
           {
             role: 'system',
-            content: this.SYSTEM_PROMPT
+            content: systemPrompt
           }
         ];
 
@@ -268,7 +272,7 @@ Remember to always provide actionable advice while emphasizing the importance of
     throw new Error('All models failed including fallbacks');
   }
 
-  static async getGPTResponse(userMessage: string, imageBase64?: string): Promise<string> {
+  static async getGPTResponse(userMessage: string, imageBase64?: string, conversationContext?: string): Promise<string> {
     try {
       const apiKey = this.getApiKey();
       
@@ -280,10 +284,11 @@ Remember to always provide actionable advice while emphasizing the importance of
       const currentModel = this.getCurrentModel();
       console.log('🤖 Using model:', currentModel);
 
+      const systemPrompt = this.SYSTEM_PROMPT + (conversationContext || '');
       const messages: any[] = [
         {
           role: 'system',
-          content: this.SYSTEM_PROMPT
+          content: systemPrompt
         }
       ];
 
@@ -354,7 +359,7 @@ Remember to always provide actionable advice while emphasizing the importance of
           if (this.detectQuotaOrBillingIssue(response.status, errorData)) {
             console.log('💰 Attempting model fallback due to quota/billing issue...');
             try {
-              const fallbackResponse = await this.tryModelFallback(userMessage, imageBase64);
+              const fallbackResponse = await this.tryModelFallback(userMessage, imageBase64, conversationContext);
               return `Fallback Model Activated. Your primary model hit quota limits. Switched to: ${this.getCurrentModel()}. ${fallbackResponse}`;
             } catch (fallbackError) {
               console.log('💥 All fallback attempts failed:', fallbackError);
@@ -373,7 +378,7 @@ Remember to always provide actionable advice while emphasizing the importance of
           if (this.detectQuotaOrBillingIssue(response.status, errorData)) {
             console.log('💰 429 due to quota issue, attempting fallback...');
             try {
-              const fallbackResponse = await this.tryModelFallback(userMessage, imageBase64);
+              const fallbackResponse = await this.tryModelFallback(userMessage, imageBase64, conversationContext);
               return `Fallback Model Activated. Your primary model hit quota limits. Switched to: ${this.getCurrentModel()}. ${fallbackResponse}`;
             } catch (fallbackError) {
               console.log('💥 All fallback attempts failed:', fallbackError);
@@ -436,13 +441,13 @@ Remember to always provide actionable advice while emphasizing the importance of
     return this.getGPTResponse(question);
   }
   
-  // Enhanced chart analysis with image support
-  static async analyzeChartWithAI(userMessage: string, imageBase64?: string): Promise<string> {
+  // Enhanced chart analysis with image support and conversation context
+  static async analyzeChartWithAI(userMessage: string, imageBase64?: string, conversationContext?: string): Promise<string> {
     const contextualMessage = imageBase64 
       ? `Please analyze this trading chart image and provide a complete trading strategy. User context: ${userMessage}`
       : `Please provide trading analysis for: ${userMessage}`;
       
-    return this.getGPTResponse(contextualMessage, imageBase64);
+    return this.getGPTResponse(contextualMessage, imageBase64, conversationContext);
   }
 
   // Get current model info for UI display
