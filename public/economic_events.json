@@ -1,0 +1,63 @@
+
+[
+  {
+    "title": "FOMC Rate Decision",
+    "datetime": "2025-07-02T18:00:00Z",
+    "region": "United States",
+    "impact": "High"
+  },
+  {
+    "title": "Non-Farm Payrolls",
+    "datetime": "2025-07-05T12:30:00Z",
+    "region": "United States",
+    "impact": "High"
+  },
+  {
+    "title": "ECB Interest Rate Decision",
+    "datetime": "2025-07-11T13:45:00Z",
+    "region": "Eurozone",
+    "impact": "High"
+  },
+  {
+    "title": "US CPI Report",
+    "datetime": "2025-07-13T12:30:00Z",
+    "region": "United States",
+    "impact": "Medium"
+  },
+  {
+    "title": "UK GDP Growth Rate",
+    "datetime": "2025-07-15T07:00:00Z",
+    "region": "United Kingdom",
+    "impact": "Medium"
+  },
+  {
+    "title": "China Manufacturing PMI",
+    "datetime": "2025-07-16T01:00:00Z",
+    "region": "China",
+    "impact": "Low"
+  },
+  {
+    "title": "Australia Employment Change",
+    "datetime": "2025-07-18T01:30:00Z",
+    "region": "Australia",
+    "impact": "Medium"
+  },
+  {
+    "title": "BOJ Monetary Policy Statement",
+    "datetime": "2025-07-21T03:00:00Z",
+    "region": "Japan",
+    "impact": "High"
+  },
+  {
+    "title": "German ZEW Economic Sentiment",
+    "datetime": "2025-07-23T09:00:00Z",
+    "region": "Germany",
+    "impact": "Low"
+  },
+  {
+    "title": "US GDP Quarterly Report",
+    "datetime": "2025-07-25T12:30:00Z",
+    "region": "United States",
+    "impact": "High"
+  }
+]

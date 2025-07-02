@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Brain, Book, Settings, Newspaper } from "lucide-react";
+import { Brain, Book, Settings, Calendar } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
 const BottomNavigation = () => {
@@ -19,9 +19,9 @@ const BottomNavigation = () => {
       label: t('navigation.learn'),
     },
     {
-      path: "/news-ai",
-      icon: Newspaper,
-      label: t('navigation.newsAI'),
+      path: "/events",
+      icon: Calendar,
+      label: "Events",
     },
     {
       path: "/settings",

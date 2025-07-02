@@ -14,7 +14,7 @@ import BottomNavigation from "@/components/BottomNavigation";
 import Favorites from "./pages/Favorites";
 import TradingChat from "./pages/TradingChat";
 import Learn from "./pages/Learn";
-import NewsAI from "./pages/NewsAI";
+import EconomicEvents from "./pages/EconomicEvents";
 import Settings from "./pages/Settings";
 import Success from "./pages/Success";
 import Cancel from "./pages/Cancel";
@@ -71,9 +71,9 @@ const App = () => (
                         <Learn />
                       </ProtectedRoute>
                     } />
-                    <Route path="/news-ai" element={
+                    <Route path="/events" element={
                       <ProtectedRoute>
-                        <NewsAI />
+                        <EconomicEvents />
                       </ProtectedRoute>
                     } />
                     <Route path="/settings" element={
