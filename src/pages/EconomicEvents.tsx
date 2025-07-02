@@ -36,21 +36,15 @@ const EconomicEvents = () => {
   };
 
   const formatLastUpdate = (date: Date) => {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-
-    if (diffHours >= 24) {
-      const diffDays = Math.floor(diffHours / 24);
-      return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    } else if (diffHours >= 1) {
-      return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    } else if (diffMinutes >= 1) {
-      return `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
-    } else {
-      return 'Just now';
-    }
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    };
+    return date.toLocaleDateString('en-US', options);
   };
 
   const handleSendToChat = (event: any) => {
@@ -147,15 +141,37 @@ const EconomicEvents = () => {
                 <p className="text-sm text-gray-400 font-medium">High-impact macroeconomic events</p>
               </div>
             </div>
-            <Button
-              onClick={handleRefresh}
-              variant="outline"
-              size="sm"
-              className="border-tradeiq-blue/50 text-tradeiq-blue hover:bg-tradeiq-blue/10"
-            >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
+            <div className="flex items-center space-x-3">
+              {/* Cache Status Indicator */}
+              {lastUpdate && (
+                <div className="flex items-center space-x-2 text-xs">
+                  {fromCache ? (
+                    <>
+                      <WifiOff className="h-4 w-4 text-gray-400" />
+                      <span className="text-gray-400">
+                        Cached • Last updated: {formatLastUpdate(lastUpdate)}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Wifi className="h-4 w-4 text-green-400" />
+                      <span className="text-green-400">
+                        Live • Last updated: {formatLastUpdate(lastUpdate)}
+                      </span>
+                    </>
+                  )}
+                </div>
+              )}
+              <Button
+                onClick={handleRefresh}
+                variant="outline"
+                size="sm"
+                className="border-tradeiq-blue/50 text-tradeiq-blue hover:bg-tradeiq-blue/10"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -165,15 +181,10 @@ const EconomicEvents = () => {
         {/* Status Bar */}
         <div className="flex items-center justify-between mb-6 p-3 bg-gray-900/50 rounded-lg">
           <div className="flex items-center space-x-2 text-sm text-gray-400">
-            {fromCache ? <WifiOff className="h-4 w-4" /> : <Wifi className="h-4 w-4" />}
-            <span>
-              {lastUpdate ? `Updated ${formatLastUpdate(lastUpdate)}` : 'No data available'}
-              {fromCache && ' (cached)'}
-            </span>
+            <Badge variant="outline" className="text-tradeiq-blue border-tradeiq-blue/30">
+              {events.length} high-impact events
+            </Badge>
           </div>
-          <Badge variant="outline" className="text-tradeiq-blue border-tradeiq-blue/30">
-            {events.length} high-impact events
-          </Badge>
         </div>
 
         {/* Error Display */}
