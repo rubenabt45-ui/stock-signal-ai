@@ -215,7 +215,8 @@ const TradingChat = () => {
                 <img 
                   src={message.image} 
                   alt="Chart" 
-                  className="max-w-full h-auto rounded-md mb-2"
+                  className="max-w-[300px] max-h-[200px] object-contain rounded-md mb-2 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => window.open(message.image, '_blank')}
                 />
               )}
               <div className="whitespace-pre-wrap text-sm">
