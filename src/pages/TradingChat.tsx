@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Camera, X, Settings, AlertCircle, Key, RefreshCw, Trash2 } from "lucide-react";
+import { Send, Camera, X, Settings, AlertCircle, Key, RefreshCw, Trash2, Pin, Clock, Brain } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +8,11 @@ import { useTranslation } from 'react-i18next';
 import { TradingAIService } from '@/services/tradingAIService';
 import { useToast } from "@/hooks/use-toast";
 import { useConversationHistory, ChatMessage } from "@/hooks/useConversationHistory";
+import { usePinnedMessages } from "@/hooks/usePinnedMessages";
+import { useSessionHistory } from "@/hooks/useSessionHistory";
+import PinnedMessagesModal from '@/components/PinnedMessagesModal';
+import SessionHistoryDrawer from '@/components/SessionHistoryDrawer';
+import CollapsibleMessage from '@/components/CollapsibleMessage';
 
 interface UploadedImage {
   id: string;
@@ -18,7 +23,9 @@ interface UploadedImage {
 const TradingChat = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { messages, addMessage, clearHistory, isLoading: isLoadingHistory } = useConversationHistory();
+  const { messages, addMessage, clearHistory, isLoading: isLoadingHistory, setMessages } = useConversationHistory();
+  const { pinnedMessages, pinMessage, unpinMessage, isMessagePinned, clearPinnedMessages } = usePinnedMessages();
+  const { sessions, saveCurrentSession, loadSession, deleteSession, clearHistory: clearSessionHistory } = useSessionHistory();
   
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -31,6 +38,9 @@ const TradingChat = () => {
   const [isApiKeyValid, setIsApiKeyValid] = useState<boolean>(false);
   const [isValidatingKey, setIsValidatingKey] = useState<boolean>(false);
   const [currentModelInfo, setCurrentModelInfo] = useState<{ model: string; isPrimary: boolean }>({ model: '', isPrimary: true });
+  const [showPinnedModal, setShowPinnedModal] = useState(false);
+  const [showSessionDrawer, setShowSessionDrawer] = useState(false);
+  const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -56,6 +66,13 @@ const TradingChat = () => {
       textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, maxHeight) + 'px';
     }
   }, [inputMessage]);
+
+  // Save session when messages change
+  useEffect(() => {
+    if (messages.length > 1) {
+      saveCurrentSession(messages);
+    }
+  }, [messages, saveCurrentSession]);
 
   // Enhanced API key validation on mount - only prompt if key is missing or invalid
   useEffect(() => {
@@ -238,6 +255,21 @@ const TradingChat = () => {
         toast({
           title: "Image too large",
           description: `${file.name} is larger than 5MB. Please choose a smaller image.`,
+          variant: "destructive"
+        });
+        processedCount++;
+        if (processedCount === totalFiles && newImages.length > 0) {
+          setUploadedImages(prev => [...prev, ...newImages]);
+        }
+        return;
+      }
+
+      // Check file type
+      const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        toast({
+          title: "Invalid file type",
+          description: `${file.name} is not a supported format. Please use PNG, JPG, JPEG, or WebP.`,
           variant: "destructive"
         });
         processedCount++;
@@ -461,6 +493,67 @@ const TradingChat = () => {
     }
   };
 
+  const handleGenerateFullAnalysis = async () => {
+    if (uploadedImages.length === 0) {
+      toast({
+        title: "No Images",
+        description: "Please upload some charts first to generate a full analysis.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGeneratingAnalysis(true);
+    
+    try {
+      const analysisPrompt = `Please provide a comprehensive analysis covering all the uploaded charts. Include:
+      
+1. **Overall Market Sentiment**: What do these charts collectively tell us about market conditions?
+2. **Key Patterns & Trends**: Identify the most significant patterns across all charts
+3. **Support & Resistance Levels**: Highlight critical levels to watch
+4. **Risk Assessment**: Overall risk factors and market outlook
+5. **Trading Opportunities**: Potential entry/exit strategies based on the combined analysis
+6. **Correlation Analysis**: How these different instruments might be related
+
+Provide a unified perspective that synthesizes insights from all the charts together.`;
+
+      const userMessage: ChatMessage = {
+        id: Date.now().toString(),
+        type: 'user',
+        content: '🧠 Generate Full Analysis of All Charts',
+        timestamp: new Date()
+      };
+      
+      addMessage(userMessage);
+      
+      // Create a combined analysis using the first image as representative
+      const aiResponse = await sendMessageWithRetry(analysisPrompt, uploadedImages[0].data);
+      
+      const assistantMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: aiResponse,
+        timestamp: new Date()
+      };
+      
+      addMessage(assistantMsg);
+      
+      toast({
+        title: "Analysis Complete",
+        description: "Full market analysis has been generated based on your uploaded charts.",
+      });
+    } catch (error) {
+      console.error('Error generating full analysis:', error);
+      toast({
+        title: "Analysis Failed",
+        description: "Could not generate the full analysis. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingAnalysis(false);
+    }
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -480,30 +573,15 @@ const TradingChat = () => {
     });
   };
 
-  const renderMessage = (content: string) => {
-    return content
-      .split('\n')
-      .map((line, index) => {
-        if (line.startsWith('# ')) {
-          return <h1 key={index} className="text-xl font-bold mb-2">{line.slice(2)}</h1>;
-        }
-        if (line.startsWith('## ')) {
-          return <h2 key={index} className="text-lg font-semibold mb-2">{line.slice(3)}</h2>;
-        }
-        if (line.startsWith('**') && line.endsWith('**')) {
-          return <p key={index} className="font-semibold mb-1">{line.slice(2, -2)}</p>;
-        }
-        if (line.startsWith('• ')) {
-          return <p key={index} className="mb-1 ml-2">{line}</p>;
-        }
-        if (line.startsWith('- ')) {
-          return <p key={index} className="mb-1 ml-2">{line}</p>;
-        }
-        if (line.trim() === '') {
-          return <br key={index} />;
-        }
-        return <p key={index} className="mb-1">{line}</p>;
+  const handleLoadSession = (sessionId: string) => {
+    const sessionMessages = loadSession(sessionId);
+    if (sessionMessages) {
+      setMessages(sessionMessages);
+      toast({
+        title: "Session Loaded",
+        description: "Previous conversation has been restored.",
       });
+    }
   };
 
   const formatTimestamp = (timestamp: Date) => {
@@ -556,6 +634,31 @@ const TradingChat = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              <Button
+                onClick={() => setShowSessionDrawer(true)}
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white hover:bg-gray-800/60 border border-gray-700/50"
+                title="Chat history"
+              >
+                <Clock className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">History</span>
+              </Button>
+              <Button
+                onClick={() => setShowPinnedModal(true)}
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white hover:bg-gray-800/60 border border-gray-700/50"
+                title="Pinned messages"
+              >
+                <Pin className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Pinned</span>
+                {pinnedMessages.length > 0 && (
+                  <span className="ml-1 text-xs bg-tradeiq-blue text-white rounded-full px-1.5 py-0.5">
+                    {pinnedMessages.length}
+                  </span>
+                )}
+              </Button>
               <Button
                 onClick={handleClearChat}
                 variant="ghost"
@@ -673,11 +776,32 @@ const TradingChat = () => {
                     }`}
                   >
                     {message.type === 'assistant' && (
-                      <div className="flex items-center space-x-2 mb-2">
-                        <div className="h-6 w-6 bg-gradient-to-br from-tradeiq-blue to-tradeiq-blue-light rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold text-xs">S</span>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <div className="h-6 w-6 bg-gradient-to-br from-tradeiq-blue to-tradeiq-blue-light rounded-full flex items-center justify-center">
+                            <span className="text-white font-bold text-xs">S</span>
+                          </div>
+                          <span className="text-sm font-medium text-gray-300">StrategyAI</span>
                         </div>
-                        <span className="text-sm font-medium text-gray-300">StrategyAI</span>
+                        <Button
+                          onClick={() => {
+                            if (isMessagePinned(message.id)) {
+                              unpinMessage(message.id);
+                            } else {
+                              pinMessage(message);
+                            }
+                          }}
+                          variant="ghost"
+                          size="sm"
+                          className={`h-6 w-6 p-0 ${
+                            isMessagePinned(message.id) 
+                              ? 'text-yellow-400 hover:text-yellow-300' 
+                              : 'text-gray-400 hover:text-yellow-400'
+                          }`}
+                          title={isMessagePinned(message.id) ? 'Unpin message' : 'Pin message'}
+                        >
+                          <Pin className="h-3 w-3" />
+                        </Button>
                       </div>
                     )}
                     
@@ -695,7 +819,11 @@ const TradingChat = () => {
                     <div className={`text-sm leading-relaxed ${
                       message.type === 'user' ? 'text-white' : 'text-gray-200'
                     }`}>
-                      {message.type === 'assistant' ? renderMessage(message.content) : message.content}
+                      {message.type === 'assistant' ? (
+                        <CollapsibleMessage content={message.content} />
+                      ) : (
+                        message.content
+                      )}
                     </div>
                     
                     <p className="text-xs opacity-70 mt-2">
@@ -747,15 +875,29 @@ const TradingChat = () => {
                     </span>
                   )}
                 </div>
-                <Button
-                  onClick={removeAllImages}
-                  size="sm"
-                  variant="ghost"
-                  className="text-red-400 hover:text-red-300 text-xs"
-                  disabled={isInputDisabled}
-                >
-                  Clear All
-                </Button>
+                <div className="flex items-center space-x-2">
+                  {uploadedImages.length > 1 && (
+                    <Button
+                      onClick={handleGenerateFullAnalysis}
+                      size="sm"
+                      variant="ghost"
+                      className="text-tradeiq-blue hover:text-tradeiq-blue-light text-xs"
+                      disabled={isInputDisabled || isGeneratingAnalysis}
+                    >
+                      <Brain className="h-3 w-3 mr-1" />
+                      {isGeneratingAnalysis ? 'Generating...' : 'Full Analysis'}
+                    </Button>
+                  )}
+                  <Button
+                    onClick={removeAllImages}
+                    size="sm"
+                    variant="ghost"
+                    className="text-red-400 hover:text-red-300 text-xs"
+                    disabled={isInputDisabled}
+                  >
+                    Clear All
+                  </Button>
+                </div>
               </div>
               
               <div className="flex space-x-3 overflow-x-auto pb-2">
@@ -856,10 +998,28 @@ const TradingChat = () => {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept="image/jpeg,image/png,image/webp,image/jpg"
         multiple
         onChange={handleImageUpload}
         className="hidden"
+      />
+
+      {/* Modals */}
+      <PinnedMessagesModal
+        isOpen={showPinnedModal}
+        onClose={() => setShowPinnedModal(false)}
+        pinnedMessages={pinnedMessages}
+        onUnpin={unpinMessage}
+        onClearAll={clearPinnedMessages}
+      />
+
+      <SessionHistoryDrawer
+        isOpen={showSessionDrawer}
+        onClose={() => setShowSessionDrawer(false)}
+        sessions={sessions}
+        onLoadSession={handleLoadSession}
+        onDeleteSession={deleteSession}
+        onClearHistory={clearSessionHistory}
       />
     </div>
   );

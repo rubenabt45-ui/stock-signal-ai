@@ -33,7 +33,7 @@ export const useConversationHistory = () => {
         const welcomeMessage: ChatMessage = {
           id: '1',
           type: 'assistant',
-          content: 'Welcome to StrategyAI – Your Trading Assistant powered by AI.\n\nYou can:\n- Ask questions about trading strategies, indicators (like RSI or MACD), and risk management.\n- Upload a chart screenshot and request a full trade setup with entry, stop loss, and take profits.\n\nTry asking:\n- What is RSI divergence?\n- How should I manage risk on a swing trade?\n- Analyze this chart and give me a trade setup.',
+          content: 'Welcome to StrategyAI – Your Trading Assistant powered by AI.\n\nYou can:\n- Ask questions about trading strategies, indicators (like RSI or MACD), and risk management.\n- Upload multiple chart screenshots for comprehensive analysis.\n- Pin important responses for quick reference.\n- Access your chat history anytime.\n\nTry asking:\n- What is RSI divergence?\n- How should I manage risk on a swing trade?\n- Upload charts and ask: "Analyze these charts and give me a full market overview"',
           timestamp: new Date()
         };
         setMessages([welcomeMessage]);
@@ -44,7 +44,7 @@ export const useConversationHistory = () => {
       const welcomeMessage: ChatMessage = {
         id: '1',
         type: 'assistant',
-        content: 'Welcome to StrategyAI – Your Trading Assistant powered by AI.\n\nYou can:\n- Ask questions about trading strategies, indicators (like RSI or MACD), and risk management.\n- Upload a chart screenshot and request a full trade setup with entry, stop loss, and take profits.\n\nTry asking:\n- What is RSI divergence?\n- How should I manage risk on a swing trade?\n- Analyze this chart and give me a trade setup.',
+        content: 'Welcome to StrategyAI – Your Trading Assistant powered by AI.\n\nYou can:\n- Ask questions about trading strategies, indicators (like RSI or MACD), and risk management.\n- Upload multiple chart screenshots for comprehensive analysis.\n- Pin important responses for quick reference.\n- Access your chat history anytime.\n\nTry asking:\n- What is RSI divergence?\n- How should I manage risk on a swing trade?\n- Upload charts and ask: "Analyze these charts and give me a full market overview"',
         timestamp: new Date()
       };
       setMessages([welcomeMessage]);
@@ -79,7 +79,7 @@ export const useConversationHistory = () => {
       const welcomeMessage: ChatMessage = {
         id: '1',
         type: 'assistant',
-        content: 'Welcome to StrategyAI – Your Trading Assistant powered by AI.\n\nYou can:\n- Ask questions about trading strategies, indicators (like RSI or MACD), and risk management.\n- Upload a chart screenshot and request a full trade setup with entry, stop loss, and take profits.\n\nTry asking:\n- What is RSI divergence?\n- How should I manage risk on a swing trade?\n- Analyze this chart and give me a trade setup.',
+        content: 'Welcome to StrategyAI – Your Trading Assistant powered by AI.\n\nYou can:\n- Ask questions about trading strategies, indicators (like RSI or MACD), and risk management.\n- Upload multiple chart screenshots for comprehensive analysis.\n- Pin important responses for quick reference.\n- Access your chat history anytime.\n\nTry asking:\n- What is RSI divergence?\n- How should I manage risk on a swing trade?\n- Upload charts and ask: "Analyze these charts and give me a full market overview"',
         timestamp: new Date()
       };
       setMessages([welcomeMessage]);
@@ -91,6 +91,7 @@ export const useConversationHistory = () => {
 
   return {
     messages,
+    setMessages,
     addMessage,
     addMessages,
     clearHistory,
