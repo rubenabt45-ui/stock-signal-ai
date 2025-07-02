@@ -157,8 +157,8 @@ const TradingChat = () => {
         </Button>
       </div>
 
-      {/* Chat Messages - Scrollable with bottom padding for input */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-32">
+      {/* Chat Messages - Scrollable with bottom padding for input and navigation */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-48">
         {messages.map(message => (
           <div key={message.id} className={`flex items-start gap-3 ${
             message.type === 'user' ? 'flex-row-reverse' : ''
@@ -211,8 +211,8 @@ const TradingChat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Bar - Fixed at Bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-4 z-10">
+      {/* Input Bar - Fixed at Bottom with high z-index */}
+      <div className="fixed bottom-16 left-0 right-0 bg-gray-800 border-t-2 border-blue-500 p-4 z-[60] shadow-lg">
         {/* Image Previews */}
         {uploadedImages.length > 0 && (
           <div className="mb-3 flex gap-2 flex-wrap">
