@@ -68,18 +68,22 @@ const TradingChat = () => {
 
     setMessages(prev => [...prev, userMessage]);
     const currentMessage = inputMessage;
+    const currentImages = [...uploadedImages];
+    
+    // Clear input and images immediately after sending
     setInputMessage('');
+    setUploadedImages([]);
     setIsLoading(true);
 
     try {
       let aiResponse: string;
       
       // If there's an image, use chart analysis with vision
-      if (uploadedImages.length > 0) {
+      if (currentImages.length > 0) {
         console.log('🖼️ Sending image for analysis...');
         aiResponse = await TradingAIService.analyzeChartWithAI(
           currentMessage || 'Please analyze this trading chart and provide a complete strategy analysis.',
-          uploadedImages[0].preview
+          currentImages[0].preview
         );
       } else {
         console.log('💬 Sending text message to GPT...');
@@ -96,7 +100,6 @@ const TradingChat = () => {
       };
       
       setMessages(prev => [...prev, assistantMessage]);
-      setUploadedImages([]);
       
     } catch (error) {
       console.error('💥 Error getting AI response:', error);
