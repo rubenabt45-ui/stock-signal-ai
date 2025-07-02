@@ -141,9 +141,9 @@ const TradingChat = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">
-      {/* Temporary Success Banner */}
+      {/* Confirmation Banner */}
       <div className="bg-green-600 text-white px-4 py-2 text-center font-medium">
-        🔧 UI Updated Successfully - All Components Now Visible
+        📸 Image upload and text input now ACTIVE
       </div>
 
       {/* Header */}
