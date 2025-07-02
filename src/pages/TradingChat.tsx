@@ -249,7 +249,7 @@ const TradingChat = () => {
           <div className="flex-1">
             <Input
               type="text"
-              placeholder="Ask about trading strategies, upload charts..."
+              placeholder="Test input active... Ask about trading strategies, upload charts..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => {
