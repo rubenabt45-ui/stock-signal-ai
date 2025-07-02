@@ -1,9 +1,9 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, X, Bot, User, Loader2, Mic } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { TradingAIService } from "@/services/tradingAIService";
 
 interface ChatMessage {
   id: string;
@@ -67,24 +67,57 @@ const TradingChat = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentMessage = inputMessage;
     setInputMessage('');
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse: ChatMessage = {
+    try {
+      let aiResponse: string;
+      
+      // If there's an image, use chart analysis with vision
+      if (uploadedImages.length > 0) {
+        console.log('🖼️ Sending image for analysis...');
+        aiResponse = await TradingAIService.analyzeChartWithAI(
+          currentMessage || 'Please analyze this trading chart and provide a complete strategy analysis.',
+          uploadedImages[0].preview
+        );
+      } else {
+        console.log('💬 Sending text message to GPT...');
+        aiResponse = await TradingAIService.getGPTResponse(currentMessage);
+      }
+
+      console.log('✅ Received AI response:', aiResponse);
+
+      const assistantMessage: ChatMessage = {
         id: Date.now().toString() + '-ai',
         type: 'assistant',
-        content: uploadedImages.length > 0 
-          ? '**Chart Analysis Complete**\n\n✅ **Technical Indicators:**\n• Support level at $45,200\n• RSI showing oversold conditions\n• MACD bullish crossover pending\n\n📈 **Trade Setup:**\n• Entry: $45,500\n• Stop Loss: $44,800\n• Take Profit 1: $47,000\n• Take Profit 2: $49,500\n\n⚠️ Risk: 2% of portfolio'
-          : `Here's my analysis of your question: "${inputMessage}". Technical analysis shows strong momentum with key support levels holding. Consider risk management strategies.`,
+        content: aiResponse,
         timestamp: new Date()
       };
       
-      setMessages(prev => [...prev, aiResponse]);
+      setMessages(prev => [...prev, assistantMessage]);
       setUploadedImages([]);
+      
+    } catch (error) {
+      console.error('💥 Error getting AI response:', error);
+      
+      const errorMessage: ChatMessage = {
+        id: Date.now().toString() + '-error',
+        type: 'assistant',
+        content: 'Sorry, I encountered an error processing your request. Please check your API key settings and try again.',
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+      
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to get AI response. Please check your settings.",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
