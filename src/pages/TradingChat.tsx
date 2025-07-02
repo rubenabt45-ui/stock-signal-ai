@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Send, Paperclip, Pin, RefreshCw, Loader2, AlertCircle } from 'lucide-react';
+import { Send, Paperclip, Pin, RefreshCw, Loader2, AlertCircle, X } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
