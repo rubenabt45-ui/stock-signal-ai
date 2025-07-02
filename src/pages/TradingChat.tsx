@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Send, Paperclip, Pin, RefreshCw, Loader2, AlertCircle, X } from 'lucide-react';
@@ -12,14 +13,20 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
 import CollapsibleMessage from '@/components/CollapsibleMessage';
 
+interface UploadedImage {
+  id: string;
+  file: File;
+  preview: string;
+}
+
 const TradingChat = () => {
   const location = useLocation();
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string>('');
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [processingImages, setProcessingImages] = useState<string[]>([]);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
@@ -30,43 +37,86 @@ const TradingChat = () => {
   const { context, updateContext, resetContext } = useSessionContext();
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() && !file) return;
+    if (!inputMessage.trim() && uploadedImages.length === 0) return;
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       type: 'user',
       content: inputMessage,
       timestamp: new Date(),
-      image: file ? preview : undefined
+      image: uploadedImages.length > 0 ? uploadedImages[0].preview : undefined
     };
 
     addMessage(userMessage);
     setInputMessage('');
-    setFile(null);
-    setPreview('');
     setIsLoading(true);
     setError(null);
 
+    // If multiple images, set them as processing
+    if (uploadedImages.length > 0) {
+      setProcessingImages(uploadedImages.map(img => img.id));
+    }
+
     try {
       // Simulate AI response delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      const aiResponse = `This is a simulated AI response to: "${inputMessage}".${file ? ' Also processing the uploaded image.' : ''}`;
-      const aiMessage: ChatMessage = {
-        id: Date.now().toString() + '-ai',
-        type: 'assistant',
-        content: aiResponse,
-        timestamp: new Date()
-      };
+      if (uploadedImages.length > 1) {
+        // Handle multiple images - create separate responses for each
+        for (let i = 0; i < uploadedImages.length; i++) {
+          const image = uploadedImages[i];
+          const aiResponse = `**Chart Analysis ${i + 1}/${uploadedImages.length}**\n\nAnalyzing uploaded chart screenshot ${i + 1}...\n\n**Technical Analysis:**\n• Support level identified at current price action\n• RSI showing potential reversal signals\n• Volume analysis suggests increasing interest\n\n**Trade Setup Suggestion:**\n• Entry: Consider position around current levels\n• Stop Loss: Below recent support\n• Take Profit 1: Next resistance level\n• Take Profit 2: Extended target based on trend\n\n*Note: This is a simulated analysis for demonstration purposes.*`;
+          
+          const aiMessage: ChatMessage = {
+            id: Date.now().toString() + '-ai-' + i,
+            type: 'assistant',
+            content: aiResponse,
+            timestamp: new Date(),
+            image: image.preview
+          };
 
-      addMessage(aiMessage);
-      updateContext(userMessage.content, aiMessage.content);
+          addMessage(aiMessage);
+          // Remove from processing
+          setProcessingImages(prev => prev.filter(id => id !== image.id));
+          
+          // Small delay between multiple responses
+          if (i < uploadedImages.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        }
+      } else {
+        // Single image or text-only response
+        let aiResponse = `This is a simulated AI response to: "${inputMessage}".`;
+        
+        if (uploadedImages.length === 1) {
+          aiResponse = `**Chart Analysis**\n\nI've analyzed your chart screenshot. Here's my assessment:\n\n**Technical Analysis:**\n• Current trend analysis shows mixed signals\n• Key support and resistance levels identified\n• Volume profile suggests moderate interest\n\n**Trade Setup Suggestion:**\n• Entry: Wait for confirmation above resistance\n• Stop Loss: Below recent swing low\n• Take Profit 1: Next resistance zone\n• Take Profit 2: Extended target if momentum continues\n\n**Risk Management:**\n• Position size: 1-2% of portfolio\n• Risk-reward ratio: 1:2 minimum\n\n*Note: This is a simulated analysis for demonstration purposes.*`;
+        }
+
+        const aiMessage: ChatMessage = {
+          id: Date.now().toString() + '-ai',
+          type: 'assistant',
+          content: aiResponse,
+          timestamp: new Date()
+        };
+
+        addMessage(aiMessage);
+      }
+
+      updateContext(userMessage.content, "Analysis completed");
     } catch (err: any) {
       console.error("Failed to send message:", err);
       setError(err.message || "Failed to send message. Please try again.");
     } finally {
+      setUploadedImages([]);
+      setProcessingImages([]);
       setIsLoading(false);
       scrollToBottom();
+      // Focus input after processing
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 100);
     }
   };
 
@@ -75,7 +125,6 @@ const TradingChat = () => {
     setError(null);
 
     try {
-      // Simulate AI response delay
       await new Promise(resolve => setTimeout(resolve, 500));
 
       const aiResponse = `This is a simulated AI response to your previous message: "${message.content}".`;
@@ -109,43 +158,69 @@ const TradingChat = () => {
   };
 
   const handleClearHistory = () => {
-    clearHistory();
-    resetContext();
-    toast({
-      title: "Chat Cleared",
-      description: "Your conversation history has been cleared.",
-    });
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-
-    if (selectedFile) {
-      if (selectedFile.size > 5 * 1024 * 1024) {
-        toast({
-          variant: "destructive",
-          title: "File Too Large",
-          description: "Please upload an image smaller than 5MB.",
-        });
-        return;
-      }
-
-      setFile(selectedFile);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(selectedFile);
+    // Show confirmation before clearing
+    if (messages.length > 1 && window.confirm("Are you sure you want to clear the chat history? This action cannot be undone.")) {
+      clearHistory();
+      resetContext();
+      toast({
+        title: "Chat Cleared",
+        description: "Your conversation history has been cleared.",
+      });
     }
   };
 
-  const handleRemoveImage = () => {
-    setFile(null);
-    setPreview('');
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    
+    if (selectedFiles.length === 0) return;
+
+    // Check if adding these files would exceed the limit
+    if (uploadedImages.length + selectedFiles.length > 3) {
+      toast({
+        variant: "destructive",
+        title: "Too Many Images",
+        description: "You can upload up to 3 images at once.",
+      });
+      return;
+    }
+
+    const validFiles = selectedFiles.filter(file => {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          variant: "destructive",
+          title: "File Too Large",
+          description: `${file.name} is larger than 5MB. Please choose a smaller image.`,
+        });
+        return false;
+      }
+      return true;
+    });
+
+    validFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const newImage: UploadedImage = {
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+          file,
+          preview: reader.result as string
+        };
+        setUploadedImages(prev => [...prev, newImage]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Clear the input
+    e.target.value = '';
+  };
+
+  const handleRemoveImage = (imageId: string) => {
+    setUploadedImages(prev => prev.filter(img => img.id !== imageId));
   };
 
   const scrollToBottom = () => {
-    chatContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    setTimeout(() => {
+      chatContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, 100);
   };
 
   useEffect(() => {
@@ -159,15 +234,15 @@ const TradingChat = () => {
   }, []);
 
   useEffect(() => {
-    window.addEventListener('beforeunload', () => {
+    const handleBeforeUnload = () => {
       saveCurrentSession(messages);
-    });
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
       saveCurrentSession(messages);
-      window.removeEventListener('beforeunload', () => {
-        saveCurrentSession(messages);
-      });
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [messages, saveCurrentSession]);
 
@@ -247,7 +322,7 @@ const TradingChat = () => {
                     )}
                     <div className="bg-gray-900/50 rounded-lg p-3 text-sm text-gray-200 w-fit">
                       {msg.image && (
-                        <img src={msg.image} alt="Uploaded" className="max-h-48 max-w-full rounded-md mb-2" />
+                        <img src={msg.image} alt="Uploaded chart" className="max-h-48 max-w-full rounded-md mb-2" />
                       )}
                       <CollapsibleMessage content={msg.content} />
                       <div className="flex items-center justify-between mt-2">
@@ -278,6 +353,34 @@ const TradingChat = () => {
                   </div>
                 </div>
               ))}
+
+              {/* Processing indicators for multiple images */}
+              {processingImages.map(imageId => {
+                const image = uploadedImages.find(img => img.id === imageId);
+                if (!image) return null;
+                
+                return (
+                  <div key={imageId} className="flex justify-start">
+                    <div className="flex flex-col items-start max-w-3/4">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src="https://github.com/shadcn.png" alt="AI Avatar" />
+                          <AvatarFallback>AI</AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium text-gray-400">Strategy AI</span>
+                      </div>
+                      <div className="bg-gray-900/50 rounded-lg p-3 text-sm text-gray-200 w-fit">
+                        <img src={image.preview} alt="Processing chart" className="max-h-48 max-w-full rounded-md mb-2" />
+                        <div className="flex items-center space-x-2 text-gray-400">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span>Analyzing chart...</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
               <div ref={chatContainerRef} />
             </div>
           )}
@@ -286,20 +389,37 @@ const TradingChat = () => {
 
       {/* Chat Input */}
       <div className="border-t border-gray-800/50 bg-black/20 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center">
-          {file && (
-            <div className="mr-4 relative">
-              <img src={preview} alt="Preview" className="h-20 w-20 rounded-md object-cover" />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleRemoveImage}
-                className="absolute top-0 right-0 bg-black/50 hover:bg-black/75 text-white"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+        {/* Image previews */}
+        {uploadedImages.length > 0 && (
+          <div className="container mx-auto px-4 py-3 border-b border-gray-700/50">
+            <div className="flex flex-wrap gap-2">
+              {uploadedImages.map((image) => (
+                <div key={image.id} className="relative">
+                  <img 
+                    src={image.preview} 
+                    alt="Preview" 
+                    className="h-16 w-16 sm:h-20 sm:w-20 rounded-md object-cover border border-gray-600" 
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleRemoveImage(image.id)}
+                    className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 hover:bg-red-600 text-white rounded-full p-0"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+              {uploadedImages.length < 3 && (
+                <div className="text-xs text-gray-400 self-end pb-1">
+                  {3 - uploadedImages.length} more image{3 - uploadedImages.length !== 1 ? 's' : ''} allowed
+                </div>
+              )}
             </div>
-          )}
+          </div>
+        )}
+        
+        <div className="container mx-auto px-4 py-4 flex items-center">
           <Input
             type="text"
             placeholder="Type your message..."
@@ -315,10 +435,16 @@ const TradingChat = () => {
               id="image-upload"
               accept="image/*"
               onChange={handleImageUpload}
+              multiple
               className="hidden"
             />
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-300">
-              <Paperclip className="h-5 w-5" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-gray-400 hover:text-gray-300"
+              disabled={uploadedImages.length >= 3}
+            >
+              <Paperclip className={`h-5 w-5 ${uploadedImages.length >= 3 ? 'opacity-50' : ''}`} />
             </Button>
           </label>
           <Button
