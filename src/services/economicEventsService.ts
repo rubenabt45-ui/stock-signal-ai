@@ -127,7 +127,7 @@ class EconomicEventsService {
 
     // Fetch new data from API
     try {
-      if (!FMP_API_KEY || FMP_API_KEY === 'YOUR_FMP_API_KEY_HERE') {
+      if (!FMP_API_KEY || FMP_API_KEY.trim() === '') {
         throw new Error('API key not configured');
       }
 
