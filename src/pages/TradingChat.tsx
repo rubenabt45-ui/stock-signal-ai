@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, X, Bot, User, Loader2, Mic } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,7 @@ interface ChatMessage {
   type: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-  image?: string;
+  images?: string[];
 }
 
 interface UploadedImage {
@@ -65,7 +64,7 @@ const TradingChat = () => {
       type: 'user',
       content: inputMessage || 'Chart analysis request',
       timestamp: new Date(),
-      image: uploadedImages.length > 0 ? uploadedImages[0].preview : undefined
+      images: uploadedImages.length > 0 ? uploadedImages.map(img => img.preview) : undefined
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -80,13 +79,31 @@ const TradingChat = () => {
     try {
       let aiResponse: string;
       
-      // If there's an image, use chart analysis with vision
+      // If there are images, process each one
       if (currentImages.length > 0) {
-        console.log('🖼️ Sending image for analysis...');
-        aiResponse = await TradingAIService.analyzeChartWithAI(
-          currentMessage || 'Please analyze this trading chart and provide a complete strategy analysis.',
-          currentImages[0].preview
-        );
+        console.log(`🖼️ Processing ${currentImages.length} images for analysis...`);
+        
+        let combinedAnalysis = '';
+        
+        for (let i = 0; i < currentImages.length; i++) {
+          const image = currentImages[i];
+          console.log(`📊 Analyzing chart ${i + 1} of ${currentImages.length}...`);
+          
+          const chartAnalysis = await TradingAIService.analyzeChartWithAI(
+            currentMessage || `Please analyze this trading chart ${i + 1} and provide a complete strategy analysis.`,
+            image.preview
+          );
+          
+          // Format each analysis with clear labeling
+          combinedAnalysis += `## Chart Analysis ${i + 1}\n\n${chartAnalysis}`;
+          
+          // Add separator between analyses (except for the last one)
+          if (i < currentImages.length - 1) {
+            combinedAnalysis += '\n\n---\n\n';
+          }
+        }
+        
+        aiResponse = combinedAnalysis;
       } else {
         console.log('💬 Sending text message to GPT...');
         aiResponse = await TradingAIService.getGPTResponse(currentMessage);
@@ -216,13 +233,18 @@ const TradingChat = () => {
                 ? 'bg-blue-600 text-white ml-auto'
                 : 'bg-gray-800 text-gray-100'
             }`}>
-              {message.image && (
-                <img 
-                  src={message.image} 
-                  alt="Chart" 
-                  className="max-w-[300px] max-h-[200px] object-contain rounded-md mb-2 cursor-pointer hover:opacity-80 transition-opacity"
-                  onClick={() => window.open(message.image, '_blank')}
-                />
+              {message.images && message.images.length > 0 && (
+                <div className="mb-2 flex flex-wrap gap-2">
+                  {message.images.map((image, index) => (
+                    <img 
+                      key={index}
+                      src={image} 
+                      alt={`Chart ${index + 1}`} 
+                      className="max-w-[150px] max-h-[100px] object-contain rounded-md cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => window.open(image, '_blank')}
+                    />
+                  ))}
+                </div>
               )}
               <div className="text-sm">
                 {message.type === 'assistant' ? (
@@ -238,7 +260,8 @@ const TradingChat = () => {
                       h2: ({ children }) => <h2 className="text-md font-semibold mb-2 text-white">{children}</h2>,
                       h3: ({ children }) => <h3 className="text-sm font-semibold mb-1 text-white">{children}</h3>,
                       code: ({ children }) => <code className="bg-gray-700 px-1 py-0.5 rounded text-blue-300 text-xs">{children}</code>,
-                      pre: ({ children }) => <pre className="bg-gray-700 p-2 rounded text-blue-300 text-xs overflow-x-auto mb-2">{children}</pre>
+                      pre: ({ children }) => <pre className="bg-gray-700 p-2 rounded text-blue-300 text-xs overflow-x-auto mb-2">{children}</pre>,
+                      hr: () => <hr className="border-gray-600 my-4" />
                     }}
                   >
                     {message.content}
