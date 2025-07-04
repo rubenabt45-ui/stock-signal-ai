@@ -15,17 +15,17 @@ const pdfResources = [
   },
   {
     id: 2,
-    title: "Top 5 Trading Mistakes",
-    description: "Discover the most common pitfalls traders face and how to avoid them to become more consistent.",
+    title: "Visual Dictionary",
+    description: "Master essential trading terms with this visual guide to key concepts like support, resistance, RRR, and more.",
     pdfUrl: "https://drive.google.com/file/d/1pq6HbxjebVUmEivUpZLM1MXk1XLncynW/view?usp=drive_link",
-    icon: Shield
+    icon: Book
   },
   {
     id: 3,
-    title: "Visual Dictionary",
-    description: "Master essential trading terms with this visual guide to key concepts like support, resistance, RRR, and more.",
+    title: "Top 5 Trading Mistakes",
+    description: "Discover the most common pitfalls traders face and how to avoid them to become more consistent.",
     pdfUrl: "https://drive.google.com/file/d/1vRQqtBzMx45ranZv7eR6Iu-PU_Gm5_1I/view?usp=drive_link",
-    icon: Book
+    icon: Shield
   }
 ];
 
