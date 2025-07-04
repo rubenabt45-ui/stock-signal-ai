@@ -37,16 +37,16 @@ const resources = [
     type: "Reference"
   },
   {
-    title: "Market Analysis Videos",
-    description: "Weekly market analysis and trading strategy videos",
-    icon: PlayCircle,
-    type: "Video"
+    title: "Market Analysis Guide",
+    description: "Explore weekly market trends and analysis in future updates",
+    icon: TrendingUp,
+    type: "Coming Soon"
   },
   {
     title: "Trading Psychology Guide",
-    description: "Master the mental aspects of successful trading",
+    description: "Master the mental aspects of successful trading with our upcoming PDF guide",
     icon: Brain,
-    type: "Guide"
+    type: "Coming Soon"
   }
 ];
 
