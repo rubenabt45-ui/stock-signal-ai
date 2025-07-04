@@ -10,21 +10,21 @@ const pdfResources = [
     id: 1,
     title: "Pre-Trade Checklist",
     description: "Avoid emotional decisions and improve your trade execution with this step-by-step checklist.",
-    pdfUrl: "/assets/docs/TradeIQ - Pre-Trade Checklist.pdf",
+    pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view?usp=drive_link",
     icon: FileText
   },
   {
     id: 2,
     title: "Top 5 Trading Mistakes",
     description: "Discover the most common pitfalls traders face and how to avoid them to become more consistent.",
-    pdfUrl: "/assets/docs/TradeIQ – 5 Trading Mistakes.pdf",
+    pdfUrl: "https://drive.google.com/file/d/1pq6HbxjebVUmEivUpZLM1MXk1XLncynW/view?usp=drive_link",
     icon: Shield
   },
   {
     id: 3,
     title: "Visual Dictionary",
     description: "Master essential trading terms with this visual guide to key concepts like support, resistance, RRR, and more.",
-    pdfUrl: "/assets/docs/TradeIQ - Visual Dictionary.pdf",
+    pdfUrl: "https://drive.google.com/file/d/1vRQqtBzMx45ranZv7eR6Iu-PU_Gm5_1I/view?usp=drive_link",
     icon: Book
   }
 ];
