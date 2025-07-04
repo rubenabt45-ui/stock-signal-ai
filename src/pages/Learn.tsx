@@ -5,42 +5,27 @@ import { Badge } from "@/components/ui/badge";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-const lessons = [
+const pdfResources = [
   {
     id: 1,
-    title: "Trading Basics",
-    description: "Learn the fundamentals of trading, market terminology, and basic concepts.",
-    duration: "15 min",
-    level: "Beginner",
-    icon: Book,
-    topics: ["Market Orders", "Limit Orders", "Bid/Ask Spread", "Market Hours"]
+    title: "Pre-Trade Checklist",
+    description: "Avoid emotional decisions and improve your trade execution with this step-by-step checklist.",
+    pdfUrl: "/assets/docs/TradeIQ - Pre-Trade Checklist.pdf",
+    icon: FileText
   },
   {
     id: 2,
-    title: "Technical Analysis",
-    description: "Master chart patterns, indicators, and technical analysis techniques.",
-    duration: "25 min",
-    level: "Intermediate",
-    icon: TrendingUp,
-    topics: ["Chart Patterns", "Moving Averages", "RSI", "MACD", "Support/Resistance"]
+    title: "Top 5 Trading Mistakes",
+    description: "Discover the most common pitfalls traders face and how to avoid them to become more consistent.",
+    pdfUrl: "/assets/docs/TradeIQ – 5 Trading Mistakes.pdf",
+    icon: Shield
   },
   {
     id: 3,
-    title: "Risk Management",
-    description: "Essential strategies to protect your capital and manage trading risks.",
-    duration: "20 min",
-    level: "Beginner",
-    icon: Shield,
-    topics: ["Position Sizing", "Stop Losses", "Risk/Reward Ratio", "Portfolio Diversification"]
-  },
-  {
-    id: 4,
-    title: "AI Trading Tools",
-    description: "Learn how to use AI-powered analysis and automated trading features.",
-    duration: "18 min",
-    level: "Advanced",
-    icon: Brain,
-    topics: ["AI Signals", "Pattern Recognition", "Sentiment Analysis", "Automated Alerts"]
+    title: "Visual Dictionary",
+    description: "Master essential trading terms with this visual guide to key concepts like support, resistance, RRR, and more.",
+    pdfUrl: "/assets/docs/TradeIQ - Visual Dictionary.pdf",
+    icon: Book
   }
 ];
 
@@ -110,75 +95,57 @@ const Learn = () => {
             </p>
             <div className="flex justify-center space-x-6 text-sm">
               <div className="text-center">
-                <div className="text-2xl font-bold text-tradeiq-blue">4</div>
-                <div className="text-gray-400">Courses</div>
+                <div className="text-2xl font-bold text-tradeiq-blue">3</div>
+                <div className="text-gray-400">PDF Guides</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-tradeiq-blue">78</div>
-                <div className="text-gray-400">Minutes</div>
+                <div className="text-2xl font-bold text-tradeiq-blue">100%</div>
+                <div className="text-gray-400">Free</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-tradeiq-blue">∞</div>
-                <div className="text-gray-400">Progress</div>
+                <div className="text-gray-400">Knowledge</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Lessons */}
+        {/* PDF Resources */}
         <section>
-          <h3 className="text-xl font-bold text-white mb-6">Trading Courses</h3>
-          <div className="grid gap-6 md:grid-cols-2">
-            {lessons.map((lesson) => {
-              const IconComponent = lesson.icon;
+          <h3 className="text-xl font-bold text-white mb-6">Trading Resources</h3>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {pdfResources.map((resource) => {
+              const IconComponent = resource.icon;
               return (
-                <Card key={lesson.id} className="tradeiq-card hover:border-tradeiq-blue/50 transition-colors">
+                <Card key={resource.id} className="tradeiq-card hover:border-tradeiq-blue/50 transition-colors">
                   <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-tradeiq-blue/20 rounded-lg">
-                          <IconComponent className="h-6 w-6 text-tradeiq-blue" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-white">{lesson.title}</CardTitle>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <Badge variant="outline" className={getLevelColor(lesson.level)}>
-                              {lesson.level}
-                            </Badge>
-                            <span className="text-xs text-gray-500">{lesson.duration}</span>
-                          </div>
-                        </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-tradeiq-blue/20 rounded-lg">
+                        <IconComponent className="h-6 w-6 text-tradeiq-blue" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-white text-lg">{resource.title}</CardTitle>
                       </div>
                     </div>
                     <CardDescription className="text-gray-400 mt-2">
-                      {lesson.description}
+                      {resource.description}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-300 mb-2">What you'll learn:</p>
-                        <div className="flex flex-wrap gap-2">
-                          {lesson.topics.map((topic, index) => (
-                            <Badge
-                              key={index}
-                              variant="secondary"
-                              className="bg-black/30 text-gray-400 text-xs"
-                            >
-                              {topic}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                      <Button className="tradeiq-button-primary w-full">
-                        <PlayCircle className="h-4 w-4 mr-2" />
-                        Start Course
-                      </Button>
-                    </div>
+                    <Button 
+                      className="tradeiq-button-primary w-full"
+                      onClick={() => window.open(resource.pdfUrl, '_blank')}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Read PDF
+                    </Button>
                   </CardContent>
                 </Card>
               );
             })}
+          </div>
+          <div className="mt-6 text-center">
+            <p className="text-gray-400 text-sm">More resources coming soon. Stay tuned!</p>
           </div>
         </section>
 
