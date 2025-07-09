@@ -99,7 +99,6 @@ const App = () => (
                    <Routes>
                      <Route path="/login" element={null} />
                      <Route path="/signup" element={null} />
-                     <Route path="/pricing" element={null} />
                      <Route path="/success" element={null} />
                      <Route path="/cancel" element={null} />
                      <Route path="*" element={<BottomNavigation />} />
