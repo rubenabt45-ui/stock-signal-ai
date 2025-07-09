@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, X, Bot, User, Loader2, Mic, RotateCcw } from 'lucide-react';
+import { Send, Paperclip, X, Bot, User, Loader2, Mic, RotateCcw, Crown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { TradingAIService } from "@/services/tradingAIService";
 import { useConversationMemory } from "@/hooks/useConversationMemory";
+import { useDailyMessages } from "@/hooks/useDailyMessages";
+import { UpgradeModal } from "@/components/UpgradeModal";
+import { Badge } from "@/components/ui/badge";
 import ReactMarkdown from 'react-markdown';
 
 interface ChatMessage {
@@ -46,6 +49,7 @@ const TradingChat = () => {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showMemoryNotification, setShowMemoryNotification] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -60,6 +64,16 @@ const TradingChat = () => {
     isMemoryActive,
     messageCount 
   } = useConversationMemory();
+
+  // Initialize daily message limits
+  const {
+    messageCount: dailyMessageCount,
+    maxMessages,
+    canSendMessage,
+    remainingMessages,
+    incrementMessageCount,
+    isPro
+  } = useDailyMessages();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -80,6 +94,12 @@ const TradingChat = () => {
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() && uploadedImages.length === 0) return;
+
+    // Check daily message limit for free users
+    if (!canSendMessage) {
+      setShowUpgradeModal(true);
+      return;
+    }
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -107,6 +127,11 @@ const TradingChat = () => {
     setInputMessage('');
     setUploadedImages([]);
     setIsLoading(true);
+
+    // Increment message count for free users
+    if (!isPro) {
+      await incrementMessageCount();
+    }
 
     try {
       let aiResponse: string;
@@ -259,6 +284,17 @@ const TradingChat = () => {
             <span className="text-xs bg-green-600 px-2 py-1 rounded-full">
               🧠 Memory: {messageCount}
             </span>
+          )}
+          {!isPro && (
+            <Badge variant="outline" className="text-xs border-yellow-500 text-yellow-400">
+              {remainingMessages}/{maxMessages} messages left
+            </Badge>
+          )}
+          {isPro && (
+            <Badge className="text-xs bg-tradeiq-blue text-white">
+              <Crown className="h-3 w-3 mr-1" />
+              Pro
+            </Badge>
           )}
         </h1>
         <div className="flex gap-2">
@@ -470,6 +506,13 @@ const TradingChat = () => {
           It does not constitute financial advice. Always do your own research and consult with a professional before making trading decisions.
         </p>
       </div>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        feature="daily messages"
+      />
     </div>
   );
 };

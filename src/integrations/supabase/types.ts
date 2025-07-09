@@ -47,6 +47,42 @@ export type Database = {
         }
         Relationships: []
       }
+      subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          stripe_customer_id: string | null
+          subscribed: boolean
+          subscription_end: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_alerts: {
         Row: {
           alert_type: string
@@ -118,6 +154,8 @@ export type Database = {
           alerts_enabled: boolean | null
           avatar_url: string | null
           created_at: string
+          daily_message_count: number | null
+          daily_message_reset: string | null
           email_alerts_enabled: boolean | null
           full_name: string | null
           id: string
@@ -125,6 +163,10 @@ export type Database = {
           language: string | null
           refresh_interval: string | null
           sound_enabled: boolean | null
+          stripe_customer_id: string | null
+          subscription_end: string | null
+          subscription_status: string | null
+          subscription_tier: string | null
           theme: string | null
           updated_at: string
           username: string | null
@@ -133,6 +175,8 @@ export type Database = {
           alerts_enabled?: boolean | null
           avatar_url?: string | null
           created_at?: string
+          daily_message_count?: number | null
+          daily_message_reset?: string | null
           email_alerts_enabled?: boolean | null
           full_name?: string | null
           id: string
@@ -140,6 +184,10 @@ export type Database = {
           language?: string | null
           refresh_interval?: string | null
           sound_enabled?: boolean | null
+          stripe_customer_id?: string | null
+          subscription_end?: string | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
           theme?: string | null
           updated_at?: string
           username?: string | null
@@ -148,6 +196,8 @@ export type Database = {
           alerts_enabled?: boolean | null
           avatar_url?: string | null
           created_at?: string
+          daily_message_count?: number | null
+          daily_message_reset?: string | null
           email_alerts_enabled?: boolean | null
           full_name?: string | null
           id?: string
@@ -155,6 +205,10 @@ export type Database = {
           language?: string | null
           refresh_interval?: string | null
           sound_enabled?: boolean | null
+          stripe_customer_id?: string | null
+          subscription_end?: string | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
           theme?: string | null
           updated_at?: string
           username?: string | null
@@ -166,7 +220,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      reset_daily_message_count: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

@@ -20,6 +20,7 @@ import Success from "./pages/Success";
 import Cancel from "./pages/Cancel";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
