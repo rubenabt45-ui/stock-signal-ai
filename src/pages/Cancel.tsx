@@ -36,7 +36,7 @@ const Cancel = () => {
                 Continue with Free Version
               </Button>
             </Link>
-            <Link to="/settings">
+            <Link to="/pricing">
               <Button variant="outline" className="w-full border-gray-700 hover:bg-gray-800 text-gray-300">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Try Upgrade Again

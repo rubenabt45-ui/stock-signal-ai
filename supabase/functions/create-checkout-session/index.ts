@@ -113,7 +113,7 @@ serve(async (req) => {
       ],
       mode: 'subscription',
       success_url: `https://lovable.dev/projects/351714c7-a4c6-4f25-bf5f-a3c37bdee2ed/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://lovable.dev/projects/351714c7-a4c6-4f25-bf5f-a3c37bdee2ed/settings`,
+      cancel_url: `https://lovable.dev/projects/351714c7-a4c6-4f25-bf5f-a3c37bdee2ed/pricing`,
       metadata: {
         user_id: user.id, // This is critical for the webhook
       },

@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Brain, Book, Settings, Calendar } from "lucide-react";
+import { Brain, Book, Settings, Calendar, Crown } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
 const BottomNavigation = () => {
@@ -22,6 +22,11 @@ const BottomNavigation = () => {
       path: "/events",
       icon: Calendar,
       label: "Events",
+    },
+    {
+      path: "/pricing",
+      icon: Crown,
+      label: "Pricing",
     },
     {
       path: "/settings",

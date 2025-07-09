@@ -18,13 +18,13 @@ const Pricing = () => {
     if (user) {
       navigate('/');
     } else {
-      navigate('/auth');
+      navigate('/login');
     }
   };
 
   const handleUpgrade = async () => {
     if (!user) {
-      navigate('/auth');
+      navigate('/login');
       return;
     }
 

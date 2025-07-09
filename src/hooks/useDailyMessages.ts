@@ -23,9 +23,16 @@ export const useDailyMessages = () => {
         .from('user_profiles')
         .select('daily_message_count, daily_message_reset')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+
+      // If no user profile exists, return with default values
+      if (!data) {
+        setMessageCount(0);
+        setLoading(false);
+        return;
+      }
 
       const today = new Date().toDateString();
       const resetDate = data.daily_message_reset ? new Date(data.daily_message_reset).toDateString() : null;

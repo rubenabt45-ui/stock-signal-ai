@@ -29,19 +29,7 @@ const TradingChat = () => {
     {
       id: '1',
       type: 'assistant',
-      content: 'Welcome to StrategyAI! Upload charts or ask trading questions.',
-      timestamp: new Date()
-    },
-    {
-      id: '2',
-      type: 'user',
-      content: 'What is RSI divergence?',
-      timestamp: new Date()
-    },
-    {
-      id: '3',
-      type: 'assistant',
-      content: 'RSI divergence occurs when price makes a new high/low but RSI doesn\'t confirm it. This can signal potential trend reversal.',
+      content: 'Welcome to StrategyAI! I\'m your AI trading assistant. Upload chart images or ask me trading questions to get started.',
       timestamp: new Date()
     }
   ]);

@@ -42,16 +42,22 @@ const App = () => (
                         <Login />
                       </PublicRoute>
                     } />
-                    <Route path="/signup" element={
-                      <PublicRoute>
-                        <Signup />
-                      </PublicRoute>
-                    } />
-                    <Route path="/success" element={
-                      <ProtectedRoute>
-                        <Success />
-                      </ProtectedRoute>
-                    } />
+                     <Route path="/signup" element={
+                       <PublicRoute>
+                         <Signup />
+                       </PublicRoute>
+                     } />
+                     <Route path="/pricing" element={<Pricing />} />
+                     <Route path="/success" element={
+                       <ProtectedRoute>
+                         <Success />
+                       </ProtectedRoute>
+                     } />
+                     <Route path="/cancel" element={
+                       <ProtectedRoute>
+                         <Cancel />
+                       </ProtectedRoute>
+                     } />
                     <Route path="/" element={
                       <ProtectedRoute>
                         <TradingChat />
@@ -82,20 +88,22 @@ const App = () => (
                         <Settings />
                       </ProtectedRoute>
                     } />
-                    <Route path="/configuration" element={
-                      <ProtectedRoute>
-                        <Settings />
-                      </ProtectedRoute>
-                    } />
+                     <Route path="/configuration" element={
+                       <ProtectedRoute>
+                         <Settings />
+                       </ProtectedRoute>
+                     } />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
-                  <Routes>
-                    <Route path="/login" element={null} />
-                    <Route path="/signup" element={null} />
-                    <Route path="/success" element={null} />
-                    <Route path="*" element={<BottomNavigation />} />
-                  </Routes>
+                   <Routes>
+                     <Route path="/login" element={null} />
+                     <Route path="/signup" element={null} />
+                     <Route path="/pricing" element={null} />
+                     <Route path="/success" element={null} />
+                     <Route path="/cancel" element={null} />
+                     <Route path="*" element={<BottomNavigation />} />
+                   </Routes>
                 </div>
               </BrowserRouter>
             </TooltipProvider>
