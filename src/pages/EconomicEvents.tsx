@@ -25,7 +25,6 @@ const EconomicEvents = () => {
         <div className="flex items-center justify-center min-h-[60vh]">
           <Card className="tradeiq-card max-w-md w-full">
             <CardHeader className="text-center py-12">
-              <div className="text-6xl mb-6">📅</div>
               <h2 className="text-2xl font-bold text-white mb-3">Economic Events – Coming Soon</h2>
               <p className="text-gray-400 text-lg">We're working on a better economic calendar. Stay tuned!</p>
             </CardHeader>
