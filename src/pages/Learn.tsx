@@ -1,9 +1,10 @@
-import { Book, PlayCircle, FileText, TrendingUp, Shield, Brain } from "lucide-react";
+import { Book, PlayCircle, FileText, TrendingUp, Shield, Brain, Crown } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useSubscription } from '@/hooks/useSubscription';
 
 const pdfResources = [
   {
@@ -53,6 +54,7 @@ const resources = [
 const Learn = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { isPro } = useSubscription();
 
   const getLevelColor = (level: string) => {
     switch (level) {
@@ -148,6 +150,45 @@ const Learn = () => {
             <p className="text-gray-400 text-sm">More resources coming soon. Stay tuned!</p>
           </div>
         </section>
+
+        {/* Pro Resources */}
+        {isPro && (
+          <section>
+            <div className="flex items-center space-x-3 mb-6">
+              <Crown className="h-6 w-6 text-yellow-500" />
+              <h3 className="text-xl font-bold text-white">Pro Resources</h3>
+              <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30">
+                Exclusive
+              </Badge>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <Card className="tradeiq-card hover:border-yellow-500/50 transition-colors border-yellow-500/20">
+                <CardHeader>
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-yellow-500/20 rounded-lg">
+                      <Brain className="h-6 w-6 text-yellow-500" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-white text-lg">Top Prompts for StrategyAI</CardTitle>
+                    </div>
+                  </div>
+                  <CardDescription className="text-gray-400 mt-2">
+                    Best prompt examples to unlock the full potential of StrategyAI. Use these tested inputs to generate trading plans, identify patterns, and boost your results.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium"
+                    onClick={() => window.open('https://drive.google.com/uc?export=download&id=1FLs2YI_6U1-aY9e80PCe1nPMw_tn4nL8', '_blank')}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Download PDF
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+        )}
 
         {/* Resources */}
         <section>
