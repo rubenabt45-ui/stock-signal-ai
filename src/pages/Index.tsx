@@ -8,13 +8,15 @@ import { TrendAnalysis } from "@/components/TrendAnalysis";
 import { VolatilityAnalysis } from "@/components/VolatilityAnalysis";
 import { AISuggestions } from "@/components/AISuggestions";
 import { MarketOverview } from "@/components/MarketOverview";
-import { TrendingUp, Sparkles, Heart, BarChart3, ChevronRight, CandlestickChart, Star, Brain } from "lucide-react";
+import { TrendingUp, Sparkles, Heart, BarChart3, ChevronRight, CandlestickChart, Star, Brain, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MotionWrapper, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrapper";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const [selectedAsset, setSelectedAsset] = useState<string>("AAPL");
+  const { user } = useAuth();
 
   // Get related symbols for market overview
   const getRelatedSymbols = (symbol: string) => {
@@ -57,6 +59,27 @@ const Index = () => {
                   <span className="hidden sm:inline">Favorites</span>
                 </Button>
               </Link>
+              {!user ? (
+                <>
+                  <Link to="/login">
+                    <Button variant="outline" className="gap-2">
+                      <span>Login</span>
+                    </Button>
+                  </Link>
+                  <Link to="/signup">
+                    <Button className="gap-2 bg-primary text-white hover:bg-primary/90">
+                      <span>Sign Up</span>
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <Link to="/settings">
+                  <Button variant="outline" className="gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline">Account</span>
+                  </Button>
+                </Link>
+              )}
               <div className="flex items-center space-x-3 bg-primary/10 px-4 py-2 rounded-xl">
                 <Sparkles className="h-5 w-5 text-primary" />
                 <span className="text-slate-700 font-medium hidden sm:block">AI-Powered</span>

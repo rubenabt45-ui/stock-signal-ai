@@ -15,14 +15,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   useEffect(() => {
     if (!loading) {
-      // If user is authenticated and tries to visit login/signup, redirect to home
+      // If user is authenticated and tries to visit login/signup, redirect to trading chat
       if (user && (location.pathname === '/login' || location.pathname === '/signup')) {
-        navigate('/');
+        navigate('/trading-chat');
         return;
       }
       
       // If user is not authenticated and tries to access protected route, redirect to login
-      if (!user && location.pathname !== '/login' && location.pathname !== '/signup') {
+      if (!user && location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/pricing') {
         navigate('/login');
         return;
       }
