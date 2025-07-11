@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNewsDigest, DigestArticle } from "@/hooks/useNewsDigest";
 import { DigestCard } from "./DigestCard";
+import { useNavigate } from "react-router-dom";
 
 interface NewsDigestProps {
   onArticleSelect: (article: DigestArticle) => void;
@@ -15,6 +16,7 @@ interface NewsDigestProps {
 export const NewsDigest = ({ onArticleSelect }: NewsDigestProps) => {
   const [digestMode, setDigestMode] = useState<'daily' | 'weekly'>('daily');
   const { digestArticles, groupedArticles, loading, hasSettings } = useNewsDigest(digestMode);
+  const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -44,7 +46,7 @@ export const NewsDigest = ({ onArticleSelect }: NewsDigestProps) => {
           <Button 
             variant="outline" 
             className="border-gray-700 hover:bg-gray-800 text-gray-300"
-            onClick={() => window.location.href = '/settings'}
+            onClick={() => navigate('/settings')}
           >
             Configure Alerts
           </Button>
