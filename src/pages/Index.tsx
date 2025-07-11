@@ -8,9 +8,10 @@ import { TrendAnalysis } from "@/components/TrendAnalysis";
 import { VolatilityAnalysis } from "@/components/VolatilityAnalysis";
 import { AISuggestions } from "@/components/AISuggestions";
 import { MarketOverview } from "@/components/MarketOverview";
-import { ChartCandlestick, Brain, Star, BarChart3 } from "lucide-react";
+import { TrendingUp, Sparkles, Heart, BarChart3, ChevronRight, CandlestickChart, Star, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MotionWrapper, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrapper";
 
 const Index = () => {
   const [selectedAsset, setSelectedAsset] = useState<string>("AAPL");
@@ -35,86 +36,128 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-tradeiq-navy">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
       {/* Header */}
-      <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <MotionWrapper animation="slide" className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <ChartCandlestick className="h-8 w-8 text-tradeiq-blue" />
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-primary rounded-2xl shadow-lg">
+                <CandlestickChart className="h-8 w-8 text-white" />
+              </div>
               <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">TradeIQ</h1>
-                <p className="text-sm text-gray-400 font-medium">Chart IA</p>
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight font-display">TradeIQ</h1>
+                <p className="text-slate-600 font-medium">Professional Chart Analysis</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/favorites">
-                <Button variant="outline" className="border-gray-700 hover:bg-gray-800 text-gray-300">
-                  <Star className="h-4 w-4 mr-2" />
-                  Favorites
+                <Button variant="outline" className="gap-2">
+                  <Heart className="h-4 w-4" />
+                  <span className="hidden sm:inline">Favorites</span>
                 </Button>
               </Link>
-              <div className="flex items-center space-x-2 text-gray-400">
-                <Brain className="h-5 w-5 text-tradeiq-blue" />
-                <span className="text-sm font-medium hidden sm:block">AI Analysis</span>
+              <div className="flex items-center space-x-3 bg-primary/10 px-4 py-2 rounded-xl">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <span className="text-slate-700 font-medium hidden sm:block">AI-Powered</span>
               </div>
             </div>
           </div>
-        </div>
+        </MotionWrapper>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-6 space-y-6">
-        {/* Asset Selection */}
-        <AssetSelection 
-          selectedAsset={selectedAsset} 
-          onAssetSelect={setSelectedAsset} 
-        />
+      <main className="container mx-auto px-6 py-8">
+        <StaggerContainer>
+          {/* Welcome Section */}
+          <StaggerItem className="mb-8">
+            <div className="text-center max-w-3xl mx-auto">
+              <h2 className="premium-title mb-4">
+                Advanced Trading Intelligence
+              </h2>
+              <p className="premium-description text-lg">
+                Harness the power of AI-driven market analysis for smarter trading decisions
+              </p>
+            </div>
+          </StaggerItem>
 
-        {/* Live Chart - Now uses TradingView's internal controls */}
-        <LiveChart 
-          asset={selectedAsset} 
-          key={selectedAsset}
-        />
+          {/* Asset Selection */}
+          <StaggerItem className="mb-8">
+            <div className="premium-section">
+              <div className="premium-header">
+                <h3 className="text-xl font-bold text-slate-900 font-display">Select Asset</h3>
+                <p className="text-slate-600">Choose a financial instrument to analyze</p>
+              </div>
+              <AssetSelection 
+                selectedAsset={selectedAsset} 
+                onAssetSelect={setSelectedAsset} 
+              />
+            </div>
+          </StaggerItem>
 
-        {/* Market Overview Section */}
-        <Card className="tradeiq-card">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-white text-lg flex items-center space-x-2">
-              <BarChart3 className="h-5 w-5 text-tradeiq-blue" />
-              <span>📈 Related Market Overview</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <MarketOverview 
-              symbols={getRelatedSymbols(selectedAsset)}
-              height={450}
-              className="w-full"
-              key={`market-overview-${selectedAsset}`}
-            />
-          </CardContent>
-        </Card>
+          {/* Live Chart */}
+          <StaggerItem className="mb-8">
+            <div className="premium-section">
+              <div className="premium-header">
+                <div className="flex items-center space-x-3">
+                  <TrendingUp className="h-6 w-6 text-primary" />
+                  <h3 className="text-xl font-bold text-slate-900 font-display">Live Chart Analysis</h3>
+                </div>
+                <p className="text-slate-600">Real-time price movements and technical indicators</p>
+              </div>
+              <div className="bg-white rounded-2xl p-2 shadow-lg border border-slate-200">
+                <LiveChart 
+                  asset={selectedAsset} 
+                  key={selectedAsset}
+                />
+              </div>
+            </div>
+          </StaggerItem>
 
-        {/* Analysis Grid - Lazy loaded after chart */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="space-y-6">
-            <PatternDetection 
-              asset={selectedAsset} 
-            />
-            <TrendAnalysis 
-              asset={selectedAsset} 
-            />
-            <VolatilityAnalysis 
-              asset={selectedAsset} 
-            />
-          </div>
-          
-          <div>
-            <AISuggestions 
-              asset={selectedAsset} 
-            />
-          </div>
-        </div>
+          {/* Market Overview Section */}
+          <StaggerItem className="mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-3">
+                  <BarChart3 className="h-6 w-6 text-primary" />
+                  <span>Market Overview</span>
+                </CardTitle>
+                <p className="text-slate-600">Related instruments and market correlations</p>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-slate-50 rounded-xl p-4">
+                  <MarketOverview 
+                    symbols={getRelatedSymbols(selectedAsset)}
+                    height={450}
+                    className="w-full"
+                    key={`market-overview-${selectedAsset}`}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </StaggerItem>
+
+          {/* Analysis Grid */}
+          <StaggerItem>
+            <div className="grid gap-8 lg:grid-cols-2">
+              <div className="space-y-8">
+                <MotionWrapper delay={0.1}>
+                  <PatternDetection asset={selectedAsset} />
+                </MotionWrapper>
+                <MotionWrapper delay={0.2}>
+                  <TrendAnalysis asset={selectedAsset} />
+                </MotionWrapper>
+                <MotionWrapper delay={0.3}>
+                  <VolatilityAnalysis asset={selectedAsset} />
+                </MotionWrapper>
+              </div>
+              
+              <MotionWrapper delay={0.4}>
+                <AISuggestions asset={selectedAsset} />
+              </MotionWrapper>
+            </div>
+          </StaggerItem>
+        </StaggerContainer>
       </main>
     </div>
   );

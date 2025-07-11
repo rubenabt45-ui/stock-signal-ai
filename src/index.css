@@ -5,35 +5,35 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 222 84% 5%;
+    --background: 255 255 255; /* Pure white background */
+    --foreground: 15 23 42; /* slate-900 */
 
-    --card: 210 20% 98%;
-    --card-foreground: 222 84% 5%;
+    --card: 255 255 255; /* Pure white cards */
+    --card-foreground: 15 23 42;
 
-    --popover: 210 20% 98%;
-    --popover-foreground: 222 84% 5%;
+    --popover: 255 255 255;
+    --popover-foreground: 15 23 42;
 
-    --primary: 213 93% 58%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 29 78 216; /* Professional blue #1D4ED8 */
+    --primary-foreground: 255 255 255;
 
-    --secondary: 210 10% 92%;
-    --secondary-foreground: 222 84% 5%;
+    --secondary: 248 250 252; /* slate-50 */
+    --secondary-foreground: 51 65 85; /* slate-600 */
 
-    --muted: 210 10% 92%;
-    --muted-foreground: 215 25% 27%;
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139; /* slate-500 */
 
-    --accent: 210 10% 92%;
-    --accent-foreground: 222 84% 5%;
+    --accent: 241 245 249; /* slate-100 */
+    --accent-foreground: 51 65 85;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive: 239 68 68; /* red-500 */
+    --destructive-foreground: 255 255 255;
 
-    --border: 210 20% 89%;
-    --input: 210 20% 89%;
-    --ring: 213 93% 58%;
+    --border: 226 232 240; /* slate-200 */
+    --input: 255 255 255;
+    --ring: 29 78 216;
 
-    --radius: 0.5rem;
+    --radius: 1rem; /* Larger radius for premium look */
 
     --sidebar-background: 210 20% 98%;
     --sidebar-foreground: 222 84% 5%;
@@ -44,20 +44,32 @@
     --sidebar-border: 210 20% 89%;
     --sidebar-ring: 213 93% 58%;
 
-    /* TradeIQ Light Theme Variables */
-    --tradeiq-navy: 210 20% 95%;
-    --tradeiq-blue: 213 93% 58%;
-    --tradeiq-blue-light: 213 93% 65%;
-    --tradeiq-success: 142 71% 45%;
-    --tradeiq-danger: 0 84% 60%;
-    --tradeiq-warning: 38 92% 50%;
-    --tradeiq-muted: 215 25% 27%;
+    /* TradeIQ Premium Theme Variables */
+    --tradeiq-navy: 249 250 251; /* Light gray background */
+    --tradeiq-blue: 29 78 216; /* Professional blue */
+    --tradeiq-blue-light: 59 130 246; /* blue-500 */
+    --tradeiq-success: 34 197 94; /* green-500 */
+    --tradeiq-danger: 239 68 68; /* red-500 */
+    --tradeiq-warning: 245 158 11; /* amber-500 */
+    --tradeiq-muted: 100 116 139; /* slate-500 */
 
-    /* Light Theme Typography Colors */
-    --text-primary: 222 84% 5%;
-    --text-secondary: 215 25% 27%;
-    --text-tertiary: 215 20% 65%;
-    --text-placeholder: 215 16% 47%;
+    /* Premium Typography Colors */
+    --text-primary: 15 23 42; /* slate-900 */
+    --text-secondary: 51 65 85; /* slate-600 */
+    --text-tertiary: 100 116 139; /* slate-500 */
+    --text-placeholder: 148 163 184; /* slate-400 */
+
+    /* Premium UI Variables */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+    /* Gradient Variables */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(59 130 246) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(34 197 94) 0%, hsl(16 185 129) 100%);
+    --gradient-background: linear-gradient(135deg, hsl(249 250 251) 0%, hsl(255 255 255) 100%);
   }
 
   .dark {
@@ -123,52 +135,160 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-variant-numeric: lining-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+
+  .font-display {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
   }
 }
 
-/* Custom TradeIQ styling */
+/* Premium TradeIQ Styling */
 .tradeiq-gradient {
-  background: linear-gradient(135deg, hsl(var(--tradeiq-navy)) 0%, hsl(var(--background)) 100%);
+  background: var(--gradient-background);
 }
 
 .tradeiq-card {
-  background: hsl(var(--card) / 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid hsl(var(--border) / 0.5);
-  box-shadow: 0 4px 16px hsl(var(--foreground) / 0.1);
+  @apply bg-white border border-slate-200 rounded-2xl shadow-xl backdrop-blur-sm;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tradeiq-card:hover {
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-2px);
 }
 
 .dark .tradeiq-card {
-  background: rgba(26, 35, 50, 0.6);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(37, 99, 235, 0.1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  @apply bg-slate-900/95 border-slate-800 shadow-2xl;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
 }
 
 .tradeiq-button-primary {
-  background: linear-gradient(135deg, hsl(var(--tradeiq-blue)) 0%, hsl(var(--tradeiq-blue-light)) 100%);
-  box-shadow: 0 4px 14px hsl(var(--tradeiq-blue) / 0.3);
+  @apply bg-primary text-primary-foreground font-semibold rounded-xl px-6 py-3;
+  background: var(--gradient-primary);
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tradeiq-button-primary:hover {
-  box-shadow: 0 6px 20px hsl(var(--tradeiq-blue) / 0.4);
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.tradeiq-button-secondary {
+  @apply bg-secondary text-secondary-foreground font-medium border border-slate-200 rounded-xl px-6 py-3;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tradeiq-button-secondary:hover {
+  @apply bg-slate-100 border-slate-300;
   transform: translateY(-1px);
 }
 
+.premium-input {
+  @apply bg-white border border-slate-200 rounded-xl px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20;
+  transition: all 0.2s ease-in-out;
+}
+
+.premium-input:focus {
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+}
+
 .chart-grid {
-  stroke: hsl(var(--tradeiq-blue) / 0.1);
+  stroke: hsl(var(--border));
 }
 
 .buy-signal {
+  @apply text-green-500 font-semibold;
   color: hsl(var(--tradeiq-success));
 }
 
 .sell-signal {
+  @apply text-red-500 font-semibold;
   color: hsl(var(--tradeiq-danger));
 }
 
 .hold-signal {
+  @apply text-amber-500 font-semibold;
   color: hsl(var(--tradeiq-warning));
+}
+
+/* Premium Section Styles */
+.premium-section {
+  @apply bg-white rounded-2xl border border-slate-200 p-8 shadow-lg;
+  transition: all 0.3s ease-in-out;
+}
+
+.premium-section:hover {
+  @apply shadow-xl;
+  transform: translateY(-1px);
+}
+
+.premium-header {
+  @apply border-b border-slate-200 pb-6 mb-6;
+}
+
+.premium-divider {
+  @apply border-slate-200 my-8;
+}
+
+/* Animated Elements */
+.fade-in {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scale-in {
+  animation: scaleIn 0.4s ease-out forwards;
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Enhanced Typography */
+.text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.premium-title {
+  @apply text-3xl font-bold text-slate-900 tracking-tight;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.premium-subtitle {
+  @apply text-lg text-slate-600 font-medium;
+}
+
+.premium-description {
+  @apply text-slate-500 leading-relaxed;
 }
 
 /* Light mode specific overrides */
