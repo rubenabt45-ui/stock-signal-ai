@@ -11,6 +11,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface PlanModalProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ interface PlanModalProps {
 const PlanModal: React.FC<PlanModalProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const startCheckout = async () => {
     if (!user) {
@@ -28,6 +30,8 @@ const PlanModal: React.FC<PlanModalProps> = ({ isOpen, onClose }) => {
         description: "Please log in to upgrade to Pro.",
         variant: "destructive",
       });
+      onClose();
+      navigate('/login');
       return;
     }
 

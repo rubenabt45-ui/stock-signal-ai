@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { CategoryFilter } from '@/pages/Favorites';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface FavoriteItem {
   symbol: string;
@@ -37,6 +38,7 @@ export const useSupabaseFavorites = () => {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Load favorites from Supabase
   const loadFavorites = async () => {
@@ -127,6 +129,7 @@ export const useSupabaseFavorites = () => {
         description: "Please log in to add favorites",
         variant: "destructive",
       });
+      setTimeout(() => navigate('/login'), 1500);
       return false;
     }
 
