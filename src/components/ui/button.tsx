@@ -9,14 +9,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5",
+        default: "bg-primary text-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5",
         destructive:
-          "bg-destructive text-destructive-foreground rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5",
+          "bg-destructive text-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5",
         outline:
-          "border-2 border-slate-200 bg-white text-slate-700 rounded-xl shadow-md hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg hover:-translate-y-0.5",
+          "border-2 border-slate-200 bg-white text-slate-900 rounded-xl shadow-md hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg hover:-translate-y-0.5",
         secondary:
           "bg-slate-100 text-slate-900 rounded-xl shadow-md hover:bg-slate-200 hover:shadow-lg hover:-translate-y-0.5",
-        ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-xl",
+        ghost: "text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-xl",
         link: "text-primary underline-offset-4 hover:underline",
         premium: "bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-800 hover:-translate-y-0.5",
       },
