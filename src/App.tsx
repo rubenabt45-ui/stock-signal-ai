@@ -11,6 +11,7 @@ import { RealTimePriceProvider } from "@/components/RealTimePriceProvider";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PublicRoute from "@/components/PublicRoute";
 import BottomNavigation from "@/components/BottomNavigation";
+import Footer from "@/components/Footer";
 import Favorites from "./pages/Favorites";
 import TradingChat from "./pages/TradingChat";
 import Learn from "./pages/Learn";
@@ -101,7 +102,12 @@ const App = () => (
                      <Route path="/signup" element={null} />
                      <Route path="/success" element={null} />
                      <Route path="/cancel" element={null} />
-                     <Route path="*" element={<BottomNavigation />} />
+                     <Route path="*" element={
+                       <div className="pb-20">
+                         <Footer />
+                         <BottomNavigation />
+                       </div>
+                     } />
                    </Routes>
                 </div>
               </BrowserRouter>

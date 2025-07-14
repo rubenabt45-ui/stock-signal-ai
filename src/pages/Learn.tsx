@@ -230,6 +230,32 @@ const Learn = () => {
             </Button>
           </CardContent>
         </Card>
+
+        {/* Investment Disclaimer */}
+        <Card className="tradeiq-card border-yellow-500/20 bg-yellow-500/5">
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-400 text-center leading-relaxed">
+              <strong className="text-yellow-400">Disclaimer:</strong> TradeIQ provides educational content and market analysis tools. 
+              None of the information provided should be considered financial advice or a recommendation to invest. 
+              Always do your own research and consult with a financial advisor before making investment decisions.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Brand Disclaimer */}
+        <div className="text-center py-4">
+          <p className="text-xs text-gray-500">
+            TradeIQ Pro is the premium version of TradeIQ. For more resources, visit{' '}
+            <a 
+              href="https://www.tradeiqpro.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-tradeiq-blue hover:underline"
+            >
+              www.tradeiqpro.com
+            </a>
+          </p>
+        </div>
       </main>
     </div>
   );

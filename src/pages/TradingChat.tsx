@@ -487,11 +487,12 @@ const TradingChat = () => {
         </div>
       </div>
 
-      {/* Legal Disclaimer - Fixed at very bottom */}
+      {/* Investment Disclaimer - Fixed at very bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 px-4 py-2 z-[50]">
         <p className="text-xs text-gray-400 text-center leading-relaxed">
-          <strong className="text-gray-300">Disclaimer:</strong> This AI assistant provides educational and informational content only. 
-          It does not constitute financial advice. Always do your own research and consult with a professional before making trading decisions.
+          <strong className="text-yellow-400">Disclaimer:</strong> TradeIQ provides educational content and market analysis tools. 
+          None of the information provided should be considered financial advice or a recommendation to invest. 
+          Always do your own research and consult with a financial advisor before making investment decisions.
         </p>
       </div>
 
