@@ -5,7 +5,7 @@ import { TrendingUp, Bell, Star } from "lucide-react";
 interface ActionButtonsProps {
   symbol?: string;
   responseType: 'trading' | 'product' | 'mixed';
-  onOpenChartAI?: (symbol: string) => void;
+  // onOpenChartAI?: (symbol: string) => void; // Removed for V1
   onSetAlert?: (symbol: string) => void;
   onAddToFavorites?: (symbol: string) => void;
 }
@@ -13,7 +13,7 @@ interface ActionButtonsProps {
 export const ActionButtons = ({ 
   symbol, 
   responseType, 
-  onOpenChartAI, 
+  // onOpenChartAI,  // Removed for V1 
   onSetAlert, 
   onAddToFavorites 
 }: ActionButtonsProps) => {
@@ -22,18 +22,7 @@ export const ActionButtons = ({
   const buttons = [];
 
   if (symbol && responseType === 'trading') {
-    buttons.push(
-      <Button
-        key="chart-ai"
-        variant="outline"
-        size="sm"
-        onClick={() => onOpenChartAI?.(symbol)}
-        className="flex items-center gap-2 text-xs border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
-      >
-        <TrendingUp className="h-3 w-3" />
-        Open in Chart AI
-      </Button>
-    );
+    // Chart AI feature removed for V1 launch
 
     buttons.push(
       <Button

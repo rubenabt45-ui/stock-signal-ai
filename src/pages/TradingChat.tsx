@@ -29,7 +29,7 @@ const TradingChat = () => {
     {
       id: '1',
       type: 'assistant',
-      content: 'Welcome to StrategyAI! I\'m your AI trading assistant. Upload chart images or ask me trading questions to get started.',
+      content: 'Welcome to TradeIQ Pro! Ask me about trading strategies, upload charts, and get personalized insights.',
       timestamp: new Date()
     }
   ]);

@@ -44,7 +44,7 @@ const BottomNavigation = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors ${
+              className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors min-h-[60px] min-w-[60px] ${
                 isActive
                   ? "text-tradeiq-blue bg-tradeiq-blue/10"
                   : "text-gray-400 hover:text-gray-300"

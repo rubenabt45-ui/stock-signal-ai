@@ -363,3 +363,62 @@
 .light .text-gray-600 {
   color: hsl(var(--text-secondary)) !important;
 }
+
+/* Mobile Responsiveness Enhancements */
+@media (max-width: 640px) {
+  /* Improve button sizes on mobile */
+  .tradeiq-button-primary {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    min-height: 44px; /* iOS touch target minimum */
+  }
+  
+  /* Better spacing for mobile cards */
+  .tradeiq-card {
+    margin: 0.5rem;
+    padding: 1rem;
+  }
+  
+  /* Responsive typography */
+  .premium-title {
+    font-size: 1.875rem; /* 30px */
+    line-height: 1.2;
+  }
+  
+  .premium-description {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  /* Mobile navigation improvements */
+  .bottom-nav-item {
+    min-height: 60px;
+    padding: 0.5rem;
+  }
+  
+  /* Better modal/dialog sizing on mobile */
+  .dialog-content {
+    width: 95vw;
+    max-width: 400px;
+    margin: 1rem;
+  }
+  
+  /* PDF viewer mobile optimization */
+  .pdf-viewer {
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+  }
+  
+  /* Chat input mobile optimization */
+  .chat-input-container {
+    padding: 1rem;
+    border-radius: 0;
+  }
+  
+  /* Ensure touch targets are accessible */
+  button, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
