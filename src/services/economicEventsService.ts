@@ -1,4 +1,6 @@
 
+// Future Feature: Economic Events Service
+/*
 import { FMP_API_KEY, FMP_BASE_URL } from '@/config/env';
 
 export interface EconomicEvent {
@@ -177,3 +179,4 @@ class EconomicEventsService {
 }
 
 export const economicEventsService = new EconomicEventsService();
+*/

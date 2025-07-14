@@ -1,4 +1,6 @@
 
+// Future Feature: News Digest Hook
+/*
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -182,3 +184,4 @@ export const useNewsDigest = (mode: 'daily' | 'weekly') => {
     hasSettings: (alertSettings?.length || 0) > 0
   };
 };
+*/

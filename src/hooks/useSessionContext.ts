@@ -47,7 +47,8 @@ export const useSessionContext = () => {
     if (lowerMessage.includes('rsi')) return 'RSI';
     if (lowerMessage.includes('macd')) return 'MACD';
     if (lowerMessage.includes('support') || lowerMessage.includes('resistance')) return 'Support/Resistance';
-    if (lowerMessage.includes('chart ai')) return 'Chart AI';
+    // Future Feature: Chart AI
+    // if (lowerMessage.includes('chart ai')) return 'Chart AI';
     if (lowerMessage.includes('alert')) return 'Alerts';
     return undefined;
   };

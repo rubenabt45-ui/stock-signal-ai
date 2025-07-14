@@ -1,4 +1,6 @@
 
+// Future Feature: News Service
+/*
 
 interface FMPNewsResponse {
   symbol: string;
@@ -255,4 +257,5 @@ export const refreshNewsForAsset = async (symbol: string): Promise<NewsArticle[]
   console.log(`🔄 [DEBUG] Refreshing news for ${symbol}`);
   return fetchNewsForAsset(symbol);
 };
+*/
 

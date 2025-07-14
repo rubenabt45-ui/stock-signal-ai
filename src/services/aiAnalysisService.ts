@@ -1,4 +1,6 @@
 
+// Future Feature: AI Analysis Service
+/*
 export interface AIAnalysis {
   summary: string[];
   sentiment: "Bullish" | "Bearish" | "Neutral";
@@ -147,3 +149,4 @@ const generateContextualAnalysis = (text: string, sentiment: "Bullish" | "Bearis
   
   return { summary, insights, tradingImplications, keyMetrics };
 };
+*/
