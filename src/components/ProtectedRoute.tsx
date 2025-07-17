@@ -17,7 +17,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     if (!loading) {
       // If user is authenticated and tries to visit login/signup, redirect to trading chat
       if (user && (location.pathname === '/login' || location.pathname === '/signup')) {
-        navigate('/trading-chat');
+        navigate('/app');
         return;
       }
       

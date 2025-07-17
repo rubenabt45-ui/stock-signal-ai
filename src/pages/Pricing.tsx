@@ -76,7 +76,7 @@ const Pricing = () => {
           
           <div className="hidden md:flex items-center space-x-6">
             <Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
-            <Link to="/app/learn" className="text-gray-300 hover:text-white transition-colors">Learn</Link>
+            <Link to="/learn-preview" className="text-gray-300 hover:text-white transition-colors">Learn Preview</Link>
             <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</Link>
             <Link to="/app">
               <Button variant="outline" size="sm">Platform</Button>

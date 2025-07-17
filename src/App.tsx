@@ -13,15 +13,19 @@ import PublicRoute from "@/components/PublicRoute";
 import BottomNavigation from "@/components/BottomNavigation";
 import Footer from "@/components/Footer";
 import Landing from "./pages/Landing";
+import LearnPreview from "./pages/LearnPreview";
+import Dashboard from "./pages/Dashboard";
 import Favorites from "./pages/Favorites";
 import TradingChat from "./pages/TradingChat";
 import Learn from "./pages/Learn";
 import EconomicEvents from "./pages/EconomicEvents";
+import MarketUpdates from "./pages/MarketUpdates";
 import Settings from "./pages/Settings";
 import Success from "./pages/Success";
 import Cancel from "./pages/Cancel";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
 import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
@@ -39,10 +43,12 @@ const App = () => (
               <BrowserRouter>
                 <div className="min-h-screen bg-tradeiq-navy">
                   <Routes>
-                    {/* Public Landing Page */}
+                    {/* Public Landing Pages */}
                     <Route path="/" element={<Landing />} />
+                    <Route path="/learn-preview" element={<LearnPreview />} />
+                    <Route path="/pricing" element={<Pricing />} />
                     
-                    {/* Public Routes */}
+                    {/* Authentication Routes */}
                     <Route path="/login" element={
                       <PublicRoute>
                         <Login />
@@ -53,22 +59,26 @@ const App = () => (
                         <Signup />
                       </PublicRoute>
                     } />
-                     <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/forgot-password" element={
+                      <PublicRoute>
+                        <ForgotPassword />
+                      </PublicRoute>
+                    } />
                     
                     {/* Protected App Routes */}
                     <Route path="/app" element={
                       <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/app/strategy-ai" element={
+                      <ProtectedRoute>
                         <TradingChat />
                       </ProtectedRoute>
                     } />
-                    <Route path="/app/favorites" element={
+                    <Route path="/app/learn" element={
                       <ProtectedRoute>
-                        <Favorites />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/app/trading-chat" element={
-                      <ProtectedRoute>
-                        <TradingChat />
+                        <Learn />
                       </ProtectedRoute>
                     } />
                     <Route path="/app/events" element={
@@ -76,21 +86,33 @@ const App = () => (
                         <EconomicEvents />
                       </ProtectedRoute>
                     } />
+                    <Route path="/app/market-updates" element={
+                      <ProtectedRoute>
+                        <MarketUpdates />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/app/favorites" element={
+                      <ProtectedRoute>
+                        <Favorites />
+                      </ProtectedRoute>
+                    } />
                     <Route path="/app/settings" element={
                       <ProtectedRoute>
                         <Settings />
                       </ProtectedRoute>
                     } />
-                     <Route path="/app/configuration" element={
-                       <ProtectedRoute>
-                         <Settings />
-                       </ProtectedRoute>
-                     } />
-                     <Route path="/app/learn" element={
-                       <ProtectedRoute>
-                         <Learn />
-                       </ProtectedRoute>
-                     } />
+                    
+                    {/* Legacy redirects for compatibility */}
+                    <Route path="/app/trading-chat" element={
+                      <ProtectedRoute>
+                        <TradingChat />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/app/configuration" element={
+                      <ProtectedRoute>
+                        <Settings />
+                      </ProtectedRoute>
+                    } />
                     
                     {/* Payment Routes */}
                     <Route path="/success" element={
@@ -109,9 +131,11 @@ const App = () => (
                   </Routes>
                    <Routes>
                      <Route path="/" element={null} />
-                      <Route path="/login" element={null} />
-                      <Route path="/signup" element={null} />
-                      <Route path="/pricing" element={null} />
+                     <Route path="/learn-preview" element={null} />
+                     <Route path="/pricing" element={null} />
+                     <Route path="/login" element={null} />
+                     <Route path="/signup" element={null} />
+                     <Route path="/forgot-password" element={null} />
                      <Route path="/success" element={null} />
                      <Route path="/cancel" element={null} />
                      <Route path="/app/*" element={

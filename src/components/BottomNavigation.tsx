@@ -11,6 +11,11 @@ const BottomNavigation = () => {
     {
       path: "/app",
       icon: Brain,
+      label: "Dashboard",
+    },
+    {
+      path: "/app/strategy-ai",
+      icon: Brain,
       label: "StrategyAI",
     },
     {
@@ -24,11 +29,6 @@ const BottomNavigation = () => {
       label: "Events",
     },
     {
-      path: "/pricing",
-      icon: Crown,
-      label: "Pricing",
-    },
-    {
       path: "/app/settings",
       icon: Settings,
       label: t('navigation.settings'),
@@ -39,7 +39,7 @@ const BottomNavigation = () => {
     <nav className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-t border-gray-800/50 z-50">
       <div className="flex justify-around items-center py-2">
         {navItems.map((item) => {
-          const isActive = location.pathname === item.path || (item.path === "/app" && location.pathname === "/app/trading-chat");
+          const isActive = location.pathname === item.path || (item.path === "/app" && location.pathname === "/app/trading-chat") || (item.path === "/app/strategy-ai" && location.pathname === "/app/trading-chat");
           return (
             <Link
               key={item.path}

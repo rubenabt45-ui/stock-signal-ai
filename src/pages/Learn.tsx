@@ -66,7 +66,7 @@ const Learn = () => {
   };
 
   const handleGoToTradingChat = () => {
-    navigate('/trading-chat');
+    navigate('/app/strategy-ai');
   };
 
   return (

@@ -31,7 +31,7 @@ const Landing = () => {
           
           <div className="hidden md:flex items-center space-x-6">
             <Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
-            <Link to="/app/learn" className="text-gray-300 hover:text-white transition-colors">Learn</Link>
+            <Link to="/learn-preview" className="text-gray-300 hover:text-white transition-colors">Learn Preview</Link>
             <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</Link>
             <Link to="/app">
               <Button variant="outline" size="sm">Platform</Button>
@@ -269,7 +269,7 @@ const Landing = () => {
           </div>
 
           <div className="text-center">
-            <Link to="/app/learn">
+            <Link to="/app/strategy-ai">
               <Button size="lg" className="px-8 py-6 text-lg">
                 Explore Learn Section
                 <ChevronRight className="ml-2 h-5 w-5" />
@@ -362,8 +362,8 @@ const Landing = () => {
                 <Link to="/app" className="block text-gray-400 hover:text-white text-sm transition-colors">
                   Trading Dashboard
                 </Link>
-                <Link to="/app/learn" className="block text-gray-400 hover:text-white text-sm transition-colors">
-                  Learn
+                <Link to="/learn-preview" className="block text-gray-400 hover:text-white text-sm transition-colors">
+                  Learn Preview
                 </Link>
                 <Link to="/pricing" className="block text-gray-400 hover:text-white text-sm transition-colors">
                   Pricing
