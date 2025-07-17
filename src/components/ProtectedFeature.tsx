@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import { useSubscription } from '@/hooks/useSubscription';
 import { FeatureLockedScreen } from '@/components/FeatureLockedScreen';
 
 interface ProtectedFeatureProps {
@@ -19,7 +19,7 @@ export const ProtectedFeature: React.FC<ProtectedFeatureProps> = ({
   description,
   icon
 }) => {
-  const { canAccessFeature, loading } = useSubscriptionStatus();
+  const { subscription_tier, loading } = useSubscription();
 
   // Show loading state
   if (loading) {
@@ -30,8 +30,8 @@ export const ProtectedFeature: React.FC<ProtectedFeatureProps> = ({
     );
   }
 
-  // Check if user can access the feature
-  const hasAccess = canAccessFeature(feature);
+  // Check if user can access the feature - simplified logic
+  const hasAccess = subscription_tier === 'pro';
 
   if (!hasAccess) {
     // Use custom fallback or default locked screen
