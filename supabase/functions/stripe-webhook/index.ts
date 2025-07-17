@@ -234,6 +234,24 @@ serve(async (req) => {
 
       await upsertUserProfile(supabase, userId, true, 'checkout.session.completed');
 
+      // Send welcome email
+      try {
+        const { data: authUser } = await supabase.auth.admin.getUserById(userId);
+        if (authUser.user?.email) {
+          await supabase.functions.invoke('send-subscription-email', {
+            body: {
+              to: authUser.user.email,
+              type: 'payment_success',
+              data: {
+                amount: session.amount_total || 999
+              }
+            }
+          });
+        }
+      } catch (emailError) {
+        logStep('WARNING: Failed to send welcome email', { error: emailError.message });
+      }
+
       return new Response('Checkout session processed successfully', { 
         status: 200, 
         headers: corsHeaders 
@@ -282,6 +300,24 @@ serve(async (req) => {
       }
 
       await upsertUserProfile(supabase, userId, false, 'customer.subscription.deleted');
+
+      // Send cancellation email
+      try {
+        const { data: authUser } = await supabase.auth.admin.getUserById(userId);
+        if (authUser.user?.email) {
+          await supabase.functions.invoke('send-subscription-email', {
+            body: {
+              to: authUser.user.email,
+              type: 'subscription_canceled',
+              data: {
+                subscription_end: new Date(subscription.current_period_end * 1000).toLocaleDateString()
+              }
+            }
+          });
+        }
+      } catch (emailError) {
+        logStep('WARNING: Failed to send cancellation email', { error: emailError.message });
+      }
 
       return new Response('Subscription deletion processed successfully', { 
         status: 200, 

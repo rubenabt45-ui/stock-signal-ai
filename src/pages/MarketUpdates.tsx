@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ProtectedFeature } from "@/components/ProtectedFeature";
 import { 
   BarChart3, 
   TrendingUp, 
@@ -15,7 +16,8 @@ import { Link } from 'react-router-dom';
 
 const MarketUpdates = () => {
   return (
-    <div className="min-h-screen bg-tradeiq-navy p-6">
+    <ProtectedFeature feature="market-updates">
+      <div className="min-h-screen bg-tradeiq-navy p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -207,9 +209,10 @@ const MarketUpdates = () => {
             None of the information provided should be considered financial advice or a recommendation to invest. 
             Always do your own research and consult with a financial advisor before making investment decisions.
           </p>
+          </div>
         </div>
       </div>
-    </div>
+    </ProtectedFeature>
   );
 };
 

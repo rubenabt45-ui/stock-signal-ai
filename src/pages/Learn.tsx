@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '@/hooks/useSubscription';
+import { ProtectedFeature } from "@/components/ProtectedFeature";
 
 const pdfResources = [
   {
@@ -70,7 +71,8 @@ const Learn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-tradeiq-navy">
+    <ProtectedFeature feature="learn">
+      <div className="min-h-screen bg-tradeiq-navy">
       {/* Header */}
       <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -255,9 +257,10 @@ const Learn = () => {
               www.tradeiqpro.com
             </a>
           </p>
-        </div>
-      </main>
-    </div>
+          </div>
+        </main>
+      </div>
+    </ProtectedFeature>
   );
 };
 

@@ -13,6 +13,7 @@ import { SupportSection } from "@/components/SupportSection";
 import { LegalSection } from "@/components/LegalSection";
 import { LogoutSection } from "@/components/LogoutSection";
 import { NotificationsSection } from "@/components/NotificationsSection";
+import { SubscriptionDashboard } from "@/components/SubscriptionDashboard";
 
 const Settings = () => {
   const { user } = useAuth();
@@ -108,6 +109,9 @@ const Settings = () => {
           userProfile={userProfile} 
           onProfileUpdate={handleProfileUpdate}
         />
+
+        {/* Subscription Dashboard */}
+        <SubscriptionDashboard />
 
         {/* Notifications Section */}
         <NotificationsSection />

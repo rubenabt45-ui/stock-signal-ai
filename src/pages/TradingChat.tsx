@@ -8,6 +8,7 @@ import { useConversationMemory } from "@/hooks/useConversationMemory";
 import { useDailyMessages } from "@/hooks/useDailyMessages";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { Badge } from "@/components/ui/badge";
+import { ProtectedFeature } from "@/components/ProtectedFeature";
 import ReactMarkdown from 'react-markdown';
 
 interface ChatMessage {
@@ -262,7 +263,8 @@ const TradingChat = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900 text-white">
+    <ProtectedFeature feature="strategy-ai">
+      <div className="flex flex-col h-screen bg-gray-900 text-white">
       {/* Header */}
       <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between flex-shrink-0">
         <h1 className="text-xl font-semibold flex items-center gap-2">
@@ -496,13 +498,14 @@ const TradingChat = () => {
         </p>
       </div>
 
-      {/* Upgrade Modal */}
-      <UpgradeModal
-        open={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        feature="daily messages"
-      />
-    </div>
+        {/* Upgrade Modal */}
+        <UpgradeModal
+          open={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          feature="daily messages"
+        />
+      </div>
+    </ProtectedFeature>
   );
 };
 

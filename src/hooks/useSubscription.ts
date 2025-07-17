@@ -69,6 +69,25 @@ export const useSubscription = () => {
     }
   };
 
+  const createCustomerPortalSession = async () => {
+    if (!user) throw new Error('User not authenticated');
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal');
+      
+      if (error) throw error;
+      
+      if (data.url) {
+        window.open(data.url, '_blank');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error creating customer portal session:', error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     checkSubscription();
   }, [user]);
@@ -77,6 +96,7 @@ export const useSubscription = () => {
     ...subscriptionInfo,
     checkSubscription,
     createCheckoutSession,
+    createCustomerPortalSession,
     isPro: subscriptionInfo.subscription_tier === 'pro',
     isFree: subscriptionInfo.subscription_tier === 'free'
   };

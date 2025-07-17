@@ -33,6 +33,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      // Check subscription status on login
+      if (session?.user) {
+        setTimeout(() => {
+          supabase.functions.invoke('check-subscription').catch(console.error);
+        }, 0);
+      }
     });
 
     // Listen for auth changes
@@ -42,6 +49,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      // Check subscription status on auth state change
+      if (session?.user) {
+        setTimeout(() => {
+          supabase.functions.invoke('check-subscription').catch(console.error);
+        }, 0);
+      }
     });
 
     return () => subscription.unsubscribe();
