@@ -53,8 +53,7 @@ const App = () => (
                         <Signup />
                       </PublicRoute>
                     } />
-                    <Route path="/pricing" element={<Pricing />} />
-                    <Route path="/learn" element={<Learn />} />
+                     <Route path="/pricing" element={<Pricing />} />
                     
                     {/* Protected App Routes */}
                     <Route path="/app" element={
@@ -82,11 +81,16 @@ const App = () => (
                         <Settings />
                       </ProtectedRoute>
                     } />
-                    <Route path="/app/configuration" element={
-                      <ProtectedRoute>
-                        <Settings />
-                      </ProtectedRoute>
-                    } />
+                     <Route path="/app/configuration" element={
+                       <ProtectedRoute>
+                         <Settings />
+                       </ProtectedRoute>
+                     } />
+                     <Route path="/app/learn" element={
+                       <ProtectedRoute>
+                         <Learn />
+                       </ProtectedRoute>
+                     } />
                     
                     {/* Payment Routes */}
                     <Route path="/success" element={
@@ -105,10 +109,9 @@ const App = () => (
                   </Routes>
                    <Routes>
                      <Route path="/" element={null} />
-                     <Route path="/login" element={null} />
-                     <Route path="/signup" element={null} />
-                     <Route path="/pricing" element={null} />
-                     <Route path="/learn" element={null} />
+                      <Route path="/login" element={null} />
+                      <Route path="/signup" element={null} />
+                      <Route path="/pricing" element={null} />
                      <Route path="/success" element={null} />
                      <Route path="/cancel" element={null} />
                      <Route path="/app/*" element={

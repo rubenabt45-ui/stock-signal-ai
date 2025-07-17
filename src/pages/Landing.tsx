@@ -31,7 +31,7 @@ const Landing = () => {
           
           <div className="hidden md:flex items-center space-x-6">
             <Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
-            <Link to="/learn" className="text-gray-300 hover:text-white transition-colors">Learn</Link>
+            <Link to="/app/learn" className="text-gray-300 hover:text-white transition-colors">Learn</Link>
             <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</Link>
             <Link to="/app">
               <Button variant="outline" size="sm">Platform</Button>
@@ -214,8 +214,73 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Demo Preview */}
+      {/* Learn Section Teaser */}
       <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-6">Master Trading with Expert Guidance</h2>
+            <p className="text-xl text-gray-300">
+              Access comprehensive trading guides, strategies, and educational resources designed to enhance your market analysis skills.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <Card className="bg-gray-800/50 border-gray-700 hover:border-tradeiq-blue/50 transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Brain className="h-5 w-5 text-tradeiq-blue mr-2" />
+                  Trading Fundamentals
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-gray-300">
+                  Learn the core principles of technical analysis and market psychology.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-800/50 border-gray-700 hover:border-tradeiq-blue/50 transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <BarChart3 className="h-5 w-5 text-tradeiq-blue mr-2" />
+                  Pattern Recognition
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-gray-300">
+                  Master chart patterns and their implications for market movements.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-800/50 border-gray-700 hover:border-tradeiq-blue/50 transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Shield className="h-5 w-5 text-tradeiq-blue mr-2" />
+                  Risk Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-gray-300">
+                  Develop strategies to protect your capital and optimize returns.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center">
+            <Link to="/app/learn">
+              <Button size="lg" className="px-8 py-6 text-lg">
+                Explore Learn Section
+                <ChevronRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Demo Preview */}
+      <section className="py-20 bg-gray-900/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-6">See TradeIQ in Action</h2>
@@ -297,7 +362,7 @@ const Landing = () => {
                 <Link to="/app" className="block text-gray-400 hover:text-white text-sm transition-colors">
                   Trading Dashboard
                 </Link>
-                <Link to="/learn" className="block text-gray-400 hover:text-white text-sm transition-colors">
+                <Link to="/app/learn" className="block text-gray-400 hover:text-white text-sm transition-colors">
                   Learn
                 </Link>
                 <Link to="/pricing" className="block text-gray-400 hover:text-white text-sm transition-colors">

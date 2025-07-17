@@ -14,7 +14,7 @@ const BottomNavigation = () => {
       label: "StrategyAI",
     },
     {
-      path: "/learn",
+      path: "/app/learn",
       icon: Book,
       label: t('navigation.learn'),
     },
