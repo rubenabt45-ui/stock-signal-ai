@@ -12,6 +12,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import PublicRoute from "@/components/PublicRoute";
 import BottomNavigation from "@/components/BottomNavigation";
 import Footer from "@/components/Footer";
+import Landing from "./pages/Landing";
 import Favorites from "./pages/Favorites";
 import TradingChat from "./pages/TradingChat";
 import Learn from "./pages/Learn";
@@ -38,71 +39,79 @@ const App = () => (
               <BrowserRouter>
                 <div className="min-h-screen bg-tradeiq-navy">
                   <Routes>
+                    {/* Public Landing Page */}
+                    <Route path="/" element={<Landing />} />
+                    
+                    {/* Public Routes */}
                     <Route path="/login" element={
                       <PublicRoute>
                         <Login />
                       </PublicRoute>
                     } />
-                     <Route path="/signup" element={
-                       <PublicRoute>
-                         <Signup />
-                       </PublicRoute>
-                     } />
-                     <Route path="/pricing" element={<Pricing />} />
-                     <Route path="/success" element={
-                       <ProtectedRoute>
-                         <Success />
-                       </ProtectedRoute>
-                     } />
-                     <Route path="/cancel" element={
-                       <ProtectedRoute>
-                         <Cancel />
-                       </ProtectedRoute>
-                     } />
-                    <Route path="/" element={
+                    <Route path="/signup" element={
+                      <PublicRoute>
+                        <Signup />
+                      </PublicRoute>
+                    } />
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/learn" element={<Learn />} />
+                    
+                    {/* Protected App Routes */}
+                    <Route path="/app" element={
                       <ProtectedRoute>
                         <TradingChat />
                       </ProtectedRoute>
                     } />
-                    <Route path="/favorites" element={
+                    <Route path="/app/favorites" element={
                       <ProtectedRoute>
                         <Favorites />
                       </ProtectedRoute>
                     } />
-                    <Route path="/trading-chat" element={
+                    <Route path="/app/trading-chat" element={
                       <ProtectedRoute>
                         <TradingChat />
                       </ProtectedRoute>
                     } />
-                    <Route path="/learn" element={
-                      <ProtectedRoute>
-                        <Learn />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/events" element={
+                    <Route path="/app/events" element={
                       <ProtectedRoute>
                         <EconomicEvents />
                       </ProtectedRoute>
                     } />
-                    <Route path="/settings" element={
+                    <Route path="/app/settings" element={
                       <ProtectedRoute>
                         <Settings />
                       </ProtectedRoute>
                     } />
-                     <Route path="/configuration" element={
-                       <ProtectedRoute>
-                         <Settings />
-                       </ProtectedRoute>
-                     } />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="/app/configuration" element={
+                      <ProtectedRoute>
+                        <Settings />
+                      </ProtectedRoute>
+                    } />
+                    
+                    {/* Payment Routes */}
+                    <Route path="/success" element={
+                      <ProtectedRoute>
+                        <Success />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/cancel" element={
+                      <ProtectedRoute>
+                        <Cancel />
+                      </ProtectedRoute>
+                    } />
+                    
+                    {/* Catch-all */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                    <Routes>
+                     <Route path="/" element={null} />
                      <Route path="/login" element={null} />
                      <Route path="/signup" element={null} />
+                     <Route path="/pricing" element={null} />
+                     <Route path="/learn" element={null} />
                      <Route path="/success" element={null} />
                      <Route path="/cancel" element={null} />
-                     <Route path="*" element={
+                     <Route path="/app/*" element={
                        <div className="pb-20">
                          <Footer />
                          <BottomNavigation />

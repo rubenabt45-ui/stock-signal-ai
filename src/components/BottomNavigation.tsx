@@ -9,7 +9,7 @@ const BottomNavigation = () => {
 
   const navItems = [
     {
-      path: "/trading-chat",
+      path: "/app",
       icon: Brain,
       label: "StrategyAI",
     },
@@ -19,7 +19,7 @@ const BottomNavigation = () => {
       label: t('navigation.learn'),
     },
     {
-      path: "/events",
+      path: "/app/events",
       icon: Calendar,
       label: "Events",
     },
@@ -29,7 +29,7 @@ const BottomNavigation = () => {
       label: "Pricing",
     },
     {
-      path: "/settings",
+      path: "/app/settings",
       icon: Settings,
       label: t('navigation.settings'),
     },
@@ -39,7 +39,7 @@ const BottomNavigation = () => {
     <nav className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-t border-gray-800/50 z-50">
       <div className="flex justify-around items-center py-2">
         {navItems.map((item) => {
-          const isActive = location.pathname === item.path || (item.path === "/trading-chat" && location.pathname === "/");
+          const isActive = location.pathname === item.path || (item.path === "/app" && location.pathname === "/app/trading-chat");
           return (
             <Link
               key={item.path}
