@@ -3,21 +3,38 @@ import { Crown, Calendar, CreditCard, ArrowRight, CheckCircle, AlertTriangle, XC
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from '@/hooks/use-toast';
 
 export const SubscriptionDashboard: React.FC = () => {
   const { 
-    role, 
-    subscription_end, 
-    daysUntilExpiry, 
+    subscription_tier = 'free',
+    subscription_end,
+    loading = true,
+    error,
+    subscribed = false,
     createCheckoutSession,
-    checkSubscription,
-    loading 
-  } = useSubscriptionStatus();
+    checkSubscription 
+  } = useSubscription() || {};
   const { toast } = useToast();
 
+  // Calculate derived state with safe defaults
+  const isPro = subscription_tier === 'pro';
+  const isExpired = subscription_end ? new Date(subscription_end) < new Date() : false;
+  const daysUntilExpiry = subscription_end ? Math.ceil((new Date(subscription_end).getTime() - new Date().getTime()) / (1000 * 3600 * 24)) : null;
+  
+  const role = isPro && !isExpired ? 'pro' : isExpired ? 'expired' : 'free';
+
   const handleUpgrade = async () => {
+    if (!createCheckoutSession) {
+      toast({
+        title: "Error",
+        description: "Checkout functionality is not available. Please try refreshing the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       toast({
         title: "Redirecting to checkout...",
@@ -26,6 +43,7 @@ export const SubscriptionDashboard: React.FC = () => {
       
       await createCheckoutSession();
     } catch (error) {
+      console.error('Checkout error:', error);
       toast({
         title: "Error",
         description: "Failed to start checkout process. Please try again.",
@@ -35,6 +53,15 @@ export const SubscriptionDashboard: React.FC = () => {
   };
 
   const handleRefreshStatus = async () => {
+    if (!checkSubscription) {
+      toast({
+        title: "Error",
+        description: "Refresh functionality is not available. Please try refreshing the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       toast({
         title: "Refreshing...",
@@ -48,6 +75,7 @@ export const SubscriptionDashboard: React.FC = () => {
         description: "Your subscription status has been refreshed.",
       });
     } catch (error) {
+      console.error('Refresh error:', error);
       toast({
         title: "Error",
         description: "Failed to refresh subscription status.",
@@ -55,6 +83,30 @@ export const SubscriptionDashboard: React.FC = () => {
       });
     }
   };
+
+  // Handle error state
+  if (error) {
+    return (
+      <Card className="border-red-500/30 bg-red-900/10">
+        <CardContent className="p-6">
+          <div className="text-center space-y-4">
+            <XCircle className="h-12 w-12 text-red-400 mx-auto" />
+            <h3 className="text-white font-semibold">Subscription Error</h3>
+            <p className="text-gray-400 text-sm">
+              Unable to load subscription information. Please try refreshing.
+            </p>
+            <Button 
+              onClick={handleRefreshStatus} 
+              variant="outline"
+              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+            >
+              Retry
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const getStatusInfo = () => {
     switch (role) {
@@ -87,12 +139,18 @@ export const SubscriptionDashboard: React.FC = () => {
 
   const statusInfo = getStatusInfo();
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return 'Invalid date';
+    }
   };
 
   if (loading) {

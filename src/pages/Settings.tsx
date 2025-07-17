@@ -14,13 +14,15 @@ import { LegalSection } from "@/components/LegalSection";
 import { LogoutSection } from "@/components/LogoutSection";
 import { NotificationsSection } from "@/components/NotificationsSection";
 import { SubscriptionDashboard } from "@/components/SubscriptionDashboard";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const Settings = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { t } = useTranslation();
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch user profile to get pro status
   useEffect(() => {
@@ -31,6 +33,7 @@ const Settings = () => {
       }
 
       try {
+        setError(null);
         const { data, error } = await supabase
           .from('user_profiles')
           .select('*')
@@ -39,11 +42,14 @@ const Settings = () => {
 
         if (error) {
           console.error('Error fetching user profile:', error);
+          setError('Failed to load profile data');
+          // Don't throw - continue with null profile
         } else {
           setUserProfile(data);
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Unexpected error:', error);
+        setError('An unexpected error occurred');
       } finally {
         setLoading(false);
       }
@@ -58,10 +64,26 @@ const Settings = () => {
 
   const isPro = userProfile?.is_pro || false;
 
+  // Show loading state while auth or profile is loading
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center">
+        <div className="text-white text-center space-y-2">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tradeiq-blue mx-auto"></div>
+          <div>{t('common.loading') || 'Loading...'}</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if user is not authenticated
   if (!user) {
     return (
       <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center">
-        <div className="text-white">{t('common.loading')}</div>
+        <div className="text-white text-center space-y-4">
+          <div className="text-red-400">Authentication required</div>
+          <div className="text-gray-400">Please log in to access settings</div>
+        </div>
       </div>
     );
   }
@@ -85,63 +107,99 @@ const Settings = () => {
 
       {/* Content */}
       <main className="container mx-auto px-4 py-6 pb-24 space-y-6">
-        {/* Profile Section */}
-        <ProfileSection 
-          user={user} 
-          userProfile={userProfile} 
-          onProfileUpdate={handleProfileUpdate}
-        />
-
-        {/* Subscription Dashboard */}
-        <SubscriptionDashboard />
-
-        {/* Notifications Section */}
-        <NotificationsSection />
-
-        {/* Preferences Section */}
-        <PreferencesSection />
-
-        {/* Security Section */}
-        <SecuritySection />
-
-        {/* Pro Subscription Management */}
-        {isPro && (
-          <div className="tradeiq-card border-green-500/20 bg-black/20 rounded-xl p-6">
-            <div className="flex items-center space-x-3 mb-4">
-              <Crown className="h-5 w-5 text-green-500" />
-              <h3 className="text-white text-lg font-semibold">{t('settings.pro.title')}</h3>
-            </div>
-            <div className="space-y-3">
-              <div>
-                <p className="text-white font-medium">{t('settings.pro.currentPlan')}</p>
-                <p className="text-green-400 text-sm">{t('settings.pro.proPlan')}</p>
-              </div>
-              <div>
-                <p className="text-white font-medium">{t('settings.pro.benefits')}</p>
-                <ul className="text-gray-400 text-sm space-y-1">
-                  {(t('settings.pro.benefitsList', { returnObjects: true }) as string[]).map((benefit: string, index: number) => (
-                    <li key={index}>• {benefit}</li>
-                  ))}
-                </ul>
-              </div>
-              <div className="text-gray-500 text-xs">
-                <p>{t('settings.pro.managedBy')}</p>
-              </div>
+        {/* Error Banner */}
+        {error && (
+          <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+            <div className="text-red-400 text-sm">
+              <strong>Warning:</strong> {error}. Some features may not work properly.
             </div>
           </div>
         )}
 
+        {/* Profile Section */}
+        <ErrorBoundary componentName="Profile Section">
+          <ProfileSection 
+            user={user} 
+            userProfile={userProfile} 
+            onProfileUpdate={handleProfileUpdate}
+          />
+        </ErrorBoundary>
+
+        {/* Subscription Dashboard */}
+        <ErrorBoundary componentName="Subscription Dashboard">
+          <SubscriptionDashboard />
+        </ErrorBoundary>
+
+        {/* Notifications Section */}
+        <ErrorBoundary componentName="Notifications Section">
+          <NotificationsSection />
+        </ErrorBoundary>
+
+        {/* Preferences Section */}
+        <ErrorBoundary componentName="Preferences Section">
+          <PreferencesSection />
+        </ErrorBoundary>
+
+        {/* Security Section */}
+        <ErrorBoundary componentName="Security Section">
+          <SecuritySection />
+        </ErrorBoundary>
+
+        {/* Pro Subscription Management */}
+        {isPro && (
+          <ErrorBoundary componentName="Pro Subscription Management">
+            <div className="tradeiq-card border-green-500/20 bg-black/20 rounded-xl p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <Crown className="h-5 w-5 text-green-500" />
+                <h3 className="text-white text-lg font-semibold">{t('settings.pro.title') || 'Pro Features'}</h3>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-white font-medium">{t('settings.pro.currentPlan') || 'Current Plan'}</p>
+                  <p className="text-green-400 text-sm">{t('settings.pro.proPlan') || 'Pro Plan'}</p>
+                </div>
+                <div>
+                  <p className="text-white font-medium">{t('settings.pro.benefits') || 'Benefits'}</p>
+                  <ul className="text-gray-400 text-sm space-y-1">
+                    {(() => {
+                      try {
+                        const benefits = t('settings.pro.benefitsList', { returnObjects: true }) as string[];
+                        return Array.isArray(benefits) ? benefits.map((benefit: string, index: number) => (
+                          <li key={index}>• {benefit}</li>
+                        )) : <li>• Unlimited access to all features</li>;
+                      } catch {
+                        return <li>• Unlimited access to all features</li>;
+                      }
+                    })()}
+                  </ul>
+                </div>
+                <div className="text-gray-500 text-xs">
+                  <p>{t('settings.pro.managedBy') || 'Managed through Stripe'}</p>
+                </div>
+              </div>
+            </div>
+          </ErrorBoundary>
+        )}
+
         {/* Integrations Section */}
-        <IntegrationsSection />
+        <ErrorBoundary componentName="Integrations Section">
+          <IntegrationsSection />
+        </ErrorBoundary>
 
         {/* Support Section */}
-        <SupportSection />
+        <ErrorBoundary componentName="Support Section">
+          <SupportSection />
+        </ErrorBoundary>
 
         {/* Legal Section */}
-        <LegalSection />
+        <ErrorBoundary componentName="Legal Section">
+          <LegalSection />
+        </ErrorBoundary>
 
         {/* Logout Section */}
-        <LogoutSection />
+        <ErrorBoundary componentName="Logout Section">
+          <LogoutSection />
+        </ErrorBoundary>
       </main>
 
       {/* Plan Modal */}
