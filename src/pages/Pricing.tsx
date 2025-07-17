@@ -1,11 +1,11 @@
 import React from 'react';
-import { Check, X, Crown, Zap } from 'lucide-react';
+import { Check, X, Crown, Zap, TrendingUp, ChevronRight } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 const Pricing = () => {
@@ -16,7 +16,7 @@ const Pricing = () => {
 
   const handleGetStarted = () => {
     if (user) {
-      navigate('/');
+      navigate('/app');
     } else {
       navigate('/login');
     }
@@ -64,16 +64,42 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-tradeiq-navy">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+      {/* Navigation */}
+      <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
+            <span className="text-xl font-bold">TradeIQ</span>
+            <Badge variant="secondary" className="text-xs">BETA</Badge>
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-6">
+            <Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
+            <Link to="/app/learn" className="text-gray-300 hover:text-white transition-colors">Learn</Link>
+            <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</Link>
+            <Link to="/app">
+              <Button variant="outline" size="sm">Platform</Button>
+            </Link>
+          </div>
+
+          <div className="md:hidden">
+            <Link to="/app">
+              <Button variant="outline" size="sm">Platform</Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       {/* Header */}
-      <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Crown className="h-8 w-8 text-tradeiq-blue" />
+      <header className="border-b border-gray-800/50 bg-gray-900/30">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-3 mb-4">
+              <Crown className="h-10 w-10 text-tradeiq-blue" />
               <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">Pricing Plans</h1>
-                <p className="text-sm text-gray-400 font-medium">Choose the plan that's right for you</p>
+                <h1 className="text-3xl font-bold text-white tracking-tight">Pricing Plans</h1>
+                <p className="text-gray-400 font-medium">Choose the plan that's right for you</p>
               </div>
             </div>
           </div>
@@ -129,10 +155,19 @@ const Pricing = () => {
               <Button 
                 onClick={handleGetStarted}
                 variant="outline" 
-                className="w-full border-gray-600 text-gray-300 hover:bg-gray-800"
+                className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 mb-4"
               >
-                Get Started Free
+                Get Started
+                <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
+
+              {!user && (
+                <div className="text-center">
+                  <Link to="/app" className="text-sm text-tradeiq-blue hover:text-tradeiq-blue/80 transition-colors">
+                    Already have an account? Access the platform →
+                  </Link>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -175,7 +210,7 @@ const Pricing = () => {
               {isPro ? (
                 <Button 
                   disabled
-                  className="w-full bg-green-600 hover:bg-green-600"
+                  className="w-full bg-green-600 hover:bg-green-600 mb-4"
                 >
                   Current Plan
                 </Button>
@@ -183,10 +218,19 @@ const Pricing = () => {
                 <Button 
                   onClick={handleUpgrade}
                   disabled={loading}
-                  className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90 text-white"
+                  className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90 text-white mb-4"
                 >
                   {loading ? 'Processing...' : 'Upgrade to Pro'}
+                  {!loading && <ChevronRight className="ml-2 h-4 w-4" />}
                 </Button>
+              )}
+
+              {!user && (
+                <div className="text-center">
+                  <Link to="/app" className="text-sm text-tradeiq-blue hover:text-tradeiq-blue/80 transition-colors">
+                    Already have an account? Access the platform →
+                  </Link>
+                </div>
               )}
             </CardContent>
           </Card>
