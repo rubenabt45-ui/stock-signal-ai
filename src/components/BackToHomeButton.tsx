@@ -11,7 +11,18 @@ export const BackToHomeButton: React.FC<BackToHomeButtonProps> = ({ className = 
   const navigate = useNavigate();
 
   const handleBackToHome = () => {
-    navigate('/');
+    console.log('🏠 Back to Home button clicked');
+    try {
+      console.log('🚀 Attempting navigation to /');
+      navigate('/');
+      console.log('✅ Navigation to / successful');
+    } catch (error) {
+      console.error('❌ Navigation to / failed, using fallback:', error);
+      setTimeout(() => {
+        console.log('🔄 Fallback navigation to / via window.location');
+        window.location.href = '/';
+      }, 100);
+    }
   };
 
   return (

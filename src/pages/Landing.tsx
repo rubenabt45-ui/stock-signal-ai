@@ -20,41 +20,40 @@ import {
 const Landing = () => {
   const navigate = useNavigate();
 
-  const handleLoginClick = (e: React.MouseEvent) => {
-    console.log("🔥 Login button clicked - event captured");
-    console.log("Event details:", e.type, e.target);
-    
-    // Remove preventDefault that might be blocking navigation
-    try {
-      console.log("🚀 Attempting navigation to /login");
-      navigate('/login');
-      console.log("✅ Navigation successful");
-    } catch (error) {
-      console.error("❌ Navigation failed, using fallback:", error);
-      // Force navigation as fallback
-      setTimeout(() => {
-        window.location.href = '/login';
-      }, 100);
-    }
+  // 🚀 COMPREHENSIVE NAVIGATION HANDLERS WITH DEBUGGING
+  const handleNavigation = (path: string, logMessage: string) => {
+    return (e?: React.MouseEvent) => {
+      console.log(`🔥 ${logMessage} - event captured`);
+      console.log(`📍 Current route: ${window.location.pathname}`);
+      console.log(`🎯 Target route: ${path}`);
+      
+      if (e) {
+        console.log("Event details:", e.type, e.target);
+      }
+      
+      try {
+        console.log(`🚀 Attempting navigation to ${path}`);
+        navigate(path);
+        console.log(`✅ Navigation to ${path} successful`);
+      } catch (error) {
+        console.error(`❌ Navigation to ${path} failed, using fallback:`, error);
+        // Force navigation as fallback with slight delay to avoid race conditions
+        setTimeout(() => {
+          console.log(`🔄 Fallback navigation to ${path} via window.location`);
+          window.location.href = path;
+        }, 100);
+      }
+    };
   };
 
-  const handleSignUpClick = (e: React.MouseEvent) => {
-    console.log("🔥 Sign Up button clicked - event captured");
-    console.log("Event details:", e.type, e.target);
-    
-    // Remove preventDefault that might be blocking navigation
-    try {
-      console.log("🚀 Attempting navigation to /signup");
-      navigate('/signup');
-      console.log("✅ Navigation successful");
-    } catch (error) {
-      console.error("❌ Navigation failed, using fallback:", error);
-      // Force navigation as fallback
-      setTimeout(() => {
-        window.location.href = '/signup';
-      }, 100);
-    }
-  };
+  // Individual navigation handlers for all CTAs
+  const handleLoginClick = handleNavigation('/login', 'Login button clicked');
+  const handleSignUpClick = handleNavigation('/signup', 'Sign Up button clicked');
+  const handlePricingClick = handleNavigation('/pricing', 'Pricing link clicked');
+  const handleLearnPreviewClick = handleNavigation('/learn-preview', 'Learn Preview link clicked');
+  const handleAppClick = handleNavigation('/app', 'Platform/App link clicked');
+  const handleJoinBetaClick = handleNavigation('/signup', 'Join the Beta button clicked');
+  const handleDemoClick = handleNavigation('/signup', 'Demo/Request Access button clicked');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
@@ -68,9 +67,9 @@ const Landing = () => {
           </div>
           
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Home</Link>
-            <Link to="/learn-preview" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Learn Preview</Link>
-            <Link to="/pricing" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Pricing</Link>
+            <Link to="/" onClick={handleNavigation('/', 'Home link clicked')} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Home</Link>
+            <Link to="/learn-preview" onClick={handleLearnPreviewClick} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Learn Preview</Link>
+            <Link to="/pricing" onClick={handlePricingClick} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Pricing</Link>
             <div className="flex items-center space-x-2">
               <Button 
                 variant="ghost" 
@@ -120,17 +119,22 @@ const Landing = () => {
             Identify patterns, trends, and opportunities with algorithmic precision
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Link to="/signup">
-              <Button size="lg" className="px-8 py-6 text-lg hover:scale-105 transform transition-all duration-300 shadow-lg hover:shadow-xl">
-                Join the Beta
-                <ChevronRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/signup">
-              <Button variant="outline" size="lg" className="px-8 py-6 text-lg hover:bg-white/10 hover:border-white/30 transition-all duration-300">
-                Watch Demo
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              className="px-8 py-6 text-lg hover:scale-105 transform transition-all duration-300 shadow-lg hover:shadow-xl"
+              onClick={handleJoinBetaClick}
+            >
+              Join the Beta
+              <ChevronRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="px-8 py-6 text-lg hover:bg-white/10 hover:border-white/30 transition-all duration-300"
+              onClick={handleDemoClick}
+            >
+              Watch Demo
+            </Button>
           </div>
           
           {/* Stats */}
@@ -335,12 +339,14 @@ const Landing = () => {
           </div>
 
           <div className="text-center">
-            <Link to="/learn-preview">
-              <Button size="lg" className="px-8 py-6 text-lg hover:scale-105 transform transition-all duration-300">
-                Explore Learn Section
-                <ChevronRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              className="px-8 py-6 text-lg hover:scale-105 transform transition-all duration-300"
+              onClick={handleLearnPreviewClick}
+            >
+              Explore Learn Section
+              <ChevronRight className="ml-2 h-5 w-5" />
+            </Button>
           </div>
         </div>
       </section>
@@ -364,11 +370,13 @@ const Landing = () => {
                   <p className="text-gray-400">Real-time platform preview</p>
                 </div>
               </div>
-              <Link to="/signup">
-                <Button size="lg" className="px-8 py-6 text-lg hover:scale-105 transform transition-all duration-300">
-                  Request Demo Access
-                </Button>
-              </Link>
+              <Button 
+                size="lg" 
+                className="px-8 py-6 text-lg hover:scale-105 transform transition-all duration-300"
+                onClick={handleDemoClick}
+              >
+                Request Demo Access
+              </Button>
             </div>
           </div>
         </div>
@@ -397,11 +405,13 @@ const Landing = () => {
                       className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400"
                     />
                   </div>
-                  <Link to="/signup">
-                    <Button size="lg" className="w-full py-6 text-lg hover:scale-105 transform transition-all duration-300">
-                      Request Early Access
-                    </Button>
-                  </Link>
+                  <Button 
+                    size="lg" 
+                    className="w-full py-6 text-lg hover:scale-105 transform transition-all duration-300"
+                    onClick={handleSignUpClick}
+                  >
+                    Request Early Access
+                  </Button>
                   <p className="text-xs text-gray-400">
                     No spam. Unsubscribe at any time.
                   </p>
@@ -429,15 +439,24 @@ const Landing = () => {
             <div>
               <h4 className="font-semibold mb-4 text-white">Platform</h4>
               <div className="space-y-2">
-                <Link to="/app" className="block text-gray-400 hover:text-white text-sm transition-colors">
+                <button 
+                  onClick={handleAppClick}
+                  className="block text-gray-400 hover:text-white text-sm transition-colors text-left"
+                >
                   Trading Dashboard
-                </Link>
-                <Link to="/learn-preview" className="block text-gray-400 hover:text-white text-sm transition-colors">
+                </button>
+                <button 
+                  onClick={handleLearnPreviewClick}
+                  className="block text-gray-400 hover:text-white text-sm transition-colors text-left"
+                >
                   Learn Preview
-                </Link>
-                <Link to="/pricing" className="block text-gray-400 hover:text-white text-sm transition-colors">
+                </button>
+                <button 
+                  onClick={handlePricingClick}
+                  className="block text-gray-400 hover:text-white text-sm transition-colors text-left"
+                >
                   Pricing
-                </Link>
+                </button>
               </div>
             </div>
             
