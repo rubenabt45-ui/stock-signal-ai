@@ -14,15 +14,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    if (!loading) {
-      // If user is authenticated and tries to visit login/signup, redirect to trading chat
-      if (user && (location.pathname === '/login' || location.pathname === '/signup')) {
-        navigate('/app');
-        return;
-      }
-      
-      // If user is not authenticated and tries to access protected route, redirect to login
-      if (!user && location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/pricing') {
+    if (!loading && !user) {
+      // Only redirect to login if user is trying to access /app/* routes
+      if (location.pathname.startsWith('/app')) {
         navigate('/login');
         return;
       }

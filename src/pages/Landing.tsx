@@ -33,14 +33,22 @@ const Landing = () => {
             <Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
             <Link to="/learn-preview" className="text-gray-300 hover:text-white transition-colors">Learn Preview</Link>
             <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</Link>
-            <Link to="/app">
-              <Button variant="outline" size="sm">Platform</Button>
-            </Link>
+            <div className="flex items-center space-x-2">
+              <Link to="/login">
+                <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">Login</Button>
+              </Link>
+              <Link to="/signup">
+                <Button variant="outline" size="sm">Sign Up</Button>
+              </Link>
+            </div>
           </div>
 
-          <div className="md:hidden">
-            <Link to="/app">
-              <Button variant="outline" size="sm">Platform</Button>
+          <div className="md:hidden flex items-center space-x-2">
+            <Link to="/login">
+              <Button variant="ghost" size="sm">Login</Button>
+            </Link>
+            <Link to="/signup">
+              <Button variant="outline" size="sm">Sign Up</Button>
             </Link>
           </div>
         </div>
@@ -56,7 +64,7 @@ const Landing = () => {
             Identify patterns, trends, and opportunities with algorithmic precision
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Link to="/app">
+            <Link to="/signup">
               <Button size="lg" className="px-8 py-6 text-lg">
                 Join the Beta
                 <ChevronRight className="ml-2 h-5 w-5" />
