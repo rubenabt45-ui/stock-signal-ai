@@ -23,28 +23,70 @@ const Landing = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  // 🚀 SIMPLIFIED NAVIGATION HANDLERS
-  const handleNavigation = (path: string, logMessage: string) => {
-    return () => {
-      console.log(`🚀 ${logMessage} - navigating to ${path}`);
-      try {
-        navigate(path);
-        console.log(`✅ Navigation to ${path} successful`);
-      } catch (error) {
-        console.error(`❌ Navigation to ${path} failed, using fallback:`, error);
-        window.location.href = path;
-      }
-    };
+  // 🚨 BULLETPROOF NAVIGATION HANDLERS
+  const handleLogin = () => {
+    console.log('🚨 Login button clicked - IMMEDIATE ACTION');
+    console.log('Current pathname:', window.location.pathname);
+    console.log('Navigate function available:', typeof navigate);
+    
+    try {
+      console.log('🚀 Attempting navigate to /login');
+      navigate('/login');
+      console.log('✅ Navigate called successfully');
+      
+      // Double-check navigation after small delay
+      setTimeout(() => {
+        if (window.location.pathname !== '/login') {
+          console.log('⚠️ Navigation failed, using fallback');
+          window.location.href = '/login';
+        }
+      }, 100);
+      
+    } catch (err) {
+      console.error('❌ Navigate failed immediately, using fallback:', err);
+      window.location.href = '/login';
+    }
   };
 
-  // Individual navigation handlers for all CTAs
-  const handleLoginClick = handleNavigation('/login', 'Login button clicked');
-  const handleSignUpClick = handleNavigation('/signup', 'Sign Up button clicked');
-  const handlePricingClick = handleNavigation('/pricing', 'Pricing link clicked');
-  const handleLearnPreviewClick = handleNavigation('/learn-preview', 'Learn Preview link clicked');
-  const handleAppClick = handleNavigation('/app', 'Platform/App link clicked');
-  const handleJoinBetaClick = handleNavigation('/signup', 'Join the Beta button clicked');
-  const handleDemoClick = handleNavigation('/signup', 'Demo/Request Access button clicked');
+  const handleSignUp = () => {
+    console.log('🚨 Sign Up button clicked');
+    try {
+      navigate('/signup');
+      setTimeout(() => {
+        if (window.location.pathname !== '/signup') {
+          window.location.href = '/signup';
+        }
+      }, 100);
+    } catch (err) {
+      console.error('❌ Navigate to signup failed:', err);
+      window.location.href = '/signup';
+    }
+  };
+
+  // Other navigation handlers
+  const handleLearnPreviewClick = () => {
+    try {
+      navigate('/learn-preview');
+    } catch (err) {
+      window.location.href = '/learn-preview';
+    }
+  };
+
+  const handlePricingClick = () => {
+    try {
+      navigate('/pricing');
+    } catch (err) {
+      window.location.href = '/pricing';
+    }
+  };
+
+  const handleAppClick = () => {
+    try {
+      navigate('/app');
+    } catch (err) {
+      window.location.href = '/app';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
@@ -65,25 +107,39 @@ const Landing = () => {
               {/* Language Selector */}
               <LanguageSelector variant="landing" />
               
-              {/* 🚨 FIXED LOGIN BUTTON - DESKTOP */}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
-                onClick={handleLoginClick}
-              >
-                {t('landing.navbar.login')}
-              </Button>
+              {/* 🚨 BULLETPROOF LOGIN BUTTON - DESKTOP */}
+              <Link to="/login" className="relative z-10">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer relative z-10"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleLogin();
+                  }}
+                  style={{ pointerEvents: 'auto' }}
+                >
+                  {t('landing.navbar.login')}
+                </Button>
+              </Link>
               
-              {/* Sign Up Button - Fixed */}
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
-                onClick={handleSignUpClick}
-              >
-                {t('landing.navbar.signUp')}
-              </Button>
+              {/* 🚨 BULLETPROOF SIGN UP BUTTON - DESKTOP */}
+              <Link to="/signup" className="relative z-10">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer relative z-10"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSignUp();
+                  }}
+                  style={{ pointerEvents: 'auto' }}
+                >
+                  {t('landing.navbar.signUp')}
+                </Button>
+              </Link>
             </div>
           </div>
 
@@ -91,25 +147,39 @@ const Landing = () => {
             {/* Language Selector */}
             <LanguageSelector variant="landing" />
             
-            {/* 🚨 FIXED LOGIN BUTTON - MOBILE */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
-              onClick={handleLoginClick}
-            >
-              {t('landing.navbar.login')}
-            </Button>
+            {/* 🚨 BULLETPROOF LOGIN BUTTON - MOBILE */}
+            <Link to="/login" className="relative z-10">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer relative z-10"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleLogin();
+                }}
+                style={{ pointerEvents: 'auto' }}
+              >
+                {t('landing.navbar.login')}
+              </Button>
+            </Link>
             
-            {/* Mobile Sign Up Button - Fixed */}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
-              onClick={handleSignUpClick}
-            >
-              {t('landing.navbar.signUp')}
-            </Button>
+            {/* 🚨 BULLETPROOF SIGN UP BUTTON - MOBILE */}
+            <Link to="/signup" className="relative z-10">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer relative z-10"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSignUp();
+                }}
+                style={{ pointerEvents: 'auto' }}
+              >
+                {t('landing.navbar.signUp')}
+              </Button>
+            </Link>
           </div>
         </div>
       </nav>
@@ -127,7 +197,7 @@ const Landing = () => {
             <Button 
               size="lg" 
               className="px-8 py-6 text-lg hover:scale-105 transform transition-all duration-300 shadow-lg hover:shadow-xl"
-              onClick={handleJoinBetaClick}
+              onClick={handleSignUp}
             >
               {t('landing.hero.joinBeta')}
               <ChevronRight className="ml-2 h-5 w-5" />
@@ -136,7 +206,7 @@ const Landing = () => {
               variant="outline" 
               size="lg" 
               className="px-8 py-6 text-lg hover:bg-white/10 hover:border-white/30 transition-all duration-300"
-              onClick={handleDemoClick}
+              onClick={handleSignUp}
             >
               {t('landing.hero.watchDemo')}
             </Button>
@@ -379,7 +449,7 @@ const Landing = () => {
                   <Button 
                     size="lg" 
                     className="w-full py-6 text-lg hover:scale-105 transform transition-all duration-300"
-                    onClick={handleSignUpClick}
+                    onClick={handleSignUp}
                   >
                     Request Early Access
                   </Button>
