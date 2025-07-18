@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import { 
   TrendingUp, 
   Brain, 
@@ -71,6 +72,9 @@ const Landing = () => {
             <Link to="/learn-preview" onClick={handleLearnPreviewClick} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Learn Preview</Link>
             <Link to="/pricing" onClick={handlePricingClick} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Pricing</Link>
             <div className="flex items-center space-x-2">
+              {/* Language Selector */}
+              <LanguageSelector variant="landing" />
+              
               {/* 🚨 BULLETPROOF LOGIN BUTTON - DESKTOP */}
               <Link to="/login" className="inline-block">
                 <Button 
@@ -129,6 +133,9 @@ const Landing = () => {
           </div>
 
           <div className="md:hidden flex items-center space-x-2">
+            {/* Language Selector */}
+            <LanguageSelector variant="landing" />
+            
             {/* 🚨 BULLETPROOF LOGIN BUTTON - MOBILE */}
             <Link to="/login" className="inline-block">
               <Button 

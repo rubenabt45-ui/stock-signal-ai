@@ -148,7 +148,8 @@
     "search": "Buscar",
     "filter": "Filtrar",
     "sort": "Ordenar",
-    "refresh": "Actualizar"
+    "refresh": "Actualizar",
+    "selectLanguage": "Seleccionar Idioma"
   },
   "toasts": {
     "profileUpdated": "Perfil actualizado exitosamente",

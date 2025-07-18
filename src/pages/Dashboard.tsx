@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import { 
   TrendingUp, 
   Brain, 
@@ -94,6 +95,7 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="flex items-center space-x-2">
+            <LanguageSelector variant="app" />
             <Badge variant={isPro ? "default" : "secondary"} className="px-3 py-1">
               {isPro ? (
                 <>

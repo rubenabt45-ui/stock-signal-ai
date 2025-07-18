@@ -15,6 +15,7 @@ import { LogoutSection } from "@/components/LogoutSection";
 import { NotificationsSection } from "@/components/NotificationsSection";
 import { SubscriptionDashboard } from "@/components/SubscriptionDashboard";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 const Settings = () => {
   const { user, loading: authLoading } = useAuth();
@@ -100,6 +101,9 @@ const Settings = () => {
                 <h1 className="text-2xl font-bold text-white tracking-tight">{t('settings.title')}</h1>
                 <p className="text-sm text-gray-400 font-medium">{t('settings.subtitle')}</p>
               </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <LanguageSelector variant="app" showText />
             </div>
           </div>
         </div>
