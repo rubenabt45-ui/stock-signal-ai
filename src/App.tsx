@@ -33,125 +33,124 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <ThemeProvider>
-        <LanguageProvider>
-          <RealTimePriceProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <div className="min-h-screen bg-tradeiq-navy">
-                  <Routes>
-                    {/* Public Landing Pages - NO AUTH REQUIRED */}
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/learn-preview" element={<LearnPreview />} />
-                    <Route path="/pricing" element={<Pricing />} />
-                    
-                    {/* Authentication Routes */}
-                    <Route path="/login" element={
-                      <PublicRoute>
-                        <Login />
-                      </PublicRoute>
-                    } />
-                    <Route path="/signup" element={
-                      <PublicRoute>
-                        <Signup />
-                      </PublicRoute>
-                    } />
-                    <Route path="/forgot-password" element={
-                      <PublicRoute>
-                        <ForgotPassword />
-                      </PublicRoute>
-                    } />
-                    
-                    {/* Protected App Routes */}
-                    <Route path="/app" element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/app/strategy-ai" element={
-                      <ProtectedRoute>
-                        <TradingChat />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/app/learn" element={
-                      <ProtectedRoute>
-                        <Learn />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/app/events" element={
-                      <ProtectedRoute>
-                        <EconomicEvents />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/app/market-updates" element={
-                      <ProtectedRoute>
-                        <MarketUpdates />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/app/favorites" element={
-                      <ProtectedRoute>
-                        <Favorites />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/app/settings" element={
-                      <ProtectedRoute>
-                        <Settings />
-                      </ProtectedRoute>
-                    } />
-                    
-                    {/* Legacy redirects for compatibility */}
-                    <Route path="/app/trading-chat" element={
-                      <ProtectedRoute>
-                        <TradingChat />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/app/configuration" element={
-                      <ProtectedRoute>
-                        <Settings />
-                      </ProtectedRoute>
-                    } />
-                    
-                    {/* Payment Routes */}
-                    <Route path="/success" element={
-                      <ProtectedRoute>
-                        <Success />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/cancel" element={
-                      <ProtectedRoute>
-                        <Cancel />
-                      </ProtectedRoute>
-                    } />
-                    
-                    {/* Catch-all */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                   <Routes>
-                     <Route path="/" element={null} />
-                     <Route path="/learn-preview" element={null} />
-                     <Route path="/pricing" element={null} />
-                     <Route path="/login" element={null} />
-                     <Route path="/signup" element={null} />
-                     <Route path="/forgot-password" element={null} />
-                     <Route path="/success" element={null} />
-                     <Route path="/cancel" element={null} />
-                     <Route path="/app/*" element={
-                       <div className="pb-20">
-                         <Footer />
-                         <BottomNavigation />
-                       </div>
-                     } />
-                   </Routes>
-                </div>
-              </BrowserRouter>
-            </TooltipProvider>
-          </RealTimePriceProvider>
-        </LanguageProvider>
-      </ThemeProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <div className="min-h-screen bg-tradeiq-navy">
+              <Routes>
+                {/* Public Landing Pages - COMPLETELY ISOLATED FROM AUTH */}
+                <Route path="/" element={<Landing />} />
+                <Route path="/learn-preview" element={<LearnPreview />} />
+                <Route path="/pricing" element={<Pricing />} />
+                
+                {/* All other routes wrapped in AuthProvider */}
+                <Route path="/*" element={
+                  <AuthProvider>
+                    <RealTimePriceProvider>
+                      <Routes>
+                        {/* Authentication Routes */}
+                        <Route path="/login" element={
+                          <PublicRoute>
+                            <Login />
+                          </PublicRoute>
+                        } />
+                        <Route path="/signup" element={
+                          <PublicRoute>
+                            <Signup />
+                          </PublicRoute>
+                        } />
+                        <Route path="/forgot-password" element={
+                          <PublicRoute>
+                            <ForgotPassword />
+                          </PublicRoute>
+                        } />
+                        
+                        {/* Protected App Routes */}
+                        <Route path="/app" element={
+                          <ProtectedRoute>
+                            <Dashboard />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/app/strategy-ai" element={
+                          <ProtectedRoute>
+                            <TradingChat />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/app/learn" element={
+                          <ProtectedRoute>
+                            <Learn />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/app/events" element={
+                          <ProtectedRoute>
+                            <EconomicEvents />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/app/market-updates" element={
+                          <ProtectedRoute>
+                            <MarketUpdates />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/app/favorites" element={
+                          <ProtectedRoute>
+                            <Favorites />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/app/settings" element={
+                          <ProtectedRoute>
+                            <Settings />
+                          </ProtectedRoute>
+                        } />
+                        
+                        {/* Legacy redirects for compatibility */}
+                        <Route path="/app/trading-chat" element={
+                          <ProtectedRoute>
+                            <TradingChat />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/app/configuration" element={
+                          <ProtectedRoute>
+                            <Settings />
+                          </ProtectedRoute>
+                        } />
+                        
+                        {/* Payment Routes */}
+                        <Route path="/success" element={
+                          <ProtectedRoute>
+                            <Success />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/cancel" element={
+                          <ProtectedRoute>
+                            <Cancel />
+                          </ProtectedRoute>
+                        } />
+                        
+                        {/* Catch-all */}
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </RealTimePriceProvider>
+                  </AuthProvider>
+                } />
+              </Routes>
+              
+              {/* Footer and Navigation for /app routes only */}
+              <Routes>
+                <Route path="/app/*" element={
+                  <div className="pb-20">
+                    <Footer />
+                    <BottomNavigation />
+                  </div>
+                } />
+              </Routes>
+            </div>
+          </BrowserRouter>
+        </TooltipProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
