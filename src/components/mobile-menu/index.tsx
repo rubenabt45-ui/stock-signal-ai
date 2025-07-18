@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MobileMenuButton } from './MobileMenuButton';
-import { MobileMenuOverlay } from './MobileMenuOverlay';
-import { MobileMenuContent } from './MobileMenuContent';
+import { Link } from 'react-router-dom';
+import { Menu, X, Home, BookOpen, DollarSign, LogIn, UserPlus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { LanguageSelector } from '@/components/LanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 interface MobileMenuProps {
   onLogin: () => void;
@@ -19,38 +21,46 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const { t } = useTranslation();
 
-  // Logging function for debugging
+  // Enhanced logging
   const logAction = (action: string, details?: any) => {
-    console.log('🍔 [MobileMenu]', {
+    console.log('🍔 [MobileMenu] UNIFIED', {
       action,
       isOpen,
       timestamp: new Date().toISOString(),
       viewport: `${window.innerWidth}x${window.innerHeight}`,
+      menuVisible: menuRef.current ? 'YES' : 'NO',
       ...details
     });
   };
 
-  // Toggle menu state
+  // Toggle menu
   const toggleMenu = () => {
     const newState = !isOpen;
     logAction('TOGGLE_MENU', { from: isOpen, to: newState });
     setIsOpen(newState);
   };
   
-  // Close menu function
+  // Close menu
   const closeMenu = (reason = 'unknown') => {
     logAction('CLOSE_MENU', { reason });
     setIsOpen(false);
   };
 
-  // Handle escape key
+  // Handle menu item clicks
+  const handleMenuClick = (action: () => void, itemName: string) => {
+    logAction('MENU_ITEM_CLICKED', { item: itemName });
+    action();
+    closeMenu('menu_item_selected');
+  };
+
+  // Escape key handler
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isOpen) {
         logAction('ESCAPE_KEY_PRESSED');
         closeMenu('escape_key');
-        // Return focus to hamburger button
         if (buttonRef.current) {
           buttonRef.current.focus();
         }
@@ -70,7 +80,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
     };
   }, [isOpen]);
 
-  // Handle click outside
+  // Click outside handler
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (!isOpen) return;
@@ -92,7 +102,6 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
     };
 
     if (isOpen) {
-      // Add slight delay to prevent immediate closing when opening
       const timer = setTimeout(() => {
         document.addEventListener('mousedown', handleClickOutside);
         document.addEventListener('touchstart', handleClickOutside, { passive: true });
@@ -139,26 +148,131 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
 
   return (
     <div className="relative md:hidden">
-      <MobileMenuButton
-        isOpen={isOpen}
+      {/* Hamburger Button */}
+      <Button
+        ref={buttonRef}
+        variant="ghost"
         onClick={toggleMenu}
-        buttonRef={buttonRef}
-      />
-      
-      <MobileMenuOverlay
-        isOpen={isOpen}
-        onClose={() => closeMenu('overlay_click')}
-      />
-      
-      <MobileMenuContent
-        isOpen={isOpen}
-        onClose={closeMenu}
-        onLogin={onLogin}
-        onSignUp={onSignUp}
-        onLearnPreview={onLearnPreview}
-        onPricing={onPricing}
-        menuRef={menuRef}
-      />
+        className="text-white hover:bg-white/10 p-3 transition-all duration-200 relative z-[80] min-h-[48px] min-w-[48px] border border-gray-700 hover:border-gray-500"
+        aria-expanded={isOpen}
+        aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        aria-controls="mobile-menu-content"
+        data-testid="mobile-menu-toggle"
+      >
+        {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+      </Button>
+
+      {/* Single Unified Menu Component */}
+      <div
+        ref={menuRef}
+        id="mobile-menu-content"
+        className={`fixed inset-0 z-[70] transition-all duration-300 ease-in-out ${
+          isOpen 
+            ? 'opacity-100 pointer-events-auto' 
+            : 'opacity-0 pointer-events-none'
+        }`}
+        data-testid="mobile-menu-content"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(17, 24, 39, 0.95)',
+          zIndex: 70
+        }}
+        onClick={(e) => {
+          // Close if clicking the background (not menu content)
+          if (e.target === e.currentTarget) {
+            closeMenu('overlay_click');
+          }
+        }}
+      >
+        {/* Menu Content Container */}
+        <div className="h-full flex flex-col bg-transparent">
+          {/* Menu Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-600 min-h-[80px]">
+            <h3 className="text-xl font-semibold text-white">Navigation</h3>
+            <Button
+              variant="ghost"
+              onClick={() => closeMenu('header_close')}
+              className="text-gray-400 hover:text-white hover:bg-gray-700 p-3 min-h-[48px] min-w-[48px] rounded-lg"
+              aria-label="Close menu"
+              data-testid="menu-close-button"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+          </div>
+
+          {/* Navigation Links */}
+          <div className="flex-1 py-6 space-y-2">
+            <Link
+              to="/"
+              onClick={() => closeMenu('home_link')}
+              className="flex items-center gap-4 px-6 py-4 text-white hover:bg-gray-700/50 active:bg-gray-600/50 transition-all duration-200 min-h-[56px] w-full group"
+              data-testid="menu-home-link"
+            >
+              <Home className="h-6 w-6 text-gray-300 group-hover:text-blue-400 flex-shrink-0" />
+              <span className="text-lg font-medium">{t('landing.navbar.home')}</span>
+            </Link>
+            
+            <button
+              onClick={() => handleMenuClick(onLearnPreview, 'Learn Preview')}
+              className="w-full flex items-center gap-4 px-6 py-4 text-left text-white hover:bg-gray-700/50 active:bg-gray-600/50 transition-all duration-200 min-h-[56px] group"
+              data-testid="menu-learn-link"
+            >
+              <BookOpen className="h-6 w-6 text-gray-300 group-hover:text-blue-400 flex-shrink-0" />
+              <span className="text-lg font-medium">{t('landing.navbar.learnPreview')}</span>
+            </button>
+            
+            <button
+              onClick={() => handleMenuClick(onPricing, 'Pricing')}
+              className="w-full flex items-center gap-4 px-6 py-4 text-left text-white hover:bg-gray-700/50 active:bg-gray-600/50 transition-all duration-200 min-h-[56px] group"
+              data-testid="menu-pricing-link"
+            >
+              <DollarSign className="h-6 w-6 text-gray-300 group-hover:text-blue-400 flex-shrink-0" />
+              <span className="text-lg font-medium">{t('landing.navbar.pricing')}</span>
+            </button>
+          </div>
+
+          {/* Language Selector */}
+          <div className="px-6 py-6 border-t border-gray-600">
+            <p className="text-base font-medium text-gray-300 mb-4">Language</p>
+            <div className="bg-gray-700/30 p-4 rounded-lg min-h-[48px] flex items-center">
+              <LanguageSelector variant="landing" />
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="px-6 py-6 space-y-4 border-t border-gray-600">
+            <Button
+              variant="outline"
+              onClick={() => handleMenuClick(onLogin, 'Login')}
+              className="w-full justify-center text-white border-gray-500 hover:border-gray-400 hover:bg-gray-700/50 transition-all duration-200 min-h-[56px] text-lg font-medium"
+              data-testid="menu-login-button"
+            >
+              <LogIn className="h-5 w-5 mr-3" />
+              {t('landing.navbar.login')}
+            </Button>
+            
+            <Button
+              onClick={() => handleMenuClick(onSignUp, 'Sign Up')}
+              className="w-full justify-center bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 min-h-[56px] text-lg font-medium shadow-lg"
+              data-testid="menu-signup-button"
+            >
+              <UserPlus className="h-5 w-5 mr-3" />
+              {t('landing.navbar.signUp')}
+            </Button>
+          </div>
+        </div>
+
+        {/* Overlay Click Area - ensure clicking background closes menu */}
+        <div 
+          className="absolute inset-0 -z-10" 
+          data-testid="mobile-menu-overlay"
+          onClick={() => closeMenu('overlay_click')}
+        />
+      </div>
     </div>
   );
 };
