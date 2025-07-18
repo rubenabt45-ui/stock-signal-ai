@@ -21,26 +21,38 @@ const Landing = () => {
   const navigate = useNavigate();
 
   const handleLoginClick = (e: React.MouseEvent) => {
-    console.log("Login button clicked");
-    e.preventDefault();
+    console.log("🔥 Login button clicked - event captured");
+    console.log("Event details:", e.type, e.target);
+    
+    // Remove preventDefault that might be blocking navigation
     try {
+      console.log("🚀 Attempting navigation to /login");
       navigate('/login');
-      console.log("Navigating to /login");
+      console.log("✅ Navigation successful");
     } catch (error) {
-      console.error("Navigation failed, using fallback:", error);
-      window.location.href = '/login';
+      console.error("❌ Navigation failed, using fallback:", error);
+      // Force navigation as fallback
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 100);
     }
   };
 
   const handleSignUpClick = (e: React.MouseEvent) => {
-    console.log("Sign Up button clicked");
-    e.preventDefault();
+    console.log("🔥 Sign Up button clicked - event captured");
+    console.log("Event details:", e.type, e.target);
+    
+    // Remove preventDefault that might be blocking navigation
     try {
+      console.log("🚀 Attempting navigation to /signup");
       navigate('/signup');
-      console.log("Navigating to /signup");
+      console.log("✅ Navigation successful");
     } catch (error) {
-      console.error("Navigation failed, using fallback:", error);
-      window.location.href = '/signup';
+      console.error("❌ Navigation failed, using fallback:", error);
+      // Force navigation as fallback
+      setTimeout(() => {
+        window.location.href = '/signup';
+      }, 100);
     }
   };
 
