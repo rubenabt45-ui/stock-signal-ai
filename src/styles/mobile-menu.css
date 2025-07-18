@@ -1,0 +1,92 @@
+// Mobile Menu CSS Fixes and Enhancements
+.mobile-menu-debug {
+  position: fixed;
+  top: 4rem;
+  left: 1rem;
+  background: #ef4444;
+  color: white;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  z-index: 100;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+@media (min-width: 768px) {
+  .mobile-menu-debug {
+    display: none;
+  }
+}
+
+// Enhanced mobile menu animations
+.mobile-menu-dropdown {
+  animation: slideInFromTop 0.3s ease-out forwards;
+  transform-origin: top center;
+}
+
+@keyframes slideInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mobile-menu-overlay {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+// Ensure proper touch targets on all devices
+.mobile-nav-item {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+}
+
+.mobile-nav-item:hover,
+.mobile-nav-item:focus {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+}
+
+// Dark theme consistency
+.mobile-menu-container {
+  background: rgba(17, 24, 39, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+// Prevent scroll issues on iOS
+body.menu-open {
+  position: fixed !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  top: 0 !important;
+}
+
+// Enhanced z-index management
+.mobile-menu-button {
+  z-index: 70;
+}
+
+.mobile-menu-content {
+  z-index: 65;
+}
+
+.mobile-menu-overlay {
+  z-index: 60;
+}
