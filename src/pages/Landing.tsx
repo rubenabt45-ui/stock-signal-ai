@@ -30,25 +30,49 @@ const Landing = () => {
           </div>
           
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
-            <Link to="/learn-preview" className="text-gray-300 hover:text-white transition-colors">Learn Preview</Link>
-            <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</Link>
+            <Link to="/" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Home</Link>
+            <Link to="/learn-preview" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Learn Preview</Link>
+            <Link to="/pricing" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Pricing</Link>
             <div className="flex items-center space-x-2">
               <Link to="/login">
-                <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">Login</Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20"
+                >
+                  Login
+                </Button>
               </Link>
               <Link to="/signup">
-                <Button variant="outline" size="sm">Sign Up</Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20"
+                >
+                  Sign Up
+                </Button>
               </Link>
             </div>
           </div>
 
           <div className="md:hidden flex items-center space-x-2">
             <Link to="/login">
-              <Button variant="ghost" size="sm">Login</Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20"
+              >
+                Login
+              </Button>
             </Link>
             <Link to="/signup">
-              <Button variant="outline" size="sm">Sign Up</Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20"
+              >
+                Sign Up
+              </Button>
             </Link>
           </div>
         </div>
@@ -65,14 +89,16 @@ const Landing = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Link to="/signup">
-              <Button size="lg" className="px-8 py-6 text-lg">
+              <Button size="lg" className="px-8 py-6 text-lg hover:scale-105 transform transition-all duration-300 shadow-lg hover:shadow-xl">
                 Join the Beta
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="px-8 py-6 text-lg">
-              Watch Demo
-            </Button>
+            <Link to="/signup">
+              <Button variant="outline" size="lg" className="px-8 py-6 text-lg hover:bg-white/10 hover:border-white/30 transition-all duration-300">
+                Watch Demo
+              </Button>
+            </Link>
           </div>
           
           {/* Stats */}
@@ -277,8 +303,8 @@ const Landing = () => {
           </div>
 
           <div className="text-center">
-            <Link to="/app/strategy-ai">
-              <Button size="lg" className="px-8 py-6 text-lg">
+            <Link to="/learn-preview">
+              <Button size="lg" className="px-8 py-6 text-lg hover:scale-105 transform transition-all duration-300">
                 Explore Learn Section
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
@@ -306,9 +332,11 @@ const Landing = () => {
                   <p className="text-gray-400">Real-time platform preview</p>
                 </div>
               </div>
-              <Button size="lg" className="px-8 py-6 text-lg">
-                Request Demo Access
-              </Button>
+              <Link to="/signup">
+                <Button size="lg" className="px-8 py-6 text-lg hover:scale-105 transform transition-all duration-300">
+                  Request Demo Access
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -337,9 +365,11 @@ const Landing = () => {
                       className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400"
                     />
                   </div>
-                  <Button size="lg" className="w-full py-6 text-lg">
-                    Request Early Access
-                  </Button>
+                  <Link to="/signup">
+                    <Button size="lg" className="w-full py-6 text-lg hover:scale-105 transform transition-all duration-300">
+                      Request Early Access
+                    </Button>
+                  </Link>
                   <p className="text-xs text-gray-400">
                     No spam. Unsubscribe at any time.
                   </p>
