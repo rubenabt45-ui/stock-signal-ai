@@ -168,14 +168,14 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
         )}
       </Button>
 
-      {/* Menu Overlay - Fixed positioned backdrop */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[40] transition-opacity duration-300"
-          onClick={() => closeMenu('overlay_click')}
-          data-testid="mobile-menu-overlay"
-        />
-      )}
+      {/* Menu Overlay - Full viewport backdrop */}
+      <div 
+        className={`fixed inset-0 bg-black/70 backdrop-blur-sm transition-all duration-300 ease-in-out ${
+          isOpen ? 'z-[40] opacity-100' : 'z-[-1] opacity-0 pointer-events-none'
+        }`}
+        onClick={() => closeMenu('overlay_click')}
+        data-testid="mobile-menu-overlay"
+      />
 
       {/* Menu Content - Fixed positioned dropdown */}
       <div
@@ -183,7 +183,8 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
         id="mobile-menu-content"
         className={`
           fixed top-20 right-4 w-80 max-w-[calc(100vw-2rem)]
-          bg-gray-900 border border-gray-600 rounded-lg shadow-2xl
+          bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-lg
+          shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] 
           transition-all duration-300 ease-in-out
           ${isOpen 
             ? 'opacity-100 translate-y-0 scale-100 z-[50] pointer-events-auto' 
@@ -191,11 +192,6 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
           }
         `}
         data-testid="mobile-menu-content"
-        style={{
-          background: 'rgba(17, 24, 39, 0.98)',
-          backdropFilter: 'blur(12px)',
-          boxShadow: isOpen ? '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 10px 20px -5px rgba(0, 0, 0, 0.4)' : 'none',
-        }}
       >
         {/* Menu Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
