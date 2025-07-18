@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { useTranslation } from 'react-i18next';
 import { 
   TrendingUp, 
   Brain, 
@@ -20,6 +21,7 @@ import {
 
 const Landing = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // 🚀 COMPREHENSIVE NAVIGATION HANDLERS WITH DEBUGGING
   const handleNavigation = (path: string, logMessage: string) => {
@@ -68,9 +70,9 @@ const Landing = () => {
           </div>
           
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/" onClick={handleNavigation('/', 'Home link clicked')} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Home</Link>
-            <Link to="/learn-preview" onClick={handleLearnPreviewClick} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Learn Preview</Link>
-            <Link to="/pricing" onClick={handlePricingClick} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Pricing</Link>
+            <Link to="/" onClick={handleNavigation('/', 'Home link clicked')} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">{t('landing.navbar.home')}</Link>
+            <Link to="/learn-preview" onClick={handleLearnPreviewClick} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">{t('landing.navbar.learnPreview')}</Link>
+            <Link to="/pricing" onClick={handlePricingClick} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">{t('landing.navbar.pricing')}</Link>
             <div className="flex items-center space-x-2">
               {/* Language Selector */}
               <LanguageSelector variant="landing" />
@@ -104,7 +106,7 @@ const Landing = () => {
                     console.log('🖱️ Login button mouse up detected');
                   }}
                 >
-                  Login
+                  {t('landing.navbar.login')}
                 </Button>
               </Link>
               
@@ -126,7 +128,7 @@ const Landing = () => {
                     }
                   }}
                 >
-                  Sign Up
+                  {t('landing.navbar.signUp')}
                 </Button>
               </Link>
             </div>
@@ -165,7 +167,7 @@ const Landing = () => {
                   console.log('📱 Mobile login touch end detected');
                 }}
               >
-                Login
+                {t('landing.navbar.login')}
               </Button>
             </Link>
             
@@ -187,7 +189,7 @@ const Landing = () => {
                   }
                 }}
               >
-                Sign Up
+                {t('landing.navbar.signUp')}
               </Button>
             </Link>
           </div>
@@ -196,10 +198,10 @@ const Landing = () => {
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-tradeiq-blue to-white bg-clip-text text-transparent">
-            Empower Your Trading with Real-Time AI
+            {t('landing.hero.title')}
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed">
-            Identify patterns, trends, and opportunities with algorithmic precision
+            {t('landing.hero.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button 
@@ -207,7 +209,7 @@ const Landing = () => {
               className="px-8 py-6 text-lg hover:scale-105 transform transition-all duration-300 shadow-lg hover:shadow-xl"
               onClick={handleJoinBetaClick}
             >
-              Join the Beta
+              {t('landing.hero.joinBeta')}
               <ChevronRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
@@ -216,7 +218,7 @@ const Landing = () => {
               className="px-8 py-6 text-lg hover:bg-white/10 hover:border-white/30 transition-all duration-300"
               onClick={handleDemoClick}
             >
-              Watch Demo
+              {t('landing.hero.watchDemo')}
             </Button>
           </div>
           
@@ -224,15 +226,15 @@ const Landing = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-16">
             <div className="text-center">
               <div className="text-3xl font-bold text-tradeiq-blue mb-2">95%</div>
-              <div className="text-gray-400">Pattern Accuracy</div>
+              <div className="text-gray-400">{t('landing.hero.stats.accuracy')}</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-tradeiq-blue mb-2">&lt; 1s</div>
-              <div className="text-gray-400">Analysis Speed</div>
+              <div className="text-gray-400">{t('landing.hero.stats.speed')}</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-tradeiq-blue mb-2">24/7</div>
-              <div className="text-gray-400">Market Monitoring</div>
+              <div className="text-gray-400">{t('landing.hero.stats.monitoring')}</div>
             </div>
           </div>
         </div>
@@ -242,12 +244,9 @@ const Landing = () => {
       <section className="py-20 bg-gray-900/50">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-6">What is TradeIQ?</h2>
+            <h2 className="text-4xl font-bold mb-6">{t('landing.about.title')}</h2>
             <p className="text-xl text-gray-300 leading-relaxed">
-              TradeIQ is an AI-powered technical analysis platform that detects patterns, 
-              analyzes trends, and highlights high-volatility zones in real-time. Our advanced 
-              machine learning algorithms provide traders with the insights they need to make 
-              informed decisions faster than ever before.
+              {t('landing.about.description')}
             </p>
           </div>
         </div>
@@ -256,7 +255,7 @@ const Landing = () => {
       {/* Core Features */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-16">Core Features</h2>
+          <h2 className="text-4xl font-bold text-center mb-16">{t('landing.features.title')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Card className="bg-gray-800/50 border-gray-700 hover:border-tradeiq-blue/50 transition-all duration-300 hover:transform hover:scale-105">
@@ -264,11 +263,11 @@ const Landing = () => {
                 <div className="mx-auto mb-4 p-3 bg-tradeiq-blue/20 rounded-full w-fit">
                   <BarChart3 className="h-8 w-8 text-tradeiq-blue" />
                 </div>
-                <CardTitle className="text-white">Pattern Detection</CardTitle>
+                <CardTitle className="text-white">{t('landing.features.patternDetection.title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-gray-300 text-center">
-                  Automated chart pattern recognition with machine learning precision
+                  {t('landing.features.patternDetection.description')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -278,11 +277,11 @@ const Landing = () => {
                 <div className="mx-auto mb-4 p-3 bg-tradeiq-blue/20 rounded-full w-fit">
                   <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
                 </div>
-                <CardTitle className="text-white">Trend Analysis</CardTitle>
+                <CardTitle className="text-white">{t('landing.features.trendAnalysis.title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-gray-300 text-center">
-                  Real-time trend identification and momentum analysis
+                  {t('landing.features.trendAnalysis.description')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -292,11 +291,11 @@ const Landing = () => {
                 <div className="mx-auto mb-4 p-3 bg-tradeiq-blue/20 rounded-full w-fit">
                   <Zap className="h-8 w-8 text-tradeiq-blue" />
                 </div>
-                <CardTitle className="text-white">Volatility Heatmaps</CardTitle>
+                <CardTitle className="text-white">{t('landing.features.volatilityHeatmaps.title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-gray-300 text-center">
-                  Visual volatility zones and risk assessment tools
+                  {t('landing.features.volatilityHeatmaps.description')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -306,11 +305,11 @@ const Landing = () => {
                 <div className="mx-auto mb-4 p-3 bg-tradeiq-blue/20 rounded-full w-fit">
                   <MessageCircle className="h-8 w-8 text-tradeiq-blue" />
                 </div>
-                <CardTitle className="text-white">TradingChat AI</CardTitle>
+                <CardTitle className="text-white">{t('landing.features.aiInsights.title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-gray-300 text-center">
-                  Conversational AI assistant for trading insights and education
+                  {t('landing.features.aiInsights.description')}
                 </CardDescription>
               </CardContent>
             </Card>

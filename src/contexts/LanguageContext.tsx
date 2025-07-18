@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,15 +13,19 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+// Define available languages outside component to prevent re-creation
+const AVAILABLE_LANGUAGES = [
+  { code: 'en', name: 'English' },
+  { code: 'es', name: 'Español' }
+];
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const { i18n, t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const availableLanguages = [
-    { code: 'en', name: 'English' },
-    { code: 'es', name: 'Español' }
-  ];
+  // Memoize available languages to prevent dependency changes
+  const availableLanguages = useMemo(() => AVAILABLE_LANGUAGES, []);
 
   // Load language from user_profiles on mount with proper error handling
   useEffect(() => {

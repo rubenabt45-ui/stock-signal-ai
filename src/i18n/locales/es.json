@@ -1,5 +1,91 @@
 
 {
+  "landing": {
+    "navbar": {
+      "home": "Inicio",
+      "learnPreview": "Vista Previa de Aprendizaje",
+      "pricing": "Precios", 
+      "login": "Iniciar Sesión",
+      "signUp": "Registrarse"
+    },
+    "hero": {
+      "title": "Plataforma de Inteligencia de Trading Impulsada por IA",
+      "subtitle": "Identifica patrones, tendencias y oportunidades con precisión algorítmica",
+      "joinBeta": "Únete a la Beta",
+      "watchDemo": "Ver Demo",
+      "stats": {
+        "accuracy": "Precisión de Patrones",
+        "speed": "Velocidad de Análisis",
+        "monitoring": "Monitoreo del Mercado"
+      }
+    },
+    "about": {
+      "title": "¿Qué es TradeIQ?",
+      "description": "TradeIQ es una plataforma de análisis técnico impulsada por IA que detecta patrones, analiza tendencias y resalta zonas de alta volatilidad en tiempo real. Nuestros algoritmos avanzados de aprendizaje automático proporcionan a los traders las perspectivas que necesitan para tomar decisiones informadas más rápido que nunca."
+    },
+    "features": {
+      "title": "Características Principales",
+      "patternDetection": {
+        "title": "Detección de Patrones",
+        "description": "Reconocimiento automatizado de patrones de gráficos con precisión de aprendizaje automático"
+      },
+      "trendAnalysis": {
+        "title": "Análisis de Tendencias",
+        "description": "Identificación de tendencias en tiempo real y análisis de momentum"
+      },
+      "volatilityHeatmaps": {
+        "title": "Mapas de Calor de Volatilidad",
+        "description": "Zonas visuales de volatilidad y herramientas de evaluación de riesgos"
+      },
+      "aiInsights": {
+        "title": "Perspectivas de IA",
+        "description": "Análisis inteligente del mercado con recomendaciones accionables"
+      }
+    },
+    "aiFeatures": {
+      "title": "Características Impulsadas por IA",
+      "subtitle": "Aprovecha el poder de la inteligencia artificial para decisiones de trading más inteligentes",
+      "chartIA": {
+        "title": "ChartIA",
+        "description": "Análisis avanzado de gráficos con IA y reconocimiento de patrones"
+      },
+      "tradingChat": {
+        "title": "TradingChat",
+        "description": "Asistente interactivo de IA para orientación y estrategia de trading"
+      },
+      "newsIA": {
+        "title": "NewsIA",
+        "description": "Noticias del mercado curadas por IA y análisis de sentimientos"
+      }
+    },
+    "pricing": {
+      "title": "Precios Simples y Transparentes",
+      "subtitle": "Elige el plan que se adapte a tu estilo de trading",
+      "freeTitle": "Gratis",
+      "freePrice": "$0",
+      "freeDescription": "Perfecto para empezar",
+      "proTitle": "Pro",
+      "proPrice": "$9.99",
+      "proDescription": "Todo lo que necesitas para trading profesional",
+      "features": {
+        "basicCharts": "Análisis básico de gráficos",
+        "limitedAI": "Perspectivas limitadas de IA",
+        "communityAccess": "Acceso a la comunidad",
+        "advancedCharts": "Análisis avanzado de gráficos",
+        "unlimitedAI": "Perspectivas ilimitadas de IA",
+        "prioritySupport": "Soporte prioritario",
+        "realTimeData": "Feeds de datos en tiempo real",
+        "customAlerts": "Alertas personalizadas"
+      },
+      "getStarted": "Comenzar",
+      "upgradeNow": "Actualizar Ahora"
+    },
+    "cta": {
+      "title": "¿Listo para Transformar tu Trading?",
+      "subtitle": "Únete a miles de traders que ya están usando TradeIQ para tomar decisiones de trading más inteligentes",
+      "startNow": "Comenzar a Tradear Más Inteligentemente"
+    }
+  },
   "navigation": {
     "chartIA": "ChartIA",
     "tradingChat": "TradingChat",
