@@ -13,8 +13,13 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Only redirect authenticated users away from auth pages (login/signup)
+    // Don't redirect from other public pages
     if (!loading && user) {
-      navigate('/app');
+      const currentPath = window.location.pathname;
+      if (currentPath === '/login' || currentPath === '/signup' || currentPath === '/forgot-password') {
+        navigate('/app');
+      }
     }
   }, [user, loading, navigate]);
 
@@ -30,8 +35,12 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
     );
   }
 
+  // If user is authenticated and this is an auth page, don't render
   if (user) {
-    return null;
+    const currentPath = window.location.pathname;
+    if (currentPath === '/login' || currentPath === '/signup' || currentPath === '/forgot-password') {
+      return null;
+    }
   }
 
   return <>{children}</>;

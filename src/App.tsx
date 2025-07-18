@@ -43,7 +43,7 @@ const App = () => (
               <BrowserRouter>
                 <div className="min-h-screen bg-tradeiq-navy">
                   <Routes>
-                    {/* Public Landing Pages */}
+                    {/* Public Landing Pages - NO AUTH REQUIRED */}
                     <Route path="/" element={<Landing />} />
                     <Route path="/learn-preview" element={<LearnPreview />} />
                     <Route path="/pricing" element={<Pricing />} />
