@@ -14,12 +14,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    if (!loading && !user) {
-      // Only redirect to login if user is trying to access /app/* routes
-      if (location.pathname.startsWith('/app')) {
-        navigate('/login');
-        return;
-      }
+    // CRITICAL: Only redirect if we're actually on an /app route AND user is not authenticated
+    if (!loading && !user && location.pathname.startsWith('/app')) {
+      console.log('🔒 ProtectedRoute: Redirecting unauthenticated user from:', location.pathname);
+      navigate('/login');
+      return;
     }
   }, [user, loading, navigate, location.pathname]);
 
@@ -35,7 +34,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  if (!user) {
+  // Don't render if no user and we're on a protected route
+  if (!user && location.pathname.startsWith('/app')) {
     return null;
   }
 
