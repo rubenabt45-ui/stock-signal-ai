@@ -421,4 +421,90 @@
     min-height: 44px;
     min-width: 44px;
   }
+  
+  /* Landing page specific mobile optimizations */
+  .landing-nav {
+    padding: 0.75rem 1rem;
+  }
+  
+  .landing-hero {
+    padding: 3rem 1rem;
+  }
+  
+  .landing-section {
+    padding: 3rem 1rem;
+  }
+  
+  /* Prevent horizontal scroll */
+  .container {
+    overflow-x: hidden;
+  }
+  
+  /* Responsive grid adjustments */
+  .grid-responsive {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Mobile card optimizations */
+  .mobile-card {
+    min-height: 120px;
+    padding: 1rem;
+  }
+  
+  /* Form optimizations */
+  input, textarea, select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+  }
+}
+
+/* Tablet Responsiveness */
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Tablet specific optimizations */
+  .tablet-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .tablet-text {
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+  
+  /* Better touch targets for tablets */
+  button, .btn, [role="button"] {
+    min-height: 48px;
+    min-width: 48px;
+  }
+}
+
+/* Large mobile (iPhone 14 Pro Max, etc.) */
+@media (min-width: 375px) and (max-width: 430px) {
+  .large-mobile-hero {
+    font-size: 2.5rem;
+    line-height: 1.1;
+  }
+  
+  .large-mobile-subtitle {
+    font-size: 1.25rem;
+    line-height: 1.5;
+  }
+}
+
+/* Small mobile (iPhone SE) */
+@media (max-width: 374px) {
+  .small-mobile-hero {
+    font-size: 2rem;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  
+  .small-mobile-padding {
+    padding: 0.5rem;
+  }
+  
+  .small-mobile-text {
+    font-size: 0.875rem;
+  }
 }
