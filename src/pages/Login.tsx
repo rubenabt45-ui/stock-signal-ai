@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import BackToHomeButton from "@/components/BackToHomeButton";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -128,6 +129,10 @@ const Login = () => {
                 Sign Up
               </Link>
             </p>
+          </div>
+          
+          <div className="mt-4">
+            <BackToHomeButton />
           </div>
         </CardContent>
       </Card>

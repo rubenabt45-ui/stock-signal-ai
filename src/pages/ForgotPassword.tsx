@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, ArrowLeft, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import BackToHomeButton from '@/components/BackToHomeButton';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -171,13 +172,17 @@ const ForgotPassword = () => {
             </CardContent>
           </Card>
           
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-4">
             <p className="text-sm text-gray-400">
               Don't have an account?{' '}
               <Link to="/signup" className="text-tradeiq-blue hover:text-tradeiq-blue/80 transition-colors">
                 Sign up for free
               </Link>
             </p>
+            
+            <div className="max-w-md mx-auto">
+              <BackToHomeButton />
+            </div>
           </div>
         </div>
       </div>
