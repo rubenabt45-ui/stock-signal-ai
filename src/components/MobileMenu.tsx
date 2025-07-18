@@ -150,14 +150,6 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
 
   return (
     <div className="relative md:hidden">
-      {/* Debug State Indicator - Remove in production */}
-      <div 
-        className="fixed top-16 left-2 bg-red-600 text-white px-2 py-1 text-xs font-bold rounded z-[200] shadow-lg"
-        data-testid="menu-debug-state"
-      >
-        MENU: {isOpen ? 'OPEN' : 'CLOSED'}
-      </div>
-
       {/* Hamburger Button */}
       <Button
         ref={buttonRef}
