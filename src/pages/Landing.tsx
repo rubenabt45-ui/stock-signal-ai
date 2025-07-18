@@ -23,28 +23,16 @@ const Landing = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  // 🚀 COMPREHENSIVE NAVIGATION HANDLERS WITH DEBUGGING
+  // 🚀 SIMPLIFIED NAVIGATION HANDLERS
   const handleNavigation = (path: string, logMessage: string) => {
-    return (e?: React.MouseEvent) => {
-      console.log(`🔥 ${logMessage} - event captured`);
-      console.log(`📍 Current route: ${window.location.pathname}`);
-      console.log(`🎯 Target route: ${path}`);
-      
-      if (e) {
-        console.log("Event details:", e.type, e.target);
-      }
-      
+    return () => {
+      console.log(`🚀 ${logMessage} - navigating to ${path}`);
       try {
-        console.log(`🚀 Attempting navigation to ${path}`);
         navigate(path);
         console.log(`✅ Navigation to ${path} successful`);
       } catch (error) {
         console.error(`❌ Navigation to ${path} failed, using fallback:`, error);
-        // Force navigation as fallback with slight delay to avoid race conditions
-        setTimeout(() => {
-          console.log(`🔄 Fallback navigation to ${path} via window.location`);
-          window.location.href = path;
-        }, 100);
+        window.location.href = path;
       }
     };
   };
@@ -70,67 +58,32 @@ const Landing = () => {
           </div>
           
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/" onClick={handleNavigation('/', 'Home link clicked')} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">{t('landing.navbar.home')}</Link>
-            <Link to="/learn-preview" onClick={handleLearnPreviewClick} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">{t('landing.navbar.learnPreview')}</Link>
-            <Link to="/pricing" onClick={handlePricingClick} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">{t('landing.navbar.pricing')}</Link>
+            <Link to="/" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">{t('landing.navbar.home')}</Link>
+            <Link to="/learn-preview" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">{t('landing.navbar.learnPreview')}</Link>
+            <Link to="/pricing" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">{t('landing.navbar.pricing')}</Link>
             <div className="flex items-center space-x-2">
               {/* Language Selector */}
               <LanguageSelector variant="landing" />
               
-              {/* 🚨 BULLETPROOF LOGIN BUTTON - DESKTOP */}
-              <Link to="/login" className="inline-block">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
-                  onClick={(e) => {
-                    console.log('🚨 DESKTOP LOGIN BUTTON CLICKED!');
-                    console.log('Event captured:', e.type, e.target);
-                    console.log('Current URL:', window.location.href);
-                    
-                    // Double-ensure navigation
-                    try {
-                      console.log('🚀 Attempting navigate to /login');
-                      e.preventDefault(); // Prevent Link default to control navigation
-                      navigate('/login');
-                      console.log('✅ Navigate successful');
-                    } catch (error) {
-                      console.error('❌ Navigate failed, using window.location:', error);
-                      window.location.href = '/login';
-                    }
-                  }}
-                  onMouseDown={(e) => {
-                    console.log('🖱️ Login button mouse down detected');
-                  }}
-                  onMouseUp={(e) => {
-                    console.log('🖱️ Login button mouse up detected');
-                  }}
-                >
-                  {t('landing.navbar.login')}
-                </Button>
-              </Link>
+              {/* 🚨 FIXED LOGIN BUTTON - DESKTOP */}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
+                onClick={handleLoginClick}
+              >
+                {t('landing.navbar.login')}
+              </Button>
               
-              {/* Sign Up Button */}
-              <Link to="/signup" className="inline-block">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
-                  onClick={(e) => {
-                    console.log('🚨 DESKTOP SIGNUP BUTTON CLICKED!');
-                    try {
-                      e.preventDefault();
-                      navigate('/signup');
-                      console.log('✅ Signup navigate successful');
-                    } catch (error) {
-                      console.error('❌ Signup navigate failed:', error);
-                      window.location.href = '/signup';
-                    }
-                  }}
-                >
-                  {t('landing.navbar.signUp')}
-                </Button>
-              </Link>
+              {/* Sign Up Button - Fixed */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
+                onClick={handleSignUpClick}
+              >
+                {t('landing.navbar.signUp')}
+              </Button>
             </div>
           </div>
 
@@ -138,63 +91,30 @@ const Landing = () => {
             {/* Language Selector */}
             <LanguageSelector variant="landing" />
             
-            {/* 🚨 BULLETPROOF LOGIN BUTTON - MOBILE */}
-            <Link to="/login" className="inline-block">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
-                onClick={(e) => {
-                  console.log('🚨 MOBILE LOGIN BUTTON CLICKED!');
-                  console.log('Event captured:', e.type, e.target);
-                  console.log('Current URL:', window.location.href);
-                  
-                  // Double-ensure navigation
-                  try {
-                    console.log('🚀 Attempting navigate to /login (mobile)');
-                    e.preventDefault(); // Prevent Link default to control navigation
-                    navigate('/login');
-                    console.log('✅ Mobile navigate successful');
-                  } catch (error) {
-                    console.error('❌ Mobile navigate failed, using window.location:', error);
-                    window.location.href = '/login';
-                  }
-                }}
-                onTouchStart={(e) => {
-                  console.log('📱 Mobile login touch start detected');
-                }}
-                onTouchEnd={(e) => {
-                  console.log('📱 Mobile login touch end detected');
-                }}
-              >
-                {t('landing.navbar.login')}
-              </Button>
-            </Link>
+            {/* 🚨 FIXED LOGIN BUTTON - MOBILE */}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
+              onClick={handleLoginClick}
+            >
+              {t('landing.navbar.login')}
+            </Button>
             
-            {/* Mobile Sign Up Button */}
-            <Link to="/signup" className="inline-block">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
-                onClick={(e) => {
-                  console.log('🚨 MOBILE SIGNUP BUTTON CLICKED!');
-                  try {
-                    e.preventDefault();
-                    navigate('/signup');
-                    console.log('✅ Mobile signup navigate successful');
-                  } catch (error) {
-                    console.error('❌ Mobile signup navigate failed:', error);
-                    window.location.href = '/signup';
-                  }
-                }}
-              >
-                {t('landing.navbar.signUp')}
-              </Button>
-            </Link>
+            {/* Mobile Sign Up Button - Fixed */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
+              onClick={handleSignUpClick}
+            >
+              {t('landing.navbar.signUp')}
+            </Button>
           </div>
         </div>
       </nav>
+
+      {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-tradeiq-blue to-white bg-clip-text text-transparent">
@@ -429,37 +349,6 @@ const Landing = () => {
               Explore Learn Section
               <ChevronRight className="ml-2 h-5 w-5" />
             </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Demo Preview */}
-      <section className="py-20 bg-gray-900/50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6">See TradeIQ in Action</h2>
-            <p className="text-xl text-gray-300">
-              Experience the power of AI-driven trading analysis
-            </p>
-          </div>
-          
-          <div className="max-w-6xl mx-auto">
-            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 text-center">
-              <div className="aspect-video bg-gradient-to-r from-gray-700 to-gray-600 rounded-xl flex items-center justify-center mb-6">
-                <div className="text-center">
-                  <BarChart3 className="h-20 w-20 text-tradeiq-blue mx-auto mb-4" />
-                  <p className="text-xl text-gray-300">Interactive Demo Coming Soon</p>
-                  <p className="text-gray-400">Real-time platform preview</p>
-                </div>
-              </div>
-              <Button 
-                size="lg" 
-                className="px-8 py-6 text-lg hover:scale-105 transform transition-all duration-300"
-                onClick={handleDemoClick}
-              >
-                Request Demo Access
-              </Button>
-            </div>
           </div>
         </div>
       </section>
