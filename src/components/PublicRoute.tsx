@@ -14,7 +14,7 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate('/');
+      navigate('/app');
     }
   }, [user, loading, navigate]);
 
