@@ -8,8 +8,9 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  resendConfirmation: (email: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -48,8 +49,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔐 AuthProvider: Auth state changed:', event, session ? 'authenticated' : 'not authenticated');
+      
+      // Handle email verification specifically
+      if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') {
+        console.log('🔐 Auth event detected:', event);
+        
+        // Check if this is from an email verification
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenHash = urlParams.get('token_hash');
+        const type = urlParams.get('type');
+        
+        if (tokenHash && type === 'email') {
+          console.log('🔐 Email verification detected, token hash present');
+          
+          try {
+            const { data, error } = await supabase.auth.verifyOtp({
+              token_hash: tokenHash,
+              type: 'email'
+            });
+            
+            if (error) {
+              console.error('🔐 Email verification failed:', error);
+              // Redirect to login with error message
+              window.location.href = '/login?verification_error=invalid_token';
+              return;
+            }
+            
+            console.log('🔐 Email verification successful');
+            // Clean up URL parameters
+            window.history.replaceState({}, document.title, window.location.pathname);
+          } catch (verifyError) {
+            console.error('🔐 Email verification exception:', verifyError);
+            window.location.href = '/login?verification_error=verification_failed';
+            return;
+          }
+        }
+      }
+      
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -73,14 +111,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, fullName?: string) => {
+    // Use production domain for redirect URL
+    const isProduction = window.location.hostname === 'tradeiqpro.com';
+    const redirectUrl = isProduction 
+      ? 'https://tradeiqpro.com/verify-email'
+      : `${window.location.origin}/verify-email`;
+    
+    console.log('🔐 Sign up with redirect URL:', redirectUrl);
+    
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/app`
+        emailRedirectTo: redirectUrl,
+        data: fullName ? { full_name: fullName } : undefined
       }
     });
+    
+    if (error) {
+      console.error('🔐 Sign up error:', error);
+    }
+    
+    return { error };
+  };
+
+  const resendConfirmation = async (email: string) => {
+    const isProduction = window.location.hostname === 'tradeiqpro.com';
+    const redirectUrl = isProduction 
+      ? 'https://tradeiqpro.com/verify-email'
+      : `${window.location.origin}/verify-email`;
+    
+    console.log('🔐 Resending confirmation with redirect URL:', redirectUrl);
+    
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: redirectUrl
+      }
+    });
+    
+    if (error) {
+      console.error('🔐 Resend confirmation error:', error);
+    }
+    
     return { error };
   };
 
@@ -95,6 +170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signUp,
     signOut,
+    resendConfirmation,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
