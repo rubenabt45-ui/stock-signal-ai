@@ -86,28 +86,147 @@
       "startNow": "Start Trading Smarter"
     }
   },
+  "dashboard": {
+    "welcomeBack": "Welcome back",
+    "subtitle": "Your trading command center. Access AI insights, educational resources, and market data.",
+    "quickActions": "Quick Actions",
+    "recentActivity": "Recent Activity",
+    "patternAccuracy": "Pattern Accuracy",
+    "analysisSpeed": "Analysis Speed", 
+    "marketMonitoring": "Market Monitoring",
+    "strategyAI": {
+      "title": "StrategyAI Chat",
+      "description": "Get AI-powered trading insights"
+    },
+    "learn": {
+      "title": "Learn Section", 
+      "description": "Educational resources and guides"
+    },
+    "events": {
+      "title": "Economic Events",
+      "description": "Market-moving events calendar"
+    },
+    "marketUpdates": {
+      "title": "Market Updates",
+      "description": "Real-time market data and analysis"
+    },
+    "activity": {
+      "strategySession": "StrategyAI Session",
+      "learnCompleted": "Learn Module Completed", 
+      "marketAlert": "Market Alert"
+    },
+    "plan": {
+      "free": "Free Plan",
+      "pro": "Pro Plan"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back to TradeIQ",
+      "subtitle": "Sign in to your trading intelligence platform",
+      "email": "Email", 
+      "password": "Password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "signIn": "Sign In",
+      "signingIn": "Signing in...",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "welcomeBack": "Welcome back!",
+      "loginSuccess": "You've successfully logged in.",
+      "loginFailed": "Login Failed",
+      "emailNotConfirmed": "Email Not Confirmed",
+      "checkEmail": "Please check your email and click the confirmation link before logging in. Check your spam folder if you don't see the email.",
+      "invalidCredentials": "Invalid email or password. Please check your credentials and try again."
+    },
+    "signup": {
+      "title": "Create your TradeIQ account", 
+      "subtitle": "Join thousands of traders using AI-powered insights",
+      "fullName": "Full Name",
+      "email": "Email",
+      "password": "Password", 
+      "confirmPassword": "Confirm Password",
+      "createAccount": "Create Account",
+      "creatingAccount": "Creating account...",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "accountCreated": "Account Created!",
+      "checkEmailConfirm": "Please check your email and click the confirmation link to activate your account.",
+      "signupFailed": "Signup Failed",
+      "passwordMismatch": "Passwords do not match.",
+      "weakPassword": "Password should be at least 6 characters long."
+    },
+    "forgotPassword": {
+      "title": "Reset your password",
+      "subtitle": "Enter your email and we'll send you a reset link", 
+      "email": "Email",
+      "sendReset": "Send Reset Link",
+      "sending": "Sending...",
+      "backToLogin": "Back to login",
+      "signUpFree": "Sign up for free",
+      "resetSent": "Reset Link Sent",
+      "checkEmail": "Please check your email for password reset instructions.",
+      "resetFailed": "Reset Failed"
+    }
+  },
+  "learn": {
+    "title": "Educational Resources",
+    "subtitle": "Master trading with our comprehensive guides and resources",
+    "pdfResources": "PDF Resources",
+    "videoTutorials": "Video Tutorials", 
+    "downloadPdf": "Download PDF",
+    "watchVideo": "Watch Video",
+    "comingSoon": "Coming Soon",
+    "levels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate", 
+      "advanced": "Advanced"
+    }
+  },
+  "pricing": {
+    "title": "Choose Your Plan",
+    "subtitle": "Start free and upgrade when you're ready",
+    "free": {
+      "title": "Free",
+      "price": "$0",
+      "period": "forever",
+      "description": "Perfect for getting started"
+    },
+    "pro": {
+      "title": "Pro", 
+      "price": "$9.99",
+      "period": "per month",
+      "description": "Everything you need for professional trading"
+    },
+    "getStarted": "Get Started",
+    "upgradeNow": "Upgrade Now",
+    "currentPlan": "Current Plan",
+    "features": {
+      "basicCharts": "Basic chart analysis",
+      "limitedAI": "Limited AI insights",
+      "communityAccess": "Community access", 
+      "advancedCharts": "Advanced chart analysis",
+      "unlimitedAI": "Unlimited AI insights",
+      "prioritySupport": "Priority support",
+      "realTimeData": "Real-time data feeds",
+      "customAlerts": "Custom alerts"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "trial": "Is there a free trial?",
+      "trialAnswer": "You can start with our free plan immediately. No credit card required to get started."
+    }
+  },
+  "tradingChat": {
+    "welcome": "Welcome to TradeIQ Pro! Ask me about trading strategies, upload charts, and get personalized insights."
+  },
   "navigation": {
     "chartIA": "ChartIA",
     "tradingChat": "TradingChat",
     "learn": "Learn",
     "newsAI": "NewsAI",
     "settings": "Settings"
-  },
-  "auth": {
-    "login": "Log In",
-    "signup": "Sign Up",
-    "logout": "Log Out",
-    "email": "Email",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "fullName": "Full Name",
-    "signInToAccount": "Sign in to your account",
-    "createAccount": "Create your account",
-    "alreadyHaveAccount": "Already have an account?",
-    "dontHaveAccount": "Don't have an account?",
-    "signingIn": "Signing in...",
-    "creatingAccount": "Creating account...",
-    "forgotPassword": "Forgot your password?"
   },
   "settings": {
     "title": "Settings",

@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { useTranslation } from 'react-i18next';
 import { 
   TrendingUp, 
   Brain, 
@@ -22,36 +23,37 @@ import { useSubscription } from '@/hooks/useSubscription';
 const Dashboard = () => {
   const { user } = useAuth();
   const { isPro } = useSubscription();
+  const { t } = useTranslation();
 
   const quickActions = [
     {
-      title: "StrategyAI Chat",
-      description: "Get AI-powered trading insights",
+      title: t('dashboard.strategyAI.title'),
+      description: t('dashboard.strategyAI.description'),
       icon: Brain,
       link: "/app/strategy-ai",
       color: "text-blue-400",
       bgColor: "bg-blue-500/20"
     },
     {
-      title: "Learn Section",
-      description: "Educational resources and guides",
+      title: t('dashboard.learn.title'),
+      description: t('dashboard.learn.description'),
       icon: BookOpen,
       link: "/app/learn",
       color: "text-green-400",
       bgColor: "bg-green-500/20"
     },
     {
-      title: "Economic Events",
-      description: "Market-moving events calendar",
+      title: t('dashboard.events.title'),
+      description: t('dashboard.events.description'),
       icon: Calendar,
       link: "/app/events",
       color: "text-purple-400",
       bgColor: "bg-purple-500/20",
-      badge: "Coming Soon"
+      badge: t('learn.comingSoon')
     },
     {
-      title: "Market Updates",
-      description: "Real-time market data and analysis",
+      title: t('dashboard.marketUpdates.title'),
+      description: t('dashboard.marketUpdates.description'),
       icon: BarChart3,
       link: "/app/market-updates",
       color: "text-orange-400",
@@ -88,10 +90,10 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">
-              Welcome back{user?.email ? `, ${user.email.split('@')[0]}` : ''}
+              {t('dashboard.welcomeBack')}{user?.email ? `, ${user.email.split('@')[0]}` : ''}
             </h1>
             <p className="text-gray-400">
-              Your trading command center. Access AI insights, educational resources, and market data.
+              {t('dashboard.subtitle')}
             </p>
           </div>
           <div className="flex items-center space-x-2">
@@ -100,10 +102,10 @@ const Dashboard = () => {
               {isPro ? (
                 <>
                   <Star className="h-3 w-3 mr-1" />
-                  Pro Plan
+                  {t('dashboard.plan.pro')}
                 </>
               ) : (
-                'Free Plan'
+                t('dashboard.plan.free')
               )}
             </Badge>
           </div>
@@ -119,7 +121,7 @@ const Dashboard = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-2xl font-bold text-white">24/7</p>
-                  <p className="text-gray-400 text-sm">Market Monitoring</p>
+                  <p className="text-gray-400 text-sm">{t('dashboard.marketMonitoring')}</p>
                 </div>
               </div>
             </CardContent>
@@ -133,7 +135,7 @@ const Dashboard = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-2xl font-bold text-white">95%</p>
-                  <p className="text-gray-400 text-sm">Pattern Accuracy</p>
+                  <p className="text-gray-400 text-sm">{t('dashboard.patternAccuracy')}</p>
                 </div>
               </div>
             </CardContent>
@@ -147,7 +149,7 @@ const Dashboard = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-2xl font-bold text-white">&lt; 1s</p>
-                  <p className="text-gray-400 text-sm">Analysis Speed</p>
+                  <p className="text-gray-400 text-sm">{t('dashboard.analysisSpeed')}</p>
                 </div>
               </div>
             </CardContent>
@@ -156,7 +158,7 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <div>
-          <h2 className="text-2xl font-bold text-white mb-6">Quick Actions</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">{t('dashboard.quickActions')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {quickActions.map((action, index) => (
               <Card key={index} className="tradeiq-card hover:border-tradeiq-blue/50 transition-all duration-300 hover:transform hover:scale-105">
@@ -182,9 +184,9 @@ const Dashboard = () => {
                       variant="outline" 
                       size="sm" 
                       className="w-full"
-                      disabled={action.badge === "Coming Soon" || action.badge === "Future"}
+                      disabled={action.badge === t('learn.comingSoon') || action.badge === "Future"}
                     >
-                      {action.badge === "Coming Soon" || action.badge === "Future" ? action.badge : "Open"}
+                      {action.badge === t('learn.comingSoon') || action.badge === "Future" ? action.badge : t('pricing.getStarted')}
                       {!action.badge && <ChevronRight className="ml-2 h-4 w-4" />}
                     </Button>
                   </Link>
@@ -201,7 +203,7 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="text-white flex items-center">
                 <Activity className="h-5 w-5 mr-2" />
-                Recent Activity
+                {t('dashboard.recentActivity')}
               </CardTitle>
               <CardDescription className="text-gray-400">
                 Your latest trading activities and updates

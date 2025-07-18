@@ -108,10 +108,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
             console.log('🌐 Could not save language to database (non-critical):', error);
           } else {
             console.log('🌐 Language saved to database successfully');
-            toast({
-              title: t('toasts.languageUpdated'),
-              description: t('toasts.languageUpdated'),
-            });
+            // Show success toast
+            setTimeout(() => {
+              toast({
+                title: t('toasts.languageUpdated'),
+                description: language === 'en' ? 'Language changed to English' : 'Idioma cambiado a Español',
+              });
+            }, 100); // Small delay to ensure language is loaded
           }
         } catch (dbError) {
           console.log('🌐 Database save failed (non-critical):', dbError);
