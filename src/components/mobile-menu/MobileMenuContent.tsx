@@ -32,93 +32,93 @@ export const MobileMenuContent: React.FC<MobileMenuContentProps> = ({
     onClose('menu_item_selected');
   };
 
-  if (!isOpen) return null;
-
   return (
     <div
       ref={menuRef}
       id="mobile-menu-content"
-      className="fixed top-20 right-4 w-80 max-w-[calc(100vw-2rem)] bg-gray-900 border border-gray-700 rounded-lg shadow-2xl z-[50] transition-all duration-300 ease-in-out"
+      className={`fixed top-0 left-0 w-full h-full z-[70] transition-all duration-300 ease-in-out ${
+        isOpen 
+          ? 'opacity-100 pointer-events-auto' 
+          : 'opacity-0 pointer-events-none'
+      }`}
       data-testid="mobile-menu-content"
-      style={{
-        opacity: isOpen ? 1 : 0,
-        transform: isOpen ? 'translateY(0) scale(1)' : 'translateY(-16px) scale(0.95)',
-        pointerEvents: isOpen ? 'auto' : 'none'
-      }}
     >
-      {/* Menu Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-900">
-        <h3 className="text-lg font-semibold text-white">Navigation</h3>
-        <Button
-          variant="ghost"
-          onClick={() => onClose('header_close')}
-          className="text-gray-400 hover:text-white hover:bg-gray-800 p-2 min-h-[48px] min-w-[48px]"
-          aria-label="Close menu"
-          data-testid="menu-close-button"
-        >
-          <X className="h-5 w-5" />
-        </Button>
-      </div>
-
-      {/* Navigation Links */}
-      <div className="py-2 bg-gray-900">
-        <Link
-          to="/"
-          onClick={() => onClose('home_link')}
-          className="flex items-center gap-3 px-6 py-4 text-white hover:bg-gray-800 transition-all duration-200 min-h-[48px] group"
-          data-testid="menu-home-link"
-        >
-          <Home className="h-5 w-5 text-gray-400 group-hover:text-blue-400" />
-          <span className="font-medium">{t('landing.navbar.home')}</span>
-        </Link>
-        
-        <button
-          onClick={() => handleMenuClick(onLearnPreview, 'Learn Preview')}
-          className="w-full flex items-center gap-3 px-6 py-4 text-left text-white hover:bg-gray-800 transition-all duration-200 min-h-[48px] group"
-          data-testid="menu-learn-link"
-        >
-          <BookOpen className="h-5 w-5 text-gray-400 group-hover:text-blue-400" />
-          <span className="font-medium">{t('landing.navbar.learnPreview')}</span>
-        </button>
-        
-        <button
-          onClick={() => handleMenuClick(onPricing, 'Pricing')}
-          className="w-full flex items-center gap-3 px-6 py-4 text-left text-white hover:bg-gray-800 transition-all duration-200 min-h-[48px] group"
-          data-testid="menu-pricing-link"
-        >
-          <DollarSign className="h-5 w-5 text-gray-400 group-hover:text-blue-400" />
-          <span className="font-medium">{t('landing.navbar.pricing')}</span>
-        </button>
-      </div>
-
-      {/* Language Selector */}
-      <div className="px-6 py-4 border-t border-gray-700 bg-gray-900">
-        <p className="text-sm font-medium text-gray-400 mb-3">Language</p>
-        <div className="bg-gray-800/50 p-3 rounded-lg">
-          <LanguageSelector variant="landing" />
+      {/* Full Screen Menu Container */}
+      <div className="flex flex-col h-full bg-gray-900 overflow-y-auto">
+        {/* Menu Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-700 bg-gray-900 min-h-[80px]">
+          <h3 className="text-xl font-semibold text-white">Navigation</h3>
+          <Button
+            variant="ghost"
+            onClick={() => onClose('header_close')}
+            className="text-gray-400 hover:text-white hover:bg-gray-800 p-3 min-h-[48px] min-w-[48px] rounded-full"
+            aria-label="Close menu"
+            data-testid="menu-close-button"
+          >
+            <X className="h-6 w-6" />
+          </Button>
         </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className="px-6 py-4 space-y-3 border-t border-gray-700 bg-gray-900">
-        <Button
-          variant="outline"
-          onClick={() => handleMenuClick(onLogin, 'Login')}
-          className="w-full justify-center text-white border-gray-600 hover:border-gray-500 hover:bg-gray-800 transition-all duration-200 min-h-[48px] text-base font-medium"
-          data-testid="menu-login-button"
-        >
-          <LogIn className="h-4 w-4 mr-2" />
-          {t('landing.navbar.login')}
-        </Button>
-        
-        <Button
-          onClick={() => handleMenuClick(onSignUp, 'Sign Up')}
-          className="w-full justify-center bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 min-h-[48px] text-base font-medium shadow-lg"
-          data-testid="menu-signup-button"
-        >
-          <UserPlus className="h-4 w-4 mr-2" />
-          {t('landing.navbar.signUp')}
-        </Button>
+        {/* Navigation Links - Full Width Touch Targets */}
+        <div className="flex-1 py-4">
+          <Link
+            to="/"
+            onClick={() => onClose('home_link')}
+            className="flex items-center gap-4 px-6 py-5 text-white hover:bg-gray-800 transition-all duration-200 min-h-[56px] w-full group border-b border-gray-800"
+            data-testid="menu-home-link"
+          >
+            <Home className="h-6 w-6 text-gray-400 group-hover:text-blue-400" />
+            <span className="text-lg font-medium">{t('landing.navbar.home')}</span>
+          </Link>
+          
+          <button
+            onClick={() => handleMenuClick(onLearnPreview, 'Learn Preview')}
+            className="w-full flex items-center gap-4 px-6 py-5 text-left text-white hover:bg-gray-800 transition-all duration-200 min-h-[56px] group border-b border-gray-800"
+            data-testid="menu-learn-link"
+          >
+            <BookOpen className="h-6 w-6 text-gray-400 group-hover:text-blue-400" />
+            <span className="text-lg font-medium">{t('landing.navbar.learnPreview')}</span>
+          </button>
+          
+          <button
+            onClick={() => handleMenuClick(onPricing, 'Pricing')}
+            className="w-full flex items-center gap-4 px-6 py-5 text-left text-white hover:bg-gray-800 transition-all duration-200 min-h-[56px] group border-b border-gray-800"
+            data-testid="menu-pricing-link"
+          >
+            <DollarSign className="h-6 w-6 text-gray-400 group-hover:text-blue-400" />
+            <span className="text-lg font-medium">{t('landing.navbar.pricing')}</span>
+          </button>
+        </div>
+
+        {/* Language Selector */}
+        <div className="px-6 py-6 border-t border-gray-700 bg-gray-900">
+          <p className="text-base font-medium text-gray-400 mb-4">Language</p>
+          <div className="bg-gray-800/50 p-4 rounded-lg min-h-[48px] flex items-center">
+            <LanguageSelector variant="landing" />
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="px-6 py-6 space-y-4 border-t border-gray-700 bg-gray-900">
+          <Button
+            variant="outline"
+            onClick={() => handleMenuClick(onLogin, 'Login')}
+            className="w-full justify-center text-white border-gray-600 hover:border-gray-500 hover:bg-gray-800 transition-all duration-200 min-h-[56px] text-lg font-medium"
+            data-testid="menu-login-button"
+          >
+            <LogIn className="h-5 w-5 mr-3" />
+            {t('landing.navbar.login')}
+          </Button>
+          
+          <Button
+            onClick={() => handleMenuClick(onSignUp, 'Sign Up')}
+            className="w-full justify-center bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 min-h-[56px] text-lg font-medium shadow-lg"
+            data-testid="menu-signup-button"
+          >
+            <UserPlus className="h-5 w-5 mr-3" />
+            {t('landing.navbar.signUp')}
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -9,16 +9,23 @@ export const MobileMenuOverlay: React.FC<MobileMenuOverlayProps> = ({
   isOpen,
   onClose
 }) => {
-  if (!isOpen) return null;
-
   return (
     <div 
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[40] transition-opacity duration-300 ease-in-out"
+      className={`fixed inset-0 bg-gray-900/90 backdrop-blur-sm z-[60] transition-all duration-300 ease-in-out ${
+        isOpen 
+          ? 'opacity-100 pointer-events-auto' 
+          : 'opacity-0 pointer-events-none'
+      }`}
       onClick={onClose}
       data-testid="mobile-menu-overlay"
-      style={{ 
-        opacity: isOpen ? 1 : 0,
-        pointerEvents: isOpen ? 'auto' : 'none'
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+        zIndex: 60
       }}
     />
   );
