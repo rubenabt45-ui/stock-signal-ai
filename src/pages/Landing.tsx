@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,32 @@ import {
 } from 'lucide-react';
 
 const Landing = () => {
+  const navigate = useNavigate();
+
+  const handleLoginClick = (e: React.MouseEvent) => {
+    console.log("Login button clicked");
+    e.preventDefault();
+    try {
+      navigate('/login');
+      console.log("Navigating to /login");
+    } catch (error) {
+      console.error("Navigation failed, using fallback:", error);
+      window.location.href = '/login';
+    }
+  };
+
+  const handleSignUpClick = (e: React.MouseEvent) => {
+    console.log("Sign Up button clicked");
+    e.preventDefault();
+    try {
+      navigate('/signup');
+      console.log("Navigating to /signup");
+    } catch (error) {
+      console.error("Navigation failed, using fallback:", error);
+      window.location.href = '/signup';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
       {/* Navigation */}
@@ -34,53 +60,45 @@ const Landing = () => {
             <Link to="/learn-preview" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Learn Preview</Link>
             <Link to="/pricing" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Pricing</Link>
             <div className="flex items-center space-x-2">
-              <Link to="/login">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20"
-                  onClick={() => console.log("Navigating to /login")}
-                >
-                  Login
-                </Button>
-              </Link>
-              <Link to="/signup">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20"
-                >
-                  Sign Up
-                </Button>
-              </Link>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105"
+                onClick={handleLoginClick}
+              >
+                Login
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105"
+                onClick={handleSignUpClick}
+              >
+                Sign Up
+              </Button>
             </div>
           </div>
 
           <div className="md:hidden flex items-center space-x-2">
-            <Link to="/login">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20"
-                onClick={() => console.log("Navigating to /login")}
-              >
-                Login
-              </Button>
-            </Link>
-            <Link to="/signup">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20"
-              >
-                Sign Up
-              </Button>
-            </Link>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105"
+              onClick={handleLoginClick}
+            >
+              Login
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105"
+              onClick={handleSignUpClick}
+            >
+              Sign Up
+            </Button>
           </div>
         </div>
       </nav>
-
-      {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-tradeiq-blue to-white bg-clip-text text-transparent">
