@@ -58,8 +58,8 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
       {/* Navigation */}
-      <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50 relative">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between relative z-10">
           <div className="flex items-center space-x-2">
             <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
             <span className="text-xl font-bold">TradeIQ</span>
@@ -71,42 +71,118 @@ const Landing = () => {
             <Link to="/learn-preview" onClick={handleLearnPreviewClick} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Learn Preview</Link>
             <Link to="/pricing" onClick={handlePricingClick} className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">Pricing</Link>
             <div className="flex items-center space-x-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105"
-                onClick={handleLoginClick}
-              >
-                Login
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105"
-                onClick={handleSignUpClick}
-              >
-                Sign Up
-              </Button>
+              {/* 🚨 BULLETPROOF LOGIN BUTTON - DESKTOP */}
+              <Link to="/login" className="inline-block">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
+                  onClick={(e) => {
+                    console.log('🚨 DESKTOP LOGIN BUTTON CLICKED!');
+                    console.log('Event captured:', e.type, e.target);
+                    console.log('Current URL:', window.location.href);
+                    
+                    // Double-ensure navigation
+                    try {
+                      console.log('🚀 Attempting navigate to /login');
+                      e.preventDefault(); // Prevent Link default to control navigation
+                      navigate('/login');
+                      console.log('✅ Navigate successful');
+                    } catch (error) {
+                      console.error('❌ Navigate failed, using window.location:', error);
+                      window.location.href = '/login';
+                    }
+                  }}
+                  onMouseDown={(e) => {
+                    console.log('🖱️ Login button mouse down detected');
+                  }}
+                  onMouseUp={(e) => {
+                    console.log('🖱️ Login button mouse up detected');
+                  }}
+                >
+                  Login
+                </Button>
+              </Link>
+              
+              {/* Sign Up Button */}
+              <Link to="/signup" className="inline-block">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
+                  onClick={(e) => {
+                    console.log('🚨 DESKTOP SIGNUP BUTTON CLICKED!');
+                    try {
+                      e.preventDefault();
+                      navigate('/signup');
+                      console.log('✅ Signup navigate successful');
+                    } catch (error) {
+                      console.error('❌ Signup navigate failed:', error);
+                      window.location.href = '/signup';
+                    }
+                  }}
+                >
+                  Sign Up
+                </Button>
+              </Link>
             </div>
           </div>
 
           <div className="md:hidden flex items-center space-x-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105"
-              onClick={handleLoginClick}
-            >
-              Login
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105"
-              onClick={handleSignUpClick}
-            >
-              Sign Up
-            </Button>
+            {/* 🚨 BULLETPROOF LOGIN BUTTON - MOBILE */}
+            <Link to="/login" className="inline-block">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
+                onClick={(e) => {
+                  console.log('🚨 MOBILE LOGIN BUTTON CLICKED!');
+                  console.log('Event captured:', e.type, e.target);
+                  console.log('Current URL:', window.location.href);
+                  
+                  // Double-ensure navigation
+                  try {
+                    console.log('🚀 Attempting navigate to /login (mobile)');
+                    e.preventDefault(); // Prevent Link default to control navigation
+                    navigate('/login');
+                    console.log('✅ Mobile navigate successful');
+                  } catch (error) {
+                    console.error('❌ Mobile navigate failed, using window.location:', error);
+                    window.location.href = '/login';
+                  }
+                }}
+                onTouchStart={(e) => {
+                  console.log('📱 Mobile login touch start detected');
+                }}
+                onTouchEnd={(e) => {
+                  console.log('📱 Mobile login touch end detected');
+                }}
+              >
+                Login
+              </Button>
+            </Link>
+            
+            {/* Mobile Sign Up Button */}
+            <Link to="/signup" className="inline-block">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer"
+                onClick={(e) => {
+                  console.log('🚨 MOBILE SIGNUP BUTTON CLICKED!');
+                  try {
+                    e.preventDefault();
+                    navigate('/signup');
+                    console.log('✅ Mobile signup navigate successful');
+                  } catch (error) {
+                    console.error('❌ Mobile signup navigate failed:', error);
+                    window.location.href = '/signup';
+                  }
+                }}
+              >
+                Sign Up
+              </Button>
+            </Link>
           </div>
         </div>
       </nav>
