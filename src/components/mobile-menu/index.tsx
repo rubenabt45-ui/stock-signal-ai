@@ -199,8 +199,8 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
         {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
       </Button>
 
-      {/* Conditionally Rendered Menu - ONLY exists when open */}
-      {isOpen ? (
+      {/* Mobile Menu - Completely Remove from DOM When Closed */}
+      {isOpen && (
         <div
           ref={menuRef}
           id="mobile-menu-content"
@@ -216,31 +216,18 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
             height: '100vh',
             backgroundColor: '#09090b',
             zIndex: 70,
-            display: 'block',
-            opacity: 1,
-            pointerEvents: 'auto'
+            display: 'block'
           }}
           onClick={(e) => {
-            // Close if clicking the background
             if (e.target === e.currentTarget) {
               closeMenu('background_click');
             }
           }}
         >
-          {/* Menu Content - Full Screen */}
-          <div 
-            className="h-full w-full flex flex-col overflow-y-auto"
-            style={{ 
-              backgroundColor: 'transparent',
-              position: 'relative',
-              zIndex: 1
-            }}
-          >
+          {/* Menu Content */}
+          <div className="h-full w-full flex flex-col overflow-y-auto">
             {/* Header */}
-            <div 
-              className="flex items-center justify-between p-6 border-b border-gray-600 min-h-[80px] flex-shrink-0"
-              style={{ backgroundColor: 'transparent' }}
-            >
+            <div className="flex items-center justify-between p-6 border-b border-gray-600 min-h-[80px]">
               <h3 className="text-xl font-semibold text-white">Navigation</h3>
               <Button
                 variant="ghost"
@@ -254,16 +241,12 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
             </div>
 
             {/* Navigation Links */}
-            <div 
-              className="flex-1 py-6 space-y-2"
-              style={{ backgroundColor: 'transparent' }}
-            >
+            <div className="flex-1 py-6 space-y-2">
               <Link
                 to="/"
                 onClick={() => closeMenu('home_link')}
                 className="flex items-center gap-4 px-6 py-4 text-white hover:bg-gray-700/30 active:bg-gray-600/30 transition-all duration-200 min-h-[56px] w-full group"
                 data-testid="menu-home-link"
-                style={{ backgroundColor: 'transparent' }}
               >
                 <Home className="h-6 w-6 text-gray-300 group-hover:text-blue-400 flex-shrink-0" />
                 <span className="text-lg font-medium">{t('landing.navbar.home')}</span>
@@ -273,7 +256,6 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
                 onClick={() => handleMenuClick(onLearnPreview, 'Learn Preview')}
                 className="w-full flex items-center gap-4 px-6 py-4 text-left text-white hover:bg-gray-700/30 active:bg-gray-600/30 transition-all duration-200 min-h-[56px] group"
                 data-testid="menu-learn-link"
-                style={{ backgroundColor: 'transparent' }}
               >
                 <BookOpen className="h-6 w-6 text-gray-300 group-hover:text-blue-400 flex-shrink-0" />
                 <span className="text-lg font-medium">{t('landing.navbar.learnPreview')}</span>
@@ -283,7 +265,6 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
                 onClick={() => handleMenuClick(onPricing, 'Pricing')}
                 className="w-full flex items-center gap-4 px-6 py-4 text-left text-white hover:bg-gray-700/30 active:bg-gray-600/30 transition-all duration-200 min-h-[56px] group"
                 data-testid="menu-pricing-link"
-                style={{ backgroundColor: 'transparent' }}
               >
                 <DollarSign className="h-6 w-6 text-gray-300 group-hover:text-blue-400 flex-shrink-0" />
                 <span className="text-lg font-medium">{t('landing.navbar.pricing')}</span>
@@ -291,10 +272,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
             </div>
 
             {/* Language Selector */}
-            <div 
-              className="px-6 py-6 border-t border-gray-600 flex-shrink-0"
-              style={{ backgroundColor: 'transparent' }}
-            >
+            <div className="px-6 py-6 border-t border-gray-600">
               <p className="text-base font-medium text-gray-300 mb-4">Language</p>
               <div className="bg-gray-700/20 p-4 rounded-lg min-h-[48px] flex items-center">
                 <LanguageSelector variant="landing" />
@@ -302,10 +280,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
             </div>
 
             {/* Action Buttons */}
-            <div 
-              className="px-6 py-6 space-y-4 border-t border-gray-600 flex-shrink-0"
-              style={{ backgroundColor: 'transparent' }}
-            >
+            <div className="px-6 py-6 space-y-4 border-t border-gray-600">
               <Button
                 variant="outline"
                 onClick={() => handleMenuClick(onLogin, 'Login')}
@@ -326,24 +301,8 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
               </Button>
             </div>
           </div>
-
-          {/* Background Overlay - Ensure clicks close menu */}
-          <div 
-            className="absolute inset-0"
-            data-testid="mobile-menu-overlay"
-            style={{ 
-              backgroundColor: 'transparent',
-              zIndex: -1,
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0
-            }}
-            onClick={() => closeMenu('overlay_click')}
-          />
         </div>
-      ) : null}
+      )}
     </div>
   );
 };
