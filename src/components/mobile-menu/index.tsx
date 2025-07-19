@@ -282,9 +282,9 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
             {/* Action Buttons */}
             <div className="px-6 py-6 space-y-4 border-t border-gray-600">
               <Button
-                variant="outline"
+                variant="ghost"
                 onClick={() => handleMenuClick(onLogin, 'Login')}
-                className="w-full justify-center text-white border-gray-500 hover:border-gray-400 hover:bg-gray-700/30 transition-all duration-200 min-h-[56px] text-lg font-medium"
+                className="w-full justify-center text-white border border-gray-600 hover:border-gray-500 hover:bg-gray-800/50 bg-transparent transition-all duration-200 min-h-[56px] text-lg font-medium"
                 data-testid="menu-login-button"
               >
                 <LogIn className="h-5 w-5 mr-3" />
@@ -293,7 +293,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
               
               <Button
                 onClick={() => handleMenuClick(onSignUp, 'Sign Up')}
-                className="w-full justify-center bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 min-h-[56px] text-lg font-medium shadow-lg"
+                className="w-full justify-center bg-blue-600 hover:bg-blue-700 text-white border-0 transition-all duration-200 min-h-[56px] text-lg font-medium"
                 data-testid="menu-signup-button"
               >
                 <UserPlus className="h-5 w-5 mr-3" />
