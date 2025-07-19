@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { MobileMenu } from '@/components/MobileMenu';
-import MobileMenuTester from '@/components/MobileMenuTester';
+
 import { useTranslation } from 'react-i18next';
 import { 
   TrendingUp, 
@@ -525,8 +525,6 @@ const Landing = () => {
         </div>
       </footer>
       
-      {/* Mobile Menu Debug Tester - Remove in production */}
-      {process.env.NODE_ENV === 'development' && <MobileMenuTester />}
     </div>
   );
 };
