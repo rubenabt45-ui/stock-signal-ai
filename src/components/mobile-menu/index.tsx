@@ -18,7 +18,8 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   onLearnPreview,
   onPricing,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [forceUpdate, setForceUpdate] = useState<number>(0);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { t } = useTranslation();
@@ -57,17 +58,21 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
     });
   };
 
-  // Toggle menu
+  // Toggle menu with forced re-render
   const toggleMenu = () => {
     console.log('🍔 [MENU DEBUG] toggleMenu called, current isOpen:', isOpen);
     const newState = !isOpen;
     console.log('🍔 [MENU DEBUG] Setting new state to:', newState);
     logAction('TOGGLE_MENU', { from: isOpen, to: newState });
+    
+    // Force update to ensure React re-renders in production
+    setForceUpdate(prev => prev + 1);
     setIsOpen(newState);
     
-    // Verify state change after React update
+    // Additional verification
     setTimeout(() => {
       console.log('🍔 [MENU DEBUG] State after update should be:', newState);
+      console.log('🍔 [MENU DEBUG] Force update counter:', forceUpdate + 1);
     }, 10);
   };
   
@@ -211,9 +216,10 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
         {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
       </Button>
 
-      {/* Mobile Menu - Completely Remove from DOM When Closed */}
-      {isOpen && (
+      {/* Mobile Menu - Explicitly controlled rendering */}
+      {isOpen === true ? (
         <div
+          key={`mobile-menu-${forceUpdate}`}
           ref={menuRef}
           id="mobile-menu-content"
           className="fixed inset-0 z-[70]"
@@ -313,7 +319,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
