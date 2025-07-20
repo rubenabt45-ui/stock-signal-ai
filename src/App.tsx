@@ -31,6 +31,12 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Pricing from "./pages/Pricing";
 import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import CookiePolicy from "./pages/CookiePolicy";
+import About from "./pages/About";
+import Blog from "./pages/Blog";
+import Careers from "./pages/Careers";
 
 // Diagnostic components
 const LandingRoute = () => {
@@ -76,6 +82,12 @@ const App = () => {
                       <Route path="/" element={<LandingRoute />} />
                       <Route path="/learn-preview" element={<LearnPreview />} />
                       <Route path="/pricing" element={<Pricing />} />
+                      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                      <Route path="/terms-of-service" element={<TermsOfService />} />
+                      <Route path="/cookie-policy" element={<CookiePolicy />} />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/blog" element={<Blog />} />
+                      <Route path="/careers" element={<Careers />} />
                       
                       {/* AUTHENTICATION ROUTES */}
                       <Route path="/login" element={
@@ -165,8 +177,20 @@ const App = () => {
                       <Route path="*" element={<NotFoundRoute />} />
                     </Routes>
                     
-                    {/* CONDITIONAL FOOTER/NAV FOR APP ROUTES ONLY */}
+                    {/* CONDITIONAL FOOTER AND NAVIGATION */}
                     <Routes>
+                      {/* Footer for all public pages */}
+                      <Route path="/" element={<Footer />} />
+                      <Route path="/learn-preview" element={<Footer />} />
+                      <Route path="/pricing" element={<Footer />} />
+                      <Route path="/privacy-policy" element={<Footer />} />
+                      <Route path="/terms-of-service" element={<Footer />} />
+                      <Route path="/cookie-policy" element={<Footer />} />
+                      <Route path="/about" element={<Footer />} />
+                      <Route path="/blog" element={<Footer />} />
+                      <Route path="/careers" element={<Footer />} />
+                      
+                      {/* Footer and bottom nav for app routes */}
                       <Route path="/app/*" element={
                         <div className="pb-20">
                           <Footer />

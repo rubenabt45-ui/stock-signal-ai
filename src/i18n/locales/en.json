@@ -405,27 +405,20 @@
       "cancelAnytime": "Cancel anytime"
     },
     "footer": {
-      "description": "TradeIQ Pro is the premium version of TradeIQ. For more resources, visit",
-      "platform": {
-        "title": "Platform",
-        "dashboard": "Dashboard",
-        "features": "Features",
-        "pricing": "Pricing",
-        "support": "Support"
-      },
-      "legal": {
-        "title": "Legal",
-        "privacy": "Privacy Policy",
-        "terms": "Terms of Service",
-        "cookies": "Cookie Policy"
-      },
-      "company": {
-        "title": "Company",
-        "about": "About Us",
-        "contact": "Contact",
-        "careers": "Careers",
-        "blog": "Blog"
-      }
+      "description": "AI-powered trading insights and market analysis platform",
+      "platform": "Platform",
+      "legal": "Legal", 
+      "company": "Company",
+      "dashboard": "Trading Dashboard",
+      "learnPreview": "Learn Preview",
+      "pricing": "Pricing",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "cookies": "Cookie Policy",
+      "about": "About",
+      "blog": "Blog",
+      "careers": "Careers",
+      "rights": "All rights reserved."
     },
     "placeholders": {
       "yourName": "Your Name",
