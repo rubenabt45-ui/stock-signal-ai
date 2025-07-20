@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +15,7 @@ export const SecuritySection = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,7 +91,7 @@ export const SecuritySection = () => {
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter your current password"
+              placeholder={t('placeholders.enterCurrentPassword')}
               className="bg-black/20 border-gray-700 text-white placeholder:text-gray-500 focus:border-tradeiq-blue"
               required
             />
@@ -102,7 +104,7 @@ export const SecuritySection = () => {
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Enter your new password (min 8 characters)"
+              placeholder={t('placeholders.enterNewPassword')}
               className="bg-black/20 border-gray-700 text-white placeholder:text-gray-500 focus:border-tradeiq-blue"
               required
               minLength={8}
@@ -116,7 +118,7 @@ export const SecuritySection = () => {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm your new password"
+              placeholder={t('placeholders.confirmNewPassword')}
               className="bg-black/20 border-gray-700 text-white placeholder:text-gray-500 focus:border-tradeiq-blue"
               required
               minLength={8}

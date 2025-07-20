@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { User } from '@supabase/supabase-js';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,7 @@ export const ProfileSection = ({ user, userProfile, onProfileUpdate }: ProfileSe
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const { toast } = useToast();
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -258,7 +260,7 @@ export const ProfileSection = ({ user, userProfile, onProfileUpdate }: ProfileSe
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="Enter your full name"
+              placeholder={t('placeholders.enterFullName')}
               className="bg-black/20 border-gray-700 text-white placeholder:text-gray-500 focus:border-tradeiq-blue"
             />
           </div>
@@ -270,7 +272,7 @@ export const ProfileSection = ({ user, userProfile, onProfileUpdate }: ProfileSe
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Choose a username (optional)"
+              placeholder={t('placeholders.chooseUsername')}
               className="bg-black/20 border-gray-700 text-white placeholder:text-gray-500 focus:border-tradeiq-blue"
             />
           </div>

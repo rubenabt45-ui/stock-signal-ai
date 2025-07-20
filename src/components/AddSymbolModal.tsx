@@ -1,6 +1,7 @@
 
 import { useState, useMemo } from "react";
 import { Search, X, Plus } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -62,6 +63,7 @@ export const AddSymbolModal = ({
   existingSymbols 
 }: AddSymbolModalProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { t } = useTranslation();
 
   const filteredAssets = useMemo(() => {
     if (!searchTerm) {
@@ -111,7 +113,7 @@ export const AddSymbolModal = ({
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <Input
               type="text"
-              placeholder="Search stocks, crypto, forex..."
+              placeholder={t('placeholders.searchStocks')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-12 h-12 bg-black/30 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-tradeiq-blue focus:ring-1 focus:ring-tradeiq-blue"

@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Search, TrendingUp, Globe, Coins, BarChart3, Zap, X } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -113,6 +114,7 @@ export const AssetSelection = ({ selectedAsset, onAssetSelect }: AssetSelectionP
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const { t } = useTranslation();
 
   // Smart search with fuzzy matching
   const filteredAssets = useMemo(() => {
@@ -159,7 +161,7 @@ export const AssetSelection = ({ selectedAsset, onAssetSelect }: AssetSelectionP
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
                 type="text"
-                placeholder="Search stocks, crypto, forex, indices..."
+                placeholder={t('placeholders.searchAssetsExtended')}
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);

@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 interface FeatureLockedScreenProps {
   feature: string;
@@ -21,19 +22,20 @@ export const FeatureLockedScreen: React.FC<FeatureLockedScreenProps> = ({
 }) => {
   const { createCheckoutSession, role, daysUntilExpiry } = useSubscriptionStatus();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleUpgrade = async () => {
     try {
       toast({
-        title: "Redirecting to checkout...",
-        description: "Please wait while we prepare your subscription.",
+        title: t('features.locked.redirecting'),
+        description: t('features.locked.redirectingDescription'),
       });
       
       await createCheckoutSession();
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to start checkout process. Please try again.",
+        title: t('common.error'),
+        description: t('features.locked.checkoutError'),
         variant: "destructive",
       });
     }
@@ -43,23 +45,23 @@ export const FeatureLockedScreen: React.FC<FeatureLockedScreenProps> = ({
     switch (role) {
       case 'expired':
         return {
-          title: "Subscription Expired",
-          message: "Your Pro subscription has expired. Renew to regain access to premium features.",
-          action: "Renew Subscription",
+          title: t('features.locked.subscriptionExpired.title'),
+          message: t('features.locked.subscriptionExpired.message'),
+          action: t('features.locked.subscriptionExpired.action'),
           variant: "destructive" as const
         };
       case 'free':
         return {
-          title: "Pro Feature",
-          message: "Upgrade to Pro to unlock this feature and get unlimited access.",
-          action: "Upgrade to Pro",
+          title: t('features.locked.proFeature.title'),
+          message: t('features.locked.proFeature.message'),
+          action: t('features.locked.proFeature.action'),
           variant: "default" as const
         };
       default:
         return {
-          title: "Access Restricted",
-          message: "This feature requires a Pro subscription.",
-          action: "Get Pro Access",
+          title: t('features.locked.accessRestricted.title'),
+          message: t('features.locked.accessRestricted.message'),
+          action: t('features.locked.accessRestricted.action'),
           variant: "default" as const
         };
     }
@@ -100,7 +102,10 @@ export const FeatureLockedScreen: React.FC<FeatureLockedScreenProps> = ({
               <div className="flex items-center justify-center space-x-2 text-red-400">
                 <Calendar className="h-4 w-4" />
                 <span className="text-sm">
-                  Expired {Math.abs(daysUntilExpiry)} day{Math.abs(daysUntilExpiry) !== 1 ? 's' : ''} ago
+                  {t('features.locked.expired', { 
+                    days: Math.abs(daysUntilExpiry),
+                    plural: Math.abs(daysUntilExpiry) !== 1 ? 's' : ''
+                  })}
                 </span>
               </div>
             </div>
@@ -108,14 +113,14 @@ export const FeatureLockedScreen: React.FC<FeatureLockedScreenProps> = ({
 
           {/* Pro Features List */}
           <div className="bg-gray-900/50 rounded-lg p-4 space-y-3">
-            <h3 className="text-white font-semibold text-sm">What you get with Pro:</h3>
+            <h3 className="text-white font-semibold text-sm">{t('features.locked.benefits.title')}</h3>
             <div className="space-y-2">
               {[
-                'Unlimited StrategyAI messages',
-                'Real-time market updates',
-                'Complete learning modules',
-                'Priority customer support',
-                'Advanced trading insights'
+                t('features.locked.benefits.unlimited'),
+                t('features.locked.benefits.realtime'),
+                t('features.locked.benefits.learning'),
+                t('features.locked.benefits.support'),
+                t('features.locked.benefits.insights')
               ].map((benefit, index) => (
                 <div key={index} className="flex items-center space-x-2">
                   <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
@@ -128,9 +133,9 @@ export const FeatureLockedScreen: React.FC<FeatureLockedScreenProps> = ({
           {/* Pricing */}
           <div className="text-center">
             <div className="text-3xl font-bold text-white">
-              $9.99<span className="text-lg font-normal text-gray-400">/month</span>
+              {t('features.locked.pricing.monthly')}<span className="text-lg font-normal text-gray-400">{t('features.locked.pricing.period')}</span>
             </div>
-            <p className="text-gray-400 text-sm mt-1">Cancel anytime</p>
+            <p className="text-gray-400 text-sm mt-1">{t('common.cancelAnytime')}</p>
           </div>
 
           {/* Action Buttons */}
@@ -149,7 +154,7 @@ export const FeatureLockedScreen: React.FC<FeatureLockedScreenProps> = ({
               className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
               onClick={() => window.history.back()}
             >
-              Go Back
+              {t('common.goBack')}
             </Button>
           </div>
 

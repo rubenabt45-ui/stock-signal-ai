@@ -411,12 +411,12 @@ const Landing = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                     <Input 
-                      placeholder="Your Name" 
+                      placeholder={t('placeholders.yourName')} 
                       className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 sm:h-14 text-base"
                     />
                     <Input 
                       type="email" 
-                      placeholder="Your Email" 
+                      placeholder={t('placeholders.yourEmail')} 
                       className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 sm:h-14 text-base"
                     />
                   </div>
@@ -425,7 +425,7 @@ const Landing = () => {
                     className="w-full py-4 sm:py-6 text-base sm:text-lg hover:scale-105 transform transition-all duration-300 min-h-[48px] sm:min-h-[56px]"
                     onClick={handleSignUp}
                   >
-                    Request Early Access
+                    {t('common.requestEarlyAccess')}
                   </Button>
                   <p className="text-xs sm:text-sm text-gray-400">
                     No spam. Unsubscribe at any time.
