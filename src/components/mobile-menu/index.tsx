@@ -59,9 +59,16 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
 
   // Toggle menu
   const toggleMenu = () => {
+    console.log('🍔 [MENU DEBUG] toggleMenu called, current isOpen:', isOpen);
     const newState = !isOpen;
+    console.log('🍔 [MENU DEBUG] Setting new state to:', newState);
     logAction('TOGGLE_MENU', { from: isOpen, to: newState });
     setIsOpen(newState);
+    
+    // Verify state change after React update
+    setTimeout(() => {
+      console.log('🍔 [MENU DEBUG] State after update should be:', newState);
+    }, 10);
   };
   
   // Close menu with enhanced cleanup
@@ -189,7 +196,12 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
       <Button
         ref={buttonRef}
         variant="ghost"
-        onClick={toggleMenu}
+        onClick={(e) => {
+          console.log('🍔 [MENU DEBUG] Button clicked! Event:', e);
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMenu();
+        }}
         className="text-white hover:bg-white/10 p-3 transition-all duration-200 relative z-[80] min-h-[48px] min-w-[48px] border border-gray-700 hover:border-gray-500"
         aria-expanded={isOpen}
         aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
