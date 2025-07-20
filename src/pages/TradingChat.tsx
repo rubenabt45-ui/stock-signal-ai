@@ -10,6 +10,7 @@ import { UpgradeModal } from "@/components/UpgradeModal";
 import { Badge } from "@/components/ui/badge";
 import { ProtectedFeature } from "@/components/ProtectedFeature";
 import ReactMarkdown from 'react-markdown';
+import { useTranslation } from 'react-i18next';
 
 interface ChatMessage {
   id: string;
@@ -26,11 +27,12 @@ interface UploadedImage {
 }
 
 const TradingChat = () => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       type: 'assistant',
-      content: 'Welcome to TradeIQ Pro! Ask me about trading strategies, upload charts, and get personalized insights.',
+      content: t('tradingChat.welcome'),
       timestamp: new Date()
     }
   ]);
@@ -390,7 +392,7 @@ const TradingChat = () => {
             </div>
             <div className="bg-gray-800 rounded-lg p-3 flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
-              <span className="text-sm text-gray-300">Analyzing...</span>
+              <span className="text-sm text-gray-300">{t('tradingChat.analyzing')}</span>
             </div>
           </div>
         )}
@@ -431,7 +433,7 @@ const TradingChat = () => {
           <div className="flex-1">
             <Input
               type="text"
-              placeholder="Ask something..."
+              placeholder={t('tradingChat.placeholder')}
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => {

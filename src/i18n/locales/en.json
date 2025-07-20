@@ -3,369 +3,350 @@
   "landing": {
     "navbar": {
       "home": "Home",
-      "learnPreview": "Learn Preview", 
+      "learnPreview": "Learn Preview",
       "pricing": "Pricing",
       "login": "Login",
       "signUp": "Sign Up"
     },
     "hero": {
-      "title": "AI-Powered Trading Intelligence Platform",
-      "subtitle": "Identify patterns, trends, and opportunities with algorithmic precision",
-      "joinBeta": "Join the Beta",
+      "title": "AI-Powered Trading Intelligence",
+      "subtitle": "Advanced pattern recognition and intelligent market analysis for smarter trading decisions",
+      "joinBeta": "Join Beta",
       "watchDemo": "Watch Demo",
       "stats": {
         "accuracy": "Pattern Accuracy",
-        "speed": "Analysis Speed", 
+        "speed": "Analysis Speed",
         "monitoring": "Market Monitoring"
       }
     },
     "about": {
       "title": "What is TradeIQ?",
-      "description": "TradeIQ is an AI-powered technical analysis platform that detects patterns, analyzes trends, and highlights high-volatility zones in real-time. Our advanced machine learning algorithms provide traders with the insights they need to make informed decisions faster than ever before."
+      "description": "TradeIQ combines artificial intelligence with advanced technical analysis to deliver real-time market insights, pattern detection, and intelligent trading recommendations. Our platform empowers traders with data-driven decision-making tools."
     },
     "features": {
       "title": "Core Features",
       "patternDetection": {
         "title": "Pattern Detection",
-        "description": "Automated chart pattern recognition with machine learning precision"
+        "description": "Advanced AI algorithms identify chart patterns and market signals in real-time"
       },
       "trendAnalysis": {
-        "title": "Trend Analysis", 
-        "description": "Real-time trend identification and momentum analysis"
+        "title": "Trend Analysis",
+        "description": "Comprehensive trend analysis with predictive insights and momentum indicators"
       },
       "volatilityHeatmaps": {
         "title": "Volatility Heatmaps",
-        "description": "Visual volatility zones and risk assessment tools"
+        "description": "Visual representation of market volatility across different timeframes and assets"
       },
       "aiInsights": {
         "title": "AI Insights",
-        "description": "Intelligent market analysis with actionable recommendations"
+        "description": "Personalized trading insights and recommendations powered by machine learning"
+      }
+    },
+    "benefits": {
+      "title": "Benefits for Traders",
+      "reducedSubjectivity": {
+        "title": "Reduced Subjectivity",
+        "description": "Eliminate emotional bias with data-driven analysis and objective insights"
+      },
+      "fasterDecisions": {
+        "title": "Faster Decisions",
+        "description": "Make informed trading decisions in seconds, not hours"
+      },
+      "practicalEducation": {
+        "title": "Practical Education",
+        "description": "Learn trading concepts through interactive AI-powered guidance"
+      },
+      "higherPrecision": {
+        "title": "Higher Precision",
+        "description": "Achieve superior accuracy with machine learning algorithms"
       }
     },
     "aiFeatures": {
-      "title": "AI-Powered Features",
-      "subtitle": "Harness the power of artificial intelligence for smarter trading decisions",
-      "chartIA": {
-        "title": "ChartIA",
-        "description": "Advanced AI chart analysis with pattern recognition"
+      "title": "AI Features",
+      "realTime": {
+        "title": "Real-time Analysis",
+        "description": "Instant pattern recognition and market signal detection"
       },
-      "tradingChat": {
-        "title": "TradingChat",
-        "description": "Interactive AI assistant for trading guidance and strategy"
+      "predictive": {
+        "title": "Predictive Insights",
+        "description": "Advanced forecasting models for market movements"
       },
-      "newsIA": {
-        "title": "NewsIA", 
-        "description": "AI-curated market news and sentiment analysis"
+      "adaptive": {
+        "title": "Adaptive Learning",
+        "description": "AI that improves with market conditions and user feedback"
       }
     },
     "pricing": {
-      "title": "Simple, Transparent Pricing",
-      "subtitle": "Choose the plan that fits your trading style",
-      "freeTitle": "Free",
-      "freePrice": "$0",
-      "freeDescription": "Perfect for getting started",
-      "proTitle": "Pro",
-      "proPrice": "$9.99",
-      "proDescription": "Everything you need for professional trading",
-      "features": {
-        "basicCharts": "Basic chart analysis",
-        "limitedAI": "Limited AI insights",
-        "communityAccess": "Community access",
-        "advancedCharts": "Advanced chart analysis",
-        "unlimitedAI": "Unlimited AI insights", 
-        "prioritySupport": "Priority support",
-        "realTimeData": "Real-time data feeds",
-        "customAlerts": "Custom alerts"
-      },
-      "getStarted": "Get Started",
-      "upgradeNow": "Upgrade Now"
+      "title": "Choose Your Plan",
+      "subtitle": "Start free, upgrade when ready"
     },
     "cta": {
       "title": "Ready to Transform Your Trading?",
-      "subtitle": "Join thousands of traders who are already using TradeIQ to make smarter trading decisions",
-      "startNow": "Start Trading Smarter"
+      "subtitle": "Join thousands of traders using AI-powered insights",
+      "getStarted": "Get Started Free",
+      "contactUs": "Contact Us"
     }
   },
   "dashboard": {
     "welcomeBack": "Welcome back",
-    "subtitle": "Your trading command center. Access AI insights, educational resources, and market data.",
-    "quickActions": "Quick Actions",
-    "recentActivity": "Recent Activity",
-    "patternAccuracy": "Pattern Accuracy",
-    "analysisSpeed": "Analysis Speed", 
-    "marketMonitoring": "Market Monitoring",
-    "strategyAI": {
-      "title": "StrategyAI Chat",
-      "description": "Get AI-powered trading insights"
-    },
-    "learn": {
-      "title": "Learn Section", 
-      "description": "Educational resources and guides"
-    },
-    "events": {
-      "title": "Economic Events",
-      "description": "Market-moving events calendar"
-    },
-    "marketUpdates": {
-      "title": "Market Updates",
-      "description": "Real-time market data and analysis"
-    },
-    "activity": {
-      "strategySession": "StrategyAI Session",
-      "learnCompleted": "Learn Module Completed", 
-      "marketAlert": "Market Alert"
-    },
+    "subtitle": "Here's what's happening in your trading journey today",
     "plan": {
       "free": "Free Plan",
       "pro": "Pro Plan"
+    },
+    "marketMonitoring": "Market Monitoring",
+    "patternAccuracy": "Pattern Accuracy",
+    "analysisSpeed": "Analysis Speed",
+    "quickActions": "Quick Actions",
+    "recentActivity": "Recent Activity",
+    "strategyAI": {
+      "title": "StrategyAI",
+      "description": "Get personalized trading insights and chart analysis powered by AI"
+    },
+    "learn": {
+      "title": "Learn",
+      "description": "Master trading concepts with our comprehensive educational resources"
+    },
+    "events": {
+      "title": "Economic Events",
+      "description": "Stay updated with important market-moving events and announcements"
+    },
+    "marketUpdates": {
+      "title": "Market Updates",
+      "description": "Real-time market news and analysis from trusted sources"
     }
   },
   "auth": {
     "login": {
-      "title": "Welcome back to TradeIQ",
-      "subtitle": "Sign in to your trading intelligence platform",
-      "email": "Email", 
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your TradeIQ account",
+      "email": "Email",
       "password": "Password",
-      "showPassword": "Show password",
-      "hidePassword": "Hide password",
-      "signIn": "Sign In",
-      "signingIn": "Signing in...",
       "forgotPassword": "Forgot your password?",
+      "signIn": "Sign In",
       "noAccount": "Don't have an account?",
-      "signUp": "Sign up",
-      "welcomeBack": "Welcome back!",
-      "loginSuccess": "You've successfully logged in.",
-      "loginFailed": "Login Failed",
-      "emailNotConfirmed": "Email Not Confirmed",
-      "checkEmail": "Please check your email and click the confirmation link before logging in. Check your spam folder if you don't see the email.",
-      "invalidCredentials": "Invalid email or password. Please check your credentials and try again."
+      "signUp": "Sign up here",
+      "success": "Successfully signed in!",
+      "error": "Invalid email or password"
     },
     "signup": {
-      "title": "Create your TradeIQ account", 
-      "subtitle": "Join thousands of traders using AI-powered insights",
+      "title": "Create Account",
+      "subtitle": "Join TradeIQ and start trading smarter",
       "fullName": "Full Name",
       "email": "Email",
-      "password": "Password", 
+      "password": "Password",
       "confirmPassword": "Confirm Password",
-      "createAccount": "Create Account",
-      "creatingAccount": "Creating account...",
-      "haveAccount": "Already have an account?",
-      "signIn": "Sign in",
-      "accountCreated": "Account Created!",
-      "checkEmailConfirm": "Please check your email and click the confirmation link to activate your account.",
-      "signupFailed": "Signup Failed",
-      "passwordMismatch": "Passwords do not match.",
-      "weakPassword": "Password should be at least 6 characters long."
+      "signUp": "Create Account",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in here",
+      "success": "Account created successfully! Please check your email to verify your account.",
+      "error": "Failed to create account. Please try again."
     },
     "forgotPassword": {
-      "title": "Reset your password",
-      "subtitle": "Enter your email and we'll send you a reset link", 
+      "title": "Reset Password",
+      "subtitle": "Enter your email to receive reset instructions",
       "email": "Email",
-      "sendReset": "Send Reset Link",
-      "sending": "Sending...",
-      "backToLogin": "Back to login",
-      "signUpFree": "Sign up for free",
-      "resetSent": "Reset Link Sent",
-      "checkEmail": "Please check your email for password reset instructions.",
-      "resetFailed": "Reset Failed"
+      "sendInstructions": "Send Instructions",
+      "backToLogin": "Back to Login",
+      "success": "Password reset instructions sent to your email",
+      "error": "Failed to send reset instructions"
+    },
+    "verifyEmail": {
+      "title": "Verify Your Email",
+      "subtitle": "Check your email and click the verification link to activate your account",
+      "resend": "Resend Verification",
+      "backToLogin": "Back to Login"
     }
   },
   "learn": {
-    "title": "Educational Resources",
-    "subtitle": "Master trading with our comprehensive guides and resources",
-    "pdfResources": "PDF Resources",
-    "videoTutorials": "Video Tutorials", 
-    "downloadPdf": "Download PDF",
-    "watchVideo": "Watch Video",
+    "title": "Trading Education",
+    "subtitle": "Master the markets with our comprehensive learning resources",
     "comingSoon": "Coming Soon",
     "levels": {
       "beginner": "Beginner",
-      "intermediate": "Intermediate", 
+      "intermediate": "Intermediate",
       "advanced": "Advanced"
     }
   },
   "pricing": {
     "title": "Choose Your Plan",
-    "subtitle": "Start free and upgrade when you're ready",
-    "free": {
-      "title": "Free",
-      "price": "$0",
-      "period": "forever",
-      "description": "Perfect for getting started"
-    },
-    "pro": {
-      "title": "Pro", 
-      "price": "$9.99",
-      "period": "per month",
-      "description": "Everything you need for professional trading"
-    },
+    "subtitle": "Start free, upgrade when ready",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
     "getStarted": "Get Started",
-    "upgradeNow": "Upgrade Now",
     "currentPlan": "Current Plan",
-    "features": {
-      "basicCharts": "Basic chart analysis",
-      "limitedAI": "Limited AI insights",
-      "communityAccess": "Community access", 
-      "advancedCharts": "Advanced chart analysis",
-      "unlimitedAI": "Unlimited AI insights",
-      "prioritySupport": "Priority support",
-      "realTimeData": "Real-time data feeds",
-      "customAlerts": "Custom alerts"
-    },
+    "upgrade": "Upgrade",
     "faq": {
-      "title": "Frequently Asked Questions",
-      "trial": "Is there a free trial?",
-      "trialAnswer": "You can start with our free plan immediately. No credit card required to get started."
+      "title": "Frequently Asked Questions"
     }
   },
   "tradingChat": {
-    "welcome": "Welcome to TradeIQ Pro! Ask me about trading strategies, upload charts, and get personalized insights."
+    "welcome": "Welcome to TradeIQ Pro! Ask me about trading strategies, upload charts, and get personalized insights.",
+    "placeholder": "Ask something...",
+    "analyzing": "Analyzing...",
+    "disclaimer": "TradeIQ provides educational content and market analysis tools.",
+    "memoryActivated": "Memory activated! I'll remember our conversation context.",
+    "upgradeRequired": "Upgrade to Pro for unlimited messages",
+    "dailyLimit": "Daily message limit reached",
+    "attachImage": "Attach Image",
+    "resetConversation": "Reset Conversation"
   },
   "navigation": {
-    "chartIA": "ChartIA",
-    "tradingChat": "TradingChat",
+    "title": "Navigation",
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "strategyAI": "StrategyAI",
     "learn": "Learn",
-    "newsAI": "NewsAI",
-    "settings": "Settings"
+    "events": "Events",
+    "favorites": "Favorites",
+    "settings": "Settings",
+    "logout": "Logout"
   },
   "settings": {
     "title": "Settings",
-    "subtitle": "Manage your preferences and account",
     "profile": {
       "title": "Profile",
-      "subtitle": "Manage your personal information",
+      "subtitle": "Manage your personal information and avatar",
       "fullName": "Full Name",
       "username": "Username",
-      "email": "Email Address",
+      "email": "Email",
       "avatar": "Profile Picture",
-      "uploadAvatar": "Upload Avatar",
-      "changeAvatar": "Change Avatar",
-      "saving": "Saving...",
-      "saved": "Profile updated successfully",
-      "error": "Failed to update profile"
+      "uploadAvatar": "Upload New Avatar",
+      "removeAvatar": "Remove Avatar",
+      "saveChanges": "Save Changes"
     },
     "preferences": {
       "title": "Preferences",
+      "subtitle": "Customize your TradeIQ experience",
       "theme": "Theme",
-      "refreshInterval": "Data Refresh Interval",
       "language": "Language",
-      "themes": {
-        "light": "Light",
-        "dark": "Dark",
-        "system": "System"
-      },
-      "intervals": {
-        "30s": "30 seconds",
-        "1min": "1 minute",
-        "5min": "5 minutes"
-      },
-      "languages": {
-        "en": "English",
-        "es": "Español"
-      },
-      "notes": {
-        "theme": "Theme changes apply immediately",
-        "refresh": "Data refresh settings affect market data updates",
-        "language": "Language changes apply immediately"
-      }
+      "refreshInterval": "Data Refresh Interval",
+      "notifications": "Notifications"
     },
     "security": {
-      "title": "Security & Privacy",
-      "subtitle": "Protect your trading data",
+      "title": "Security",
+      "subtitle": "Manage your account security settings",
       "changePassword": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
       "twoFactor": "Two-Factor Authentication",
-      "sessions": "Active Sessions",
-      "privacy": "Privacy Settings"
+      "enable": "Enable",
+      "disable": "Disable"
     },
     "integrations": {
       "title": "Integrations",
-      "subtitle": "Connect your trading platforms",
-      "brokers": "Trading Brokers",
-      "apis": "API Connections",
-      "webhooks": "Webhooks"
+      "subtitle": "Connect with external platforms and services",
+      "tradingview": "TradingView",
+      "discord": "Discord",
+      "telegram": "Telegram"
     },
     "support": {
-      "title": "Support & Help",
-      "subtitle": "Get assistance and resources",
+      "title": "Support",
+      "subtitle": "Get help and contact our support team",
       "helpCenter": "Help Center",
       "contactSupport": "Contact Support",
-      "documentation": "Documentation",
-      "community": "Community Forum"
+      "reportBug": "Report a Bug",
+      "featureRequest": "Feature Request"
     },
     "legal": {
-      "title": "Legal & Compliance",
+      "title": "Legal",
       "subtitle": "Terms, privacy, and legal information",
-      "terms": "Terms and Conditions",
+      "terms": "Terms of Service",
       "privacy": "Privacy Policy",
       "license": "License Agreement"
     },
     "account": {
       "title": "Account",
-      "subtitle": "Manage your TradeIQ account",
-      "signedInAs": "Signed in as",
-      "logOut": "Log Out"
+      "subtitle": "Manage your account settings",
+      "deleteAccount": "Delete Account",
+      "exportData": "Export Data",
+      "logout": "Logout"
     },
-    "pro": {
-      "title": "Pro Subscription",
-      "currentPlan": "Current Plan",
-      "proPlan": "TradeIQ Pro - $9.99/month",
-      "benefits": "Benefits",
-      "benefitsList": [
-        "Unlimited ChartIA access",
-        "Advanced TradingChat with memory",
-        "Real-time NewsAI + favorites",
-        "Priority support access"
-      ],
-      "managedBy": "Subscription managed through Stripe. Contact support for assistance.",
-      "upgrade": "Upgrade to Pro",
-      "active": "Pro Plan Active"
+    "subscription": {
+      "title": "Subscription",
+      "subtitle": "Manage your Pro subscription",
+      "current": "Current Plan",
+      "upgrade": "Upgrade Plan",
+      "billing": "Billing History",
+      "cancel": "Cancel Subscription"
     }
   },
   "legal": {
-    "terms": {
-      "title": "Terms and Conditions",
-      "content": "Welcome to TradeIQ. By using our service, you agree to these terms and conditions. Please read them carefully before using our platform."
-    },
-    "privacy": {
-      "title": "Privacy Policy",
-      "content": "Your privacy is important to us. This policy explains how we collect, use, and protect your personal information when you use TradeIQ."
-    },
-    "license": {
-      "title": "License Agreement",
-      "content": "This license agreement governs your use of the TradeIQ software and services. Please review the terms carefully."
-    },
-    "lastUpdated": "Last updated"
+    "terms": "Terms and Conditions",
+    "privacy": "Privacy Policy",
+    "license": "License Agreement"
   },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
-    "close": "Close",
+    "delete": "Delete",
+    "edit": "Edit",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
-    "retry": "Retry",
-    "edit": "Edit",
-    "delete": "Delete",
-    "confirm": "Confirm",
+    "warning": "Warning",
+    "info": "Info",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "close": "Close",
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
     "search": "Search",
     "filter": "Filter",
     "sort": "Sort",
+    "export": "Export",
+    "import": "Import",
+    "upload": "Upload",
+    "download": "Download",
     "refresh": "Refresh",
-    "selectLanguage": "Select Language"
+    "retry": "Retry",
+    "continue": "Continue",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "view": "View",
+    "hide": "Hide",
+    "show": "Show"
   },
-  "toasts": {
+  "placeholders": {
+    "search": "Search...",
+    "searchStocks": "Search stocks, crypto, forex...",
+    "enterSymbol": "Enter stock symbol (e.g., AAPL, TSLA)",
+    "enterName": "Enter your full name",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "confirmPassword": "Confirm your password",
+    "enterUsername": "Choose a username (optional)",
+    "currentPassword": "Enter your current password",
+    "newPassword": "Enter your new password (min 8 characters)",
+    "askSomething": "Ask something..."
+  },
+  "toast": {
     "profileUpdated": "Profile updated successfully",
-    "profileUpdateFailed": "Failed to update profile",
-    "themeUpdated": "Theme updated",
-    "themeUpdateFailed": "Failed to save theme",
-    "languageUpdated": "Language updated",
-    "languageUpdateFailed": "Failed to save language preference",
-    "refreshIntervalUpdated": "Refresh interval updated",
-    "refreshIntervalUpdateFailed": "Failed to save refresh interval",
-    "logoutSuccess": "Logged out successfully",
-    "logoutFailed": "Logout failed"
+    "avatarUpdated": "Avatar updated successfully",
+    "avatarRemoved": "Avatar removed successfully",
+    "passwordChanged": "Password changed successfully",
+    "preferencesUpdated": "Preferences updated successfully",
+    "themeChanged": "Theme changed successfully",
+    "languageChanged": "Language changed successfully",
+    "loggedOut": "Logged out successfully",
+    "error": "An error occurred",
+    "success": "Operation completed successfully",
+    "dataExported": "Data exported successfully",
+    "subscriptionUpdated": "Subscription updated successfully"
+  },
+  "errors": {
+    "general": "Something went wrong. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "authentication": "Authentication failed. Please log in again.",
+    "authorization": "You don't have permission to perform this action.",
+    "validation": "Please check your input and try again.",
+    "fileSize": "File size is too large. Maximum size is 5MB.",
+    "fileType": "Invalid file type. Please upload a valid image.",
+    "uploadFailed": "Upload failed. Please try again.",
+    "saveFailed": "Failed to save changes. Please try again.",
+    "loadFailed": "Failed to load data. Please refresh the page."
   }
 }

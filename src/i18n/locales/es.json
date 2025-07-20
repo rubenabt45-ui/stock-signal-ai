@@ -1,17 +1,16 @@
-
 {
   "landing": {
     "navbar": {
       "home": "Inicio",
-      "learnPreview": "Vista Previa de Aprendizaje",
-      "pricing": "Precios", 
+      "learnPreview": "Vista Previa Aprender",
+      "pricing": "Precios",
       "login": "Iniciar Sesión",
       "signUp": "Registrarse"
     },
     "hero": {
-      "title": "Plataforma de Inteligencia de Trading Impulsada por IA",
-      "subtitle": "Identifica patrones, tendencias y oportunidades con precisión algorítmica",
-      "joinBeta": "Únete a la Beta",
+      "title": "Inteligencia de Trading con IA",
+      "subtitle": "Reconocimiento avanzado de patrones y análisis inteligente del mercado para decisiones de trading más inteligentes",
+      "joinBeta": "Unirse a Beta",
       "watchDemo": "Ver Demo",
       "stats": {
         "accuracy": "Precisión de Patrones",
@@ -21,162 +20,146 @@
     },
     "about": {
       "title": "¿Qué es TradeIQ?",
-      "description": "TradeIQ es una plataforma de análisis técnico impulsada por IA que detecta patrones, analiza tendencias y resalta zonas de alta volatilidad en tiempo real. Nuestros algoritmos avanzados de aprendizaje automático proporcionan a los traders las perspectivas que necesitan para tomar decisiones informadas más rápido que nunca."
+      "description": "TradeIQ combina inteligencia artificial con análisis técnico avanzado para entregar insights del mercado en tiempo real, detección de patrones y recomendaciones inteligentes de trading. Nuestra plataforma empodera a los traders con herramientas de toma de decisiones basadas en datos."
     },
     "features": {
       "title": "Características Principales",
       "patternDetection": {
         "title": "Detección de Patrones",
-        "description": "Reconocimiento automatizado de patrones de gráficos con precisión de aprendizaje automático"
+        "description": "Algoritmos avanzados de IA identifican patrones de gráficos y señales del mercado en tiempo real"
       },
       "trendAnalysis": {
         "title": "Análisis de Tendencias",
-        "description": "Identificación de tendencias en tiempo real y análisis de momentum"
+        "description": "Análisis integral de tendencias con insights predictivos e indicadores de momentum"
       },
       "volatilityHeatmaps": {
         "title": "Mapas de Calor de Volatilidad",
-        "description": "Zonas visuales de volatilidad y herramientas de evaluación de riesgos"
+        "description": "Representación visual de la volatilidad del mercado en diferentes marcos temporales y activos"
       },
       "aiInsights": {
-        "title": "Perspectivas de IA",
-        "description": "Análisis inteligente del mercado con recomendaciones accionables"
+        "title": "Insights de IA",
+        "description": "Insights personalizados de trading y recomendaciones impulsadas por aprendizaje automático"
+      }
+    },
+    "benefits": {
+      "title": "Beneficios para Traders",
+      "reducedSubjectivity": {
+        "title": "Subjetividad Reducida",
+        "description": "Elimina el sesgo emocional con análisis basado en datos e insights objetivos"
+      },
+      "fasterDecisions": {
+        "title": "Decisiones Más Rápidas",
+        "description": "Toma decisiones informadas de trading en segundos, no horas"
+      },
+      "practicalEducation": {
+        "title": "Educación Práctica",
+        "description": "Aprende conceptos de trading a través de guía interactiva impulsada por IA"
+      },
+      "higherPrecision": {
+        "title": "Mayor Precisión",
+        "description": "Logra precisión superior con algoritmos de aprendizaje automático"
       }
     },
     "aiFeatures": {
-      "title": "Características Impulsadas por IA",
-      "subtitle": "Aprovecha el poder de la inteligencia artificial para decisiones de trading más inteligentes",
-      "chartIA": {
-        "title": "ChartIA",
-        "description": "Análisis avanzado de gráficos con IA y reconocimiento de patrones"
+      "title": "Características de IA",
+      "realTime": {
+        "title": "Análisis en Tiempo Real",
+        "description": "Reconocimiento instantáneo de patrones y detección de señales del mercado"
       },
-      "tradingChat": {
-        "title": "TradingChat",
-        "description": "Asistente interactivo de IA para orientación y estrategia de trading"
+      "predictive": {
+        "title": "Insights Predictivos",
+        "description": "Modelos avanzados de pronóstico para movimientos del mercado"
       },
-      "newsIA": {
-        "title": "NewsIA",
-        "description": "Noticias del mercado curadas por IA y análisis de sentimientos"
+      "adaptive": {
+        "title": "Aprendizaje Adaptativo",
+        "description": "IA que mejora con las condiciones del mercado y retroalimentación del usuario"
       }
     },
     "pricing": {
-      "title": "Precios Simples y Transparentes",
-      "subtitle": "Elige el plan que se adapte a tu estilo de trading",
-      "freeTitle": "Gratis",
-      "freePrice": "$0",
-      "freeDescription": "Perfecto para empezar",
-      "proTitle": "Pro",
-      "proPrice": "$9.99",
-      "proDescription": "Todo lo que necesitas para trading profesional",
-      "features": {
-        "basicCharts": "Análisis básico de gráficos",
-        "limitedAI": "Perspectivas limitadas de IA",
-        "communityAccess": "Acceso a la comunidad",
-        "advancedCharts": "Análisis avanzado de gráficos",
-        "unlimitedAI": "Perspectivas ilimitadas de IA",
-        "prioritySupport": "Soporte prioritario",
-        "realTimeData": "Feeds de datos en tiempo real",
-        "customAlerts": "Alertas personalizadas"
-      },
-      "getStarted": "Comenzar",
-      "upgradeNow": "Actualizar Ahora"
+      "title": "Elige Tu Plan",
+      "subtitle": "Comienza gratis, actualiza cuando estés listo"
     },
     "cta": {
-      "title": "¿Listo para Transformar tu Trading?",
-      "subtitle": "Únete a miles de traders que ya están usando TradeIQ para tomar decisiones de trading más inteligentes",
-      "startNow": "Comenzar a Tradear Más Inteligentemente"
+      "title": "¿Listo para Transformar Tu Trading?",
+      "subtitle": "Únete a miles de traders usando insights impulsados por IA",
+      "getStarted": "Comenzar Gratis",
+      "contactUs": "Contáctanos"
     }
   },
   "dashboard": {
-    "welcomeBack": "Bienvenido de nuevo",
-    "subtitle": "Tu centro de comando de trading. Accede a perspectivas de IA, recursos educativos y datos del mercado.",
-    "quickActions": "Acciones Rápidas",
-    "recentActivity": "Actividad Reciente",
-    "patternAccuracy": "Precisión de Patrones",
-    "analysisSpeed": "Velocidad de Análisis",
-    "marketMonitoring": "Monitoreo del Mercado",
-    "strategyAI": {
-      "title": "Chat StrategyAI",
-      "description": "Obtén perspectivas de trading impulsadas por IA"
-    },
-    "learn": {
-      "title": "Sección de Aprendizaje",
-      "description": "Recursos educativos y guías"
-    },
-    "events": {
-      "title": "Eventos Económicos",
-      "description": "Calendario de eventos que mueven el mercado"
-    },
-    "marketUpdates": {
-      "title": "Actualizaciones del Mercado",
-      "description": "Datos del mercado y análisis en tiempo real"
-    },
-    "activity": {
-      "strategySession": "Sesión de StrategyAI",
-      "learnCompleted": "Módulo de Aprendizaje Completado",
-      "marketAlert": "Alerta del Mercado"
-    },
+    "welcomeBack": "Bienvenido de vuelta",
+    "subtitle": "Esto es lo que está pasando en tu viaje de trading hoy",
     "plan": {
       "free": "Plan Gratuito",
       "pro": "Plan Pro"
+    },
+    "marketMonitoring": "Monitoreo del Mercado",
+    "patternAccuracy": "Precisión de Patrones",
+    "analysisSpeed": "Velocidad de Análisis",
+    "quickActions": "Acciones Rápidas",
+    "recentActivity": "Actividad Reciente",
+    "strategyAI": {
+      "title": "StrategyAI",
+      "description": "Obtén insights personalizados de trading y análisis de gráficos impulsados por IA"
+    },
+    "learn": {
+      "title": "Aprender",
+      "description": "Domina conceptos de trading con nuestros recursos educativos integrales"
+    },
+    "events": {
+      "title": "Eventos Económicos",
+      "description": "Mantente actualizado con eventos importantes que mueven el mercado y anuncios"
+    },
+    "marketUpdates": {
+      "title": "Actualizaciones del Mercado",
+      "description": "Noticias del mercado en tiempo real y análisis de fuentes confiables"
     }
   },
   "auth": {
     "login": {
-      "title": "Bienvenido de nuevo a TradeIQ",
-      "subtitle": "Inicia sesión en tu plataforma de inteligencia de trading",
+      "title": "Bienvenido de Vuelta",
+      "subtitle": "Inicia sesión en tu cuenta de TradeIQ",
       "email": "Correo Electrónico",
       "password": "Contraseña",
-      "showPassword": "Mostrar contraseña",
-      "hidePassword": "Ocultar contraseña",
-      "signIn": "Iniciar Sesión",
-      "signingIn": "Iniciando sesión...",
       "forgotPassword": "¿Olvidaste tu contraseña?",
+      "signIn": "Iniciar Sesión",
       "noAccount": "¿No tienes una cuenta?",
-      "signUp": "Registrarse",
-      "welcomeBack": "¡Bienvenido de nuevo!",
-      "loginSuccess": "Has iniciado sesión exitosamente.",
-      "loginFailed": "Inicio de Sesión Fallido",
-      "emailNotConfirmed": "Correo No Confirmado",
-      "checkEmail": "Por favor revisa tu correo y haz clic en el enlace de confirmación antes de iniciar sesión. Revisa tu carpeta de spam si no ves el correo.",
-      "invalidCredentials": "Correo o contraseña inválidos. Por favor verifica tus credenciales e intenta de nuevo."
+      "signUp": "Regístrate aquí",
+      "success": "¡Sesión iniciada exitosamente!",
+      "error": "Correo electrónico o contraseña inválidos"
     },
     "signup": {
-      "title": "Crea tu cuenta de TradeIQ",
-      "subtitle": "Únete a miles de traders que usan perspectivas impulsadas por IA",
+      "title": "Crear Cuenta",
+      "subtitle": "Únete a TradeIQ y comienza a hacer trading más inteligente",
       "fullName": "Nombre Completo",
       "email": "Correo Electrónico",
       "password": "Contraseña",
       "confirmPassword": "Confirmar Contraseña",
-      "createAccount": "Crear Cuenta",
-      "creatingAccount": "Creando cuenta...",
-      "haveAccount": "¿Ya tienes una cuenta?",
-      "signIn": "Iniciar sesión",
-      "accountCreated": "¡Cuenta Creada!",
-      "checkEmailConfirm": "Por favor revisa tu correo y haz clic en el enlace de confirmación para activar tu cuenta.",
-      "signupFailed": "Registro Fallido",
-      "passwordMismatch": "Las contraseñas no coinciden.",
-      "weakPassword": "La contraseña debe tener al menos 6 caracteres."
+      "signUp": "Crear Cuenta",
+      "hasAccount": "¿Ya tienes una cuenta?",
+      "signIn": "Inicia sesión aquí",
+      "success": "¡Cuenta creada exitosamente! Por favor revisa tu correo electrónico para verificar tu cuenta.",
+      "error": "Error al crear la cuenta. Por favor intenta de nuevo."
     },
     "forgotPassword": {
-      "title": "Restablece tu contraseña",
-      "subtitle": "Ingresa tu correo y te enviaremos un enlace de restablecimiento",
+      "title": "Restablecer Contraseña",
+      "subtitle": "Ingresa tu correo electrónico para recibir instrucciones de restablecimiento",
       "email": "Correo Electrónico",
-      "sendReset": "Enviar Enlace de Restablecimiento",
-      "sending": "Enviando...",
-      "backToLogin": "Volver al inicio de sesión",
-      "signUpFree": "Registrarse gratis",
-      "resetSent": "Enlace de Restablecimiento Enviado",
-      "checkEmail": "Por favor revisa tu correo para las instrucciones de restablecimiento de contraseña.",
-      "resetFailed": "Restablecimiento Fallido"
+      "sendInstructions": "Enviar Instrucciones",
+      "backToLogin": "Volver al Inicio de Sesión",
+      "success": "Instrucciones de restablecimiento de contraseña enviadas a tu correo electrónico",
+      "error": "Error al enviar instrucciones de restablecimiento"
+    },
+    "verifyEmail": {
+      "title": "Verifica Tu Correo Electrónico",
+      "subtitle": "Revisa tu correo electrónico y haz clic en el enlace de verificación para activar tu cuenta",
+      "resend": "Reenviar Verificación",
+      "backToLogin": "Volver al Inicio de Sesión"
     }
   },
   "learn": {
-    "title": "Recursos Educativos",
-    "subtitle": "Domina el trading con nuestras guías y recursos completos",
-    "pdfResources": "Recursos PDF",
-    "videoTutorials": "Tutoriales en Video",
-    "downloadPdf": "Descargar PDF",
-    "watchVideo": "Ver Video",
+    "title": "Educación de Trading",
+    "subtitle": "Domina los mercados con nuestros recursos de aprendizaje integrales",
     "comingSoon": "Próximamente",
     "levels": {
       "beginner": "Principiante",
@@ -186,186 +169,183 @@
   },
   "pricing": {
     "title": "Elige Tu Plan",
-    "subtitle": "Comienza gratis y actualiza cuando estés listo",
-    "free": {
-      "title": "Gratis",
-      "price": "$0",
-      "period": "para siempre",
-      "description": "Perfecto para empezar"
-    },
-    "pro": {
-      "title": "Pro",
-      "price": "$9.99",
-      "period": "por mes",
-      "description": "Todo lo que necesitas para trading profesional"
-    },
+    "subtitle": "Comienza gratis, actualiza cuando estés listo",
+    "monthly": "Mensual",
+    "yearly": "Anual",
     "getStarted": "Comenzar",
-    "upgradeNow": "Actualizar Ahora",
     "currentPlan": "Plan Actual",
-    "features": {
-      "basicCharts": "Análisis básico de gráficos",
-      "limitedAI": "Perspectivas limitadas de IA",
-      "communityAccess": "Acceso a la comunidad",
-      "advancedCharts": "Análisis avanzado de gráficos",
-      "unlimitedAI": "Perspectivas ilimitadas de IA",
-      "prioritySupport": "Soporte prioritario",
-      "realTimeData": "Feeds de datos en tiempo real",
-      "customAlerts": "Alertas personalizadas"
-    },
+    "upgrade": "Actualizar",
     "faq": {
-      "title": "Preguntas Frecuentes",
-      "trial": "¿Hay una prueba gratuita?",
-      "trialAnswer": "Puedes comenzar con nuestro plan gratuito inmediatamente. No se requiere tarjeta de crédito para empezar."
+      "title": "Preguntas Frecuentes"
     }
   },
   "tradingChat": {
-    "welcome": "¡Bienvenido a TradeIQ Pro! Pregúntame sobre estrategias de trading, sube gráficos y obtén perspectivas personalizadas."
+    "welcome": "¡Bienvenido a TradeIQ Pro! Pregúntame sobre estrategias de trading, sube gráficos y obtén insights personalizados.",
+    "placeholder": "Pregunta algo...",
+    "analyzing": "Analizando...",
+    "disclaimer": "TradeIQ proporciona contenido educativo y herramientas de análisis del mercado.",
+    "memoryActivated": "¡Memoria activada! Recordaré el contexto de nuestra conversación.",
+    "upgradeRequired": "Actualiza a Pro para mensajes ilimitados",
+    "dailyLimit": "Límite diario de mensajes alcanzado",
+    "attachImage": "Adjuntar Imagen",
+    "resetConversation": "Reiniciar Conversación"
   },
   "navigation": {
-    "chartIA": "ChartIA",
-    "tradingChat": "TradingChat",
+    "title": "Navegación",
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "strategyAI": "StrategyAI",
     "learn": "Aprender",
-    "newsAI": "NoticiasAI",
-    "settings": "Configuración"
+    "events": "Eventos",
+    "favorites": "Favoritos",
+    "settings": "Configuración",
+    "logout": "Cerrar Sesión"
   },
   "settings": {
     "title": "Configuración",
-    "subtitle": "Gestiona tus preferencias y cuenta",
     "profile": {
       "title": "Perfil",
-      "subtitle": "Gestiona tu información personal",
+      "subtitle": "Gestiona tu información personal y avatar",
       "fullName": "Nombre Completo",
       "username": "Nombre de Usuario",
-      "email": "Dirección de Correo",
+      "email": "Correo Electrónico",
       "avatar": "Foto de Perfil",
-      "uploadAvatar": "Subir Avatar",
-      "changeAvatar": "Cambiar Avatar",
-      "saving": "Guardando...",
-      "saved": "Perfil actualizado exitosamente",
-      "error": "Error al actualizar el perfil"
+      "uploadAvatar": "Subir Nuevo Avatar",
+      "removeAvatar": "Eliminar Avatar",
+      "saveChanges": "Guardar Cambios"
     },
     "preferences": {
       "title": "Preferencias",
+      "subtitle": "Personaliza tu experiencia TradeIQ",
       "theme": "Tema",
-      "refreshInterval": "Intervalo de Actualización",
       "language": "Idioma",
-      "themes": {
-        "light": "Claro",
-        "dark": "Oscuro",
-        "system": "Sistema"
-      },
-      "intervals": {
-        "30s": "30 segundos",
-        "1min": "1 minuto",
-        "5min": "5 minutos"
-      },
-      "languages": {
-        "en": "English",
-        "es": "Español"
-      },
-      "notes": {
-        "theme": "Los cambios de tema se aplican inmediatamente",
-        "refresh": "La configuración de actualización afecta las actualizaciones de datos del mercado",
-        "language": "Los cambios de idioma se aplican inmediatamente"
-      }
+      "refreshInterval": "Intervalo de Actualización de Datos",
+      "notifications": "Notificaciones"
     },
     "security": {
-      "title": "Seguridad y Privacidad",
-      "subtitle": "Protege tus datos de trading",
+      "title": "Seguridad",
+      "subtitle": "Gestiona la configuración de seguridad de tu cuenta",
       "changePassword": "Cambiar Contraseña",
+      "currentPassword": "Contraseña Actual",
+      "newPassword": "Nueva Contraseña",
+      "confirmPassword": "Confirmar Nueva Contraseña",
       "twoFactor": "Autenticación de Dos Factores",
-      "sessions": "Sesiones Activas",
-      "privacy": "Configuración de Privacidad"
+      "enable": "Habilitar",
+      "disable": "Deshabilitar"
     },
     "integrations": {
       "title": "Integraciones",
-      "subtitle": "Conecta tus plataformas de trading",
-      "brokers": "Brokers de Trading",
-      "apis": "Conexiones API",
-      "webhooks": "Webhooks"
+      "subtitle": "Conecta con plataformas y servicios externos",
+      "tradingview": "TradingView",
+      "discord": "Discord",
+      "telegram": "Telegram"
     },
     "support": {
-      "title": "Soporte y Ayuda",
-      "subtitle": "Obtén asistencia y recursos",
+      "title": "Soporte",
+      "subtitle": "Obtén ayuda y contacta a nuestro equipo de soporte",
       "helpCenter": "Centro de Ayuda",
       "contactSupport": "Contactar Soporte",
-      "documentation": "Documentación",
-      "community": "Foro de la Comunidad"
+      "reportBug": "Reportar un Error",
+      "featureRequest": "Solicitar Característica"
     },
     "legal": {
-      "title": "Legal y Cumplimiento",
+      "title": "Legal",
       "subtitle": "Términos, privacidad e información legal",
-      "terms": "Términos y Condiciones",
+      "terms": "Términos de Servicio",
       "privacy": "Política de Privacidad",
       "license": "Acuerdo de Licencia"
     },
     "account": {
       "title": "Cuenta",
-      "subtitle": "Gestiona tu cuenta de TradeIQ",
-      "signedInAs": "Conectado como",
-      "logOut": "Cerrar Sesión"
+      "subtitle": "Gestiona la configuración de tu cuenta",
+      "deleteAccount": "Eliminar Cuenta",
+      "exportData": "Exportar Datos",
+      "logout": "Cerrar Sesión"
     },
-    "pro": {
-      "title": "Suscripción Pro",
-      "currentPlan": "Plan Actual",
-      "proPlan": "TradeIQ Pro - $9.99/mes",
-      "benefits": "Beneficios",
-      "benefitsList": [
-        "Acceso ilimitado a ChartIA",
-        "TradingChat avanzado con memoria",
-        "NoticiasAI en tiempo real + favoritos",
-        "Acceso prioritario al soporte"
-      ],
-      "managedBy": "Suscripción gestionada a través de Stripe. Contacta al soporte para asistencia.",
-      "upgrade": "Actualizar a Pro",
-      "active": "Plan Pro Activo"
+    "subscription": {
+      "title": "Suscripción",
+      "subtitle": "Gestiona tu suscripción Pro",
+      "current": "Plan Actual",
+      "upgrade": "Actualizar Plan",
+      "billing": "Historial de Facturación",
+      "cancel": "Cancelar Suscripción"
     }
   },
   "legal": {
-    "terms": {
-      "title": "Términos y Condiciones",
-      "content": "Bienvenido a TradeIQ. Al usar nuestro servicio, aceptas estos términos y condiciones. Por favor, léelos cuidadosamente antes de usar nuestra plataforma."
-    },
-    "privacy": {
-      "title": "Política de Privacidad",
-      "content": "Tu privacidad es importante para nosotros. Esta política explica cómo recopilamos, usamos y protegemos tu información personal cuando usas TradeIQ."
-    },
-    "license": {
-      "title": "Acuerdo de Licencia",
-      "content": "Este acuerdo de licencia rige tu uso del software y servicios de TradeIQ. Por favor, revisa los términos cuidadosamente."
-    },
-    "lastUpdated": "Última actualización"
+    "terms": "Términos y Condiciones",
+    "privacy": "Política de Privacidad",
+    "license": "Acuerdo de Licencia"
   },
   "common": {
     "save": "Guardar",
     "cancel": "Cancelar",
-    "close": "Cerrar",
+    "delete": "Eliminar",
+    "edit": "Editar",
     "loading": "Cargando...",
     "error": "Error",
     "success": "Éxito",
-    "retry": "Reintentar",
-    "edit": "Editar",
-    "delete": "Eliminar",
-    "confirm": "Confirmar",
+    "warning": "Advertencia",
+    "info": "Información",
+    "yes": "Sí",
+    "no": "No",
+    "ok": "OK",
+    "close": "Cerrar",
     "back": "Atrás",
     "next": "Siguiente",
     "previous": "Anterior",
     "search": "Buscar",
     "filter": "Filtrar",
     "sort": "Ordenar",
+    "export": "Exportar",
+    "import": "Importar",
+    "upload": "Subir",
+    "download": "Descargar",
     "refresh": "Actualizar",
-    "selectLanguage": "Seleccionar Idioma"
+    "retry": "Reintentar",
+    "continue": "Continuar",
+    "submit": "Enviar",
+    "confirm": "Confirmar",
+    "view": "Ver",
+    "hide": "Ocultar",
+    "show": "Mostrar"
   },
-  "toasts": {
+  "placeholders": {
+    "search": "Buscar...",
+    "searchStocks": "Buscar acciones, cripto, forex...",
+    "enterSymbol": "Ingresa símbolo de acción (ej., AAPL, TSLA)",
+    "enterName": "Ingresa tu nombre completo",
+    "enterEmail": "Ingresa tu correo electrónico",
+    "enterPassword": "Ingresa tu contraseña",
+    "confirmPassword": "Confirma tu contraseña",
+    "enterUsername": "Elige un nombre de usuario (opcional)",
+    "currentPassword": "Ingresa tu contraseña actual",
+    "newPassword": "Ingresa tu nueva contraseña (mín. 8 caracteres)",
+    "askSomething": "Pregunta algo..."
+  },
+  "toast": {
     "profileUpdated": "Perfil actualizado exitosamente",
-    "profileUpdateFailed": "Error al actualizar el perfil",
-    "themeUpdated": "Tema actualizado",
-    "themeUpdateFailed": "Error al guardar el tema",
-    "languageUpdated": "Idioma actualizado",
-    "languageUpdateFailed": "Error al guardar la preferencia de idioma",
-    "refreshIntervalUpdated": "Intervalo de actualización actualizado",
-    "refreshIntervalUpdateFailed": "Error al guardar el intervalo de actualización",
-    "logoutSuccess": "Sesión cerrada exitosamente",
-    "logoutFailed": "Error al cerrar sesión"
+    "avatarUpdated": "Avatar actualizado exitosamente",
+    "avatarRemoved": "Avatar eliminado exitosamente",
+    "passwordChanged": "Contraseña cambiada exitosamente",
+    "preferencesUpdated": "Preferencias actualizadas exitosamente",
+    "themeChanged": "Tema cambiado exitosamente",
+    "languageChanged": "Idioma cambiado exitosamente",
+    "loggedOut": "Sesión cerrada exitosamente",
+    "error": "Ocurrió un error",
+    "success": "Operación completada exitosamente",
+    "dataExported": "Datos exportados exitosamente",
+    "subscriptionUpdated": "Suscripción actualizada exitosamente"
+  },
+  "errors": {
+    "general": "Algo salió mal. Por favor intenta de nuevo.",
+    "network": "Error de red. Por favor verifica tu conexión.",
+    "authentication": "Autenticación falló. Por favor inicia sesión de nuevo.",
+    "authorization": "No tienes permiso para realizar esta acción.",
+    "validation": "Por favor verifica tu entrada e intenta de nuevo.",
+    "fileSize": "El tamaño del archivo es muy grande. El tamaño máximo es 5MB.",
+    "fileType": "Tipo de archivo inválido. Por favor sube una imagen válida.",
+    "uploadFailed": "Error al subir. Por favor intenta de nuevo.",
+    "saveFailed": "Error al guardar cambios. Por favor intenta de nuevo.",
+    "loadFailed": "Error al cargar datos. Por favor actualiza la página."
   }
 }
