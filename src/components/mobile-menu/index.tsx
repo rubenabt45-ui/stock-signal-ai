@@ -190,8 +190,16 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
 
   // Enhanced DOM inspection on every render
   React.useEffect(() => {
+    console.log('🍔 [PRODUCTION CHECK] Mobile menu component version: 2.1.0');
+    console.log('🍔 [PRODUCTION CHECK] Current timestamp:', new Date().toISOString());
+    console.log('🍔 [PRODUCTION CHECK] Environment check:', {
+      isDev: process.env.NODE_ENV === 'development',
+      userAgent: navigator.userAgent,
+      viewport: `${window.innerWidth}x${window.innerHeight}`
+    });
     logAction('COMPONENT_RENDER', {
-      renderState: isOpen ? 'OPEN' : 'CLOSED'
+      renderState: isOpen ? 'OPEN' : 'CLOSED',
+      version: '2.1.0'
     });
   });
 
