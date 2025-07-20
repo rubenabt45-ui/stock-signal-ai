@@ -90,7 +90,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       
       // Save to localStorage
       localStorage.setItem('i18nextLng', language);
-      console.log('🌐 Language changed to:', language);
+      console.log('🌐 [TRANSLATION_FIX] Language changed to:', language);
+      console.log('🌐 [TRANSLATION_FIX] Current i18n language:', i18n.language);
 
       if (user?.id) {
         // Try to save to database, but don't fail if it doesn't work

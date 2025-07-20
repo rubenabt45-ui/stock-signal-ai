@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, RefreshCw, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'expired'>('verifying');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -75,7 +77,7 @@ const VerifyEmail = () => {
       <Card className="tradeiq-card w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-white">
-            Email Verification
+            {t('auth.verifyEmail.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-6">
@@ -86,10 +88,10 @@ const VerifyEmail = () => {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-white mb-2">
-                  Verifying Your Email...
+                  {t('auth.verifyEmail.verifying.title')}
                 </h3>
                 <p className="text-gray-400">
-                  Please wait while we verify your email address.
+                  {t('auth.verifyEmail.verifying.description')}
                 </p>
               </div>
             </>
@@ -104,16 +106,16 @@ const VerifyEmail = () => {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-white mb-2">
-                  Email Verified Successfully!
+                  {t('auth.verifyEmail.success.title')}
                 </h3>
                 <p className="text-gray-400 mb-4">
-                  Your email has been verified. You will be redirected to the login page shortly.
+                  {t('auth.verifyEmail.success.description')}
                 </p>
                 <Button 
                   onClick={handleGoToLogin}
                   className="tradeiq-button-primary"
                 >
-                  Go to Login
+                  {t('auth.verifyEmail.success.goToLogin')}
                 </Button>
               </div>
             </>
@@ -128,7 +130,7 @@ const VerifyEmail = () => {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-white mb-2">
-                  {status === 'expired' ? 'Verification Link Expired' : 'Verification Failed'}
+                  {status === 'expired' ? t('auth.verifyEmail.expired.title') : t('auth.verifyEmail.error.title')}
                 </h3>
                 <p className="text-gray-400 mb-4">
                   {errorMessage}
@@ -139,14 +141,14 @@ const VerifyEmail = () => {
                     className="tradeiq-button-primary w-full"
                   >
                     <Mail className="mr-2 h-4 w-4" />
-                    Request New Verification Link
+                    {t('auth.verifyEmail.error.requestNew')}
                   </Button>
                   <Button 
                     onClick={handleGoToLogin}
                     variant="outline"
                     className="w-full"
                   >
-                    Back to Login
+                    {t('auth.verifyEmail.error.backToLogin')}
                   </Button>
                 </div>
               </div>
@@ -155,7 +157,7 @@ const VerifyEmail = () => {
 
           <div className="text-xs text-gray-500 border-t border-gray-700 pt-4">
             <p>
-              If you continue to experience issues, please contact support or try copying and pasting the verification link directly into your browser.
+              {t('auth.verifyEmail.support')}
             </p>
           </div>
         </CardContent>

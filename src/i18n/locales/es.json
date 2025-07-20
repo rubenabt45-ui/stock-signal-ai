@@ -60,6 +60,22 @@
         "description": "Logra precisión superior con algoritmos de aprendizaje automático"
       }
     },
+    "learningSection": {
+      "title": "Domina el Trading con Orientación Experta",
+      "description": "Accede a guías de trading integrales, estrategias y recursos educativos diseñados para mejorar tus habilidades de análisis de mercado.",
+      "fundamentals": {
+        "title": "Fundamentos del Trading",
+        "description": "Aprende los principios fundamentales del análisis técnico y la psicología del mercado."
+      },
+      "patterns": {
+        "title": "Reconocimiento de Patrones",
+        "description": "Domina los patrones de gráficos y sus implicaciones para los movimientos del mercado."
+      },
+      "riskManagement": {
+        "title": "Gestión de Riesgos",
+        "description": "Desarrolla estrategias para proteger tu capital y optimizar los retornos."
+      }
+    },
     "aiFeatures": {
       "title": "Características de IA",
       "realTime": {
@@ -151,10 +167,25 @@
       "error": "Error al enviar instrucciones de restablecimiento"
     },
     "verifyEmail": {
-      "title": "Verifica Tu Correo Electrónico",
-      "subtitle": "Revisa tu correo electrónico y haz clic en el enlace de verificación para activar tu cuenta",
-      "resend": "Reenviar Verificación",
-      "backToLogin": "Volver al Inicio de Sesión"
+      "title": "Verificación de Email",
+      "verifying": {
+        "title": "Verificando tu Email...",
+        "description": "Por favor espera mientras verificamos tu dirección de email."
+      },
+      "success": {
+        "title": "¡Email Verificado Exitosamente!",
+        "description": "Tu email ha sido verificado. Serás redirigido a la página de login en breve.",
+        "goToLogin": "Ir al Login"
+      },
+      "error": {
+        "title": "Verificación Fallida",
+        "requestNew": "Solicitar Nuevo Enlace de Verificación",
+        "backToLogin": "Volver al Login"
+      },
+      "expired": {
+        "title": "Enlace de Verificación Expirado"
+      },
+      "support": "Si continúas experimentando problemas, por favor contacta soporte o intenta copiar y pegar el enlace de verificación directamente en tu navegador."
     }
   },
   "learn": {

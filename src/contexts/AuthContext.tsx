@@ -118,7 +118,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ? 'https://tradeiqpro.com/verify-email'
       : `${window.location.origin}/verify-email`;
     
-    console.log('🔐 Sign up with redirect URL:', redirectUrl);
+    console.log('🔐 [EMAIL_VERIFICATION_FIX] Sign up with redirect URL:', redirectUrl);
+    console.log('🔐 [EMAIL_VERIFICATION_FIX] Current hostname:', window.location.hostname);
+    console.log('🔐 [EMAIL_VERIFICATION_FIX] Is production:', isProduction);
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -142,7 +144,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ? 'https://tradeiqpro.com/verify-email'
       : `${window.location.origin}/verify-email`;
     
-    console.log('🔐 Resending confirmation with redirect URL:', redirectUrl);
+    console.log('🔐 [EMAIL_VERIFICATION_FIX] Resending confirmation with redirect URL:', redirectUrl);
+    console.log('🔐 [EMAIL_VERIFICATION_FIX] Current hostname:', window.location.hostname);
+    console.log('🔐 [EMAIL_VERIFICATION_FIX] Is production:', isProduction);
     
     const { error } = await supabase.auth.resend({
       type: 'signup',

@@ -61,6 +61,22 @@
         "description": "Achieve superior accuracy with machine learning algorithms"
       }
     },
+    "learningSection": {
+      "title": "Master Trading with Expert Guidance",
+      "description": "Access comprehensive trading guides, strategies, and educational resources designed to enhance your market analysis skills.",
+      "fundamentals": {
+        "title": "Trading Fundamentals",
+        "description": "Learn the core principles of technical analysis and market psychology."
+      },
+      "patterns": {
+        "title": "Pattern Recognition",
+        "description": "Master chart patterns and their implications for market movements."
+      },
+      "riskManagement": {
+        "title": "Risk Management",
+        "description": "Develop strategies to protect your capital and optimize returns."
+      }
+    },
     "aiFeatures": {
       "title": "AI Features",
       "realTime": {
@@ -152,10 +168,25 @@
       "error": "Failed to send reset instructions"
     },
     "verifyEmail": {
-      "title": "Verify Your Email",
-      "subtitle": "Check your email and click the verification link to activate your account",
-      "resend": "Resend Verification",
-      "backToLogin": "Back to Login"
+      "title": "Email Verification",
+      "verifying": {
+        "title": "Verifying Your Email...",
+        "description": "Please wait while we verify your email address."
+      },
+      "success": {
+        "title": "Email Verified Successfully!",
+        "description": "Your email has been verified. You will be redirected to the login page shortly.",
+        "goToLogin": "Go to Login"
+      },
+      "error": {
+        "title": "Verification Failed",
+        "requestNew": "Request New Verification Link",
+        "backToLogin": "Back to Login"
+      },
+      "expired": {
+        "title": "Verification Link Expired"
+      },
+      "support": "If you continue to experience issues, please contact support or try copying and pasting the verification link directly into your browser."
     }
   },
   "learn": {

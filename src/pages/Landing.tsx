@@ -284,16 +284,16 @@ const Landing = () => {
       {/* Benefits */}
       <section className="py-12 sm:py-16 lg:py-20 bg-gray-900/50">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">Benefits for Traders</h2>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">{t('landing.benefits.title')}</h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <div className="text-center">
               <div className="mx-auto mb-4 sm:mb-6 p-3 sm:p-4 bg-green-500/20 rounded-full w-fit">
                 <Brain className="h-8 w-8 sm:h-10 sm:w-10 text-green-400" />
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-white">Reduced Subjectivity</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-white">{t('landing.benefits.reducedSubjectivity.title')}</h3>
               <p className="text-gray-300 text-sm sm:text-base">
-                Eliminate emotional bias with data-driven analysis and objective insights
+                {t('landing.benefits.reducedSubjectivity.description')}
               </p>
             </div>
 
@@ -301,9 +301,9 @@ const Landing = () => {
               <div className="mx-auto mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-500/20 rounded-full w-fit">
                 <Clock className="h-8 w-8 sm:h-10 sm:w-10 text-blue-400" />
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-white">Faster Decisions</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-white">{t('landing.benefits.fasterDecisions.title')}</h3>
               <p className="text-gray-300 text-sm sm:text-base">
-                Make informed trading decisions in seconds, not hours
+                {t('landing.benefits.fasterDecisions.description')}
               </p>
             </div>
 
@@ -311,9 +311,9 @@ const Landing = () => {
               <div className="mx-auto mb-4 sm:mb-6 p-3 sm:p-4 bg-purple-500/20 rounded-full w-fit">
                 <Star className="h-8 w-8 sm:h-10 sm:w-10 text-purple-400" />
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-white">Practical Education</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-white">{t('landing.benefits.practicalEducation.title')}</h3>
               <p className="text-gray-300 text-sm sm:text-base">
-                Learn trading concepts through interactive AI-powered guidance
+                {t('landing.benefits.practicalEducation.description')}
               </p>
             </div>
 
@@ -321,9 +321,9 @@ const Landing = () => {
               <div className="mx-auto mb-4 sm:mb-6 p-3 sm:p-4 bg-orange-500/20 rounded-full w-fit">
                 <Target className="h-8 w-8 sm:h-10 sm:w-10 text-orange-400" />
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-white">Higher Precision</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-white">{t('landing.benefits.higherPrecision.title')}</h3>
               <p className="text-gray-300 text-sm sm:text-base">
-                Achieve superior accuracy with machine learning algorithms
+                {t('landing.benefits.higherPrecision.description')}
               </p>
             </div>
           </div>
@@ -334,9 +334,9 @@ const Landing = () => {
       <section className="py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">Master Trading with Expert Guidance</h2>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">{t('landing.learningSection.title')}</h2>
             <p className="text-lg sm:text-xl text-gray-300 px-2">
-              Access comprehensive trading guides, strategies, and educational resources designed to enhance your market analysis skills.
+              {t('landing.learningSection.description')}
             </p>
           </div>
           
@@ -345,12 +345,12 @@ const Landing = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center text-base sm:text-lg">
                   <Brain className="h-4 w-4 sm:h-5 sm:w-5 text-tradeiq-blue mr-2" />
-                  Trading Fundamentals
+                  {t('landing.learningSection.fundamentals.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-gray-300 text-sm sm:text-base">
-                  Learn the core principles of technical analysis and market psychology.
+                  {t('landing.learningSection.fundamentals.description')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -359,12 +359,12 @@ const Landing = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center text-base sm:text-lg">
                   <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-tradeiq-blue mr-2" />
-                  Pattern Recognition
+                  {t('landing.learningSection.patterns.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-gray-300 text-sm sm:text-base">
-                  Master chart patterns and their implications for market movements.
+                  {t('landing.learningSection.patterns.description')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -373,12 +373,12 @@ const Landing = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center text-base sm:text-lg">
                   <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-tradeiq-blue mr-2" />
-                  Risk Management
+                  {t('landing.learningSection.riskManagement.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-gray-300 text-sm sm:text-base">
-                  Develop strategies to protect your capital and optimize returns.
+                  {t('landing.learningSection.riskManagement.description')}
                 </CardDescription>
               </CardContent>
             </Card>
