@@ -1,517 +1,227 @@
 
 {
-  "landing": {
-    "navbar": {
-      "home": "Home",
-      "learnPreview": "Learn Preview",
-      "pricing": "Pricing",
-      "login": "Login",
-      "signUp": "Sign Up"
-    },
-    "hero": {
-      "title": "AI-Powered Trading Intelligence",
-      "subtitle": "Advanced pattern recognition and intelligent market analysis for smarter trading decisions",
-      "joinBeta": "Join Beta",
-      "watchDemo": "Watch Demo",
-      "stats": {
-        "accuracy": "Pattern Accuracy",
-        "speed": "Analysis Speed",
-        "monitoring": "Market Monitoring"
-      }
-    },
-    "about": {
-      "title": "What is TradeIQ?",
-      "description": "TradeIQ combines artificial intelligence with advanced technical analysis to deliver real-time market insights, pattern detection, and intelligent trading recommendations. Our platform empowers traders with data-driven decision-making tools."
-    },
-    "features": {
-      "title": "Core Features",
-      "patternDetection": {
-        "title": "Pattern Detection",
-        "description": "Advanced AI algorithms identify chart patterns and market signals in real-time"
-      },
-      "trendAnalysis": {
-        "title": "Trend Analysis",
-        "description": "Comprehensive trend analysis with predictive insights and momentum indicators"
-      },
-      "volatilityHeatmaps": {
-        "title": "Volatility Heatmaps",
-        "description": "Visual representation of market volatility across different timeframes and assets"
-      },
-      "aiInsights": {
-        "title": "AI Insights",
-        "description": "Personalized trading insights and recommendations powered by machine learning"
-      }
-    },
-    "benefits": {
-      "title": "Benefits for Traders",
-      "reducedSubjectivity": {
-        "title": "Reduced Subjectivity",
-        "description": "Eliminate emotional bias with data-driven analysis and objective insights"
-      },
-      "fasterDecisions": {
-        "title": "Faster Decisions",
-        "description": "Make informed trading decisions in seconds, not hours"
-      },
-      "practicalEducation": {
-        "title": "Practical Education",
-        "description": "Learn trading concepts through interactive AI-powered guidance"
-      },
-      "higherPrecision": {
-        "title": "Higher Precision",
-        "description": "Achieve superior accuracy with machine learning algorithms"
-      }
-    },
-    "learningSection": {
-      "title": "Master Trading with Expert Guidance",
-      "description": "Access comprehensive trading guides, strategies, and educational resources designed to enhance your market analysis skills.",
-      "fundamentals": {
-        "title": "Trading Fundamentals",
-        "description": "Learn the core principles of technical analysis and market psychology."
-      },
-      "patterns": {
-        "title": "Pattern Recognition",
-        "description": "Master chart patterns and their implications for market movements."
-      },
-      "riskManagement": {
-        "title": "Risk Management",
-        "description": "Develop strategies to protect your capital and optimize returns."
-      }
-    },
-    "aiFeatures": {
-      "title": "AI Features",
-      "realTime": {
-        "title": "Real-time Analysis",
-        "description": "Instant pattern recognition and market signal detection"
-      },
-      "predictive": {
-        "title": "Predictive Insights",
-        "description": "Advanced forecasting models for market movements"
-      },
-      "adaptive": {
-        "title": "Adaptive Learning",
-        "description": "AI that improves with market conditions and user feedback"
-      }
-    },
-    "pricing": {
-      "title": "Choose Your Plan",
-      "subtitle": "Start free, upgrade when ready"
-    },
-    "cta": {
-      "title": "Ready to Transform Your Trading?",
-      "subtitle": "Join thousands of traders using AI-powered insights",
-      "getStarted": "Get Started Free",
-      "contactUs": "Contact Us"
-    }
+  "common": {
+    "home": "Home",
+    "pricing": "Pricing",
+    "login": "Login",
+    "signup": "Sign Up",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "close": "Close",
+    "open": "Open",
+    "more": "More",
+    "less": "Less",
+    "all": "All",
+    "none": "None",
+    "other": "Other",
+    "settings": "Settings",
+    "help": "Help",
+    "about": "About",
+    "contact": "Contact",
+    "support": "Support",
+    "documentation": "Documentation",
+    "features": "Features",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "account": "Account",
+    "billing": "Billing",
+    "subscription": "Subscription",
+    "notifications": "Notifications",
+    "security": "Security",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies",
+    "language": "Language",
+    "theme": "Theme",
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "active": "Active",
+    "inactive": "Inactive",
+    "online": "Online",
+    "offline": "Offline",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "public": "Public",
+    "private": "Private",
+    "draft": "Draft",
+    "published": "Published",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "failed": "Failed",
+    "processing": "Processing",
+    "queued": "Queued",
+    "scheduled": "Scheduled",
+    "expired": "Expired",
+    "valid": "Valid",
+    "invalid": "Invalid",
+    "required": "Required",
+    "optional": "Optional",
+    "recommended": "Recommended",
+    "deprecated": "Deprecated",
+    "beta": "Beta",
+    "preview": "Preview",
+    "coming_soon": "Coming Soon",
+    "maintenance": "Maintenance",
+    "upgrade": "Upgrade",
+    "downgrade": "Downgrade",
+    "free": "Free",
+    "premium": "Premium",
+    "pro": "Pro",
+    "basic": "Basic",
+    "standard": "Standard",
+    "advanced": "Advanced",
+    "enterprise": "Enterprise",
+    "custom": "Custom",
+    "default": "Default",
+    "auto": "Auto",
+    "manual": "Manual",
+    "automatic": "Automatic",
+    "enabled_by_default": "Enabled by default",
+    "disabled_by_default": "Disabled by default"
   },
-  "dashboard": {
-    "welcomeBack": "Welcome back",
-    "subtitle": "Here's what's happening in your trading journey today",
-    "plan": {
-      "free": "Free Plan",
-      "pro": "Pro Plan"
-    },
-    "marketMonitoring": "Market Monitoring",
-    "patternAccuracy": "Pattern Accuracy",
-    "analysisSpeed": "Analysis Speed",
-    "quickActions": "Quick Actions",
-    "recentActivity": "Recent Activity",
-    "strategyAI": {
-      "title": "StrategyAI",
-      "description": "Get personalized trading insights and chart analysis powered by AI"
-    },
-    "learn": {
-      "title": "Learn",
-      "description": "Master trading concepts with our comprehensive educational resources"
-    },
-    "events": {
-      "title": "Economic Events",
-      "description": "Stay updated with important market-moving events and announcements"
-    },
-    "marketUpdates": {
-      "title": "Market Updates",
-      "description": "Real-time market news and analysis from trusted sources"
-    }
+  "placeholders": {
+    "enterEmail": "Enter your email address",
+    "enterPassword": "Enter your password",
+    "confirmPassword": "Confirm your password",
+    "enterName": "Enter your name",
+    "enterMessage": "Enter your message",
+    "search": "Search...",
+    "optional": "Optional"
   },
   "auth": {
     "login": {
       "title": "Welcome Back",
-      "subtitle": "Sign in to your TradeIQ account",
+      "subtitle": "Sign in to your TradeIQ Pro account",
       "email": "Email",
       "password": "Password",
-      "forgotPassword": "Forgot your password?",
       "signIn": "Sign In",
-      "signingIn": "Signing In...",
+      "signingIn": "Signing in...",
+      "forgotPassword": "Forgot Password?",
       "noAccount": "Don't have an account?",
-      "signUp": "Sign up here",
-      "success": "Successfully signed in!",
-      "loginSuccess": "Login successful!",
-      "welcomeBack": "Welcome back!",
+      "signUp": "Sign up",
       "loginFailed": "Login Failed",
       "emailNotConfirmed": "Email Not Confirmed",
-      "checkEmail": "Please check your email and click the verification link to confirm your account.",
+      "checkEmail": "Please check your email and click the confirmation link before signing in.",
       "invalidCredentials": "Invalid email or password. Please try again.",
       "showPassword": "Show password",
       "hidePassword": "Hide password"
     },
     "signup": {
-      "title": "Create Account",
-      "subtitle": "Join TradeIQ and start trading smarter",
+      "title": "Create Your Account",
+      "subtitle": "Join TradeIQ Pro and start trading smarter",
       "fullName": "Full Name",
       "email": "Email",
       "password": "Password",
       "confirmPassword": "Confirm Password",
-      "signUp": "Create Account",
-      "hasAccount": "Already have an account?",
-      "signIn": "Sign in here",
-      "success": "Account created successfully! Please check your email to verify your account.",
-      "error": "Failed to create account. Please try again."
+      "signUp": "Sign Up",
+      "signingUp": "Creating account...",
+      "alreadyHaveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "terms": "By creating an account, you agree to our",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
+      "checkEmail": "Check Your Email",
+      "checkEmailDescription": "We've sent a verification link to your email address. Please click the link to verify your account.",
+      "didntReceiveEmail": "Didn't receive the email? Check your spam folder or",
+      "resendEmail": "resend verification email",
+      "backToLogin": "Back to Login"
     },
     "forgotPassword": {
       "title": "Reset Password",
       "subtitle": "Enter your email to receive reset instructions",
       "email": "Email",
-      "sendInstructions": "Send Reset Link",
+      "sendInstructions": "Send Reset Instructions",
+      "backToLogin": "Back to Login"
+    },
+    "resetPasswordRequest": {
+      "title": "Reset Your Password",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password",
+      "checkEmailTitle": "Check Your Email",
+      "emailLabel": "Email Address",
+      "sendButton": "Send Reset Link",
+      "sending": "Sending...",
+      "emailSent": "Reset Link Sent",
+      "checkEmail": "Please check your email for password reset instructions",
+      "emailSentDescription": "We've sent a password reset link to {{email}}",
+      "instructionsSent": "Password reset instructions have been sent to your email. Please check your inbox and follow the link to reset your password.",
+      "didntReceive": "Didn't receive the email? Check your spam folder or try again.",
+      "sendAnother": "Send Another Email",
       "backToLogin": "Back to Login",
-      "success": "Password reset instructions sent to your email",
-      "error": "Failed to send reset instructions"
+      "emailRequired": "Email Required",
+      "enterEmail": "Please enter your email address",
+      "error": "Error",
+      "failedToSend": "Failed to send reset email. Please try again.",
+      "unexpectedError": "An unexpected error occurred. Please try again."
     },
     "resetPassword": {
-      "title": "Set New Password",
-      "subtitle": "Enter your new password below",
+      "title": "Reset Password",
+      "setNewPassword": "Set New Password",
+      "passwordUpdated": "Password Updated!",
+      "updateFailed": "Update Failed",
       "newPassword": "New Password",
       "confirmPassword": "Confirm New Password",
+      "enterNewPassword": "Enter your new password",
+      "confirmNewPassword": "Confirm your new password",
       "updatePassword": "Update Password",
-      "success": "Password updated successfully!",
-      "error": "Failed to update password"
+      "updating": "Updating Password...",
+      "goToLogin": "Go to Login",
+      "backToLogin": "Back to Login",
+      "requestNewLink": "Request New Reset Link",
+      "attempt": "Attempt",
+      "success": "Success",
+      "successDescription": "Password updated successfully! Redirecting to login...",
+      "successMessage": "Your password has been successfully updated. You will be redirected to the login page shortly.",
+      "error": "Error",
+      "updateFailed": "Failed to update password. Please try again.",
+      "unexpectedError": "An unexpected error occurred. Please try again.",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "passwordRequirements": "Password Requirements",
+      "passwordRequirementsHint": "Password must contain at least 8 characters with uppercase, lowercase, numbers, and special characters.",
+      "passwordTooShort": "Password must be at least {{minLength}} characters long",
+      "passwordNeedsUppercase": "Password must contain at least one uppercase letter",
+      "passwordNeedsLowercase": "Password must contain at least one lowercase letter",
+      "passwordNeedsNumber": "Password must contain at least one number",
+      "passwordNeedsSpecial": "Password must contain at least one special character",
+      "linkExpired": "Reset Link Expired",
+      "linkExpiredDescription": "Your password reset link has expired or is no longer valid. Please request a new password reset link.",
+      "invalidLink": "Invalid Reset Link",
+      "invalidLinkDescription": "The password reset link is invalid. Please request a new one.",
+      "sessionExpired": "Session Expired",
+      "sessionExpiredDescription": "Your password reset session has expired. Please request a new password reset link."
     },
     "verifyEmail": {
-      "title": "Email Verification",
-      "verifying": {
-        "title": "Verifying Your Email...",
-        "description": "Please wait while we verify your email address."
-      },
-      "success": {
-        "title": "Email Verified Successfully!",
-        "description": "Your email has been verified. You will be redirected to the login page shortly.",
-        "goToLogin": "Go to Login"
-      },
-      "error": {
-        "title": "Verification Failed",
-        "requestNew": "Request New Verification Link",
-        "backToLogin": "Back to Login"
-      },
-      "expired": {
-        "title": "Verification Link Expired"
-      },
-      "support": "If you continue to experience issues, please contact support or try copying and pasting the verification link directly into your browser."
+      "title": "Verify Your Email",
+      "subtitle": "We've sent a verification link to your email",
+      "verifying": "Verifying your email...",
+      "verified": "Email Verified!",
+      "verifiedDescription": "Your email has been verified successfully. You can now access your account.",
+      "invalid": "Invalid Verification Link",
+      "invalidDescription": "The verification link is invalid or has expired. Please request a new one.",
+      "expired": "Verification Link Expired",
+      "expiredDescription": "Your verification link has expired. Please request a new verification email.",
+      "resendVerification": "Resend Verification Email",
+      "resending": "Resending...",
+      "backToLogin": "Back to Login",
+      "goToLogin": "Go to Login",
+      "error": "Verification Error",
+      "unexpectedError": "An unexpected error occurred during verification. Please try again.",
+      "missingParameters": "Required parameters are missing from the verification link.",
+      "emailRequired": "Email address is required for verification."
     }
-  },
-  "learn": {
-    "title": "Trading Education",
-    "subtitle": "Master the markets with our comprehensive learning resources",
-    "comingSoon": "Coming Soon",
-    "levels": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced"
-    }
-  },
-  "pricing": {
-    "title": "Choose Your Plan",
-    "subtitle": "Start free, upgrade when ready",
-    "monthly": "Monthly",
-    "yearly": "Yearly",
-    "getStarted": "Get Started",
-    "currentPlan": "Current Plan",
-    "upgrade": "Upgrade",
-    "faq": {
-      "title": "Frequently Asked Questions"
-    }
-  },
-  "tradingChat": {
-    "welcome": "Welcome to TradeIQ Pro! Ask me about trading strategies, upload charts, and get personalized insights.",
-    "placeholder": "Ask something...",
-    "analyzing": "Analyzing...",
-    "disclaimer": "TradeIQ provides educational content and market analysis tools.",
-    "memoryActivated": "Memory activated! I'll remember our conversation context.",
-    "upgradeRequired": "Upgrade to Pro for unlimited messages",
-    "dailyLimit": "Daily message limit reached",
-    "attachImage": "Attach Image",
-    "resetConversation": "Reset Conversation"
-  },
-  "navigation": {
-    "title": "Navigation",
-    "home": "Home",
-    "dashboard": "Dashboard",
-    "strategyAI": "StrategyAI",
-    "learn": "Learn",
-    "events": "Events",
-    "favorites": "Favorites",
-    "settings": "Settings",
-    "logout": "Logout"
-  },
-  "settings": {
-    "title": "Settings",
-    "profile": {
-      "title": "Profile",
-      "subtitle": "Manage your personal information and avatar",
-      "fullName": "Full Name",
-      "username": "Username",
-      "email": "Email",
-      "avatar": "Profile Picture",
-      "uploadAvatar": "Upload New Avatar",
-      "removeAvatar": "Remove Avatar",
-      "saveChanges": "Save Changes"
-    },
-    "preferences": {
-      "title": "Preferences",
-      "subtitle": "Customize your TradeIQ experience",
-      "theme": "Theme",
-      "language": "Language",
-      "refreshInterval": "Data Refresh Interval",
-      "notifications": "Notifications"
-    },
-    "security": {
-      "title": "Security",
-      "subtitle": "Manage your account security settings",
-      "changePassword": "Change Password",
-      "currentPassword": "Current Password",
-      "newPassword": "New Password",
-      "confirmPassword": "Confirm New Password",
-      "twoFactor": "Two-Factor Authentication",
-      "enable": "Enable",
-      "disable": "Disable"
-    },
-    "integrations": {
-      "title": "Integrations",
-      "subtitle": "Connect with external platforms and services",
-      "tradingview": "TradingView",
-      "discord": "Discord",
-      "telegram": "Telegram"
-    },
-    "support": {
-      "title": "Support",
-      "subtitle": "Get help and contact our support team",
-      "helpCenter": "Help Center",
-      "contactSupport": "Contact Support",
-      "reportBug": "Report a Bug",
-      "featureRequest": "Feature Request"
-    },
-    "legal": {
-      "title": "Legal",
-      "subtitle": "Terms, privacy, and legal information",
-      "terms": "Terms of Service",
-      "privacy": "Privacy Policy",
-      "license": "License Agreement"
-    },
-    "account": {
-      "title": "Account",
-      "subtitle": "Manage your account settings",
-      "deleteAccount": "Delete Account",
-      "exportData": "Export Data",
-      "logout": "Logout"
-    },
-    "subscription": {
-      "title": "Subscription",
-      "subtitle": "Manage your Pro subscription",
-      "current": "Current Plan",
-      "upgrade": "Upgrade Plan",
-      "billing": "Billing History",
-      "cancel": "Cancel Subscription"
-    }
-  },
-  "legal": {
-    "terms": "Terms and Conditions",
-    "privacy": "Privacy Policy",
-    "license": "License Agreement"
-  },
-  "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
-    "warning": "Warning",
-    "info": "Info",
-    "yes": "Yes",
-    "no": "No",
-    "ok": "OK",
-    "close": "Close",
-    "back": "Back",
-    "next": "Next",
-    "previous": "Previous",
-    "search": "Search",
-    "filter": "Filter",
-    "sort": "Sort",
-    "export": "Export",
-    "import": "Import",
-    "upload": "Upload",
-    "download": "Download",
-    "refresh": "Refresh",
-    "retry": "Retry",
-    "continue": "Continue",
-    "submit": "Submit",
-    "confirm": "Confirm",
-    "view": "View",
-    "hide": "Hide",
-    "show": "Show",
-    "home": "Home",
-    "pricing": "Pricing",
-    "selectLanguage": "Select Language",
-    "goBack": "Go Back",
-    "requestEarlyAccess": "Request Early Access",
-    "cancelAnytime": "Cancel anytime"
-  },
-  "footer": {
-    "description": "AI-powered trading insights and market analysis platform",
-    "platform": "Platform",
-    "legal": "Legal", 
-    "company": "Company",
-    "dashboard": "Trading Dashboard",
-    "learnPreview": "Learn Preview",
-    "pricing": "Pricing",
-    "privacy": "Privacy Policy",
-    "terms": "Terms of Service",
-    "cookies": "Cookie Policy",
-    "about": "About",
-    "blog": "Blog",
-    "careers": "Careers",
-    "rights": "All rights reserved."
-  },
-  "placeholders": {
-    "yourName": "Your Name",
-    "yourEmail": "Your Email",
-    "enterEmail": "Enter your email",
-    "enterPassword": "Enter your password",
-    "enterCurrentPassword": "Enter your current password",
-    "enterNewPassword": "Enter your new password (min 8 characters)",
-    "confirmNewPassword": "Confirm your new password",
-    "enterFullName": "Enter your full name",
-    "chooseUsername": "Choose a username (optional)",
-    "searchStocks": "Search stocks, crypto, forex...",
-    "searchAssetsExtended": "Search stocks, crypto, forex, indices...",
-    "stockSymbol": "Enter stock symbol (e.g., AAPL, TSLA)",
-    "alertSymbol": "e.g. AAPL, BTC",
-    "alertThresholdPercentage": "5.0",
-    "alertThresholdPrice": "100.00",
-    "confirmPassword": "Confirm your password",
-    "askSomething": "Ask something..."
-  },
-  "features": {
-    "locked": {
-      "subscriptionExpired": {
-        "title": "Subscription Expired",
-        "message": "Your Pro subscription has expired. Renew to regain access to premium features.",
-        "action": "Renew Subscription"
-      },
-      "proFeature": {
-        "title": "Pro Feature",
-        "message": "Upgrade to Pro to unlock this feature and get unlimited access.",
-        "action": "Upgrade to Pro"
-      },
-      "accessRestricted": {
-        "title": "Access Restricted",
-        "message": "This feature requires a Pro subscription.",
-        "action": "Get Pro Access"
-      },
-      "benefits": {
-        "title": "What you get with Pro:",
-        "unlimited": "Unlimited StrategyAI messages",
-        "realtime": "Real-time market updates",
-        "learning": "Complete learning modules",
-        "support": "Priority customer support",
-        "insights": "Advanced trading insights"
-      },
-      "pricing": {
-        "monthly": "$9.99",
-        "period": "/month"
-      },
-      "redirecting": "Redirecting to checkout...",
-      "redirectingDescription": "Please wait while we prepare your subscription.",
-      "checkoutError": "Failed to start checkout process. Please try again.",
-      "expired": "Expired {days} day{plural} ago"
-    }
-  },
-  "toasts": {
-    "authRequired": "Authentication Required",
-    "alreadyAdded": "Already Added",
-    "errorReordering": "Error Reordering",
-    "alertCreated": "Alert Created",
-    "alertUpdated": "Alert Updated",
-    "alertDeleted": "Alert Deleted",
-    "uploadFailed": "Upload failed",
-    "avatarUpdated": "Avatar updated",
-    "profileUpdated": "Profile updated",
-    "updateFailed": "Update failed",
-    "passwordUpdated": "Password updated",
-    "statusUpdated": "Status Updated",
-    "preferencesUpdated": "Preferences Updated",
-    "logoutFailed": "Logout failed",
-    "themeUpdated": "Theme updated",
-    "checkoutFailed": "Checkout failed"
-  },
-  "patterns": {
-    "bullishMomentum": "Bullish Momentum",
-    "bearishPressure": "Bearish Pressure",
-    "downwardPressure": "Downward Pressure",
-    "consolidationPhase": "Consolidation Phase"
-  },
-  "volatility": {
-    "veryHigh": "Very High"
-  },
-  "assets": {
-    "nasdaqComposite": "NASDAQ Composite",
-    "russell2000": "Russell 2000",
-    "ftse100": "FTSE 100",
-    "nikkei225": "Nikkei 225",
-    "goldSpot": "Gold Spot",
-    "silverSpot": "Silver Spot",
-    "crudeOil": "Crude Oil",
-    "naturalGas": "Natural Gas",
-    "daxIndex": "DAX Index",
-    "euroBund": "Euro Bund",
-    "euroBTP": "Euro BTP",
-    "euroBOBL": "Euro BOBL",
-    "relatedAssets": "Related Assets"
-  },
-  "tradingView": {
-    "integration": "TradingView Integration"
-  },
-  "altTexts": {
-    "chartScreenshot": "Chart screenshot",
-    "profilePicture": "Profile picture"
-  },
-  "ariaLabels": {
-    "closeMenu": "Close menu",
-    "toggleSidebar": "Toggle Sidebar",
-    "navigationMenu": "navigation menu"
-  },
-  "toast": {
-    "profileUpdated": "Profile updated successfully",
-    "avatarUpdated": "Avatar updated successfully",
-    "avatarRemoved": "Avatar removed successfully",
-    "passwordChanged": "Password changed successfully",
-    "preferencesUpdated": "Preferences updated successfully",
-    "themeChanged": "Theme changed successfully",
-    "languageChanged": "Language changed successfully",
-    "loggedOut": "Logged out successfully",
-    "error": "An error occurred",
-    "success": "Operation completed successfully",
-    "dataExported": "Data exported successfully",
-    "subscriptionUpdated": "Subscription updated successfully"
-  },
-  "errors": {
-    "general": "Something went wrong. Please try again.",
-    "network": "Network error. Please check your connection.",
-    "authentication": "Authentication failed. Please log in again.",
-    "authorization": "You don't have permission to perform this action.",
-    "validation": "Please check your input and try again.",
-    "fileSize": "File size is too large. Maximum size is 5MB.",
-    "fileType": "Invalid file type. Please upload a valid image.",
-    "uploadFailed": "Upload failed. Please try again.",
-    "saveFailed": "Failed to save changes. Please try again.",
-    "loadFailed": "Failed to load data. Please refresh the page."
   }
 }

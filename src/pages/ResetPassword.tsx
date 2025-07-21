@@ -34,24 +34,28 @@ const ResetPassword = () => {
     console.log('🔐 [PASSWORD_RESET] Reset password page loaded');
     console.log('🔐 [PASSWORD_RESET] Access token present:', !!accessToken);
     console.log('🔐 [PASSWORD_RESET] Refresh token present:', !!refreshToken);
-    console.log('🔐 [EMAIL_MONITORING] Password reset token validation');
+    console.log('🔐 [PASSWORD_RESET] URL parameters:', { 
+      hasAccessToken: !!accessToken, 
+      hasRefreshToken: !!refreshToken, 
+      error,
+      errorDescription
+    });
     
     if (error) {
-      console.error('🔐 [PASSWORD_RESET] URL contains error:', error, errorDescription);
-      console.error('🔐 [EMAIL_MONITORING] Password reset token invalid or expired');
+      console.error('🔐 [PASSWORD_RESET_FAILED] URL contains error:', error, errorDescription);
       
       if (error === 'access_denied' || errorDescription?.includes('expired')) {
         setStatus('expired');
         toast({
-          title: "Reset Link Expired",
-          description: "Your password reset link has expired. Please request a new one.",
+          title: t('auth.resetPassword.linkExpired'),
+          description: t('auth.resetPassword.linkExpiredDescription'),
           variant: "destructive",
         });
       } else {
         setStatus('error');
         toast({
-          title: "Invalid Reset Link",
-          description: "The password reset link is invalid. Please request a new one.",
+          title: t('auth.resetPassword.invalidLink'),
+          description: t('auth.resetPassword.invalidLinkDescription'),
           variant: "destructive",
         });
       }
@@ -59,14 +63,11 @@ const ResetPassword = () => {
     }
     
     if (!accessToken || !refreshToken) {
-      console.error('🔐 [PASSWORD_RESET] Missing tokens, redirecting to login');
-      console.error('🔐 [EMAIL_MONITORING] Password reset token missing');
+      console.error('🔐 [PASSWORD_RESET_FAILED] Missing tokens, redirecting to login');
       setStatus('error');
       navigate('/login?error=invalid_reset_link');
-    } else {
-      console.log('🔐 [EMAIL_MONITORING] Password reset token validated successfully');
     }
-  }, [searchParams, navigate, toast]);
+  }, [searchParams, navigate, toast, t]);
 
   const validatePassword = (password: string) => {
     const minLength = 8;
@@ -76,23 +77,23 @@ const ResetPassword = () => {
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
     
     if (password.length < minLength) {
-      return `Password must be at least ${minLength} characters long`;
+      return t('auth.resetPassword.passwordTooShort', { minLength });
     }
     
     if (!hasUpperCase) {
-      return 'Password must contain at least one uppercase letter';
+      return t('auth.resetPassword.passwordNeedsUppercase');
     }
     
     if (!hasLowerCase) {
-      return 'Password must contain at least one lowercase letter';
+      return t('auth.resetPassword.passwordNeedsLowercase');
     }
     
     if (!hasNumbers) {
-      return 'Password must contain at least one number';
+      return t('auth.resetPassword.passwordNeedsNumber');
     }
     
     if (!hasSpecialChar) {
-      return 'Password must contain at least one special character';
+      return t('auth.resetPassword.passwordNeedsSpecial');
     }
     
     return null;
@@ -103,8 +104,8 @@ const ResetPassword = () => {
     
     if (password !== confirmPassword) {
       toast({
-        title: "Error",
-        description: "Passwords do not match",
+        title: t('auth.resetPassword.error'),
+        description: t('auth.resetPassword.passwordsDoNotMatch'),
         variant: "destructive",
       });
       return;
@@ -113,7 +114,7 @@ const ResetPassword = () => {
     const passwordError = validatePassword(password);
     if (passwordError) {
       toast({
-        title: "Password Requirements",
+        title: t('auth.resetPassword.passwordRequirements'),
         description: passwordError,
         variant: "destructive",
       });
@@ -124,37 +125,34 @@ const ResetPassword = () => {
     setRetryCount(prev => prev + 1);
     
     console.log('🔐 [PASSWORD_RESET] Password update attempt #' + (retryCount + 1));
-    console.log('🔐 [EMAIL_MONITORING] Password reset completion initiated');
     
     try {
       const { error } = await updatePassword(password);
       
       if (error) {
-        console.error('🔐 [PASSWORD_RESET] Password update failed:', error);
-        console.error('🔐 [EMAIL_MONITORING] Password reset completion failed:', error);
+        console.error('🔐 [PASSWORD_RESET_FAILED] Password update failed:', error);
         
         if (error.message.includes('expired') || error.message.includes('invalid')) {
           setStatus('expired');
           toast({
-            title: "Session Expired",
-            description: "Your password reset session has expired. Please request a new password reset link.",
+            title: t('auth.resetPassword.sessionExpired'),
+            description: t('auth.resetPassword.sessionExpiredDescription'),
             variant: "destructive",
           });
         } else {
           setStatus('error');
           toast({
-            title: "Error",
-            description: error.message || "Failed to update password. Please try again.",
+            title: t('auth.resetPassword.error'),
+            description: error.message || t('auth.resetPassword.updateFailed'),
             variant: "destructive",
           });
         }
       } else {
-        console.log('🔐 [PASSWORD_RESET] Password updated successfully');
-        console.log('🔐 [EMAIL_MONITORING] Password reset completion successful');
+        console.log('🔐 [PASSWORD_RESET_SUCCESS] Password updated successfully');
         setStatus('success');
         toast({
-          title: "Success",
-          description: "Password updated successfully! Redirecting to login...",
+          title: t('auth.resetPassword.success'),
+          description: t('auth.resetPassword.successDescription'),
         });
         
         setTimeout(() => {
@@ -162,12 +160,11 @@ const ResetPassword = () => {
         }, 2000);
       }
     } catch (error) {
-      console.error('🔐 [PASSWORD_RESET] Password update exception:', error);
-      console.error('🔐 [EMAIL_MONITORING] Password reset completion exception:', error);
+      console.error('🔐 [PASSWORD_RESET_FAILED] Password update exception:', error);
       setStatus('error');
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: t('auth.resetPassword.error'),
+        description: t('auth.resetPassword.unexpectedError'),
         variant: "destructive",
       });
     } finally {
@@ -177,7 +174,7 @@ const ResetPassword = () => {
 
   const handleRequestNewLink = () => {
     console.log('🔐 [PASSWORD_RESET] User requesting new reset link');
-    navigate('/forgot-password');
+    navigate('/reset-password-request');
   };
 
   if (status === 'expired') {
@@ -194,7 +191,7 @@ const ResetPassword = () => {
             
             <div className="flex items-center space-x-6">
               <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
-                Back to Login
+                {t('auth.resetPassword.backToLogin')}
               </Button>
             </div>
           </div>
@@ -210,13 +207,13 @@ const ResetPassword = () => {
                   </div>
                 </div>
                 <CardTitle className="text-2xl text-white">
-                  Reset Link Expired
+                  {t('auth.resetPassword.linkExpired')}
                 </CardTitle>
               </CardHeader>
               
               <CardContent className="text-center space-y-6">
                 <p className="text-gray-400">
-                  Your password reset link has expired or is no longer valid. Please request a new password reset link.
+                  {t('auth.resetPassword.linkExpiredDescription')}
                 </p>
                 
                 <div className="space-y-3">
@@ -224,7 +221,7 @@ const ResetPassword = () => {
                     onClick={handleRequestNewLink}
                     className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90"
                   >
-                    Request New Reset Link
+                    {t('auth.resetPassword.requestNewLink')}
                   </Button>
                   
                   <Button 
@@ -232,7 +229,7 @@ const ResetPassword = () => {
                     variant="outline"
                     className="w-full"
                   >
-                    Back to Login
+                    {t('auth.resetPassword.backToLogin')}
                   </Button>
                 </div>
               </CardContent>
@@ -260,7 +257,7 @@ const ResetPassword = () => {
           
           <div className="flex items-center space-x-6">
             <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
-              Back to Login
+              {t('auth.resetPassword.backToLogin')}
             </Button>
           </div>
         </div>
@@ -283,9 +280,9 @@ const ResetPassword = () => {
                 </div>
               </div>
               <CardTitle className="text-2xl text-white">
-                {status === 'success' ? 'Password Updated!' : 
-                 status === 'error' ? 'Update Failed' : 
-                 'Set New Password'}
+                {status === 'success' ? t('auth.resetPassword.passwordUpdated') : 
+                 status === 'error' ? t('auth.resetPassword.updateFailed') : 
+                 t('auth.resetPassword.setNewPassword')}
               </CardTitle>
             </CardHeader>
             
@@ -293,20 +290,20 @@ const ResetPassword = () => {
               {status === 'success' ? (
                 <div className="text-center space-y-4">
                   <p className="text-green-400">
-                    Your password has been successfully updated. You will be redirected to the login page shortly.
+                    {t('auth.resetPassword.successMessage')}
                   </p>
                   <Button 
                     onClick={() => navigate('/login')}
                     className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90"
                   >
-                    Go to Login
+                    {t('auth.resetPassword.goToLogin')}
                   </Button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
                     <label htmlFor="password" className="text-sm font-medium text-gray-300">
-                      New Password
+                      {t('auth.resetPassword.newPassword')}
                     </label>
                     <div className="relative">
                       <Input
@@ -314,7 +311,7 @@ const ResetPassword = () => {
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter new password"
+                        placeholder={t('auth.resetPassword.enterNewPassword')}
                         className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 pr-10"
                         required
                         minLength={8}
@@ -328,13 +325,13 @@ const ResetPassword = () => {
                       </button>
                     </div>
                     <div className="text-xs text-gray-400">
-                      Password must contain at least 8 characters with uppercase, lowercase, numbers, and special characters.
+                      {t('auth.resetPassword.passwordRequirementsHint')}
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-300">
-                      Confirm New Password
+                      {t('auth.resetPassword.confirmPassword')}
                     </label>
                     <div className="relative">
                       <Input
@@ -342,7 +339,7 @@ const ResetPassword = () => {
                         type={showConfirmPassword ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm your new password"
+                        placeholder={t('auth.resetPassword.confirmNewPassword')}
                         className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 pr-10"
                         required
                         minLength={8}
@@ -362,8 +359,8 @@ const ResetPassword = () => {
                     className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90"
                     disabled={loading}
                   >
-                    {loading ? 'Updating Password...' : 'Update Password'}
-                    {retryCount > 0 && ` (Attempt ${retryCount})`}
+                    {loading ? t('auth.resetPassword.updating') : t('auth.resetPassword.updatePassword')}
+                    {retryCount > 0 && ` (${t('auth.resetPassword.attempt')} ${retryCount})`}
                   </Button>
                   
                   {status === 'error' && (
@@ -373,7 +370,7 @@ const ResetPassword = () => {
                         variant="outline"
                         className="w-full"
                       >
-                        Request New Reset Link
+                        {t('auth.resetPassword.requestNewLink')}
                       </Button>
                     </div>
                   )}

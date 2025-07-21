@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -28,6 +29,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import ResetPasswordRequest from "./pages/ResetPasswordRequest";
 import Pricing from "./pages/Pricing";
 import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
@@ -103,6 +105,11 @@ const App = () => {
                       <Route path="/forgot-password" element={
                         <PublicRoute>
                           <ForgotPassword />
+                       </PublicRoute>
+                     } />
+                     <Route path="/reset-password-request" element={
+                       <PublicRoute>
+                         <ResetPasswordRequest />
                        </PublicRoute>
                      } />
                      <Route path="/reset-password" element={

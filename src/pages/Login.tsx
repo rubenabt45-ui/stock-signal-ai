@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, ChartCandlestick, RefreshCw, AlertCircle, Github } from "lucide-react";
@@ -389,7 +388,7 @@ const Login = () => {
           
           <div className="mt-4 text-center">
             <Link
-              to="/forgot-password"
+              to="/reset-password-request"
               className="text-tradeiq-blue hover:text-blue-400 text-sm"
             >
               {t('auth.login.forgotPassword')}

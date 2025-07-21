@@ -1,528 +1,227 @@
+
 {
-  "landing": {
-    "navbar": {
-      "home": "Inicio",
-      "learnPreview": "Vista Previa Aprender",
-      "pricing": "Precios",
-      "login": "Iniciar Sesión",
-      "signUp": "Registrarse"
-    },
-    "hero": {
-      "title": "Inteligencia de Trading con IA",
-      "subtitle": "Reconocimiento avanzado de patrones y análisis inteligente del mercado para decisiones de trading más inteligentes",
-      "joinBeta": "Unirse a Beta",
-      "watchDemo": "Ver Demo",
-      "stats": {
-        "accuracy": "Precisión de Patrones",
-        "speed": "Velocidad de Análisis",
-        "monitoring": "Monitoreo del Mercado"
-      }
-    },
-    "about": {
-      "title": "¿Qué es TradeIQ?",
-      "description": "TradeIQ combina inteligencia artificial con análisis técnico avanzado para entregar insights del mercado en tiempo real, detección de patrones y recomendaciones inteligentes de trading. Nuestra plataforma empodera a los traders con herramientas de toma de decisiones basadas en datos."
-    },
-    "features": {
-      "title": "Características Principales",
-      "patternDetection": {
-        "title": "Detección de Patrones",
-        "description": "Algoritmos avanzados de IA identifican patrones de gráficos y señales del mercado en tiempo real"
-      },
-      "trendAnalysis": {
-        "title": "Análisis de Tendencias",
-        "description": "Análisis integral de tendencias con insights predictivos e indicadores de momentum"
-      },
-      "volatilityHeatmaps": {
-        "title": "Mapas de Calor de Volatilidad",
-        "description": "Representación visual de la volatilidad del mercado en diferentes marcos temporales y activos"
-      },
-      "aiInsights": {
-        "title": "Insights de IA",
-        "description": "Insights personalizados de trading y recomendaciones impulsadas por aprendizaje automático"
-      }
-    },
-    "benefits": {
-      "title": "Beneficios para Traders",
-      "reducedSubjectivity": {
-        "title": "Subjetividad Reducida",
-        "description": "Elimina el sesgo emocional con análisis basado en datos e insights objetivos"
-      },
-      "fasterDecisions": {
-        "title": "Decisiones Más Rápidas",
-        "description": "Toma decisiones informadas de trading en segundos, no horas"
-      },
-      "practicalEducation": {
-        "title": "Educación Práctica",
-        "description": "Aprende conceptos de trading a través de guía interactiva impulsada por IA"
-      },
-      "higherPrecision": {
-        "title": "Mayor Precisión",
-        "description": "Logra precisión superior con algoritmos de aprendizaje automático"
-      }
-    },
-    "learningSection": {
-      "title": "Domina el Trading con Orientación Experta",
-      "description": "Accede a guías de trading integrales, estrategias y recursos educativos diseñados para mejorar tus habilidades de análisis de mercado.",
-      "fundamentals": {
-        "title": "Fundamentos del Trading",
-        "description": "Aprende los principios fundamentales del análisis técnico y la psicología del mercado."
-      },
-      "patterns": {
-        "title": "Reconocimiento de Patrones",
-        "description": "Domina los patrones de gráficos y sus implicaciones para los movimientos del mercado."
-      },
-      "riskManagement": {
-        "title": "Gestión de Riesgos",
-        "description": "Desarrolla estrategias para proteger tu capital y optimizar los retornos."
-      }
-    },
-    "aiFeatures": {
-      "title": "Características de IA",
-      "realTime": {
-        "title": "Análisis en Tiempo Real",
-        "description": "Reconocimiento instantáneo de patrones y detección de señales del mercado"
-      },
-      "predictive": {
-        "title": "Insights Predictivos",
-        "description": "Modelos avanzados de pronóstico para movimientos del mercado"
-      },
-      "adaptive": {
-        "title": "Aprendizaje Adaptativo",
-        "description": "IA que mejora con las condiciones del mercado y retroalimentación del usuario"
-      }
-    },
-    "pricing": {
-      "title": "Elige Tu Plan",
-      "subtitle": "Comienza gratis, actualiza cuando estés listo"
-    },
-    "cta": {
-      "title": "¿Listo para Transformar Tu Trading?",
-      "subtitle": "Únete a miles de traders usando insights impulsados por IA",
-      "getStarted": "Comenzar Gratis",
-      "contactUs": "Contáctanos"
-    }
-  },
-  "dashboard": {
-    "welcomeBack": "Bienvenido de vuelta",
-    "subtitle": "Esto es lo que está pasando en tu viaje de trading hoy",
-    "plan": {
-      "free": "Plan Gratuito",
-      "pro": "Plan Pro"
-    },
-    "marketMonitoring": "Monitoreo del Mercado",
-    "patternAccuracy": "Precisión de Patrones",
-    "analysisSpeed": "Velocidad de Análisis",
-    "quickActions": "Acciones Rápidas",
-    "recentActivity": "Actividad Reciente",
-    "strategyAI": {
-      "title": "StrategyAI",
-      "description": "Obtén insights personalizados de trading y análisis de gráficos impulsados por IA"
-    },
-    "learn": {
-      "title": "Aprender",
-      "description": "Domina conceptos de trading con nuestros recursos educativos integrales"
-    },
-    "events": {
-      "title": "Eventos Económicos",
-      "description": "Mantente actualizado con eventos importantes que mueven el mercado y anuncios"
-    },
-    "marketUpdates": {
-      "title": "Actualizaciones del Mercado",
-      "description": "Noticias del mercado en tiempo real y análisis de fuentes confiables"
-    }
-  },
-  "auth": {
-    "login": {
-      "title": "Bienvenido de Vuelta",
-      "subtitle": "Inicia sesión en tu cuenta de TradeIQ",
-      "email": "Correo Electrónico",
-      "password": "Contraseña",
-      "forgotPassword": "¿Olvidaste tu contraseña?",
-      "signIn": "Iniciar Sesión",
-      "noAccount": "¿No tienes una cuenta?",
-      "signUp": "Regístrate aquí",
-      "success": "¡Sesión iniciada exitosamente!",
-      "error": "Correo electrónico o contraseña inválidos"
-    },
-    "signup": {
-      "title": "Crear Cuenta",
-      "subtitle": "Únete a TradeIQ y comienza a hacer trading más inteligente",
-      "fullName": "Nombre Completo",
-      "email": "Correo Electrónico",
-      "password": "Contraseña",
-      "confirmPassword": "Confirmar Contraseña",
-      "signUp": "Crear Cuenta",
-      "hasAccount": "¿Ya tienes una cuenta?",
-      "signIn": "Inicia sesión aquí",
-      "success": "¡Cuenta creada exitosamente! Por favor revisa tu correo electrónico para verificar tu cuenta.",
-      "error": "Error al crear la cuenta. Por favor intenta de nuevo."
-    },
-    "forgotPassword": {
-      "title": "Restablecer Contraseña",
-      "subtitle": "Ingresa tu correo electrónico para recibir instrucciones de restablecimiento",
-      "email": "Correo Electrónico",
-      "sendInstructions": "Enviar Instrucciones",
-      "backToLogin": "Volver al Inicio de Sesión",
-      "success": "Instrucciones de restablecimiento de contraseña enviadas a tu correo electrónico",
-      "error": "Error al enviar instrucciones de restablecimiento"
-    },
-    "verifyEmail": {
-      "title": "Verificación de Email",
-      "verifying": {
-        "title": "Verificando tu Email...",
-        "description": "Por favor espera mientras verificamos tu dirección de email."
-      },
-      "success": {
-        "title": "¡Email Verificado Exitosamente!",
-        "description": "Tu email ha sido verificado. Serás redirigido a la página de login en breve.",
-        "goToLogin": "Ir al Login"
-      },
-      "error": {
-        "title": "Verificación Fallida",
-        "requestNew": "Solicitar Nuevo Enlace de Verificación",
-        "backToLogin": "Volver al Login"
-      },
-      "expired": {
-        "title": "Enlace de Verificación Expirado"
-      },
-      "support": "Si continúas experimentando problemas, por favor contacta soporte o intenta copiar y pegar el enlace de verificación directamente en tu navegador."
-    }
-  },
-  "learn": {
-    "title": "Educación de Trading",
-    "subtitle": "Domina los mercados con nuestros recursos de aprendizaje integrales",
-    "comingSoon": "Próximamente",
-    "levels": {
-      "beginner": "Principiante",
-      "intermediate": "Intermedio",
-      "advanced": "Avanzado"
-    }
-  },
-  "pricing": {
-    "title": "Elige Tu Plan",
-    "subtitle": "Comienza gratis, actualiza cuando estés listo",
-    "monthly": "Mensual",
-    "yearly": "Anual",
-    "getStarted": "Comenzar",
-    "currentPlan": "Plan Actual",
-    "upgrade": "Actualizar",
-    "faq": {
-      "title": "Preguntas Frecuentes"
-    }
-  },
-  "tradingChat": {
-    "welcome": "¡Bienvenido a TradeIQ Pro! Pregúntame sobre estrategias de trading, sube gráficos y obtén insights personalizados.",
-    "placeholder": "Pregunta algo...",
-    "analyzing": "Analizando...",
-    "disclaimer": "TradeIQ proporciona contenido educativo y herramientas de análisis del mercado.",
-    "memoryActivated": "¡Memoria activada! Recordaré el contexto de nuestra conversación.",
-    "upgradeRequired": "Actualiza a Pro para mensajes ilimitados",
-    "dailyLimit": "Límite diario de mensajes alcanzado",
-    "attachImage": "Adjuntar Imagen",
-    "resetConversation": "Reiniciar Conversación"
-  },
-  "navigation": {
-    "title": "Navegación",
-    "home": "Inicio",
-    "dashboard": "Panel",
-    "strategyAI": "StrategyAI",
-    "learn": "Aprender",
-    "events": "Eventos",
-    "favorites": "Favoritos",
-    "settings": "Configuración",
-    "logout": "Cerrar Sesión"
-  },
-  "settings": {
-    "title": "Configuración",
-    "profile": {
-      "title": "Perfil",
-      "subtitle": "Gestiona tu información personal y avatar",
-      "fullName": "Nombre Completo",
-      "username": "Nombre de Usuario",
-      "email": "Correo Electrónico",
-      "avatar": "Foto de Perfil",
-      "uploadAvatar": "Subir Nuevo Avatar",
-      "removeAvatar": "Eliminar Avatar",
-      "saveChanges": "Guardar Cambios"
-    },
-    "preferences": {
-      "title": "Preferencias",
-      "subtitle": "Personaliza tu experiencia TradeIQ",
-      "theme": "Tema",
-      "language": "Idioma",
-      "refreshInterval": "Intervalo de Actualización de Datos",
-      "notifications": "Notificaciones"
-    },
-    "security": {
-      "title": "Seguridad",
-      "subtitle": "Gestiona la configuración de seguridad de tu cuenta",
-      "changePassword": "Cambiar Contraseña",
-      "currentPassword": "Contraseña Actual",
-      "newPassword": "Nueva Contraseña",
-      "confirmPassword": "Confirmar Nueva Contraseña",
-      "twoFactor": "Autenticación de Dos Factores",
-      "enable": "Habilitar",
-      "disable": "Deshabilitar"
-    },
-    "integrations": {
-      "title": "Integraciones",
-      "subtitle": "Conecta con plataformas y servicios externos",
-      "tradingview": "TradingView",
-      "discord": "Discord",
-      "telegram": "Telegram"
-    },
-    "support": {
-      "title": "Soporte",
-      "subtitle": "Obtén ayuda y contacta a nuestro equipo de soporte",
-      "helpCenter": "Centro de Ayuda",
-      "contactSupport": "Contactar Soporte",
-      "reportBug": "Reportar un Error",
-      "featureRequest": "Solicitar Característica"
-    },
-    "legal": {
-      "title": "Legal",
-      "subtitle": "Términos, privacidad e información legal",
-      "terms": "Términos de Servicio",
-      "privacy": "Política de Privacidad",
-      "license": "Acuerdo de Licencia"
-    },
-    "account": {
-      "title": "Cuenta",
-      "subtitle": "Gestiona la configuración de tu cuenta",
-      "deleteAccount": "Eliminar Cuenta",
-      "exportData": "Exportar Datos",
-      "logout": "Cerrar Sesión"
-    },
-    "subscription": {
-      "title": "Suscripción",
-      "subtitle": "Gestiona tu suscripción Pro",
-      "current": "Plan Actual",
-      "upgrade": "Actualizar Plan",
-      "billing": "Historial de Facturación",
-      "cancel": "Cancelar Suscripción"
-    }
-  },
-  "legal": {
-    "terms": "Términos y Condiciones",
-    "privacy": "Política de Privacidad",
-    "license": "Acuerdo de Licencia"
-  },
   "common": {
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
+    "home": "Inicio",
+    "pricing": "Precios",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
     "loading": "Cargando...",
     "error": "Error",
     "success": "Éxito",
-    "warning": "Advertencia",
-    "info": "Información",
-    "yes": "Sí",
-    "no": "No",
-    "ok": "OK",
-    "close": "Cerrar",
-    "back": "Atrás",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "back": "Volver",
     "next": "Siguiente",
     "previous": "Anterior",
     "search": "Buscar",
-    "filter": "Filtrar",
-    "sort": "Ordenar",
-    "export": "Exportar",
-    "import": "Importar",
-    "upload": "Subir",
-    "download": "Descargar",
-    "refresh": "Actualizar",
-    "retry": "Reintentar",
-    "continue": "Continuar",
-    "submit": "Enviar",
-    "confirm": "Confirmar",
-    "view": "Ver",
-    "hide": "Ocultar",
-    "show": "Mostrar"
+    "close": "Cerrar",
+    "open": "Abrir",
+    "more": "Más",
+    "less": "Menos",
+    "all": "Todo",
+    "none": "Ninguno",
+    "other": "Otro",
+    "settings": "Configuración",
+    "help": "Ayuda",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "support": "Soporte",
+    "documentation": "Documentación",
+    "features": "Características",
+    "dashboard": "Panel",
+    "profile": "Perfil",
+    "account": "Cuenta",
+    "billing": "Facturación",
+    "subscription": "Suscripción",
+    "notifications": "Notificaciones",
+    "security": "Seguridad",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "cookies": "Cookies",
+    "language": "Idioma",
+    "theme": "Tema",
+    "dark": "Oscuro",
+    "light": "Claro",
+    "system": "Sistema",
+    "enabled": "Habilitado",
+    "disabled": "Deshabilitado",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "online": "En línea",
+    "offline": "Fuera de línea",
+    "connected": "Conectado",
+    "disconnected": "Desconectado",
+    "available": "Disponible",
+    "unavailable": "No disponible",
+    "public": "Público",
+    "private": "Privado",
+    "draft": "Borrador",
+    "published": "Publicado",
+    "pending": "Pendiente",
+    "approved": "Aprobado",
+    "rejected": "Rechazado",
+    "completed": "Completado",
+    "failed": "Fallido",
+    "processing": "Procesando",
+    "queued": "En cola",
+    "scheduled": "Programado",
+    "expired": "Expirado",
+    "valid": "Válido",
+    "invalid": "Inválido",
+    "required": "Requerido",
+    "optional": "Opcional",
+    "recommended": "Recomendado",
+    "deprecated": "Obsoleto",
+    "beta": "Beta",
+    "preview": "Vista previa",
+    "coming_soon": "Próximamente",
+    "maintenance": "Mantenimiento",
+    "upgrade": "Actualizar",
+    "downgrade": "Degradar",
+    "free": "Gratis",
+    "premium": "Premium",
+    "pro": "Pro",
+    "basic": "Básico",
+    "standard": "Estándar",
+    "advanced": "Avanzado",
+    "enterprise": "Empresa",
+    "custom": "Personalizado",
+    "default": "Predeterminado",
+    "auto": "Auto",
+    "manual": "Manual",
+    "automatic": "Automático",
+    "enabled_by_default": "Habilitado por defecto",
+    "disabled_by_default": "Deshabilitado por defecto"
   },
   "placeholders": {
-    "search": "Buscar...",
-    "searchStocks": "Buscar acciones, cripto, forex...",
-    "enterSymbol": "Ingresa símbolo de acción (ej., AAPL, TSLA)",
-    "enterName": "Ingresa tu nombre completo",
-    "enterEmail": "Ingresa tu correo electrónico",
+    "enterEmail": "Ingresa tu dirección de correo",
     "enterPassword": "Ingresa tu contraseña",
     "confirmPassword": "Confirma tu contraseña",
-    "enterUsername": "Elige un nombre de usuario (opcional)",
-    "currentPassword": "Ingresa tu contraseña actual",
-    "newPassword": "Ingresa tu nueva contraseña (mín. 8 caracteres)",
-    "askSomething": "Pregunta algo..."
+    "enterName": "Ingresa tu nombre",
+    "enterMessage": "Ingresa tu mensaje",
+    "search": "Buscar...",
+    "optional": "Opcional"
   },
-  "toast": {
-    "profileUpdated": "Perfil actualizado exitosamente",
-    "avatarUpdated": "Avatar actualizado exitosamente",
-    "avatarRemoved": "Avatar eliminado exitosamente",
-    "passwordChanged": "Contraseña cambiada exitosamente",
-    "preferencesUpdated": "Preferencias actualizadas exitosamente",
-    "themeChanged": "Tema cambiado exitosamente",
-    "languageChanged": "Idioma cambiado exitosamente",
-    "loggedOut": "Sesión cerrada exitosamente",
-    "error": "Ocurrió un error",
-    "success": "Operación completada exitosamente",
-    "dataExported": "Datos exportados exitosamente",
-    "subscriptionUpdated": "Suscripción actualizada exitosamente"
-  },
-  "errors": {
-    "general": "Algo salió mal. Por favor intenta de nuevo.",
-    "network": "Error de red. Por favor verifica tu conexión.",
-    "authentication": "Autenticación falló. Por favor inicia sesión de nuevo.",
-    "authorization": "No tienes permiso para realizar esta acción.",
-    "validation": "Por favor verifica tu entrada e intenta de nuevo.",
-    "fileSize": "El tamaño del archivo es muy grande. El tamaño máximo es 5MB.",
-    "fileType": "Tipo de archivo inválido. Por favor sube una imagen válida.",
-    "uploadFailed": "Error al subir. Por favor intenta de nuevo.",
-    "saveFailed": "Error al guardar cambios. Por favor intenta de nuevo.",
-    "loadFailed": "Error al cargar datos. Por favor actualiza la página."
+  "auth": {
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "subtitle": "Inicia sesión en tu cuenta de TradeIQ Pro",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "signIn": "Iniciar sesión",
+      "signingIn": "Iniciando sesión...",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "noAccount": "¿No tienes una cuenta?",
+      "signUp": "Regístrate",
+      "loginFailed": "Error de inicio de sesión",
+      "emailNotConfirmed": "Correo no confirmado",
+      "checkEmail": "Por favor revisa tu correo y haz clic en el enlace de confirmación antes de iniciar sesión.",
+      "invalidCredentials": "Correo o contraseña incorrectos. Inténtalo de nuevo.",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña"
     },
-    "common": {
-      "loading": "Cargando...",
-      "search": "Buscar",
-      "save": "Guardar",
-      "cancel": "Cancelar",
-      "delete": "Eliminar",
-      "edit": "Editar",
-      "back": "Atrás",
-      "next": "Siguiente",
-      "previous": "Anterior",
-      "close": "Cerrar",
-      "open": "Abrir",
-      "yes": "Sí",
-      "no": "No",
-      "ok": "OK",
+    "signup": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Únete a TradeIQ Pro y comienza a operar de manera inteligente",
+      "fullName": "Nombre completo",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "signUp": "Registrarse",
+      "signingUp": "Creando cuenta...",
+      "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+      "signIn": "Inicia sesión",
+      "terms": "Al crear una cuenta, aceptas nuestros",
+      "termsOfService": "Términos de servicio",
+      "and": "y",
+      "privacyPolicy": "Política de privacidad",
+      "checkEmail": "Revisa tu correo",
+      "checkEmailDescription": "Hemos enviado un enlace de verificación a tu dirección de correo. Por favor haz clic en el enlace para verificar tu cuenta.",
+      "didntReceiveEmail": "¿No recibiste el correo? Revisa tu carpeta de spam o",
+      "resendEmail": "reenviar correo de verificación",
+      "backToLogin": "Volver al inicio de sesión"
+    },
+    "forgotPassword": {
+      "title": "Restablecer contraseña",
+      "subtitle": "Ingresa tu correo para recibir instrucciones de restablecimiento",
+      "email": "Correo electrónico",
+      "sendInstructions": "Enviar instrucciones de restablecimiento",
+      "backToLogin": "Volver al inicio de sesión"
+    },
+    "resetPasswordRequest": {
+      "title": "Restablecer tu contraseña",
+      "subtitle": "Ingresa tu dirección de correo y te enviaremos un enlace para restablecer tu contraseña",
+      "checkEmailTitle": "Revisa tu correo",
+      "emailLabel": "Dirección de correo electrónico",
+      "sendButton": "Enviar enlace de restablecimiento",
+      "sending": "Enviando...",
+      "emailSent": "Enlace de restablecimiento enviado",
+      "checkEmail": "Por favor revisa tu correo para las instrucciones de restablecimiento de contraseña",
+      "emailSentDescription": "Hemos enviado un enlace de restablecimiento de contraseña a {{email}}",
+      "instructionsSent": "Las instrucciones de restablecimiento de contraseña han sido enviadas a tu correo. Por favor revisa tu bandeja de entrada y sigue el enlace para restablecer tu contraseña.",
+      "didntReceive": "¿No recibiste el correo? Revisa tu carpeta de spam o inténtalo de nuevo.",
+      "sendAnother": "Enviar otro correo",
+      "backToLogin": "Volver al inicio de sesión",
+      "emailRequired": "Correo requerido",
+      "enterEmail": "Por favor ingresa tu dirección de correo",
       "error": "Error",
-      "success": "Éxito",
-      "warning": "Advertencia",
-      "info": "Información",
-      "selectLanguage": "Seleccionar Idioma",
-      "goBack": "Volver",
-      "requestEarlyAccess": "Solicitar Acceso Temprano",
-      "cancelAnytime": "Cancelar en cualquier momento"
+      "failedToSend": "Error al enviar el correo de restablecimiento. Por favor inténtalo de nuevo.",
+      "unexpectedError": "Ocurrió un error inesperado. Por favor inténtalo de nuevo."
     },
-    "footer": {
-      "description": "Plataforma de análisis de mercado e insights de trading impulsada por IA",
-      "platform": "Plataforma",
-      "legal": "Legal",
-      "company": "Empresa", 
-      "dashboard": "Panel de Trading",
-      "learnPreview": "Vista Previa de Aprendizaje",
-      "pricing": "Precios",
-      "privacy": "Política de Privacidad",
-      "terms": "Términos de Servicio",
-      "cookies": "Política de Cookies",
-      "about": "Acerca de",
-      "blog": "Blog",
-      "careers": "Carreras",
-      "rights": "Todos los derechos reservados."
-    },
-    "placeholders": {
-      "yourName": "Tu Nombre",
-      "yourEmail": "Tu Email",
-      "enterEmail": "Ingresa tu email",
-      "enterPassword": "Ingresa tu contraseña",
-      "enterCurrentPassword": "Ingresa tu contraseña actual",
-      "enterNewPassword": "Ingresa tu nueva contraseña (mín 8 caracteres)",
+    "resetPassword": {
+      "title": "Restablecer contraseña",
+      "setNewPassword": "Establecer nueva contraseña",
+      "passwordUpdated": "¡Contraseña actualizada!",
+      "updateFailed": "Actualización fallida",
+      "newPassword": "Nueva contraseña",
+      "confirmPassword": "Confirmar nueva contraseña",
+      "enterNewPassword": "Ingresa tu nueva contraseña",
       "confirmNewPassword": "Confirma tu nueva contraseña",
-      "enterFullName": "Ingresa tu nombre completo",
-      "chooseUsername": "Elige un nombre de usuario (opcional)",
-      "searchStocks": "Buscar acciones, crypto, forex...",
-      "searchAssetsExtended": "Buscar acciones, crypto, forex, índices...",
-      "stockSymbol": "Ingresa símbolo de acción (ej., AAPL, TSLA)",
-      "alertSymbol": "ej. AAPL, BTC",
-      "alertThresholdPercentage": "5.0",
-      "alertThresholdPrice": "100.00"
+      "updatePassword": "Actualizar contraseña",
+      "updating": "Actualizando contraseña...",
+      "goToLogin": "Ir al inicio de sesión",
+      "backToLogin": "Volver al inicio de sesión",
+      "requestNewLink": "Solicitar nuevo enlace de restablecimiento",
+      "attempt": "Intento",
+      "success": "Éxito",
+      "successDescription": "¡Contraseña actualizada exitosamente! Redirigiendo al inicio de sesión...",
+      "successMessage": "Tu contraseña ha sido actualizada exitosamente. Serás redirigido a la página de inicio de sesión en breve.",
+      "error": "Error",
+      "updateFailed": "Error al actualizar la contraseña. Por favor inténtalo de nuevo.",
+      "unexpectedError": "Ocurrió un error inesperado. Por favor inténtalo de nuevo.",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden",
+      "passwordRequirements": "Requisitos de contraseña",
+      "passwordRequirementsHint": "La contraseña debe contener al menos 8 caracteres con mayúsculas, minúsculas, números y caracteres especiales.",
+      "passwordTooShort": "La contraseña debe tener al menos {{minLength}} caracteres",
+      "passwordNeedsUppercase": "La contraseña debe contener al menos una letra mayúscula",
+      "passwordNeedsLowercase": "La contraseña debe contener al menos una letra minúscula",
+      "passwordNeedsNumber": "La contraseña debe contener al menos un número",
+      "passwordNeedsSpecial": "La contraseña debe contener al menos un carácter especial",
+      "linkExpired": "Enlace de restablecimiento expirado",
+      "linkExpiredDescription": "Tu enlace de restablecimiento de contraseña ha expirado o ya no es válido. Por favor solicita un nuevo enlace de restablecimiento de contraseña.",
+      "invalidLink": "Enlace de restablecimiento inválido",
+      "invalidLinkDescription": "El enlace de restablecimiento de contraseña es inválido. Por favor solicita uno nuevo.",
+      "sessionExpired": "Sesión expirada",
+      "sessionExpiredDescription": "Tu sesión de restablecimiento de contraseña ha expirado. Por favor solicita un nuevo enlace de restablecimiento de contraseña."
     },
-    "features": {
-      "locked": {
-        "subscriptionExpired": {
-          "title": "Suscripción Expirada",
-          "message": "Tu suscripción Pro ha expirado. Renueva para recuperar el acceso a las características premium.",
-          "action": "Renovar Suscripción"
-        },
-        "proFeature": {
-          "title": "Característica Pro",
-          "message": "Actualiza a Pro para desbloquear esta característica y obtener acceso ilimitado.",
-          "action": "Actualizar a Pro"
-        },
-        "accessRestricted": {
-          "title": "Acceso Restringido",
-          "message": "Esta característica requiere una suscripción Pro.",
-          "action": "Obtener Acceso Pro"
-        },
-        "benefits": {
-          "title": "Lo que obtienes con Pro:",
-          "unlimited": "Mensajes ilimitados de StrategyAI",
-          "realtime": "Actualizaciones de mercado en tiempo real",
-          "learning": "Módulos de aprendizaje completos",
-          "support": "Soporte prioritario al cliente",
-          "insights": "Insights avanzados de trading"
-        },
-        "pricing": {
-          "monthly": "$9.99",
-          "period": "/mes"
-        },
-        "redirecting": "Redirigiendo al checkout...",
-        "redirectingDescription": "Por favor espera mientras preparamos tu suscripción.",
-        "checkoutError": "Error al iniciar el proceso de checkout. Por favor inténtalo de nuevo.",
-        "expired": "Expiró hace {days} día{plural}"
-      }
-    },
-    "toasts": {
-      "authRequired": "Autenticación Requerida",
-      "alreadyAdded": "Ya Agregado",
-      "errorReordering": "Error al Reordenar",
-      "alertCreated": "Alerta Creada",
-      "alertUpdated": "Alerta Actualizada",
-      "alertDeleted": "Alerta Eliminada",
-      "uploadFailed": "Error en la subida",
-      "avatarUpdated": "Avatar actualizado",
-      "profileUpdated": "Perfil actualizado",
-      "updateFailed": "Error en la actualización",
-      "passwordUpdated": "Contraseña actualizada",
-      "statusUpdated": "Estado Actualizado",
-      "preferencesUpdated": "Preferencias Actualizadas",
-      "logoutFailed": "Error al cerrar sesión",
-      "themeUpdated": "Tema actualizado",
-      "checkoutFailed": "Error en el checkout"
-    },
-    "patterns": {
-      "bullishMomentum": "Impulso Alcista",
-      "bearishPressure": "Presión Bajista",
-      "downwardPressure": "Presión a la Baja",
-      "consolidationPhase": "Fase de Consolidación"
-    },
-    "volatility": {
-      "veryHigh": "Muy Alta"
-    },
-    "assets": {
-      "nasdaqComposite": "NASDAQ Composite",
-      "russell2000": "Russell 2000",
-      "ftse100": "FTSE 100",
-      "nikkei225": "Nikkei 225",
-      "goldSpot": "Oro Spot",
-      "silverSpot": "Plata Spot",
-      "crudeOil": "Petróleo Crudo",
-      "naturalGas": "Gas Natural",
-      "daxIndex": "Índice DAX",
-      "euroBund": "Euro Bund",
-      "euroBTP": "Euro BTP",
-      "euroBOBL": "Euro BOBL",
-      "relatedAssets": "Activos Relacionados"
-    },
-    "tradingView": {
-      "integration": "Integración TradingView"
-    },
-    "altTexts": {
-      "chartScreenshot": "Captura de pantalla del gráfico",
-      "profilePicture": "Foto de perfil"
-    },
-    "ariaLabels": {
-      "closeMenu": "Cerrar menú",
-      "toggleSidebar": "Alternar Barra Lateral",
-      "navigationMenu": "menú de navegación"
+    "verifyEmail": {
+      "title": "Verifica tu correo",
+      "subtitle": "Hemos enviado un enlace de verificación a tu correo",
+      "verifying": "Verificando tu correo...",
+      "verified": "¡Correo verificado!",
+      "verifiedDescription": "Tu correo ha sido verificado exitosamente. Ahora puedes acceder a tu cuenta.",
+      "invalid": "Enlace de verificación inválido",
+      "invalidDescription": "El enlace de verificación es inválido o ha expirado. Por favor solicita uno nuevo.",
+      "expired": "Enlace de verificación expirado",
+      "expiredDescription": "Tu enlace de verificación ha expirado. Por favor solicita un nuevo correo de verificación.",
+      "resendVerification": "Reenviar correo de verificación",
+      "resending": "Reenviando...",
+      "backToLogin": "Volver al inicio de sesión",
+      "goToLogin": "Ir al inicio de sesión",
+      "error": "Error de verificación",
+      "unexpectedError": "Ocurrió un error inesperado durante la verificación. Por favor inténtalo de nuevo.",
+      "missingParameters": "Faltan parámetros requeridos en el enlace de verificación.",
+      "emailRequired": "Se requiere la dirección de correo electrónico para la verificación."
     }
   }
+}
