@@ -43,9 +43,9 @@ const Login = () => {
     // Handle various status messages
     if (isVerified) {
       toast({
-        title: "✅ Email Verified Successfully!",
-        description: "Your email has been confirmed. You can now log in with your credentials.",
-        duration: 6000,
+        title: "🎉 Email Verified Successfully!",
+        description: "Your email has been confirmed. Welcome to TradeIQ Pro! You can now log in with your credentials.",
+        duration: 8000,
       });
     }
 
@@ -133,8 +133,9 @@ const Login = () => {
     } else {
       console.log('🔐 [LOGIN] Login successful');
       toast({
-        title: t('auth.login.welcomeBack'),
-        description: t('auth.login.loginSuccess'),
+        title: "🎉 Welcome Back!",
+        description: "Successfully logged in to TradeIQ Pro. Redirecting to dashboard...",
+        duration: 4000,
       });
       navigate("/app");
     }
@@ -238,7 +239,7 @@ const Login = () => {
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="text-green-400">
                 {isVerified 
-                  ? "✅ Email verified successfully! You can now log in with your credentials."
+                  ? "🎉 Email verified successfully! Welcome to TradeIQ Pro! You can now log in with your credentials."
                   : "🔒 Password updated successfully! You can now log in with your new password."
                 }
               </AlertDescription>

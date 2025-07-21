@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -88,14 +87,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, fullName?: string) => {
     // Always use production domain for email verification
-    const isProduction = window.location.hostname === 'tradeiqpro.com';
-    const redirectUrl = isProduction 
-      ? 'https://tradeiqpro.com/verify-email'
-      : `${window.location.origin}/verify-email`;
+    const redirectUrl = 'https://tradeiqpro.com/verify-email';
     
     console.log('🔐 [AUTH_FLOW] Sign up with redirect URL:', redirectUrl);
     console.log('🔐 [AUTH_FLOW] Current hostname:', window.location.hostname);
-    console.log('🔐 [AUTH_FLOW] Is production:', isProduction);
+    console.log('🔐 [AUTH_FLOW] Using production redirect for all environments');
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -116,10 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const resendConfirmation = async (email: string) => {
-    const isProduction = window.location.hostname === 'tradeiqpro.com';
-    const redirectUrl = isProduction 
-      ? 'https://tradeiqpro.com/verify-email'
-      : `${window.location.origin}/verify-email`;
+    const redirectUrl = 'https://tradeiqpro.com/verify-email';
     
     console.log('🔐 [AUTH_FLOW] Resending confirmation with redirect URL:', redirectUrl);
     
@@ -141,10 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const resetPassword = async (email: string) => {
-    const isProduction = window.location.hostname === 'tradeiqpro.com';
-    const redirectUrl = isProduction 
-      ? 'https://tradeiqpro.com/reset-password'
-      : `${window.location.origin}/reset-password`;
+    const redirectUrl = 'https://tradeiqpro.com/reset-password';
     
     console.log('🔐 [AUTH_FLOW] Password reset request for:', email);
     console.log('🔐 [AUTH_FLOW] Reset redirect URL:', redirectUrl);
@@ -179,10 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithOAuth = async (provider: 'google' | 'github') => {
-    const isProduction = window.location.hostname === 'tradeiqpro.com';
-    const redirectUrl = isProduction 
-      ? 'https://tradeiqpro.com/app'
-      : `${window.location.origin}/app`;
+    const redirectUrl = 'https://tradeiqpro.com/app';
     
     console.log('🔐 [AUTH_FLOW] OAuth sign in with provider:', provider);
     console.log('🔐 [AUTH_FLOW] OAuth redirect URL:', redirectUrl);

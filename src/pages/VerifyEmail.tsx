@@ -27,8 +27,8 @@ const VerifyEmail = () => {
       const type = searchParams.get('type');
       const redirectTo = searchParams.get('redirect_to');
 
-      console.log('🔐 [EMAIL_VERIFICATION] Starting verification process');
-      console.log('🔐 [EMAIL_VERIFICATION] Token received and processed', { 
+      console.log('🔐 [EMAIL_VERIFICATION] Token received');
+      console.log('🔐 [EMAIL_VERIFICATION] Processing verification with params:', { 
         tokenHash: tokenHash ? 'present' : 'missing',
         type,
         redirectTo,
@@ -41,14 +41,14 @@ const VerifyEmail = () => {
 
       // Validate required parameters
       if (!tokenHash || !type) {
-        console.error('🔐 [EMAIL_VERIFICATION_ERROR] Missing required parameters');
+        console.error('🔐 [EMAIL_VERIFICATION] Missing required parameters');
         setStatus('invalid');
         setErrorMessage('Invalid verification link. Required parameters are missing.');
         return;
       }
 
       if (type !== 'email') {
-        console.error('🔐 [EMAIL_VERIFICATION_ERROR] Invalid verification type:', type);
+        console.error('🔐 [EMAIL_VERIFICATION] Invalid verification type:', type);
         setStatus('invalid');
         setErrorMessage('Invalid verification link type. Expected email verification.');
         return;
@@ -56,7 +56,7 @@ const VerifyEmail = () => {
 
       // Verify the production domain
       const isProduction = window.location.hostname === 'tradeiqpro.com';
-      console.log('🔐 [EMAIL_VERIFICATION] Domain check:', {
+      console.log('🔐 [EMAIL_VERIFICATION] Domain verification:', {
         currentDomain: window.location.hostname,
         isProduction,
         expectedDomain: 'tradeiqpro.com'
@@ -71,31 +71,31 @@ const VerifyEmail = () => {
         });
 
         if (error) {
-          console.error('🔐 [EMAIL_VERIFICATION_ERROR] Supabase verification failed:', error);
+          console.error('🔐 [EMAIL_VERIFICATION] Verification failed:', error);
           
           // Handle specific error types
           if (error.message.includes('expired')) {
-            console.log('🔐 [EMAIL_VERIFICATION_ERROR] Token expired');
+            console.log('🔐 [EMAIL_VERIFICATION] Invalid or expired token');
             setStatus('expired');
             setErrorMessage('Your verification link has expired. Please request a new verification email.');
           } else if (error.message.includes('invalid') || error.message.includes('not found')) {
-            console.log('🔐 [EMAIL_VERIFICATION_ERROR] Token invalid or not found');
+            console.log('🔐 [EMAIL_VERIFICATION] Invalid or expired token');
             setStatus('invalid');
             setErrorMessage('Your verification link is invalid or has already been used. Please request a new verification email.');
           } else {
-            console.log('🔐 [EMAIL_VERIFICATION_ERROR] Generic verification error');
+            console.log('🔐 [EMAIL_VERIFICATION] Generic verification error');
             setStatus('error');
             setErrorMessage(error.message || 'Email verification failed. Please try again or request a new verification email.');
           }
         } else {
-          console.log('🔐 [EMAIL_VERIFICATION_SUCCESS] Email verification successful:', data);
+          console.log('🔐 [EMAIL_VERIFICATION] Verification successful');
           setStatus('success');
           
-          // Show success toast
+          // Show success toast with enhanced message
           toast({
-            title: "Email Verified Successfully!",
-            description: "Your email has been confirmed. You can now log in to your account.",
-            duration: 5000,
+            title: "🎉 Email Verified Successfully!",
+            description: "Your email has been confirmed. You can now log in to your TradeIQ Pro account.",
+            duration: 6000,
           });
 
           // Clean up URL parameters
@@ -103,12 +103,12 @@ const VerifyEmail = () => {
           
           // Auto-redirect to login after 3 seconds
           setTimeout(() => {
-            console.log('🔐 [EMAIL_VERIFICATION_SUCCESS] Redirecting to login');
+            console.log('🔐 [EMAIL_VERIFICATION] Redirecting to login');
             navigate('/login?verified=true');
           }, 3000);
         }
       } catch (error) {
-        console.error('🔐 [EMAIL_VERIFICATION_ERROR] Exception during verification:', error);
+        console.error('🔐 [EMAIL_VERIFICATION] Exception during verification:', error);
         setStatus('error');
         setErrorMessage('An unexpected error occurred during verification. Please try again.');
       }
@@ -166,13 +166,13 @@ const VerifyEmail = () => {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-white mb-2">
-                  {t('auth.verifyEmail.success.title')}
+                  🎉 Email Verified Successfully!
                 </h3>
                 <p className="text-gray-400 mb-4">
-                  {t('auth.verifyEmail.success.description')}
+                  Your email has been confirmed. Welcome to TradeIQ Pro!
                 </p>
-                <p className="text-sm text-gray-500 mb-4">
-                  You will be automatically redirected to the login page in a few seconds...
+                <p className="text-sm text-tradeiq-blue mb-4">
+                  Redirecting you to login in 3 seconds...
                 </p>
                 <Button 
                   onClick={handleGoToLogin}
@@ -193,7 +193,7 @@ const VerifyEmail = () => {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-white mb-2">
-                  Verification Link Expired
+                  ⏰ Verification Link Expired
                 </h3>
                 <p className="text-gray-400 mb-4">
                   {errorMessage}
@@ -227,7 +227,7 @@ const VerifyEmail = () => {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-white mb-2">
-                  {status === 'invalid' ? 'Invalid Verification Link' : 'Verification Failed'}
+                  {status === 'invalid' ? '❌ Invalid Verification Link' : '⚠️ Verification Failed'}
                 </h3>
                 <p className="text-gray-400 mb-4">
                   {errorMessage}
@@ -256,7 +256,7 @@ const VerifyEmail = () => {
           {/* Debug Information (only in development) */}
           {window.location.hostname !== 'tradeiqpro.com' && (
             <div className="text-xs text-gray-600 border-t border-gray-700 pt-4">
-              <p className="mb-2">Debug Info:</p>
+              <p className="mb-2">🔧 Debug Info:</p>
               <ul className="text-left space-y-1">
                 <li>Domain: {window.location.hostname}</li>
                 <li>Token: {verificationDetails.tokenHash ? 'Present' : 'Missing'}</li>
@@ -268,7 +268,7 @@ const VerifyEmail = () => {
 
           <div className="text-xs text-gray-500 border-t border-gray-700 pt-4">
             <p>
-              {t('auth.verifyEmail.support')}
+              Need help? Contact support at support@tradeiqpro.com
             </p>
           </div>
         </CardContent>
