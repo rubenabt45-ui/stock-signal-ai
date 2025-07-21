@@ -51,15 +51,15 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     // Ensure we're using the production domain for verification
-    const verificationUrl = redirect_to.includes('tradeiqpro.com') 
-      ? `${redirect_to}?token_hash=${token_hash}&type=${email_action_type}`
-      : `https://tradeiqpro.com/verify-email?token_hash=${token_hash}&type=${email_action_type}`;
+    // Use the proper Supabase verification URL format
+    const productionDomain = 'https://tradeiqpro.com';
+    const verificationUrl = `${productionDomain}/verify-email?token_hash=${token_hash}&type=${email_action_type}&email=${encodeURIComponent(user.email)}`;
 
     console.log("🔐 [EMAIL_VERIFICATION] Final verification URL:", verificationUrl);
 
     const fullName = user.user_metadata?.full_name || "Trader";
 
-    // Enhanced email template with production domain focus
+    // Enhanced email template with proper verification link
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -169,6 +169,16 @@ const handler = async (req: Request): Promise<Response> => {
               margin: 20px 0;
               font-size: 14px;
             }
+            .url-box {
+              word-break: break-all;
+              background-color: #f1f5f9;
+              padding: 16px;
+              border-radius: 6px;
+              font-size: 12px;
+              color: #475569;
+              border: 1px solid #cbd5e1;
+              font-family: 'Courier New', monospace;
+            }
           </style>
         </head>
         <body>
@@ -180,7 +190,7 @@ const handler = async (req: Request): Promise<Response> => {
             
             <p>Hello ${fullName},</p>
             
-            <p>Welcome to <strong>TradeIQ Pro</strong>! To complete your account setup and start using our AI-powered trading platform, please verify your email address.</p>
+            <p>Welcome to <strong>TradeIQ Pro</strong>! To complete your account setup and start using our AI-powered trading platform, please verify your email address by clicking the button below.</p>
             
             <div class="production-notice">
               🌐 This verification will redirect you to: <strong>tradeiqpro.com</strong>
@@ -210,15 +220,16 @@ const handler = async (req: Request): Promise<Response> => {
                 <li>Verification URL validated: ✅</li>
                 <li>Token generated: ✅</li>
                 <li>SMTP service: Active</li>
+                <li>Domain: tradeiqpro.com</li>
               </ul>
             </div>
             
             <p><strong>🔗 Alternative verification link:</strong></p>
-            <div style="word-break: break-all; background-color: #f1f5f9; padding: 16px; border-radius: 6px; font-size: 12px; color: #475569; border: 1px solid #cbd5e1;">
+            <div class="url-box">
               ${verificationUrl}
             </div>
             
-            <p><strong>🔢 Verification code (if needed):</strong></p>
+            <p><strong>🔢 Manual verification code (if needed):</strong></p>
             <div class="token-box">
               ${token}
             </div>
@@ -270,6 +281,7 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(JSON.stringify({ 
         success: true, 
         id: emailResponse.data?.id,
+        verificationUrl: verificationUrl,
         timestamp: new Date().toISOString()
       }), {
         status: 200,

@@ -16,69 +16,89 @@ const VerifyEmail = () => {
   const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'expired' | 'invalid'>('verifying');
   const [errorMessage, setErrorMessage] = useState('');
   const [verificationDetails, setVerificationDetails] = useState<{
+    token?: string;
     tokenHash?: string;
     type?: string;
     redirectTo?: string;
   }>({});
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
     const verifyEmailToken = async () => {
+      // Extract all possible parameters from URL
+      const token = searchParams.get('token');
       const tokenHash = searchParams.get('token_hash');
       const type = searchParams.get('type');
       const redirectTo = searchParams.get('redirect_to');
-
+      
       console.log('🔐 [EMAIL_VERIFICATION] Token received');
-      console.log('🔐 [EMAIL_VERIFICATION] Processing verification with params:', { 
+      console.log('🔐 [EMAIL_VERIFICATION] URL parameters:', {
+        token: token ? 'present' : 'missing',
         tokenHash: tokenHash ? 'present' : 'missing',
-        type,
-        redirectTo,
-        currentUrl: window.location.href,
-        currentDomain: window.location.hostname,
+        type: type || 'missing',
+        redirectTo: redirectTo || 'missing',
+        fullUrl: window.location.href,
+        searchParams: window.location.search,
         timestamp: new Date().toISOString()
       });
 
       // Store verification details for debugging
-      setVerificationDetails({ tokenHash, type, redirectTo });
+      setVerificationDetails({ token, tokenHash, type, redirectTo });
 
-      // Validate required parameters
-      if (!tokenHash || !type) {
+      // Check if we have the required parameters
+      const hasToken = token || tokenHash;
+      const hasType = type;
+
+      if (!hasToken || !hasType) {
         console.error('🔐 [EMAIL_VERIFICATION] Missing required parameters');
-        console.error('🔐 [EMAIL_VERIFICATION] Token hash:', tokenHash ? 'present' : 'missing');
-        console.error('🔐 [EMAIL_VERIFICATION] Type:', type);
+        console.error('🔐 [EMAIL_VERIFICATION] Analysis:', {
+          token: token ? 'present' : 'missing',
+          tokenHash: tokenHash ? 'present' : 'missing',
+          type: type ? 'present' : 'missing',
+          allParams: Object.fromEntries(searchParams.entries())
+        });
         setStatus('invalid');
-        setErrorMessage('Invalid verification link. Required parameters are missing.');
+        setErrorMessage('Invalid verification link. Required parameters are missing. Please check your email and try clicking the link again.');
         return;
       }
 
-      if (type !== 'email') {
+      // Validate type parameter
+      if (type !== 'email' && type !== 'signup') {
         console.error('🔐 [EMAIL_VERIFICATION] Invalid verification type:', type);
         setStatus('invalid');
-        setErrorMessage('Invalid verification link type. Expected email verification.');
+        setErrorMessage('Invalid verification link type. Please use the verification link from your email.');
         return;
       }
-
-      // Verify the production domain
-      const isProduction = window.location.hostname === 'tradeiqpro.com';
-      console.log('🔐 [EMAIL_VERIFICATION] Domain verification:', {
-        currentDomain: window.location.hostname,
-        isProduction,
-        expectedDomain: 'tradeiqpro.com'
-      });
 
       try {
         console.log('🔐 [EMAIL_VERIFICATION] Attempting token verification with Supabase');
         
-        const { data, error } = await supabase.auth.verifyOtp({
-          token_hash: tokenHash,
-          type: 'email'
-        });
+        let verificationResult;
+        
+        // Try verification with token_hash first (new format)
+        if (tokenHash) {
+          console.log('🔐 [EMAIL_VERIFICATION] Using token_hash verification');
+          verificationResult = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: type === 'signup' ? 'signup' : 'email'
+          });
+        } else if (token) {
+          console.log('🔐 [EMAIL_VERIFICATION] Using token verification');
+          verificationResult = await supabase.auth.verifyOtp({
+            token: token,
+            type: type === 'signup' ? 'signup' : 'email'
+          });
+        }
+
+        const { data, error } = verificationResult;
 
         if (error) {
           console.error('🔐 [EMAIL_VERIFICATION] Verification failed:', error);
           console.error('🔐 [EMAIL_VERIFICATION] Error details:', {
             message: error.message,
             status: error.status,
-            name: error.name
+            name: error.name,
+            code: error.code
           });
           
           // Handle specific error types
@@ -96,7 +116,7 @@ const VerifyEmail = () => {
             setErrorMessage(error.message || 'Email verification failed. Please try again or request a new verification email.');
           }
         } else {
-          console.log('🔐 [EMAIL_VERIFICATION_SUCCESS] Verification successful');
+          console.log('🔐 [EMAIL_VERIFICATION] Verification successful');
           console.log('🔐 [EMAIL_VERIFICATION_SUCCESS] User data:', {
             userId: data.user?.id,
             email: data.user?.email,
@@ -105,7 +125,7 @@ const VerifyEmail = () => {
           
           setStatus('success');
           
-          // Show success toast with enhanced message
+          // Show success toast
           toast({
             title: "🎉 Email Verified Successfully!",
             description: "Your email has been confirmed. You can now log in to your TradeIQ Pro account.",
@@ -131,6 +151,59 @@ const VerifyEmail = () => {
     verifyEmailToken();
   }, [searchParams, navigate, toast]);
 
+  const handleResendVerification = async () => {
+    // Get email from URL params or prompt user
+    const email = searchParams.get('email') || prompt('Please enter your email address to resend verification:');
+    
+    if (!email) {
+      toast({
+        title: "Email Required",
+        description: "Please provide your email address to resend the verification email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsResending(true);
+    
+    try {
+      console.log('🔐 [EMAIL_VERIFICATION] Resending verification email for:', email);
+      
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: 'https://tradeiqpro.com/verify-email'
+        }
+      });
+
+      if (error) {
+        console.error('🔐 [EMAIL_VERIFICATION] Resend failed:', error);
+        toast({
+          title: "Failed to Resend Email",
+          description: error.message || "Please try again or contact support.",
+          variant: "destructive",
+        });
+      } else {
+        console.log('🔐 [EMAIL_VERIFICATION] Verification email resent successfully');
+        toast({
+          title: "✅ Verification Email Sent",
+          description: "Please check your email for the new verification link.",
+          duration: 5000,
+        });
+      }
+    } catch (error) {
+      console.error('🔐 [EMAIL_VERIFICATION] Resend exception:', error);
+      toast({
+        title: "Error",
+        description: "Failed to resend verification email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   const handleRetryVerification = () => {
     console.log('🔐 [EMAIL_VERIFICATION] User requested retry, redirecting to login');
     navigate('/login?verification_retry=true');
@@ -139,11 +212,6 @@ const VerifyEmail = () => {
   const handleGoToLogin = () => {
     console.log('🔐 [EMAIL_VERIFICATION] User navigating to login');
     navigate('/login');
-  };
-
-  const handleRequestNewLink = () => {
-    console.log('🔐 [EMAIL_VERIFICATION] User requesting new verification link');
-    navigate('/login?request_verification=true');
   };
 
   return (
@@ -220,11 +288,21 @@ const VerifyEmail = () => {
                 </p>
                 <div className="space-y-3">
                   <Button 
-                    onClick={handleRequestNewLink}
+                    onClick={handleResendVerification}
                     className="tradeiq-button-primary w-full"
+                    disabled={isResending}
                   >
-                    <Mail className="mr-2 h-4 w-4" />
-                    Request New Verification Email
+                    {isResending ? (
+                      <>
+                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="mr-2 h-4 w-4" />
+                        Resend Verification Email
+                      </>
+                    )}
                   </Button>
                   <Button 
                     onClick={handleGoToLogin}
@@ -254,19 +332,29 @@ const VerifyEmail = () => {
                 </p>
                 <div className="space-y-3">
                   <Button 
-                    onClick={handleRetryVerification}
+                    onClick={handleResendVerification}
                     className="tradeiq-button-primary w-full"
+                    disabled={isResending}
                   >
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Try Again
+                    {isResending ? (
+                      <>
+                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="mr-2 h-4 w-4" />
+                        Resend Verification Email
+                      </>
+                    )}
                   </Button>
                   <Button 
-                    onClick={handleRequestNewLink}
+                    onClick={handleRetryVerification}
                     variant="outline"
                     className="w-full"
                   >
-                    <Mail className="mr-2 h-4 w-4" />
-                    Request New Verification Email
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Try Again
                   </Button>
                 </div>
               </div>
@@ -279,9 +367,12 @@ const VerifyEmail = () => {
               <p className="mb-2">🔧 Debug Info:</p>
               <ul className="text-left space-y-1">
                 <li>Domain: {window.location.hostname}</li>
-                <li>Token: {verificationDetails.tokenHash ? 'Present' : 'Missing'}</li>
+                <li>Token: {verificationDetails.token ? 'Present' : 'Missing'}</li>
+                <li>Token Hash: {verificationDetails.tokenHash ? 'Present' : 'Missing'}</li>
                 <li>Type: {verificationDetails.type || 'N/A'}</li>
                 <li>Status: {status}</li>
+                <li>Full URL: {window.location.href}</li>
+                <li>Search: {window.location.search}</li>
                 <li>Time: {new Date().toLocaleTimeString()}</li>
               </ul>
             </div>
