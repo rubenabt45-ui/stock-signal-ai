@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -5,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, ArrowLeft, Mail } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 import BackToHomeButton from '@/components/BackToHomeButton';
 
 const ForgotPassword = () => {
@@ -14,6 +16,8 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
+  const { resetPassword } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,19 +32,20 @@ const ForgotPassword = () => {
     }
 
     setLoading(true);
+    console.log('🔐 [FORGOT_PASSWORD] Initiating password reset for:', email);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
+      const { error } = await resetPassword(email);
 
       if (error) {
+        console.error('🔐 [FORGOT_PASSWORD] Password reset failed:', error);
         toast({
           title: "Error",
-          description: error.message,
+          description: error.message || "Failed to send reset email. Please try again.",
           variant: "destructive",
         });
       } else {
+        console.log('🔐 [FORGOT_PASSWORD] Password reset email sent successfully');
         setSent(true);
         toast({
           title: "Recovery email sent",
@@ -48,6 +53,7 @@ const ForgotPassword = () => {
         });
       }
     } catch (error) {
+      console.error('🔐 [FORGOT_PASSWORD] Password reset exception:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred. Please try again.",
@@ -70,10 +76,14 @@ const ForgotPassword = () => {
           </div>
           
           <div className="flex items-center space-x-6">
-            <Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
-            <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</Link>
+            <Link to="/" className="text-gray-300 hover:text-white transition-colors">
+              {t('common.home')}
+            </Link>
+            <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors">
+              {t('common.pricing')}
+            </Link>
             <Link to="/login">
-              <Button variant="outline" size="sm">Sign In</Button>
+              <Button variant="outline" size="sm">{t('auth.login.signIn')}</Button>
             </Link>
           </div>
         </div>
@@ -90,12 +100,12 @@ const ForgotPassword = () => {
                 </div>
               </div>
               <CardTitle className="text-2xl text-white">
-                {sent ? 'Check Your Email' : 'Forgot Password?'}
+                {sent ? 'Check Your Email' : t('auth.forgotPassword.title')}
               </CardTitle>
               <CardDescription className="text-gray-300">
                 {sent 
                   ? `We've sent a password reset link to ${email}`
-                  : 'Enter your email address and we\'ll send you a link to reset your password.'
+                  : t('auth.forgotPassword.subtitle')
                 }
               </CardDescription>
             </CardHeader>
@@ -128,7 +138,7 @@ const ForgotPassword = () => {
                     <Link to="/login">
                       <Button variant="ghost" className="w-full">
                         <ArrowLeft className="h-4 w-4 mr-2" />
-                        Back to Sign In
+                        {t('auth.forgotPassword.backToLogin')}
                       </Button>
                     </Link>
                   </div>
@@ -137,12 +147,12 @@ const ForgotPassword = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
                     <label htmlFor="email" className="text-sm font-medium text-gray-300">
-                      Email Address
+                      {t('auth.forgotPassword.email')}
                     </label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder={t('placeholders.enterEmail')}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400"
@@ -155,7 +165,7 @@ const ForgotPassword = () => {
                     className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90"
                     disabled={loading}
                   >
-                    {loading ? 'Sending...' : 'Send Reset Link'}
+                    {loading ? 'Sending...' : t('auth.forgotPassword.sendInstructions')}
                   </Button>
 
                   <div className="text-center">
@@ -164,7 +174,7 @@ const ForgotPassword = () => {
                       className="text-sm text-tradeiq-blue hover:text-tradeiq-blue/80 transition-colors inline-flex items-center"
                     >
                       <ArrowLeft className="h-4 w-4 mr-1" />
-                      Back to Sign In
+                      {t('auth.forgotPassword.backToLogin')}
                     </Link>
                   </div>
                 </form>
@@ -174,9 +184,9 @@ const ForgotPassword = () => {
           
           <div className="mt-6 text-center space-y-4">
             <p className="text-sm text-gray-400">
-              Don't have an account?{' '}
+              {t('auth.login.noAccount')}{' '}
               <Link to="/signup" className="text-tradeiq-blue hover:text-tradeiq-blue/80 transition-colors">
-                Sign up for free
+                {t('auth.login.signUp')}
               </Link>
             </p>
             

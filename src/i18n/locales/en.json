@@ -140,10 +140,18 @@
       "password": "Password",
       "forgotPassword": "Forgot your password?",
       "signIn": "Sign In",
+      "signingIn": "Signing In...",
       "noAccount": "Don't have an account?",
       "signUp": "Sign up here",
       "success": "Successfully signed in!",
-      "error": "Invalid email or password"
+      "loginSuccess": "Login successful!",
+      "welcomeBack": "Welcome back!",
+      "loginFailed": "Login Failed",
+      "emailNotConfirmed": "Email Not Confirmed",
+      "checkEmail": "Please check your email and click the verification link to confirm your account.",
+      "invalidCredentials": "Invalid email or password. Please try again.",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
     },
     "signup": {
       "title": "Create Account",
@@ -162,10 +170,19 @@
       "title": "Reset Password",
       "subtitle": "Enter your email to receive reset instructions",
       "email": "Email",
-      "sendInstructions": "Send Instructions",
+      "sendInstructions": "Send Reset Link",
       "backToLogin": "Back to Login",
       "success": "Password reset instructions sent to your email",
       "error": "Failed to send reset instructions"
+    },
+    "resetPassword": {
+      "title": "Set New Password",
+      "subtitle": "Enter your new password below",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "updatePassword": "Update Password",
+      "success": "Password updated successfully!",
+      "error": "Failed to update password"
     },
     "verifyEmail": {
       "title": "Email Verification",
@@ -339,20 +356,137 @@
     "confirm": "Confirm",
     "view": "View",
     "hide": "Hide",
-    "show": "Show"
+    "show": "Show",
+    "home": "Home",
+    "pricing": "Pricing",
+    "selectLanguage": "Select Language",
+    "goBack": "Go Back",
+    "requestEarlyAccess": "Request Early Access",
+    "cancelAnytime": "Cancel anytime"
+  },
+  "footer": {
+    "description": "AI-powered trading insights and market analysis platform",
+    "platform": "Platform",
+    "legal": "Legal", 
+    "company": "Company",
+    "dashboard": "Trading Dashboard",
+    "learnPreview": "Learn Preview",
+    "pricing": "Pricing",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "cookies": "Cookie Policy",
+    "about": "About",
+    "blog": "Blog",
+    "careers": "Careers",
+    "rights": "All rights reserved."
   },
   "placeholders": {
-    "search": "Search...",
-    "searchStocks": "Search stocks, crypto, forex...",
-    "enterSymbol": "Enter stock symbol (e.g., AAPL, TSLA)",
-    "enterName": "Enter your full name",
+    "yourName": "Your Name",
+    "yourEmail": "Your Email",
     "enterEmail": "Enter your email",
     "enterPassword": "Enter your password",
+    "enterCurrentPassword": "Enter your current password",
+    "enterNewPassword": "Enter your new password (min 8 characters)",
+    "confirmNewPassword": "Confirm your new password",
+    "enterFullName": "Enter your full name",
+    "chooseUsername": "Choose a username (optional)",
+    "searchStocks": "Search stocks, crypto, forex...",
+    "searchAssetsExtended": "Search stocks, crypto, forex, indices...",
+    "stockSymbol": "Enter stock symbol (e.g., AAPL, TSLA)",
+    "alertSymbol": "e.g. AAPL, BTC",
+    "alertThresholdPercentage": "5.0",
+    "alertThresholdPrice": "100.00",
     "confirmPassword": "Confirm your password",
-    "enterUsername": "Choose a username (optional)",
-    "currentPassword": "Enter your current password",
-    "newPassword": "Enter your new password (min 8 characters)",
     "askSomething": "Ask something..."
+  },
+  "features": {
+    "locked": {
+      "subscriptionExpired": {
+        "title": "Subscription Expired",
+        "message": "Your Pro subscription has expired. Renew to regain access to premium features.",
+        "action": "Renew Subscription"
+      },
+      "proFeature": {
+        "title": "Pro Feature",
+        "message": "Upgrade to Pro to unlock this feature and get unlimited access.",
+        "action": "Upgrade to Pro"
+      },
+      "accessRestricted": {
+        "title": "Access Restricted",
+        "message": "This feature requires a Pro subscription.",
+        "action": "Get Pro Access"
+      },
+      "benefits": {
+        "title": "What you get with Pro:",
+        "unlimited": "Unlimited StrategyAI messages",
+        "realtime": "Real-time market updates",
+        "learning": "Complete learning modules",
+        "support": "Priority customer support",
+        "insights": "Advanced trading insights"
+      },
+      "pricing": {
+        "monthly": "$9.99",
+        "period": "/month"
+      },
+      "redirecting": "Redirecting to checkout...",
+      "redirectingDescription": "Please wait while we prepare your subscription.",
+      "checkoutError": "Failed to start checkout process. Please try again.",
+      "expired": "Expired {days} day{plural} ago"
+    }
+  },
+  "toasts": {
+    "authRequired": "Authentication Required",
+    "alreadyAdded": "Already Added",
+    "errorReordering": "Error Reordering",
+    "alertCreated": "Alert Created",
+    "alertUpdated": "Alert Updated",
+    "alertDeleted": "Alert Deleted",
+    "uploadFailed": "Upload failed",
+    "avatarUpdated": "Avatar updated",
+    "profileUpdated": "Profile updated",
+    "updateFailed": "Update failed",
+    "passwordUpdated": "Password updated",
+    "statusUpdated": "Status Updated",
+    "preferencesUpdated": "Preferences Updated",
+    "logoutFailed": "Logout failed",
+    "themeUpdated": "Theme updated",
+    "checkoutFailed": "Checkout failed"
+  },
+  "patterns": {
+    "bullishMomentum": "Bullish Momentum",
+    "bearishPressure": "Bearish Pressure",
+    "downwardPressure": "Downward Pressure",
+    "consolidationPhase": "Consolidation Phase"
+  },
+  "volatility": {
+    "veryHigh": "Very High"
+  },
+  "assets": {
+    "nasdaqComposite": "NASDAQ Composite",
+    "russell2000": "Russell 2000",
+    "ftse100": "FTSE 100",
+    "nikkei225": "Nikkei 225",
+    "goldSpot": "Gold Spot",
+    "silverSpot": "Silver Spot",
+    "crudeOil": "Crude Oil",
+    "naturalGas": "Natural Gas",
+    "daxIndex": "DAX Index",
+    "euroBund": "Euro Bund",
+    "euroBTP": "Euro BTP",
+    "euroBOBL": "Euro BOBL",
+    "relatedAssets": "Related Assets"
+  },
+  "tradingView": {
+    "integration": "TradingView Integration"
+  },
+  "altTexts": {
+    "chartScreenshot": "Chart screenshot",
+    "profilePicture": "Profile picture"
+  },
+  "ariaLabels": {
+    "closeMenu": "Close menu",
+    "toggleSidebar": "Toggle Sidebar",
+    "navigationMenu": "navigation menu"
   },
   "toast": {
     "profileUpdated": "Profile updated successfully",
@@ -379,151 +513,5 @@
     "uploadFailed": "Upload failed. Please try again.",
     "saveFailed": "Failed to save changes. Please try again.",
     "loadFailed": "Failed to load data. Please refresh the page."
-    },
-    "common": {
-      "loading": "Loading...",
-      "search": "Search",
-      "save": "Save",
-      "cancel": "Cancel",
-      "delete": "Delete",
-      "edit": "Edit",
-      "back": "Back",
-      "next": "Next",
-      "previous": "Previous",
-      "close": "Close",
-      "open": "Open",
-      "yes": "Yes",
-      "no": "No",
-      "ok": "OK",
-      "error": "Error",
-      "success": "Success",
-      "warning": "Warning",
-      "info": "Information",
-      "selectLanguage": "Select Language",
-      "goBack": "Go Back",
-      "requestEarlyAccess": "Request Early Access",
-      "cancelAnytime": "Cancel anytime"
-    },
-    "footer": {
-      "description": "AI-powered trading insights and market analysis platform",
-      "platform": "Platform",
-      "legal": "Legal", 
-      "company": "Company",
-      "dashboard": "Trading Dashboard",
-      "learnPreview": "Learn Preview",
-      "pricing": "Pricing",
-      "privacy": "Privacy Policy",
-      "terms": "Terms of Service",
-      "cookies": "Cookie Policy",
-      "about": "About",
-      "blog": "Blog",
-      "careers": "Careers",
-      "rights": "All rights reserved."
-    },
-    "placeholders": {
-      "yourName": "Your Name",
-      "yourEmail": "Your Email",
-      "enterEmail": "Enter your email",
-      "enterPassword": "Enter your password",
-      "enterCurrentPassword": "Enter your current password",
-      "enterNewPassword": "Enter your new password (min 8 characters)",
-      "confirmNewPassword": "Confirm your new password",
-      "enterFullName": "Enter your full name",
-      "chooseUsername": "Choose a username (optional)",
-      "searchStocks": "Search stocks, crypto, forex...",
-      "searchAssetsExtended": "Search stocks, crypto, forex, indices...",
-      "stockSymbol": "Enter stock symbol (e.g., AAPL, TSLA)",
-      "alertSymbol": "e.g. AAPL, BTC",
-      "alertThresholdPercentage": "5.0",
-      "alertThresholdPrice": "100.00"
-    },
-    "features": {
-      "locked": {
-        "subscriptionExpired": {
-          "title": "Subscription Expired",
-          "message": "Your Pro subscription has expired. Renew to regain access to premium features.",
-          "action": "Renew Subscription"
-        },
-        "proFeature": {
-          "title": "Pro Feature",
-          "message": "Upgrade to Pro to unlock this feature and get unlimited access.",
-          "action": "Upgrade to Pro"
-        },
-        "accessRestricted": {
-          "title": "Access Restricted",
-          "message": "This feature requires a Pro subscription.",
-          "action": "Get Pro Access"
-        },
-        "benefits": {
-          "title": "What you get with Pro:",
-          "unlimited": "Unlimited StrategyAI messages",
-          "realtime": "Real-time market updates",
-          "learning": "Complete learning modules",
-          "support": "Priority customer support",
-          "insights": "Advanced trading insights"
-        },
-        "pricing": {
-          "monthly": "$9.99",
-          "period": "/month"
-        },
-        "redirecting": "Redirecting to checkout...",
-        "redirectingDescription": "Please wait while we prepare your subscription.",
-        "checkoutError": "Failed to start checkout process. Please try again.",
-        "expired": "Expired {days} day{plural} ago"
-      }
-    },
-    "toasts": {
-      "authRequired": "Authentication Required",
-      "alreadyAdded": "Already Added",
-      "errorReordering": "Error Reordering",
-      "alertCreated": "Alert Created",
-      "alertUpdated": "Alert Updated",
-      "alertDeleted": "Alert Deleted",
-      "uploadFailed": "Upload failed",
-      "avatarUpdated": "Avatar updated",
-      "profileUpdated": "Profile updated",
-      "updateFailed": "Update failed",
-      "passwordUpdated": "Password updated",
-      "statusUpdated": "Status Updated",
-      "preferencesUpdated": "Preferences Updated",
-      "logoutFailed": "Logout failed",
-      "themeUpdated": "Theme updated",
-      "checkoutFailed": "Checkout failed"
-    },
-    "patterns": {
-      "bullishMomentum": "Bullish Momentum",
-      "bearishPressure": "Bearish Pressure",
-      "downwardPressure": "Downward Pressure",
-      "consolidationPhase": "Consolidation Phase"
-    },
-    "volatility": {
-      "veryHigh": "Very High"
-    },
-    "assets": {
-      "nasdaqComposite": "NASDAQ Composite",
-      "russell2000": "Russell 2000",
-      "ftse100": "FTSE 100",
-      "nikkei225": "Nikkei 225",
-      "goldSpot": "Gold Spot",
-      "silverSpot": "Silver Spot",
-      "crudeOil": "Crude Oil",
-      "naturalGas": "Natural Gas",
-      "daxIndex": "DAX Index",
-      "euroBund": "Euro Bund",
-      "euroBTP": "Euro BTP",
-      "euroBOBL": "Euro BOBL",
-      "relatedAssets": "Related Assets"
-    },
-    "tradingView": {
-      "integration": "TradingView Integration"
-    },
-    "altTexts": {
-      "chartScreenshot": "Chart screenshot",
-      "profilePicture": "Profile picture"
-    },
-    "ariaLabels": {
-      "closeMenu": "Close menu",
-      "toggleSidebar": "Toggle Sidebar",
-      "navigationMenu": "navigation menu"
-    }
   }
+}
