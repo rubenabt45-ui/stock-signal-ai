@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
@@ -39,20 +40,32 @@ const handler = async (req: Request): Promise<Response> => {
     const { user, email_data } = data;
     const { token, token_hash, redirect_to, email_action_type } = email_data;
 
-    console.log("📧 Processing email verification for:", user.email);
+    console.log("🔐 [EMAIL_VERIFICATION] Processing verification email for:", user.email);
+    console.log("🔐 [EMAIL_VERIFICATION] Email data:", {
+      email: user.email,
+      redirectTo: redirect_to,
+      actionType: email_action_type,
+      tokenPresent: !!token,
+      tokenHashPresent: !!token_hash
+    });
 
-    // Create verification URL
-    const verificationUrl = `${redirect_to}?token_hash=${token_hash}&type=${email_action_type}`;
+    // Ensure we're using the production domain for verification
+    const verificationUrl = redirect_to.includes('tradeiqpro.com') 
+      ? `${redirect_to}?token_hash=${token_hash}&type=${email_action_type}`
+      : `https://tradeiqpro.com/verify-email?token_hash=${token_hash}&type=${email_action_type}`;
+
+    console.log("🔐 [EMAIL_VERIFICATION] Final verification URL:", verificationUrl);
+
     const fullName = user.user_metadata?.full_name || "Trader";
 
-    // Enhanced email template with clear instructions
+    // Enhanced email template with production domain focus
     const htmlContent = `
       <!DOCTYPE html>
       <html>
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Verify Your TradeIQ Account</title>
+          <title>Verify Your TradeIQ Pro Account</title>
           <style>
             body { 
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
@@ -75,14 +88,14 @@ const handler = async (req: Request): Promise<Response> => {
               margin-bottom: 32px;
             }
             .logo {
-              font-size: 28px;
+              font-size: 32px;
               font-weight: bold;
               color: #2563eb;
               margin-bottom: 8px;
             }
             .title {
               color: #1e293b;
-              font-size: 24px;
+              font-size: 26px;
               font-weight: 600;
               margin-bottom: 16px;
             }
@@ -90,9 +103,9 @@ const handler = async (req: Request): Promise<Response> => {
               display: inline-block;
               background-color: #2563eb;
               color: white;
-              padding: 16px 32px;
+              padding: 18px 36px;
               text-decoration: none;
-              border-radius: 6px;
+              border-radius: 8px;
               font-weight: 600;
               font-size: 16px;
               margin: 24px 0;
@@ -104,22 +117,23 @@ const handler = async (req: Request): Promise<Response> => {
             }
             .token-box {
               background-color: #f1f5f9;
-              border: 1px solid #cbd5e1;
-              border-radius: 4px;
-              padding: 16px;
+              border: 2px solid #cbd5e1;
+              border-radius: 6px;
+              padding: 20px;
               font-family: 'Courier New', monospace;
-              font-size: 18px;
+              font-size: 20px;
               text-align: center;
-              margin: 16px 0;
-              letter-spacing: 2px;
+              margin: 20px 0;
+              letter-spacing: 3px;
               color: #1e293b;
+              font-weight: bold;
             }
             .instructions {
-              background-color: #fef3c7;
-              border-left: 4px solid #f59e0b;
-              padding: 16px;
+              background-color: #dbeafe;
+              border-left: 4px solid #3b82f6;
+              padding: 18px;
               margin: 24px 0;
-              border-radius: 0 4px 4px 0;
+              border-radius: 0 6px 6px 0;
             }
             .footer {
               margin-top: 32px;
@@ -132,45 +146,60 @@ const handler = async (req: Request): Promise<Response> => {
             .troubleshooting {
               margin-top: 24px;
               background-color: #f8fafc;
-              padding: 16px;
-              border-radius: 4px;
+              padding: 18px;
+              border-radius: 6px;
               font-size: 14px;
+            }
+            .production-notice {
+              background-color: #fef3c7;
+              border: 1px solid #f59e0b;
+              padding: 16px;
+              border-radius: 6px;
+              margin: 20px 0;
+              text-align: center;
+              font-weight: 600;
+              color: #92400e;
             }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <div class="logo">📈 TradeIQ</div>
-              <h1 class="title">Verify Your Email Address</h1>
+              <div class="logo">📈 TradeIQ Pro</div>
+              <h1 class="title">🔐 Verify Your Email Address</h1>
             </div>
             
             <p>Hello ${fullName},</p>
             
-            <p>Thank you for signing up for TradeIQ! To complete your account setup and start using our AI-powered trading platform, please verify your email address.</p>
+            <p>Welcome to <strong>TradeIQ Pro</strong>! To complete your account setup and start using our AI-powered trading platform, please verify your email address.</p>
+            
+            <div class="production-notice">
+              🌐 This verification will redirect you to: <strong>tradeiqpro.com</strong>
+            </div>
             
             <div style="text-align: center;">
               <a href="${verificationUrl}" class="verify-button">
-                Verify My Email Address
+                ✅ Verify My Email Address
               </a>
             </div>
             
             <div class="instructions">
               <strong>📋 Verification Instructions:</strong>
               <ul style="margin: 8px 0; padding-left: 20px;">
-                <li>Click the blue "Verify My Email Address" button above</li>
+                <li>Click the "Verify My Email Address" button above</li>
+                <li>You'll be redirected to <strong>tradeiqpro.com</strong> for verification</li>
                 <li>If the button doesn't work, copy and paste the link below directly into your browser</li>
-                <li>The verification link will expire in 24 hours for security</li>
+                <li>This verification link will expire in 24 hours for security</li>
                 <li>If you don't see this email, check your spam/junk folder</li>
               </ul>
             </div>
             
-            <p><strong>Alternative verification link:</strong></p>
-            <div style="word-break: break-all; background-color: #f1f5f9; padding: 12px; border-radius: 4px; font-size: 12px; color: #475569;">
+            <p><strong>🔗 Alternative verification link:</strong></p>
+            <div style="word-break: break-all; background-color: #f1f5f9; padding: 16px; border-radius: 6px; font-size: 12px; color: #475569; border: 1px solid #cbd5e1;">
               ${verificationUrl}
             </div>
             
-            <p><strong>Verification code (if needed):</strong></p>
+            <p><strong>🔢 Verification code (if needed):</strong></p>
             <div class="token-box">
               ${token}
             </div>
@@ -178,29 +207,30 @@ const handler = async (req: Request): Promise<Response> => {
             <div class="troubleshooting">
               <strong>🔧 Troubleshooting:</strong>
               <ul style="margin: 8px 0;">
+                <li>Make sure you're clicking the link in the same browser you used to sign up</li>
                 <li>If the link doesn't work, try copying and pasting it directly into your browser</li>
-                <li>Make sure you're using the same browser you used to sign up</li>
-                <li>Clear your browser cache and cookies if the page won't load</li>
-                <li>If you continue having issues, contact our support team</li>
-                <li>You can also request a new verification link from the login page</li>
+                <li>Clear your browser cache and cookies if the verification page won't load</li>
+                <li>The verification must be completed on <strong>tradeiqpro.com</strong></li>
+                <li>If you continue having issues, you can request a new verification link from the login page</li>
               </ul>
             </div>
             
             <p>Once verified, you'll be able to:</p>
             <ul>
-              <li>✅ Access AI-powered trading insights</li>
-              <li>✅ Use our advanced chart analysis tools</li>
+              <li>✅ Access AI-powered trading insights and analysis</li>
+              <li>✅ Use our advanced chart analysis and technical indicators</li>
               <li>✅ Get personalized trading recommendations</li>
-              <li>✅ Join our community of traders</li>
+              <li>✅ Join our community of professional traders</li>
+              <li>✅ Access real-time market data and news</li>
             </ul>
             
             <div class="footer">
-              <p>If you didn't create a TradeIQ account, you can safely ignore this email.</p>
+              <p>If you didn't create a TradeIQ Pro account, you can safely ignore this email.</p>
               <p>This verification link will expire in 24 hours for your security.</p>
               <p>
-                <strong>TradeIQ</strong><br>
+                <strong>TradeIQ Pro</strong><br>
                 AI-Powered Trading Intelligence Platform<br>
-                <a href="https://tradeiqpro.com" style="color: #2563eb;">tradeiqpro.com</a>
+                <a href="https://tradeiqpro.com" style="color: #2563eb; text-decoration: none;">🌐 tradeiqpro.com</a>
               </p>
             </div>
           </div>
@@ -209,13 +239,13 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const emailResponse = await resend.emails.send({
-      from: "TradeIQ <noreply@tradeiqpro.com>",
+      from: "TradeIQ Pro <noreply@tradeiqpro.com>",
       to: [user.email],
-      subject: "🔐 Verify Your TradeIQ Account - Action Required",
+      subject: "🔐 Verify Your TradeIQ Pro Account - Action Required",
       html: htmlContent,
     });
 
-    console.log("📧 Email sent successfully:", emailResponse);
+    console.log("🔐 [EMAIL_VERIFICATION] Email sent successfully:", emailResponse);
 
     return new Response(JSON.stringify({ success: true, id: emailResponse.data?.id }), {
       status: 200,
@@ -225,7 +255,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
   } catch (error: any) {
-    console.error("❌ Error in email verification function:", error);
+    console.error("🔐 [EMAIL_VERIFICATION] Error in verification email function:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {

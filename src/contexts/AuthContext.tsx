@@ -55,47 +55,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔐 [AUTH_FLOW] Auth state changed:', event, session ? 'authenticated' : 'not authenticated');
       
-      // Handle email verification specifically
-      if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') {
-        console.log('🔐 [AUTH_FLOW] Auth event detected:', event);
-        
-        // Check if this is from an email verification
-        const urlParams = new URLSearchParams(window.location.search);
-        const tokenHash = urlParams.get('token_hash');
-        const type = urlParams.get('type');
-        
-        if (tokenHash && type === 'email') {
-          console.log('🔐 [AUTH_FLOW] Email verification detected, token hash present');
-          
-          try {
-            const { data, error } = await supabase.auth.verifyOtp({
-              token_hash: tokenHash,
-              type: 'email'
-            });
-            
-            if (error) {
-              console.error('🔐 [AUTH_FLOW] Email verification failed:', error);
-              // Redirect to login with error message
-              window.location.href = '/login?verification_error=invalid_token';
-              return;
-            }
-            
-            console.log('🔐 [AUTH_FLOW] Email verification successful');
-            // Clean up URL parameters
-            window.history.replaceState({}, document.title, window.location.pathname);
-          } catch (verifyError) {
-            console.error('🔐 [AUTH_FLOW] Email verification exception:', verifyError);
-            window.location.href = '/login?verification_error=verification_failed';
-            return;
-          }
-        }
-      }
-      
-      // Handle password recovery
-      if (event === 'PASSWORD_RECOVERY') {
-        console.log('🔐 [AUTH_FLOW] Password recovery event detected');
-      }
-      
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -128,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signUp = async (email: string, password: string, fullName?: string) => {
-    // Use production domain for redirect URL
+    // Always use production domain for email verification
     const isProduction = window.location.hostname === 'tradeiqpro.com';
     const redirectUrl = isProduction 
       ? 'https://tradeiqpro.com/verify-email'

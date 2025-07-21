@@ -30,6 +30,8 @@ const Login = () => {
   const isVerified = searchParams.get('verified') === 'true';
   const passwordUpdated = searchParams.get('password_updated') === 'true';
   const errorParam = searchParams.get('error');
+  const verificationRetry = searchParams.get('verification_retry') === 'true';
+  const requestVerification = searchParams.get('request_verification') === 'true';
 
   useEffect(() => {
     if (user) {
@@ -41,22 +43,22 @@ const Login = () => {
     // Handle various status messages
     if (isVerified) {
       toast({
-        title: "Email Verified Successfully!",
-        description: "Your email has been confirmed. You can now log in.",
-        duration: 5000,
+        title: "✅ Email Verified Successfully!",
+        description: "Your email has been confirmed. You can now log in with your credentials.",
+        duration: 6000,
       });
     }
 
     if (passwordUpdated) {
       toast({
-        title: "Password Updated Successfully!",
+        title: "🔒 Password Updated Successfully!",
         description: "Your password has been changed. You can now log in with your new password.",
-        duration: 5000,
+        duration: 6000,
       });
     }
 
     if (verificationError) {
-      let errorMessage = "Please try requesting a new verification link.";
+      let errorMessage = "Please try requesting a new verification link below.";
       
       if (verificationError === 'invalid_token') {
         errorMessage = "Your verification link is invalid or expired. Please request a new one.";
@@ -65,16 +67,32 @@ const Login = () => {
       }
 
       toast({
-        title: "Email Verification Issue",
+        title: "❌ Email Verification Issue",
         description: errorMessage,
         variant: "destructive",
         duration: 10000,
       });
     }
 
+    if (verificationRetry) {
+      toast({
+        title: "🔄 Verification Retry",
+        description: "Please enter your email address and request a new verification link.",
+        duration: 8000,
+      });
+    }
+
+    if (requestVerification) {
+      toast({
+        title: "📧 Request New Verification",
+        description: "Please enter your email address to receive a new verification link.",
+        duration: 8000,
+      });
+    }
+
     if (errorParam === 'invalid_reset_link') {
       toast({
-        title: "Invalid Reset Link",
+        title: "❌ Invalid Reset Link",
         description: "The password reset link is invalid or expired. Please request a new one.",
         variant: "destructive",
         duration: 10000,
@@ -82,10 +100,10 @@ const Login = () => {
     }
     
     // Clean up URL parameters
-    if (isVerified || verificationError || passwordUpdated || errorParam) {
+    if (isVerified || verificationError || passwordUpdated || errorParam || verificationRetry || requestVerification) {
       window.history.replaceState({}, document.title, '/login');
     }
-  }, [isVerified, verificationError, passwordUpdated, errorParam, toast]);
+  }, [isVerified, verificationError, passwordUpdated, errorParam, verificationRetry, requestVerification, toast]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,7 +151,7 @@ const Login = () => {
     if (error) {
       console.error('🔐 [LOGIN] OAuth login failed:', error);
       toast({
-        title: "OAuth Login Failed",
+        title: "❌ OAuth Login Failed",
         description: error.message || `Failed to login with ${provider}. Please try again.`,
         variant: "destructive",
       });
@@ -145,7 +163,7 @@ const Login = () => {
   const handleResendVerification = async () => {
     if (!email) {
       toast({
-        title: "Email Required",
+        title: "📧 Email Required",
         description: "Please enter your email address to resend verification.",
         variant: "destructive",
       });
@@ -153,6 +171,7 @@ const Login = () => {
     }
 
     setResendingVerification(true);
+    console.log('🔐 [LOGIN] Resending verification email for:', email);
     
     try {
       const { error } = await resendConfirmation(email);
@@ -160,21 +179,22 @@ const Login = () => {
       if (error) {
         console.error('🔐 [LOGIN] Resend verification error:', error);
         toast({
-          title: "Resend Failed",
+          title: "❌ Resend Failed",
           description: error.message || "Failed to resend verification email. Please try again.",
           variant: "destructive",
         });
       } else {
+        console.log('🔐 [LOGIN] Verification email resent successfully');
         toast({
-          title: "Verification Email Sent!",
-          description: "Please check your email and click the verification link. If you don't see it, check your spam folder.",
-          duration: 8000,
+          title: "✅ Verification Email Sent!",
+          description: "Please check your email and click the verification link. Don't forget to check your spam folder if you don't see it.",
+          duration: 10000,
         });
       }
     } catch (error) {
       console.error('🔐 [LOGIN] Resend verification exception:', error);
       toast({
-        title: "Resend Failed",
+        title: "❌ Resend Failed",
         description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
@@ -218,8 +238,20 @@ const Login = () => {
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="text-green-400">
                 {isVerified 
-                  ? "Email verified successfully! You can now log in with your credentials."
-                  : "Password updated successfully! You can now log in with your new password."
+                  ? "✅ Email verified successfully! You can now log in with your credentials."
+                  : "🔒 Password updated successfully! You can now log in with your new password."
+                }
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {(verificationRetry || requestVerification) && (
+            <Alert className="mb-4 border-blue-500/50 bg-blue-900/20">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-blue-400">
+                {verificationRetry 
+                  ? "🔄 Please enter your email and request a new verification link."
+                  : "📧 Please enter your email to receive a new verification link."
                 }
               </AlertDescription>
             </Alert>
@@ -328,7 +360,7 @@ const Login = () => {
           
           {/* Resend Verification Section */}
           <div className="mt-4 p-4 bg-gray-800/30 rounded-lg border border-gray-700/50">
-            <h4 className="text-sm font-medium text-gray-300 mb-2">Need to verify your email?</h4>
+            <h4 className="text-sm font-medium text-gray-300 mb-2">📧 Need to verify your email?</h4>
             <p className="text-xs text-gray-400 mb-3">
               If you haven't received a verification email or your link expired, request a new one.
             </p>
