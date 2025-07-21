@@ -22,51 +22,85 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<'form' | 'success' | 'error' | 'expired'>('form');
+  const [status, setStatus] = useState<'validating' | 'form' | 'success' | 'error' | 'expired'>('validating');
   const [retryCount, setRetryCount] = useState(0);
+  const [tokenValidated, setTokenValidated] = useState(false);
 
   useEffect(() => {
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    const error = searchParams.get('error');
-    const errorDescription = searchParams.get('error_description');
-    
-    console.log('🔐 [PASSWORD_RESET] Reset password page loaded');
-    console.log('🔐 [PASSWORD_RESET] Access token present:', !!accessToken);
-    console.log('🔐 [PASSWORD_RESET] Refresh token present:', !!refreshToken);
-    console.log('🔐 [PASSWORD_RESET] URL parameters:', { 
-      hasAccessToken: !!accessToken, 
-      hasRefreshToken: !!refreshToken, 
-      error,
-      errorDescription
-    });
-    
-    if (error) {
-      console.error('🔐 [PASSWORD_RESET_FAILED] URL contains error:', error, errorDescription);
+    const validateToken = async () => {
+      const accessToken = searchParams.get('access_token');
+      const refreshToken = searchParams.get('refresh_token');
+      const error = searchParams.get('error');
+      const errorDescription = searchParams.get('error_description');
+      const type = searchParams.get('type');
       
-      if (error === 'access_denied' || errorDescription?.includes('expired')) {
-        setStatus('expired');
-        toast({
-          title: t('auth.resetPassword.linkExpired'),
-          description: t('auth.resetPassword.linkExpiredDescription'),
-          variant: "destructive",
-        });
-      } else {
+      console.log('🔐 [PASSWORD_RESET] Reset password page loaded');
+      console.log('🔐 [PASSWORD_RESET] URL parameters:', { 
+        hasAccessToken: !!accessToken, 
+        hasRefreshToken: !!refreshToken, 
+        error,
+        errorDescription,
+        type
+      });
+      
+      // Check for URL errors first
+      if (error) {
+        console.error('🔐 [PASSWORD_RESET_FAILED] URL contains error:', error, errorDescription);
+        
+        if (error === 'access_denied' || errorDescription?.includes('expired')) {
+          setStatus('expired');
+          toast({
+            title: t('auth.resetPassword.linkExpired'),
+            description: t('auth.resetPassword.linkExpiredDescription'),
+            variant: "destructive",
+          });
+        } else {
+          setStatus('error');
+          toast({
+            title: t('auth.resetPassword.invalidLink'),
+            description: t('auth.resetPassword.invalidLinkDescription'),
+            variant: "destructive",
+          });
+        }
+        return;
+      }
+      
+      // Check if this is a password recovery request
+      if (type !== 'recovery') {
+        console.error('🔐 [PASSWORD_RESET_FAILED] Invalid token type:', type);
         setStatus('error');
         toast({
           title: t('auth.resetPassword.invalidLink'),
           description: t('auth.resetPassword.invalidLinkDescription'),
           variant: "destructive",
         });
+        return;
       }
-      return;
-    }
+      
+      // Validate required tokens
+      if (!accessToken || !refreshToken) {
+        console.error('🔐 [PASSWORD_RESET_FAILED] Missing tokens');
+        setStatus('error');
+        toast({
+          title: t('auth.resetPassword.invalidLink'),
+          description: t('auth.resetPassword.invalidLinkDescription'),
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // If we have valid tokens, show the form
+      console.log('🔐 [PASSWORD_RESET] Token validation successful');
+      setTokenValidated(true);
+      setStatus('form');
+      
+      toast({
+        title: t('auth.resetPassword.tokenValidated'),
+        description: t('auth.resetPassword.tokenValidatedDescription'),
+      });
+    };
     
-    if (!accessToken || !refreshToken) {
-      console.error('🔐 [PASSWORD_RESET_FAILED] Missing tokens, redirecting to login');
-      setStatus('error');
-      navigate('/login?error=invalid_reset_link');
-    }
+    validateToken();
   }, [searchParams, navigate, toast, t]);
 
   const validatePassword = (password: string) => {
@@ -102,6 +136,15 @@ const ResetPassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!tokenValidated) {
+      toast({
+        title: t('auth.resetPassword.error'),
+        description: t('auth.resetPassword.invalidSession'),
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (password !== confirmPassword) {
       toast({
         title: t('auth.resetPassword.error'),
@@ -132,7 +175,7 @@ const ResetPassword = () => {
       if (error) {
         console.error('🔐 [PASSWORD_RESET_FAILED] Password update failed:', error);
         
-        if (error.message.includes('expired') || error.message.includes('invalid')) {
+        if (error.message.includes('expired') || error.message.includes('invalid') || error.message.includes('session')) {
           setStatus('expired');
           toast({
             title: t('auth.resetPassword.sessionExpired'),
@@ -177,6 +220,54 @@ const ResetPassword = () => {
     navigate('/reset-password-request');
   };
 
+  // Show loading state while validating token
+  if (status === 'validating') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+        {/* Navigation */}
+        <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
+              <span className="text-xl font-bold">TradeIQ</span>
+              <Badge variant="secondary" className="text-xs">BETA</Badge>
+            </div>
+            
+            <div className="flex items-center space-x-6">
+              <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
+                {t('auth.resetPassword.backToLogin')}
+              </Button>
+            </div>
+          </div>
+        </nav>
+
+        <div className="container mx-auto px-4 py-20">
+          <div className="max-w-md mx-auto">
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardHeader className="text-center">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="p-3 bg-tradeiq-blue/20 rounded-full">
+                    <TrendingUp className="h-8 w-8 text-tradeiq-blue animate-spin" />
+                  </div>
+                </div>
+                <CardTitle className="text-2xl text-white">
+                  {t('auth.resetPassword.validatingToken')}
+                </CardTitle>
+              </CardHeader>
+              
+              <CardContent className="text-center">
+                <p className="text-gray-400">
+                  {t('auth.resetPassword.validatingTokenDescription')}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show expired token screen
   if (status === 'expired') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
@@ -357,7 +448,7 @@ const ResetPassword = () => {
                   <Button 
                     type="submit" 
                     className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90"
-                    disabled={loading}
+                    disabled={loading || !tokenValidated}
                   >
                     {loading ? t('auth.resetPassword.updating') : t('auth.resetPassword.updatePassword')}
                     {retryCount > 0 && ` (${t('auth.resetPassword.attempt')} ${retryCount})`}
