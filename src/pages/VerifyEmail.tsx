@@ -19,6 +19,7 @@ const VerifyEmail = () => {
     token?: string;
     tokenHash?: string;
     type?: string;
+    email?: string;
     redirectTo?: string;
   }>({});
   const [isResending, setIsResending] = useState(false);
@@ -29,6 +30,7 @@ const VerifyEmail = () => {
       const token = searchParams.get('token');
       const tokenHash = searchParams.get('token_hash');
       const type = searchParams.get('type');
+      const email = searchParams.get('email');
       const redirectTo = searchParams.get('redirect_to');
       
       console.log('🔐 [EMAIL_VERIFICATION] Token received');
@@ -36,6 +38,7 @@ const VerifyEmail = () => {
         token: token ? 'present' : 'missing',
         tokenHash: tokenHash ? 'present' : 'missing',
         type: type || 'missing',
+        email: email || 'missing',
         redirectTo: redirectTo || 'missing',
         fullUrl: window.location.href,
         searchParams: window.location.search,
@@ -43,7 +46,7 @@ const VerifyEmail = () => {
       });
 
       // Store verification details for debugging
-      setVerificationDetails({ token, tokenHash, type, redirectTo });
+      setVerificationDetails({ token, tokenHash, type, email, redirectTo });
 
       // Check if we have the required parameters
       const hasToken = token || tokenHash;
@@ -55,6 +58,7 @@ const VerifyEmail = () => {
           token: token ? 'present' : 'missing',
           tokenHash: tokenHash ? 'present' : 'missing',
           type: type ? 'present' : 'missing',
+          email: email ? 'present' : 'missing',
           allParams: Object.fromEntries(searchParams.entries())
         });
         setStatus('invalid');
@@ -84,9 +88,17 @@ const VerifyEmail = () => {
           });
         } else if (token) {
           console.log('🔐 [EMAIL_VERIFICATION] Using token verification');
+          // For token verification, we need the email parameter
+          if (!email) {
+            console.error('🔐 [EMAIL_VERIFICATION] Email parameter required for token verification');
+            setStatus('invalid');
+            setErrorMessage('Invalid verification link. Email parameter is missing. Please use the verification link from your email.');
+            return;
+          }
           verificationResult = await supabase.auth.verifyOtp({
             token: token,
-            type: type === 'signup' ? 'signup' : 'email'
+            type: type === 'signup' ? 'signup' : 'email',
+            email: email
           });
         }
 
@@ -370,6 +382,7 @@ const VerifyEmail = () => {
                 <li>Token: {verificationDetails.token ? 'Present' : 'Missing'}</li>
                 <li>Token Hash: {verificationDetails.tokenHash ? 'Present' : 'Missing'}</li>
                 <li>Type: {verificationDetails.type || 'N/A'}</li>
+                <li>Email: {verificationDetails.email || 'N/A'}</li>
                 <li>Status: {status}</li>
                 <li>Full URL: {window.location.href}</li>
                 <li>Search: {window.location.search}</li>
