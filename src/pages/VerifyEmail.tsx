@@ -23,6 +23,7 @@ const VerifyEmail = () => {
     redirectTo?: string;
   }>({});
   const [isResending, setIsResending] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     const verifyEmailToken = async () => {
@@ -61,6 +62,7 @@ const VerifyEmail = () => {
           email: email ? 'present' : 'missing',
           allParams: Object.fromEntries(searchParams.entries())
         });
+        console.error('🔐 [EMAIL_MONITORING] Token validation failed - missing parameters');
         setStatus('invalid');
         setErrorMessage('Invalid verification link. Required parameters are missing. Please check your email and try clicking the link again.');
         return;
@@ -69,10 +71,20 @@ const VerifyEmail = () => {
       // Validate type parameter
       if (type !== 'email' && type !== 'signup') {
         console.error('🔐 [EMAIL_VERIFICATION] Invalid verification type:', type);
+        console.error('🔐 [EMAIL_MONITORING] Token validation failed - invalid type');
         setStatus('invalid');
         setErrorMessage('Invalid verification link type. Please use the verification link from your email.');
         return;
       }
+
+      // Log token validation attempt
+      console.log('🔐 [EMAIL_MONITORING] Token validation initiated');
+      console.log('🔐 [EMAIL_MONITORING] Token details:', {
+        hasToken: !!token,
+        hasTokenHash: !!tokenHash,
+        type: type,
+        email: email ? 'present' : 'missing'
+      });
 
       try {
         console.log('🔐 [EMAIL_VERIFICATION] Attempting token verification with Supabase');
@@ -82,15 +94,18 @@ const VerifyEmail = () => {
         // Try verification with token_hash first (new format)
         if (tokenHash) {
           console.log('🔐 [EMAIL_VERIFICATION] Using token_hash verification');
+          console.log('🔐 [EMAIL_MONITORING] Token hash verification attempt');
           verificationResult = await supabase.auth.verifyOtp({
             token_hash: tokenHash,
             type: type === 'signup' ? 'signup' : 'email'
           });
         } else if (token) {
           console.log('🔐 [EMAIL_VERIFICATION] Using token verification');
+          console.log('🔐 [EMAIL_MONITORING] Token verification attempt');
           // For token verification, we need the email parameter
           if (!email) {
             console.error('🔐 [EMAIL_VERIFICATION] Email parameter required for token verification');
+            console.error('🔐 [EMAIL_MONITORING] Token validation failed - missing email for token verification');
             setStatus('invalid');
             setErrorMessage('Invalid verification link. Email parameter is missing. Please use the verification link from your email.');
             return;
@@ -112,18 +127,22 @@ const VerifyEmail = () => {
             name: error.name,
             code: error.code
           });
+          console.error('🔐 [EMAIL_MONITORING] Token validation failed:', error.message);
           
           // Handle specific error types
           if (error.message.includes('expired') || error.message.includes('Token has expired')) {
             console.log('🔐 [EMAIL_VERIFICATION_ERROR] Token expired');
+            console.log('🔐 [EMAIL_MONITORING] Token expired - cleanup recommended');
             setStatus('expired');
             setErrorMessage('Your verification link has expired. Please request a new verification email.');
           } else if (error.message.includes('invalid') || error.message.includes('not found') || error.message.includes('Token not found')) {
             console.log('🔐 [EMAIL_VERIFICATION_ERROR] Invalid or used token');
+            console.log('🔐 [EMAIL_MONITORING] Token invalid or already used - cleanup recommended');
             setStatus('invalid');
             setErrorMessage('Your verification link is invalid or has already been used. Please request a new verification email.');
           } else {
             console.log('🔐 [EMAIL_VERIFICATION_ERROR] Generic verification error');
+            console.error('🔐 [EMAIL_MONITORING] Generic verification error:', error.message);
             setStatus('error');
             setErrorMessage(error.message || 'Email verification failed. Please try again or request a new verification email.');
           }
@@ -134,6 +153,7 @@ const VerifyEmail = () => {
             email: data.user?.email,
             emailConfirmed: data.user?.email_confirmed_at ? 'confirmed' : 'pending'
           });
+          console.log('🔐 [EMAIL_MONITORING] Email verification completed successfully');
           
           setStatus('success');
           
@@ -155,6 +175,7 @@ const VerifyEmail = () => {
         }
       } catch (error) {
         console.error('🔐 [EMAIL_VERIFICATION] Exception during verification:', error);
+        console.error('🔐 [EMAIL_MONITORING] Verification exception:', error);
         setStatus('error');
         setErrorMessage('An unexpected error occurred during verification. Please try again.');
       }
@@ -177,38 +198,78 @@ const VerifyEmail = () => {
     }
 
     setIsResending(true);
+    setRetryCount(prev => prev + 1);
     
     try {
       console.log('🔐 [EMAIL_VERIFICATION] Resending verification email for:', email);
+      console.log('🔐 [EMAIL_MONITORING] Manual resend attempt #' + (retryCount + 1));
       
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: email,
-        options: {
-          emailRedirectTo: 'https://tradeiqpro.com/verify-email'
-        }
-      });
+      // Implement retry logic with exponential backoff
+      const maxRetries = 3;
+      let attempts = 0;
+      let lastError;
+      
+      while (attempts < maxRetries) {
+        try {
+          const { error } = await supabase.auth.resend({
+            type: 'signup',
+            email: email,
+            options: {
+              emailRedirectTo: 'https://tradeiqpro.com/verify-email'
+            }
+          });
 
-      if (error) {
-        console.error('🔐 [EMAIL_VERIFICATION] Resend failed:', error);
-        toast({
-          title: "Failed to Resend Email",
-          description: error.message || "Please try again or contact support.",
-          variant: "destructive",
-        });
-      } else {
-        console.log('🔐 [EMAIL_VERIFICATION] Verification email resent successfully');
-        toast({
-          title: "✅ Verification Email Sent",
-          description: "Please check your email for the new verification link.",
-          duration: 5000,
-        });
+          if (error) {
+            lastError = error;
+            attempts++;
+            
+            if (attempts < maxRetries) {
+              const delay = Math.pow(2, attempts) * 1000;
+              console.log('🔐 [EMAIL_MONITORING] Retry attempt ' + attempts + ' failed, retrying in ' + delay + 'ms');
+              await new Promise(resolve => setTimeout(resolve, delay));
+              continue;
+            }
+            
+            console.error('🔐 [EMAIL_VERIFICATION] Resend failed after ' + maxRetries + ' attempts:', error);
+            console.error('🔐 [EMAIL_MONITORING] Email resend failed after all retries:', error);
+            throw error;
+          }
+          
+          console.log('🔐 [EMAIL_VERIFICATION] Verification email resent successfully');
+          console.log('🔐 [EMAIL_MONITORING] Email resend successful on attempt ' + (attempts + 1));
+          
+          toast({
+            title: "✅ Verification Email Sent",
+            description: "Please check your email for the new verification link. Don't forget to check your spam folder.",
+            duration: 8000,
+          });
+          
+          break;
+        } catch (attemptError) {
+          lastError = attemptError;
+          attempts++;
+          
+          if (attempts < maxRetries) {
+            const delay = Math.pow(2, attempts) * 1000;
+            console.log('🔐 [EMAIL_MONITORING] Exception on attempt ' + attempts + ', retrying in ' + delay + 'ms');
+            await new Promise(resolve => setTimeout(resolve, delay));
+            continue;
+          }
+          
+          throw attemptError;
+        }
       }
+      
+      if (attempts >= maxRetries && lastError) {
+        throw lastError;
+      }
+      
     } catch (error) {
-      console.error('🔐 [EMAIL_VERIFICATION] Resend exception:', error);
+      console.error('🔐 [EMAIL_VERIFICATION] Resend failed:', error);
+      console.error('🔐 [EMAIL_MONITORING] Final resend failure:', error);
       toast({
-        title: "Error",
-        description: "Failed to resend verification email. Please try again.",
+        title: "Failed to Resend Email",
+        description: "Please try again later or contact support if the problem persists.",
         variant: "destructive",
       });
     } finally {
@@ -307,7 +368,7 @@ const VerifyEmail = () => {
                     {isResending ? (
                       <>
                         <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                        Sending...
+                        Sending... {retryCount > 0 && `(Attempt ${retryCount})`}
                       </>
                     ) : (
                       <>
@@ -351,7 +412,7 @@ const VerifyEmail = () => {
                     {isResending ? (
                       <>
                         <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                        Sending...
+                        Sending... {retryCount > 0 && `(Attempt ${retryCount})`}
                       </>
                     ) : (
                       <>
@@ -373,7 +434,7 @@ const VerifyEmail = () => {
             </>
           )}
 
-          {/* Debug Information (only in development) */}
+          {/* Enhanced Debug Information */}
           {window.location.hostname !== 'tradeiqpro.com' && (
             <div className="text-xs text-gray-600 border-t border-gray-700 pt-4">
               <p className="mb-2">🔧 Debug Info:</p>
@@ -384,6 +445,7 @@ const VerifyEmail = () => {
                 <li>Type: {verificationDetails.type || 'N/A'}</li>
                 <li>Email: {verificationDetails.email || 'N/A'}</li>
                 <li>Status: {status}</li>
+                <li>Retry Count: {retryCount}</li>
                 <li>Full URL: {window.location.href}</li>
                 <li>Search: {window.location.search}</li>
                 <li>Time: {new Date().toLocaleTimeString()}</li>

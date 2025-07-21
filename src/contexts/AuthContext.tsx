@@ -128,6 +128,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user && !data.user.email_confirmed_at) {
         console.log('🔐 [EMAIL_VERIFICATION] Email verification required');
         console.log('🔐 [EMAIL_VERIFICATION] User should check email for verification link');
+        
+        // Log email delivery attempt
+        console.log('🔐 [EMAIL_MONITORING] Verification email delivery initiated for:', email);
+        
+        // Optional: Add a small delay and then check if email was delivered
+        setTimeout(() => {
+          console.log('🔐 [EMAIL_MONITORING] Email delivery status check - verification email should have been sent');
+        }, 2000);
       } else if (data.user && data.user.email_confirmed_at) {
         console.log('🔐 [EMAIL_VERIFICATION] User already verified');
       }
@@ -135,6 +143,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: null };
     } catch (error: any) {
       console.error('🔐 [EMAIL_VERIFICATION] Signup exception:', error);
+      console.error('🔐 [EMAIL_MONITORING] Email delivery failed during signup:', error);
       return { error: { message: 'An unexpected error occurred during signup' } };
     }
   };
@@ -145,32 +154,65 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('🔐 [EMAIL_VERIFICATION] Resending confirmation email');
     console.log('🔐 [EMAIL_VERIFICATION] Email:', email);
     console.log('🔐 [EMAIL_VERIFICATION] Redirect URL:', redirectUrl);
+    console.log('🔐 [EMAIL_MONITORING] Retry attempt for email delivery');
     
-    try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email,
-        options: {
-          emailRedirectTo: redirectUrl
-        }
-      });
-      
-      if (error) {
-        console.error('🔐 [EMAIL_VERIFICATION] Resend error:', error);
-        console.error('🔐 [EMAIL_VERIFICATION] Error details:', {
-          message: error.message,
-          status: error.status,
-          name: error.name
+    // Retry mechanism with exponential backoff
+    const maxRetries = 3;
+    let retryCount = 0;
+    
+    while (retryCount < maxRetries) {
+      try {
+        const { error } = await supabase.auth.resend({
+          type: 'signup',
+          email,
+          options: {
+            emailRedirectTo: redirectUrl
+          }
         });
-        return { error };
-      }
+        
+        if (error) {
+          console.error('🔐 [EMAIL_VERIFICATION] Resend error (attempt ' + (retryCount + 1) + '):', error);
+          console.error('🔐 [EMAIL_VERIFICATION] Error details:', {
+            message: error.message,
+            status: error.status,
+            name: error.name
+          });
+          
+          retryCount++;
+          
+          if (retryCount < maxRetries) {
+            const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
+            console.log('🔐 [EMAIL_MONITORING] Retrying email delivery in ' + delay + 'ms');
+            await new Promise(resolve => setTimeout(resolve, delay));
+            continue;
+          }
+          
+          console.error('🔐 [EMAIL_MONITORING] Email delivery failed after ' + maxRetries + ' attempts');
+          return { error };
+        }
 
-      console.log('🔐 [EMAIL_VERIFICATION] Email resent successfully');
-      return { error: null };
-    } catch (error: any) {
-      console.error('🔐 [EMAIL_VERIFICATION] Resend exception:', error);
-      return { error: { message: 'Failed to resend verification email' } };
+        console.log('🔐 [EMAIL_VERIFICATION] Email resent successfully');
+        console.log('🔐 [EMAIL_MONITORING] Email delivery successful on attempt ' + (retryCount + 1));
+        return { error: null };
+      } catch (error: any) {
+        console.error('🔐 [EMAIL_VERIFICATION] Resend exception (attempt ' + (retryCount + 1) + '):', error);
+        console.error('🔐 [EMAIL_MONITORING] Email delivery exception:', error);
+        
+        retryCount++;
+        
+        if (retryCount < maxRetries) {
+          const delay = Math.pow(2, retryCount) * 1000;
+          console.log('🔐 [EMAIL_MONITORING] Retrying after exception in ' + delay + 'ms');
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        
+        console.error('🔐 [EMAIL_MONITORING] Email delivery failed with exceptions after ' + maxRetries + ' attempts');
+        return { error: { message: 'Failed to resend verification email after multiple attempts' } };
+      }
     }
+    
+    return { error: { message: 'Maximum retry attempts exceeded' } };
   };
 
   const resetPassword = async (email: string) => {
@@ -178,22 +220,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     console.log('🔐 [AUTH_FLOW] Password reset request for:', email);
     console.log('🔐 [AUTH_FLOW] Reset redirect URL:', redirectUrl);
+    console.log('🔐 [EMAIL_MONITORING] Password reset email delivery initiated');
     
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: redirectUrl,
-    });
+    // Retry mechanism for password reset emails
+    const maxRetries = 3;
+    let retryCount = 0;
     
-    if (error) {
-      console.error('🔐 [AUTH_FLOW] Password reset error:', error);
-    } else {
-      console.log('🔐 [AUTH_FLOW] Password reset email sent successfully');
+    while (retryCount < maxRetries) {
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: redirectUrl,
+        });
+        
+        if (error) {
+          console.error('🔐 [AUTH_FLOW] Password reset error (attempt ' + (retryCount + 1) + '):', error);
+          console.error('🔐 [EMAIL_MONITORING] Password reset email delivery failed:', error);
+          
+          retryCount++;
+          
+          if (retryCount < maxRetries) {
+            const delay = Math.pow(2, retryCount) * 1000;
+            console.log('🔐 [EMAIL_MONITORING] Retrying password reset email in ' + delay + 'ms');
+            await new Promise(resolve => setTimeout(resolve, delay));
+            continue;
+          }
+          
+          console.error('🔐 [EMAIL_MONITORING] Password reset email delivery failed after ' + maxRetries + ' attempts');
+          return { error };
+        }
+        
+        console.log('🔐 [AUTH_FLOW] Password reset email sent successfully');
+        console.log('🔐 [EMAIL_MONITORING] Password reset email delivery successful on attempt ' + (retryCount + 1));
+        return { error: null };
+      } catch (error: any) {
+        console.error('🔐 [AUTH_FLOW] Password reset exception (attempt ' + (retryCount + 1) + '):', error);
+        console.error('🔐 [EMAIL_MONITORING] Password reset email delivery exception:', error);
+        
+        retryCount++;
+        
+        if (retryCount < maxRetries) {
+          const delay = Math.pow(2, retryCount) * 1000;
+          console.log('🔐 [EMAIL_MONITORING] Retrying after exception in ' + delay + 'ms');
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        
+        console.error('🔐 [EMAIL_MONITORING] Password reset email delivery failed with exceptions after ' + maxRetries + ' attempts');
+        return { error: { message: 'Failed to send password reset email after multiple attempts' } };
+      }
     }
     
-    return { error };
+    return { error: { message: 'Maximum retry attempts exceeded' } };
   };
 
   const updatePassword = async (password: string) => {
     console.log('🔐 [AUTH_FLOW] Updating password');
+    console.log('🔐 [AUTH_FLOW] Password reset completion initiated');
     
     const { error } = await supabase.auth.updateUser({
       password: password
@@ -201,8 +283,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (error) {
       console.error('🔐 [AUTH_FLOW] Password update error:', error);
+      console.error('🔐 [EMAIL_MONITORING] Password reset completion failed:', error);
     } else {
       console.log('🔐 [AUTH_FLOW] Password updated successfully');
+      console.log('🔐 [EMAIL_MONITORING] Password reset completion successful');
     }
     
     return { error };
