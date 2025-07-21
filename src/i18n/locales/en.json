@@ -1,3 +1,4 @@
+
 {
   "common": {
     "home": "Home",
@@ -11,13 +12,97 @@
     "cancel": "Cancel",
     "loading": "Loading...",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "requestEarlyAccess": "Request Early Access"
+  },
+  "placeholders": {
+    "yourName": "Your Name",
+    "yourEmail": "Your Email"
+  },
+  "landing": {
+    "navbar": {
+      "home": "Home",
+      "learnPreview": "Learn Preview",
+      "pricing": "Pricing",
+      "login": "Login",
+      "signUp": "Sign Up"
+    },
+    "hero": {
+      "title": "AI-Powered Trading Analysis",
+      "subtitle": "Experience the future of trading with real-time AI analysis, pattern detection, and intelligent insights.",
+      "joinBeta": "Join Beta",
+      "watchDemo": "Watch Demo",
+      "stats": {
+        "accuracy": "Accuracy Rate",
+        "speed": "Analysis Speed",
+        "monitoring": "Market Monitoring"
+      }
+    },
+    "about": {
+      "title": "What is TradeIQ?",
+      "description": "TradeIQ combines advanced artificial intelligence with real-time market data to provide traders with unprecedented insights into market patterns, trends, and opportunities. Our platform analyzes thousands of data points every second to deliver actionable intelligence when you need it most."
+    },
+    "features": {
+      "title": "Core Features",
+      "patternDetection": {
+        "title": "Pattern Detection",
+        "description": "Advanced AI algorithms identify chart patterns and trading signals with high accuracy."
+      },
+      "trendAnalysis": {
+        "title": "Trend Analysis",
+        "description": "Real-time trend analysis powered by machine learning to spot market movements."
+      },
+      "volatilityHeatmaps": {
+        "title": "Volatility Heatmaps",
+        "description": "Visual representation of market volatility across different assets and timeframes."
+      },
+      "aiInsights": {
+        "title": "AI Insights",
+        "description": "Personalized trading insights and recommendations based on your trading style."
+      }
+    },
+    "benefits": {
+      "title": "Why Choose TradeIQ?",
+      "reducedSubjectivity": {
+        "title": "Reduced Subjectivity",
+        "description": "Remove emotional bias from trading decisions with data-driven analysis."
+      },
+      "fasterDecisions": {
+        "title": "Faster Decisions",
+        "description": "Make informed trading decisions in seconds, not hours."
+      },
+      "practicalEducation": {
+        "title": "Practical Education",
+        "description": "Learn advanced trading concepts through real-world examples and AI guidance."
+      },
+      "higherPrecision": {
+        "title": "Higher Precision",
+        "description": "Increase your trading accuracy with AI-powered pattern recognition."
+      }
+    },
+    "learningSection": {
+      "title": "Master Trading with AI",
+      "description": "Our comprehensive learning platform combines theoretical knowledge with practical AI-driven insights.",
+      "fundamentals": {
+        "title": "Trading Fundamentals",
+        "description": "Learn the basics of trading with interactive lessons and real-time examples."
+      },
+      "patterns": {
+        "title": "Chart Patterns",
+        "description": "Master chart pattern recognition with AI-powered analysis and detection."
+      },
+      "riskManagement": {
+        "title": "Risk Management",
+        "description": "Develop robust risk management strategies using AI-driven insights."
+      }
+    }
   },
   "auth": {
     "login": {
       "signIn": "Sign In",
       "noAccount": "Don't have an account?",
-      "signUp": "Sign Up"
+      "signUp": "Sign Up",
+      "forgotPassword": "Forgot Password?"
     },
     "resetPasswordRequest": {
       "emailRequired": "Email is required",

@@ -1,98 +1,23 @@
+
 {
   "common": {
     "home": "Inicio",
     "pricing": "Precios",
-    "login": "Iniciar sesión",
-    "signup": "Registrarse",
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "submit": "Enviar",
+    "cancel": "Cancelar",
     "loading": "Cargando...",
     "error": "Error",
     "success": "Éxito",
-    "cancel": "Cancelar",
-    "save": "Guardar",
-    "back": "Volver",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "search": "Buscar",
-    "close": "Cerrar",
-    "open": "Abrir",
-    "more": "Más",
-    "less": "Menos",
-    "all": "Todo",
-    "none": "Ninguno",
-    "other": "Otro",
-    "settings": "Configuración",
-    "help": "Ayuda",
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "support": "Soporte",
-    "documentation": "Documentación",
-    "features": "Características",
-    "dashboard": "Panel",
-    "profile": "Perfil",
-    "account": "Cuenta",
-    "billing": "Facturación",
-    "subscription": "Suscripción",
-    "notifications": "Notificaciones",
-    "security": "Seguridad",
-    "privacy": "Privacidad",
-    "terms": "Términos",
-    "cookies": "Cookies",
-    "language": "Idioma",
-    "theme": "Tema",
-    "dark": "Oscuro",
-    "light": "Claro",
-    "system": "Sistema",
-    "enabled": "Habilitado",
-    "disabled": "Deshabilitado",
-    "active": "Activo",
-    "inactive": "Inactivo",
-    "online": "En línea",
-    "offline": "Fuera de línea",
-    "connected": "Conectado",
-    "disconnected": "Desconectado",
-    "available": "Disponible",
-    "unavailable": "No disponible",
-    "public": "Público",
-    "private": "Privado",
-    "draft": "Borrador",
-    "published": "Publicado",
-    "pending": "Pendiente",
-    "approved": "Aprobado",
-    "rejected": "Rechazado",
-    "completed": "Completado",
-    "failed": "Fallido",
-    "processing": "Procesando",
-    "queued": "En cola",
-    "scheduled": "Programado",
-    "expired": "Expirado",
-    "valid": "Válido",
-    "invalid": "Inválido",
-    "required": "Requerido",
-    "optional": "Opcional",
-    "recommended": "Recomendado",
-    "deprecated": "Obsoleto",
-    "beta": "Beta",
-    "preview": "Vista previa",
-    "coming_soon": "Próximamente",
-    "maintenance": "Mantenimiento",
-    "upgrade": "Actualizar",
-    "downgrade": "Degradar",
-    "free": "Gratis",
-    "premium": "Premium",
-    "pro": "Pro",
-    "basic": "Básico",
-    "standard": "Estándar",
-    "advanced": "Avanzado",
-    "enterprise": "Empresa",
-    "custom": "Personalizado",
-    "default": "Predeterminado",
-    "auto": "Auto",
-    "manual": "Manual",
-    "automatic": "Automático",
-    "enabled_by_default": "Habilitado por defecto",
-    "disabled_by_default": "Deshabilitado por defecto"
+    "requestEarlyAccess": "Solicitar Acceso Temprano"
   },
   "placeholders": {
+    "yourName": "Tu Nombre",
+    "yourEmail": "Tu Correo Electrónico",
     "enterEmail": "Ingresa tu dirección de correo",
     "enterPassword": "Ingresa tu contraseña",
     "confirmPassword": "Confirma tu contraseña",
@@ -100,6 +25,84 @@
     "enterMessage": "Ingresa tu mensaje",
     "search": "Buscar...",
     "optional": "Opcional"
+  },
+  "landing": {
+    "navbar": {
+      "home": "Inicio",
+      "learnPreview": "Vista Previa de Aprendizaje",
+      "pricing": "Precios",
+      "login": "Iniciar Sesión",
+      "signUp": "Registrarse"
+    },
+    "hero": {
+      "title": "Análisis de Trading Impulsado por IA",
+      "subtitle": "Experimenta el futuro del trading con análisis de IA en tiempo real, detección de patrones e insights inteligentes.",
+      "joinBeta": "Únete a la Beta",
+      "watchDemo": "Ver Demo",
+      "stats": {
+        "accuracy": "Tasa de Precisión",
+        "speed": "Velocidad de Análisis",
+        "monitoring": "Monitoreo del Mercado"
+      }
+    },
+    "about": {
+      "title": "¿Qué es TradeIQ?",
+      "description": "TradeIQ combina inteligencia artificial avanzada con datos de mercado en tiempo real para proporcionar a los traders insights sin precedentes sobre patrones de mercado, tendencias y oportunidades. Nuestra plataforma analiza miles de puntos de datos cada segundo para entregar inteligencia accionable cuando más la necesitas."
+    },
+    "features": {
+      "title": "Características Principales",
+      "patternDetection": {
+        "title": "Detección de Patrones",
+        "description": "Algoritmos avanzados de IA identifican patrones de gráficos y señales de trading con alta precisión."
+      },
+      "trendAnalysis": {
+        "title": "Análisis de Tendencias",
+        "description": "Análisis de tendencias en tiempo real impulsado por aprendizaje automático para detectar movimientos del mercado."
+      },
+      "volatilityHeatmaps": {
+        "title": "Mapas de Calor de Volatilidad",
+        "description": "Representación visual de la volatilidad del mercado en diferentes activos y marcos de tiempo."
+      },
+      "aiInsights": {
+        "title": "Insights de IA",
+        "description": "Insights de trading personalizados y recomendaciones basadas en tu estilo de trading."
+      }
+    },
+    "benefits": {
+      "title": "¿Por qué elegir TradeIQ?",
+      "reducedSubjectivity": {
+        "title": "Subjetividad Reducida",
+        "description": "Elimina el sesgo emocional de las decisiones de trading con análisis basado en datos."
+      },
+      "fasterDecisions": {
+        "title": "Decisiones Más Rápidas",
+        "description": "Toma decisiones de trading informadas en segundos, no horas."
+      },
+      "practicalEducation": {
+        "title": "Educación Práctica",
+        "description": "Aprende conceptos avanzados de trading a través de ejemplos del mundo real y guía de IA."
+      },
+      "higherPrecision": {
+        "title": "Mayor Precisión",
+        "description": "Aumenta tu precisión en el trading con reconocimiento de patrones impulsado por IA."
+      }
+    },
+    "learningSection": {
+      "title": "Domina el Trading con IA",
+      "description": "Nuestra plataforma de aprendizaje integral combina conocimiento teórico con insights prácticos impulsados por IA.",
+      "fundamentals": {
+        "title": "Fundamentos del Trading",
+        "description": "Aprende los conceptos básicos del trading con lecciones interactivas y ejemplos en tiempo real."
+      },
+      "patterns": {
+        "title": "Patrones de Gráficos",
+        "description": "Domina el reconocimiento de patrones de gráficos con análisis y detección impulsados por IA."
+      },
+      "riskManagement": {
+        "title": "Gestión de Riesgos",
+        "description": "Desarrolla estrategias robustas de gestión de riesgos utilizando insights impulsados por IA."
+      }
+    }
   },
   "auth": {
     "login": {
