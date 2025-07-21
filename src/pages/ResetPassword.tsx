@@ -9,6 +9,7 @@ import { TrendingUp, CheckCircle, XCircle, Eye, EyeOff, AlertTriangle } from 'lu
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
 import BackToHomeButton from '@/components/BackToHomeButton';
 
 const ResetPassword = () => {
@@ -25,9 +26,10 @@ const ResetPassword = () => {
   const [status, setStatus] = useState<'validating' | 'form' | 'success' | 'error' | 'expired'>('validating');
   const [retryCount, setRetryCount] = useState(0);
   const [tokenValidated, setTokenValidated] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    const validateToken = async () => {
+    const validateTokenAndSession = async () => {
       const accessToken = searchParams.get('access_token');
       const refreshToken = searchParams.get('refresh_token');
       const error = searchParams.get('error');
@@ -40,7 +42,8 @@ const ResetPassword = () => {
         hasRefreshToken: !!refreshToken, 
         error,
         errorDescription,
-        type
+        type,
+        fullUrl: window.location.href
       });
       
       // Check for URL errors first
@@ -49,6 +52,7 @@ const ResetPassword = () => {
         
         if (error === 'access_denied' || errorDescription?.includes('expired')) {
           setStatus('expired');
+          setErrorMessage(t('auth.resetPassword.linkExpired'));
           toast({
             title: t('auth.resetPassword.linkExpired'),
             description: t('auth.resetPassword.linkExpiredDescription'),
@@ -56,6 +60,7 @@ const ResetPassword = () => {
           });
         } else {
           setStatus('error');
+          setErrorMessage(t('auth.resetPassword.invalidLink'));
           toast({
             title: t('auth.resetPassword.invalidLink'),
             description: t('auth.resetPassword.invalidLinkDescription'),
@@ -69,6 +74,7 @@ const ResetPassword = () => {
       if (type !== 'recovery') {
         console.error('🔐 [PASSWORD_RESET_FAILED] Invalid token type:', type);
         setStatus('error');
+        setErrorMessage(t('auth.resetPassword.invalidLink'));
         toast({
           title: t('auth.resetPassword.invalidLink'),
           description: t('auth.resetPassword.invalidLinkDescription'),
@@ -79,8 +85,9 @@ const ResetPassword = () => {
       
       // Validate required tokens
       if (!accessToken || !refreshToken) {
-        console.error('🔐 [PASSWORD_RESET_FAILED] Missing tokens');
+        console.error('🔐 [PASSWORD_RESET_FAILED] Missing required tokens');
         setStatus('error');
+        setErrorMessage(t('auth.resetPassword.invalidLink'));
         toast({
           title: t('auth.resetPassword.invalidLink'),
           description: t('auth.resetPassword.invalidLinkDescription'),
@@ -88,19 +95,88 @@ const ResetPassword = () => {
         });
         return;
       }
-      
-      // If we have valid tokens, show the form
-      console.log('🔐 [PASSWORD_RESET] Token validation successful');
-      setTokenValidated(true);
-      setStatus('form');
-      
-      toast({
-        title: t('auth.resetPassword.tokenValidated'),
-        description: t('auth.resetPassword.tokenValidatedDescription'),
-      });
+
+      try {
+        // Set the session using the tokens from the URL
+        console.log('🔐 [PASSWORD_RESET] Setting session with tokens...');
+        const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (sessionError) {
+          console.error('🔐 [PASSWORD_RESET_FAILED] Session error:', sessionError);
+          
+          if (sessionError.message.includes('expired') || sessionError.message.includes('invalid')) {
+            setStatus('expired');
+            setErrorMessage(t('auth.resetPassword.sessionExpired'));
+            toast({
+              title: t('auth.resetPassword.sessionExpired'),
+              description: t('auth.resetPassword.sessionExpiredDescription'),
+              variant: "destructive",
+            });
+          } else {
+            setStatus('error');
+            setErrorMessage(sessionError.message || t('auth.resetPassword.tokenValidationFailed'));
+            toast({
+              title: t('auth.resetPassword.error'),
+              description: sessionError.message || t('auth.resetPassword.tokenValidationFailed'),
+              variant: "destructive",
+            });
+          }
+          return;
+        }
+
+        if (!sessionData.session || !sessionData.user) {
+          console.error('🔐 [PASSWORD_RESET_FAILED] No session or user after setting session');
+          setStatus('error');
+          setErrorMessage(t('auth.resetPassword.invalidSession'));
+          toast({
+            title: t('auth.resetPassword.error'),
+            description: t('auth.resetPassword.invalidSession'),
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Verify the session is valid for password reset
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          console.error('🔐 [PASSWORD_RESET_FAILED] Failed to get user after session set:', userError);
+          setStatus('expired');
+          setErrorMessage(t('auth.resetPassword.sessionExpired'));
+          toast({
+            title: t('auth.resetPassword.sessionExpired'),
+            description: t('auth.resetPassword.sessionExpiredDescription'),
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // If we reach here, the token is valid
+        console.log('🔐 [PASSWORD_RESET] Token validation successful, user:', user.email);
+        setTokenValidated(true);
+        setStatus('form');
+        
+        toast({
+          title: t('auth.resetPassword.tokenValidated'),
+          description: t('auth.resetPassword.tokenValidatedDescription'),
+        });
+        
+      } catch (error: any) {
+        console.error('🔐 [PASSWORD_RESET_FAILED] Token validation exception:', error);
+        setStatus('error');
+        setErrorMessage(t('auth.resetPassword.unexpectedError'));
+        toast({
+          title: t('auth.resetPassword.error'),
+          description: t('auth.resetPassword.unexpectedError'),
+          variant: "destructive",
+        });
+      }
     };
     
-    validateToken();
+    validateTokenAndSession();
   }, [searchParams, navigate, toast, t]);
 
   const validatePassword = (password: string) => {
@@ -177,6 +253,7 @@ const ResetPassword = () => {
         
         if (error.message.includes('expired') || error.message.includes('invalid') || error.message.includes('session')) {
           setStatus('expired');
+          setErrorMessage(t('auth.resetPassword.sessionExpired'));
           toast({
             title: t('auth.resetPassword.sessionExpired'),
             description: t('auth.resetPassword.sessionExpiredDescription'),
@@ -184,6 +261,7 @@ const ResetPassword = () => {
           });
         } else {
           setStatus('error');
+          setErrorMessage(error.message || t('auth.resetPassword.updateFailed'));
           toast({
             title: t('auth.resetPassword.error'),
             description: error.message || t('auth.resetPassword.updateFailed'),
@@ -198,13 +276,18 @@ const ResetPassword = () => {
           description: t('auth.resetPassword.successDescription'),
         });
         
+        // Clear the session after successful password reset
+        await supabase.auth.signOut();
+        
+        // Redirect to login after success
         setTimeout(() => {
           navigate('/login?password_updated=true');
-        }, 2000);
+        }, 3000);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('🔐 [PASSWORD_RESET_FAILED] Password update exception:', error);
       setStatus('error');
+      setErrorMessage(t('auth.resetPassword.unexpectedError'));
       toast({
         title: t('auth.resetPassword.error'),
         description: t('auth.resetPassword.unexpectedError'),
@@ -304,7 +387,75 @@ const ResetPassword = () => {
               
               <CardContent className="text-center space-y-6">
                 <p className="text-gray-400">
-                  {t('auth.resetPassword.linkExpiredDescription')}
+                  {errorMessage || t('auth.resetPassword.linkExpiredDescription')}
+                </p>
+                
+                <div className="space-y-3">
+                  <Button 
+                    onClick={handleRequestNewLink}
+                    className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90"
+                  >
+                    {t('auth.resetPassword.requestNewLink')}
+                  </Button>
+                  
+                  <Button 
+                    onClick={() => navigate('/login')}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    {t('auth.resetPassword.backToLogin')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <div className="mt-6 text-center">
+              <BackToHomeButton />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error screen
+  if (status === 'error') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+        {/* Navigation */}
+        <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
+              <span className="text-xl font-bold">TradeIQ</span>
+              <Badge variant="secondary" className="text-xs">BETA</Badge>
+            </div>
+            
+            <div className="flex items-center space-x-6">
+              <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
+                {t('auth.resetPassword.backToLogin')}
+              </Button>
+            </div>
+          </div>
+        </nav>
+
+        <div className="container mx-auto px-4 py-20">
+          <div className="max-w-md mx-auto">
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardHeader className="text-center">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="p-3 bg-red-500/20 rounded-full">
+                    <XCircle className="h-8 w-8 text-red-400" />
+                  </div>
+                </div>
+                <CardTitle className="text-2xl text-white">
+                  {t('auth.resetPassword.error')}
+                </CardTitle>
+              </CardHeader>
+              
+              <CardContent className="text-center space-y-6">
+                <p className="text-gray-400">
+                  {errorMessage || t('auth.resetPassword.invalidLinkDescription')}
                 </p>
                 
                 <div className="space-y-3">
@@ -363,17 +514,13 @@ const ResetPassword = () => {
                 <div className="p-3 bg-tradeiq-blue/20 rounded-full">
                   {status === 'success' ? (
                     <CheckCircle className="h-8 w-8 text-green-400" />
-                  ) : status === 'error' ? (
-                    <XCircle className="h-8 w-8 text-red-400" />
                   ) : (
                     <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
                   )}
                 </div>
               </div>
               <CardTitle className="text-2xl text-white">
-                {status === 'success' ? t('auth.resetPassword.passwordUpdated') : 
-                 status === 'error' ? t('auth.resetPassword.updateFailed') : 
-                 t('auth.resetPassword.setNewPassword')}
+                {status === 'success' ? t('auth.resetPassword.passwordUpdated') : t('auth.resetPassword.setNewPassword')}
               </CardTitle>
             </CardHeader>
             
@@ -382,6 +529,9 @@ const ResetPassword = () => {
                 <div className="text-center space-y-4">
                   <p className="text-green-400">
                     {t('auth.resetPassword.successMessage')}
+                  </p>
+                  <p className="text-gray-400 text-sm">
+                    {t('auth.resetPassword.redirectingToLogin')}
                   </p>
                   <Button 
                     onClick={() => navigate('/login')}
@@ -453,18 +603,6 @@ const ResetPassword = () => {
                     {loading ? t('auth.resetPassword.updating') : t('auth.resetPassword.updatePassword')}
                     {retryCount > 0 && ` (${t('auth.resetPassword.attempt')} ${retryCount})`}
                   </Button>
-                  
-                  {status === 'error' && (
-                    <div className="space-y-3">
-                      <Button 
-                        onClick={handleRequestNewLink}
-                        variant="outline"
-                        className="w-full"
-                      >
-                        {t('auth.resetPassword.requestNewLink')}
-                      </Button>
-                    </div>
-                  )}
                 </form>
               )}
             </CardContent>

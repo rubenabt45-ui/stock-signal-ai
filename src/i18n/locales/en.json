@@ -1,130 +1,136 @@
 
 {
-  "common": {
-    "home": "Home",
-    "pricing": "Pricing",
-    "signIn": "Sign In",
-    "signUp": "Sign Up",
-    "email": "Email",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "submit": "Submit",
-    "cancel": "Cancel",
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
-    "requestEarlyAccess": "Request Early Access"
-  },
-  "placeholders": {
-    "yourName": "Your Name",
-    "yourEmail": "Your Email"
-  },
   "landing": {
-    "navbar": {
+    "nav": {
       "home": "Home",
-      "learnPreview": "Learn Preview",
-      "pricing": "Pricing",
+      "about": "About",
+      "features": "Features",
+      "benefits": "Benefits",
+      "learning": "Learning",
       "login": "Login",
-      "signUp": "Sign Up"
+      "signup": "Sign Up",
+      "getStarted": "Get Started"
     },
     "hero": {
-      "title": "AI-Powered Trading Analysis",
-      "subtitle": "Experience the future of trading with real-time AI analysis, pattern detection, and intelligent insights.",
-      "joinBeta": "Join Beta",
-      "watchDemo": "Watch Demo",
-      "stats": {
-        "accuracy": "Accuracy Rate",
-        "speed": "Analysis Speed",
-        "monitoring": "Market Monitoring"
-      }
+      "title": "Master Trading with AI-Powered Insights",
+      "subtitle": "Transform your trading strategy with real-time market analysis, personalized AI recommendations, and comprehensive learning resources.",
+      "cta": "Start Trading Smarter",
+      "secondary": "Learn More"
+    },
+    "stats": {
+      "accuracy": "95% Accuracy",
+      "users": "10K+ Users",
+      "trades": "1M+ Trades"
     },
     "about": {
-      "title": "What is TradeIQ?",
-      "description": "TradeIQ combines advanced artificial intelligence with real-time market data to provide traders with unprecedented insights into market patterns, trends, and opportunities. Our platform analyzes thousands of data points every second to deliver actionable intelligence when you need it most."
+      "title": "About TradeIQ",
+      "description": "TradeIQ combines cutting-edge artificial intelligence with comprehensive market analysis to help traders make informed decisions. Our platform provides real-time insights, personalized recommendations, and educational resources to enhance your trading journey."
     },
     "features": {
-      "title": "Core Features",
-      "patternDetection": {
-        "title": "Pattern Detection",
-        "description": "Advanced AI algorithms identify chart patterns and trading signals with high accuracy."
+      "title": "Powerful Features",
+      "ai": {
+        "title": "AI-Powered Analysis",
+        "description": "Advanced algorithms analyze market patterns and provide actionable insights"
       },
-      "trendAnalysis": {
-        "title": "Trend Analysis",
-        "description": "Real-time trend analysis powered by machine learning to spot market movements."
+      "realtime": {
+        "title": "Real-Time Data",
+        "description": "Live market data and instant notifications for trading opportunities"
       },
-      "volatilityHeatmaps": {
-        "title": "Volatility Heatmaps",
-        "description": "Visual representation of market volatility across different assets and timeframes."
-      },
-      "aiInsights": {
-        "title": "AI Insights",
-        "description": "Personalized trading insights and recommendations based on your trading style."
+      "learning": {
+        "title": "Learning Resources",
+        "description": "Comprehensive guides and tutorials to improve your trading skills"
       }
     },
     "benefits": {
       "title": "Why Choose TradeIQ?",
-      "reducedSubjectivity": {
-        "title": "Reduced Subjectivity",
-        "description": "Remove emotional bias from trading decisions with data-driven analysis."
+      "smart": {
+        "title": "Smart Trading",
+        "description": "Make data-driven decisions with AI-powered market analysis"
       },
-      "fasterDecisions": {
-        "title": "Faster Decisions",
-        "description": "Make informed trading decisions in seconds, not hours."
+      "education": {
+        "title": "Continuous Learning",
+        "description": "Access educational content and improve your trading knowledge"
       },
-      "practicalEducation": {
-        "title": "Practical Education",
-        "description": "Learn advanced trading concepts through real-world examples and AI guidance."
-      },
-      "higherPrecision": {
-        "title": "Higher Precision",
-        "description": "Increase your trading accuracy with AI-powered pattern recognition."
+      "support": {
+        "title": "Expert Support",
+        "description": "Get help from our team of trading experts and analysts"
       }
     },
-    "learningSection": {
-      "title": "Master Trading with AI",
-      "description": "Our comprehensive learning platform combines theoretical knowledge with practical AI-driven insights.",
-      "fundamentals": {
-        "title": "Trading Fundamentals",
-        "description": "Learn the basics of trading with interactive lessons and real-time examples."
-      },
-      "patterns": {
-        "title": "Chart Patterns",
-        "description": "Master chart pattern recognition with AI-powered analysis and detection."
-      },
-      "riskManagement": {
-        "title": "Risk Management",
-        "description": "Develop robust risk management strategies using AI-driven insights."
-      }
+    "learning": {
+      "title": "Master Trading with Our Learning Platform",
+      "description": "Access comprehensive courses, tutorials, and real-world examples to enhance your trading skills.",
+      "cta": "Explore Learning"
     }
   },
   "auth": {
     "login": {
-      "signIn": "Sign In",
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your TradeIQ account",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign In",
+      "forgotPassword": "Forgot Password?",
       "noAccount": "Don't have an account?",
-      "signUp": "Sign Up",
-      "forgotPassword": "Forgot Password?"
+      "signUp": "Sign up",
+      "signingIn": "Signing in...",
+      "oauthDivider": "Or continue with",
+      "googleSignIn": "Continue with Google",
+      "githubSignIn": "Continue with GitHub",
+      "rememberMe": "Remember me",
+      "backToHome": "Back to Home",
+      "passwordUpdated": "Password updated successfully! You can now sign in with your new password.",
+      "errors": {
+        "invalidCredentials": "Invalid email or password",
+        "emailNotConfirmed": "Please check your email and click the verification link before signing in",
+        "tooManyRequests": "Too many login attempts. Please try again later",
+        "userNotFound": "No account found with this email address",
+        "invalidEmail": "Please enter a valid email address",
+        "passwordRequired": "Password is required",
+        "signInFailed": "Sign in failed. Please try again"
+      }
     },
-    "resetPasswordRequest": {
-      "emailRequired": "Email is required",
-      "enterEmail": "Please enter your email address",
-      "error": "Error",
-      "failedToSend": "Failed to send password reset email",
-      "emailSent": "Email Sent",
-      "checkEmail": "Check your email for password reset instructions",
-      "sending": "Sending...",
-      "sendButton": "Send Reset Link",
-      "title": "Reset Your Password",
-      "subtitle": "Enter your email to receive a password reset link.",
-      "emailLabel": "Email Address",
-      "checkEmailTitle": "Check Your Email",
-      "emailSentDescription": "We have sent password reset instructions to {{email}}.",
-      "instructionsSent": "Instructions have been sent to your email.",
-      "didntReceive": "Didn't receive the email? Check your spam folder or try again.",
-      "sendAnother": "Send Another Email",
-      "backToLogin": "Back to Login"
+    "signup": {
+      "title": "Create Your Account",
+      "subtitle": "Start your trading journey with TradeIQ",
+      "fullName": "Full Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Create Account",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "signingUp": "Creating account...",
+      "oauthDivider": "Or sign up with",
+      "googleSignUp": "Sign up with Google",
+      "githubSignUp": "Sign up with GitHub",
+      "terms": "By creating an account, you agree to our Terms of Service and Privacy Policy",
+      "backToHome": "Back to Home",
+      "checkEmail": "Check your email for a verification link to complete your registration.",
+      "emailSent": "Verification email sent!",
+      "errors": {
+        "emailExists": "An account with this email already exists",
+        "passwordTooShort": "Password must be at least 8 characters long",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "invalidEmail": "Please enter a valid email address",
+        "fullNameRequired": "Full name is required",
+        "signUpFailed": "Sign up failed. Please try again",
+        "weakPassword": "Password should be at least 8 characters with uppercase, lowercase, number and special character"
+      }
     },
     "resetPassword": {
       "title": "Reset Password",
+      "subtitle": "Enter your email to reset your password",
+      "email": "Email",
+      "submit": "Send Reset Link",
+      "backToLogin": "Back to Login",
+      "emailSent": "Reset link sent!",
+      "checkEmail": "Check your email for a link to reset your password.",
+      "sending": "Sending...",
+      "validatingToken": "Validating reset link...",
+      "validatingTokenDescription": "Please wait while we verify your password reset link.",
+      "tokenValidated": "Link verified!",
+      "tokenValidatedDescription": "You can now set your new password.",
+      "tokenValidationFailed": "Invalid or expired reset link",
       "setNewPassword": "Set New Password",
       "newPassword": "New Password",
       "confirmPassword": "Confirm Password",
@@ -132,107 +138,79 @@
       "confirmNewPassword": "Confirm your new password",
       "updatePassword": "Update Password",
       "updating": "Updating...",
-      "passwordUpdated": "Password Updated",
-      "success": "Password Reset Successful",
-      "successDescription": "Your password has been updated successfully.",
-      "successMessage": "You will be redirected to the login page shortly.",
+      "passwordUpdated": "Password Updated!",
+      "successMessage": "Your password has been successfully updated.",
+      "redirectingToLogin": "Redirecting to login in 3 seconds...",
       "goToLogin": "Go to Login",
+      "success": "Password updated successfully",
+      "successDescription": "Your password has been updated. You can now sign in with your new password.",
       "error": "Error",
-      "updateFailed": "Password Update Failed",
+      "updateFailed": "Failed to update password",
       "passwordsDoNotMatch": "Passwords do not match",
-      "passwordRequirements": "Password Requirements",
-      "passwordRequirementsHint": "At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character",
-      "passwordTooShort": "Password must be at least {{minLength}} characters",
+      "passwordRequirements": "Password requirements not met",
+      "passwordTooShort": "Password must be at least {{minLength}} characters long",
       "passwordNeedsUppercase": "Password must contain at least one uppercase letter",
       "passwordNeedsLowercase": "Password must contain at least one lowercase letter",
       "passwordNeedsNumber": "Password must contain at least one number",
       "passwordNeedsSpecial": "Password must contain at least one special character",
-      "unexpectedError": "An unexpected error occurred. Please try again.",
-      "backToLogin": "Back to Login",
-      "sessionExpired": "Session Expired",
-      "sessionExpiredDescription": "Your password reset session has expired. Please request a new reset link.",
+      "passwordRequirementsHint": "Password must be at least 8 characters with uppercase, lowercase, number and special character",
       "linkExpired": "Reset Link Expired",
-      "linkExpiredDescription": "This password reset link has expired or is no longer valid. Please request a new one.",
-      "invalidLink": "Invalid Reset Link",
-      "invalidLinkDescription": "This password reset link is invalid or has already been used.",
-      "requestNewLink": "Request New Reset Link",
+      "linkExpiredDescription": "This password reset link has expired. Please request a new one.",
+      "sessionExpired": "Session expired",
+      "sessionExpiredDescription": "Your reset session has expired. Please request a new password reset link.",
+      "invalidLink": "Invalid reset link",
+      "invalidLinkDescription": "This password reset link is invalid or has been used. Please request a new one.",
+      "invalidSession": "Invalid session",
+      "requestNewLink": "Request New Link",
+      "unexpectedError": "An unexpected error occurred. Please try again.",
       "attempt": "Attempt",
-      "validatingToken": "Validating Reset Token",
-      "validatingTokenDescription": "Please wait while we validate your password reset token...",
-      "tokenValidated": "Token Validated",
-      "tokenValidatedDescription": "You can now set your new password.",
-      "invalidSession": "Invalid session. Please request a new reset link."
-    },
-    "signup": {
-      "title": "Create an Account",
-      "fullName": "Full Name",
-      "email": "Email",
-      "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "signUp": "Sign Up",
-      "alreadyHaveAccount": "Already have an account?",
-      "signIn": "Sign In",
-      "error": "Error",
-      "success": "Success",
-      "emailVerificationSent": "Verification email sent",
-      "checkEmail": "Please check your email to verify your account."
+      "errors": {
+        "invalidEmail": "Please enter a valid email address",
+        "emailRequired": "Email is required",
+        "resetFailed": "Failed to send reset email. Please try again",
+        "userNotFound": "No account found with this email address"
+      }
     },
     "verifyEmail": {
       "title": "Verify Your Email",
-      "description": "Please check your email and click the verification link to activate your account.",
+      "subtitle": "Please check your email and click the verification link",
+      "success": "Email verified successfully!",
+      "error": "Email verification failed",
       "resend": "Resend Verification Email",
-      "resendSuccess": "Verification email resent successfully.",
-      "resendError": "Failed to resend verification email."
-    },
-    "forgotPassword": {
-      "title": "Forgot Password",
-      "email": "Email",
-      "sendResetLink": "Send Reset Link",
       "backToLogin": "Back to Login",
-      "emailSent": "Email Sent",
-      "checkEmail": "Check your email for password reset instructions.",
-      "error": "Error",
-      "failedToSend": "Failed to send password reset email."
+      "checkEmail": "We've sent a verification link to your email address. Please check your inbox and click the link to verify your account.",
+      "alreadyVerified": "Your email is already verified. You can now sign in to your account.",
+      "verifying": "Verifying your email...",
+      "verified": "Email Verified!",
+      "verifiedDescription": "Your email has been successfully verified. You can now sign in to your account.",
+      "resendSuccess": "Verification email sent!",
+      "resendDescription": "Please check your email for the verification link.",
+      "resending": "Sending..."
     }
   },
-  "resetPassword": {
-    "title": "Reset Password",
-    "setNewPassword": "Set New Password",
-    "newPassword": "New Password",
-    "confirmPassword": "Confirm Password",
-    "enterNewPassword": "Enter your new password",
-    "confirmNewPassword": "Confirm your new password",
-    "updatePassword": "Update Password",
-    "updating": "Updating...",
-    "passwordUpdated": "Password Updated",
-    "success": "Password Reset Successful",
-    "successDescription": "Your password has been updated successfully.",
-    "successMessage": "You will be redirected to the login page shortly.",
-    "goToLogin": "Go to Login",
-    "error": "Error",
-    "updateFailed": "Password Update Failed",
-    "passwordsDoNotMatch": "Passwords do not match",
-    "passwordRequirements": "Password Requirements",
-    "passwordRequirementsHint": "At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character",
-    "passwordTooShort": "Password must be at least {{minLength}} characters",
-    "passwordNeedsUppercase": "Password must contain at least one uppercase letter",
-    "passwordNeedsLowercase": "Password must contain at least one lowercase letter",
-    "passwordNeedsNumber": "Password must contain at least one number",
-    "passwordNeedsSpecial": "Password must contain at least one special character",
-    "unexpectedError": "An unexpected error occurred. Please try again.",
-    "backToLogin": "Back to Login",
-    "sessionExpired": "Session Expired",
-    "sessionExpiredDescription": "Your password reset session has expired. Please request a new reset link.",
-    "linkExpired": "Reset Link Expired",
-    "linkExpiredDescription": "This password reset link has expired or is no longer valid. Please request a new one.",
-    "invalidLink": "Invalid Reset Link",
-    "invalidLinkDescription": "This password reset link is invalid or has already been used.",
-    "requestNewLink": "Request New Reset Link",
-    "attempt": "Attempt",
-    "validatingToken": "Validating Reset Token",
-    "validatingTokenDescription": "Please wait while we validate your password reset token...",
-    "tokenValidated": "Token Validated",
-    "tokenValidatedDescription": "You can now set your new password.",
-    "invalidSession": "Invalid session. Please request a new reset link."
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "features": "Features",
+    "benefits": "Benefits",
+    "learning": "Learning",
+    "login": "Login",
+    "signup": "Sign Up",
+    "getStarted": "Get Started"
+  },
+  "footer": {
+    "company": "Company",
+    "about": "About",
+    "blog": "Blog",
+    "careers": "Careers",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "cookies": "Cookie Policy",
+    "support": "Support",
+    "contact": "Contact",
+    "help": "Help Center",
+    "community": "Community",
+    "allRightsReserved": "All rights reserved"
   }
 }

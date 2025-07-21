@@ -1,177 +1,136 @@
 
 {
-  "common": {
-    "home": "Inicio",
-    "pricing": "Precios",
-    "signIn": "Iniciar sesión",
-    "signUp": "Registrarse",
-    "email": "Correo electrónico",
-    "password": "Contraseña",
-    "confirmPassword": "Confirmar contraseña",
-    "submit": "Enviar",
-    "cancel": "Cancelar",
-    "loading": "Cargando...",
-    "error": "Error",
-    "success": "Éxito",
-    "requestEarlyAccess": "Solicitar Acceso Temprano"
-  },
-  "placeholders": {
-    "yourName": "Tu Nombre",
-    "yourEmail": "Tu Correo Electrónico",
-    "enterEmail": "Ingresa tu dirección de correo",
-    "enterPassword": "Ingresa tu contraseña",
-    "confirmPassword": "Confirma tu contraseña",
-    "enterName": "Ingresa tu nombre",
-    "enterMessage": "Ingresa tu mensaje",
-    "search": "Buscar...",
-    "optional": "Opcional"
-  },
   "landing": {
-    "navbar": {
+    "nav": {
       "home": "Inicio",
-      "learnPreview": "Vista Previa de Aprendizaje",
-      "pricing": "Precios",
+      "about": "Acerca de",
+      "features": "Características",
+      "benefits": "Beneficios",
+      "learning": "Aprendizaje",
       "login": "Iniciar Sesión",
-      "signUp": "Registrarse"
+      "signup": "Registrarse",
+      "getStarted": "Comenzar"
     },
     "hero": {
-      "title": "Análisis de Trading Impulsado por IA",
-      "subtitle": "Experimenta el futuro del trading con análisis de IA en tiempo real, detección de patrones e insights inteligentes.",
-      "joinBeta": "Únete a la Beta",
-      "watchDemo": "Ver Demo",
-      "stats": {
-        "accuracy": "Tasa de Precisión",
-        "speed": "Velocidad de Análisis",
-        "monitoring": "Monitoreo del Mercado"
-      }
+      "title": "Domina el Trading con Análisis Impulsado por IA",
+      "subtitle": "Transforma tu estrategia de trading con análisis de mercado en tiempo real, recomendaciones personalizadas de IA y recursos de aprendizaje integral.",
+      "cta": "Comienza a Tradear Más Inteligente",
+      "secondary": "Saber Más"
+    },
+    "stats": {
+      "accuracy": "95% Precisión",
+      "users": "10K+ Usuarios",
+      "trades": "1M+ Operaciones"
     },
     "about": {
-      "title": "¿Qué es TradeIQ?",
-      "description": "TradeIQ combina inteligencia artificial avanzada con datos de mercado en tiempo real para proporcionar a los traders insights sin precedentes sobre patrones de mercado, tendencias y oportunidades. Nuestra plataforma analiza miles de puntos de datos cada segundo para entregar inteligencia accionable cuando más la necesitas."
+      "title": "Acerca de TradeIQ",
+      "description": "TradeIQ combina inteligencia artificial de vanguardia con análisis integral del mercado para ayudar a los traders a tomar decisiones informadas. Nuestra plataforma proporciona perspectivas en tiempo real, recomendaciones personalizadas y recursos educativos para mejorar tu experiencia de trading."
     },
     "features": {
-      "title": "Características Principales",
-      "patternDetection": {
-        "title": "Detección de Patrones",
-        "description": "Algoritmos avanzados de IA identifican patrones de gráficos y señales de trading con alta precisión."
+      "title": "Características Poderosas",
+      "ai": {
+        "title": "Análisis Impulsado por IA",
+        "description": "Algoritmos avanzados analizan patrones del mercado y proporcionan perspectivas accionables"
       },
-      "trendAnalysis": {
-        "title": "Análisis de Tendencias",
-        "description": "Análisis de tendencias en tiempo real impulsado por aprendizaje automático para detectar movimientos del mercado."
+      "realtime": {
+        "title": "Datos en Tiempo Real",
+        "description": "Datos de mercado en vivo y notificaciones instantáneas para oportunidades de trading"
       },
-      "volatilityHeatmaps": {
-        "title": "Mapas de Calor de Volatilidad",
-        "description": "Representación visual de la volatilidad del mercado en diferentes activos y marcos de tiempo."
-      },
-      "aiInsights": {
-        "title": "Insights de IA",
-        "description": "Insights de trading personalizados y recomendaciones basadas en tu estilo de trading."
+      "learning": {
+        "title": "Recursos de Aprendizaje",
+        "description": "Guías y tutoriales comprehensivos para mejorar tus habilidades de trading"
       }
     },
     "benefits": {
-      "title": "¿Por qué elegir TradeIQ?",
-      "reducedSubjectivity": {
-        "title": "Subjetividad Reducida",
-        "description": "Elimina el sesgo emocional de las decisiones de trading con análisis basado en datos."
+      "title": "¿Por Qué Elegir TradeIQ?",
+      "smart": {
+        "title": "Trading Inteligente",
+        "description": "Toma decisiones basadas en datos con análisis de mercado impulsado por IA"
       },
-      "fasterDecisions": {
-        "title": "Decisiones Más Rápidas",
-        "description": "Toma decisiones de trading informadas en segundos, no horas."
+      "education": {
+        "title": "Aprendizaje Continuo",
+        "description": "Accede a contenido educativo y mejora tu conocimiento de trading"
       },
-      "practicalEducation": {
-        "title": "Educación Práctica",
-        "description": "Aprende conceptos avanzados de trading a través de ejemplos del mundo real y guía de IA."
-      },
-      "higherPrecision": {
-        "title": "Mayor Precisión",
-        "description": "Aumenta tu precisión en el trading con reconocimiento de patrones impulsado por IA."
+      "support": {
+        "title": "Soporte Experto",
+        "description": "Obtén ayuda de nuestro equipo de expertos en trading y analistas"
       }
     },
-    "learningSection": {
-      "title": "Domina el Trading con IA",
-      "description": "Nuestra plataforma de aprendizaje integral combina conocimiento teórico con insights prácticos impulsados por IA.",
-      "fundamentals": {
-        "title": "Fundamentos del Trading",
-        "description": "Aprende los conceptos básicos del trading con lecciones interactivas y ejemplos en tiempo real."
-      },
-      "patterns": {
-        "title": "Patrones de Gráficos",
-        "description": "Domina el reconocimiento de patrones de gráficos con análisis y detección impulsados por IA."
-      },
-      "riskManagement": {
-        "title": "Gestión de Riesgos",
-        "description": "Desarrolla estrategias robustas de gestión de riesgos utilizando insights impulsados por IA."
-      }
+    "learning": {
+      "title": "Domina el Trading con Nuestra Plataforma de Aprendizaje",
+      "description": "Accede a cursos comprehensivos, tutoriales y ejemplos del mundo real para mejorar tus habilidades de trading.",
+      "cta": "Explorar Aprendizaje"
     }
   },
   "auth": {
     "login": {
-      "title": "Bienvenido de nuevo",
-      "subtitle": "Inicia sesión en tu cuenta de TradeIQ Pro",
-      "email": "Correo electrónico",
+      "title": "Bienvenido de Vuelta",
+      "subtitle": "Inicia sesión en tu cuenta de TradeIQ",
+      "email": "Correo Electrónico",
       "password": "Contraseña",
-      "signIn": "Iniciar sesión",
-      "signingIn": "Iniciando sesión...",
+      "submit": "Iniciar Sesión",
       "forgotPassword": "¿Olvidaste tu contraseña?",
       "noAccount": "¿No tienes una cuenta?",
-      "signUp": "Regístrate",
-      "loginFailed": "Error de inicio de sesión",
-      "emailNotConfirmed": "Correo no confirmado",
-      "checkEmail": "Por favor revisa tu correo y haz clic en el enlace de confirmación antes de iniciar sesión.",
-      "invalidCredentials": "Correo o contraseña incorrectos. Inténtalo de nuevo.",
-      "showPassword": "Mostrar contraseña",
-      "hidePassword": "Ocultar contraseña"
+      "signUp": "Registrarse",
+      "signingIn": "Iniciando sesión...",
+      "oauthDivider": "O continúa con",
+      "googleSignIn": "Continuar con Google",
+      "githubSignIn": "Continuar con GitHub",
+      "rememberMe": "Recordarme",
+      "backToHome": "Volver al Inicio",
+      "passwordUpdated": "¡Contraseña actualizada exitosamente! Ahora puedes iniciar sesión con tu nueva contraseña.",
+      "errors": {
+        "invalidCredentials": "Email o contraseña inválidos",
+        "emailNotConfirmed": "Por favor revisa tu email y haz clic en el enlace de verificación antes de iniciar sesión",
+        "tooManyRequests": "Demasiados intentos de inicio de sesión. Por favor intenta más tarde",
+        "userNotFound": "No se encontró ninguna cuenta con este email",
+        "invalidEmail": "Por favor ingresa un email válido",
+        "passwordRequired": "La contraseña es requerida",
+        "signInFailed": "Inicio de sesión fallido. Por favor intenta nuevamente"
+      }
     },
     "signup": {
-      "title": "Crea tu cuenta",
-      "subtitle": "Únete a TradeIQ Pro y comienza a operar de manera inteligente",
-      "fullName": "Nombre completo",
-      "email": "Correo electrónico",
+      "title": "Crea tu Cuenta",
+      "subtitle": "Comienza tu viaje de trading con TradeIQ",
+      "fullName": "Nombre Completo",
+      "email": "Correo Electrónico",
       "password": "Contraseña",
-      "confirmPassword": "Confirmar contraseña",
-      "signUp": "Registrarse",
+      "confirmPassword": "Confirmar Contraseña",
+      "submit": "Crear Cuenta",
+      "haveAccount": "¿Ya tienes una cuenta?",
+      "signIn": "Iniciar sesión",
       "signingUp": "Creando cuenta...",
-      "alreadyHaveAccount": "¿Ya tienes una cuenta?",
-      "signIn": "Inicia sesión",
-      "terms": "Al crear una cuenta, aceptas nuestros",
-      "termsOfService": "Términos de servicio",
-      "and": "y",
-      "privacyPolicy": "Política de privacidad",
-      "checkEmail": "Revisa tu correo",
-      "checkEmailDescription": "Hemos enviado un enlace de verificación a tu dirección de correo. Por favor haz clic en el enlace para verificar tu cuenta.",
-      "didntReceiveEmail": "¿No recibiste el correo? Revisa tu carpeta de spam o",
-      "resendEmail": "reenviar correo de verificación",
-      "backToLogin": "Volver al inicio de sesión"
-    },
-    "forgotPassword": {
-      "title": "Restablecer contraseña",
-      "subtitle": "Ingresa tu correo para recibir instrucciones de restablecimiento",
-      "email": "Correo electrónico",
-      "sendInstructions": "Enviar instrucciones de restablecimiento",
-      "backToLogin": "Volver al inicio de sesión"
-    },
-    "resetPasswordRequest": {
-      "title": "Restablecer tu contraseña",
-      "subtitle": "Ingresa tu dirección de correo y te enviaremos un enlace para restablecer tu contraseña",
-      "checkEmailTitle": "Revisa tu correo",
-      "emailLabel": "Dirección de correo electrónico",
-      "sendButton": "Enviar enlace de restablecimiento",
-      "sending": "Enviando...",
-      "emailSent": "Enlace de restablecimiento enviado",
-      "checkEmail": "Por favor revisa tu correo para las instrucciones de restablecimiento de contraseña",
-      "emailSentDescription": "Hemos enviado un enlace de restablecimiento de contraseña a {{email}}",
-      "instructionsSent": "Las instrucciones de restablecimiento de contraseña han sido enviadas a tu correo. Por favor revisa tu bandeja de entrada y sigue el enlace para restablecer tu contraseña.",
-      "didntReceive": "¿No recibiste el correo? Revisa tu carpeta de spam o inténtalo de nuevo.",
-      "sendAnother": "Enviar otro correo",
-      "backToLogin": "Volver al inicio de sesión",
-      "emailRequired": "Correo requerido",
-      "enterEmail": "Por favor ingresa tu dirección de correo",
-      "error": "Error",
-      "failedToSend": "Error al enviar el correo de restablecimiento. Por favor inténtalo de nuevo.",
-      "unexpectedError": "Ocurrió un error inesperado. Por favor inténtalo de nuevo."
+      "oauthDivider": "O regístrate con",
+      "googleSignUp": "Registrarse con Google",
+      "githubSignUp": "Registrarse con GitHub",
+      "terms": "Al crear una cuenta, aceptas nuestros Términos de Servicio y Política de Privacidad",
+      "backToHome": "Volver al Inicio",
+      "checkEmail": "Revisa tu email para un enlace de verificación para completar tu registro.",
+      "emailSent": "¡Email de verificación enviado!",
+      "errors": {
+        "emailExists": "Ya existe una cuenta con este email",
+        "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+        "passwordsDoNotMatch": "Las contraseñas no coinciden",
+        "invalidEmail": "Por favor ingresa un email válido",
+        "fullNameRequired": "El nombre completo es requerido",
+        "signUpFailed": "Registro fallido. Por favor intenta nuevamente",
+        "weakPassword": "La contraseña debe tener al menos 8 caracteres con mayúscula, minúscula, número y carácter especial"
+      }
     },
     "resetPassword": {
       "title": "Restablecer Contraseña",
+      "subtitle": "Ingresa tu email para restablecer tu contraseña",
+      "email": "Correo Electrónico",
+      "submit": "Enviar Enlace de Restablecimiento",
+      "backToLogin": "Volver al Inicio de Sesión",
+      "emailSent": "¡Enlace de restablecimiento enviado!",
+      "checkEmail": "Revisa tu email para un enlace para restablecer tu contraseña.",
+      "sending": "Enviando...",
+      "validatingToken": "Validando enlace de restablecimiento...",
+      "validatingTokenDescription": "Por favor espera mientras verificamos tu enlace de restablecimiento de contraseña.",
+      "tokenValidated": "¡Enlace verificado!",
+      "tokenValidatedDescription": "Ahora puedes establecer tu nueva contraseña.",
+      "tokenValidationFailed": "Enlace de restablecimiento inválido o expirado",
       "setNewPassword": "Establecer Nueva Contraseña",
       "newPassword": "Nueva Contraseña",
       "confirmPassword": "Confirmar Contraseña",
@@ -179,55 +138,79 @@
       "confirmNewPassword": "Confirma tu nueva contraseña",
       "updatePassword": "Actualizar Contraseña",
       "updating": "Actualizando...",
-      "passwordUpdated": "Contraseña Actualizada",
-      "success": "Restablecimiento de Contraseña Exitoso",
-      "successDescription": "Tu contraseña ha sido actualizada exitosamente.",
-      "successMessage": "Serás redirigido a la página de inicio de sesión en breve.",
+      "passwordUpdated": "¡Contraseña Actualizada!",
+      "successMessage": "Tu contraseña ha sido actualizada exitosamente.",
+      "redirectingToLogin": "Redirigiendo al inicio de sesión en 3 segundos...",
       "goToLogin": "Ir al Inicio de Sesión",
+      "success": "Contraseña actualizada exitosamente",
+      "successDescription": "Tu contraseña ha sido actualizada. Ahora puedes iniciar sesión con tu nueva contraseña.",
       "error": "Error",
-      "updateFailed": "Error al Actualizar Contraseña",
+      "updateFailed": "Fallo al actualizar contraseña",
       "passwordsDoNotMatch": "Las contraseñas no coinciden",
-      "passwordRequirements": "Requisitos de Contraseña",
-      "passwordRequirementsHint": "Al menos 8 caracteres, 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial",
+      "passwordRequirements": "Requisitos de contraseña no cumplidos",
       "passwordTooShort": "La contraseña debe tener al menos {{minLength}} caracteres",
       "passwordNeedsUppercase": "La contraseña debe contener al menos una letra mayúscula",
       "passwordNeedsLowercase": "La contraseña debe contener al menos una letra minúscula",
       "passwordNeedsNumber": "La contraseña debe contener al menos un número",
       "passwordNeedsSpecial": "La contraseña debe contener al menos un carácter especial",
-      "unexpectedError": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo.",
-      "backToLogin": "Volver al Inicio de Sesión",
-      "sessionExpired": "Sesión Expirada",
-      "sessionExpiredDescription": "Tu sesión de restablecimiento de contraseña ha expirado. Por favor, solicita un nuevo enlace de restablecimiento.",
+      "passwordRequirementsHint": "La contraseña debe tener al menos 8 caracteres con mayúscula, minúscula, número y carácter especial",
       "linkExpired": "Enlace de Restablecimiento Expirado",
-      "linkExpiredDescription": "Este enlace de restablecimiento de contraseña ha expirado o ya no es válido. Por favor, solicita uno nuevo.",
-      "invalidLink": "Enlace de Restablecimiento Inválido",
-      "invalidLinkDescription": "Este enlace de restablecimiento de contraseña es inválido o ya ha sido utilizado.",
-      "requestNewLink": "Solicitar Nuevo Enlace de Restablecimiento",
+      "linkExpiredDescription": "Este enlace de restablecimiento de contraseña ha expirado. Por favor solicita uno nuevo.",
+      "sessionExpired": "Sesión expirada",
+      "sessionExpiredDescription": "Tu sesión de restablecimiento ha expirado. Por favor solicita un nuevo enlace de restablecimiento de contraseña.",
+      "invalidLink": "Enlace de restablecimiento inválido",
+      "invalidLinkDescription": "Este enlace de restablecimiento de contraseña es inválido o ha sido usado. Por favor solicita uno nuevo.",
+      "invalidSession": "Sesión inválida",
+      "requestNewLink": "Solicitar Nuevo Enlace",
+      "unexpectedError": "Ocurrió un error inesperado. Por favor intenta nuevamente.",
       "attempt": "Intento",
-      "validatingToken": "Validando Token de Restablecimiento",
-      "validatingTokenDescription": "Por favor espera mientras validamos tu token de restablecimiento de contraseña...",
-      "tokenValidated": "Token Validado",
-      "tokenValidatedDescription": "Ahora puedes establecer tu nueva contraseña.",
-      "invalidSession": "Sesión inválida. Por favor, solicita un nuevo enlace de restablecimiento."
+      "errors": {
+        "invalidEmail": "Por favor ingresa un email válido",
+        "emailRequired": "El email es requerido",
+        "resetFailed": "Fallo al enviar email de restablecimiento. Por favor intenta nuevamente",
+        "userNotFound": "No se encontró ninguna cuenta con este email"
+      }
     },
     "verifyEmail": {
-      "title": "Verifica tu correo",
-      "subtitle": "Hemos enviado un enlace de verificación a tu correo",
-      "verifying": "Verificando tu correo...",
-      "verified": "¡Correo verificado!",
-      "verifiedDescription": "Tu correo ha sido verificado exitosamente. Ahora puedes acceder a tu cuenta.",
-      "invalid": "Enlace de verificación inválido",
-      "invalidDescription": "El enlace de verificación es inválido o ha expirado. Por favor solicita uno nuevo.",
-      "expired": "Enlace de verificación expirado",
-      "expiredDescription": "Tu enlace de verificación ha expirado. Por favor solicita un nuevo correo de verificación.",
-      "resendVerification": "Reenviar correo de verificación",
-      "resending": "Reenviando...",
-      "backToLogin": "Volver al inicio de sesión",
-      "goToLogin": "Ir al inicio de sesión",
-      "error": "Error de verificación",
-      "unexpectedError": "Ocurrió un error inesperado durante la verificación. Por favor inténtalo de nuevo.",
-      "missingParameters": "Faltan parámetros requeridos en el enlace de verificación.",
-      "emailRequired": "Se requiere la dirección de correo electrónico para la verificación."
+      "title": "Verifica tu Email",
+      "subtitle": "Por favor revisa tu email y haz clic en el enlace de verificación",
+      "success": "¡Email verificado exitosamente!",
+      "error": "Verificación de email fallida",
+      "resend": "Reenviar Email de Verificación",
+      "backToLogin": "Volver al Inicio de Sesión",
+      "checkEmail": "Hemos enviado un enlace de verificación a tu dirección de email. Por favor revisa tu bandeja de entrada y haz clic en el enlace para verificar tu cuenta.",
+      "alreadyVerified": "Tu email ya está verificado. Ahora puedes iniciar sesión en tu cuenta.",
+      "verifying": "Verificando tu email...",
+      "verified": "¡Email Verificado!",
+      "verifiedDescription": "Tu email ha sido verificado exitosamente. Ahora puedes iniciar sesión en tu cuenta.",
+      "resendSuccess": "¡Email de verificación enviado!",
+      "resendDescription": "Por favor revisa tu email para el enlace de verificación.",
+      "resending": "Enviando..."
     }
+  },
+  "navigation": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "features": "Características",
+    "benefits": "Beneficios",
+    "learning": "Aprendizaje",
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "getStarted": "Comenzar"
+  },
+  "footer": {
+    "company": "Empresa",
+    "about": "Acerca de",
+    "blog": "Blog",
+    "careers": "Carreras",
+    "legal": "Legal",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "cookies": "Política de Cookies",
+    "support": "Soporte",
+    "contact": "Contacto",
+    "help": "Centro de Ayuda",
+    "community": "Comunidad",
+    "allRightsReserved": "Todos los derechos reservados"
   }
 }
