@@ -1,11 +1,12 @@
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, ChartCandlestick, Github } from "lucide-react";
+import { Eye, EyeOff, ChartCandlestick, Github, Mail, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from 'react-i18next';
@@ -20,7 +21,9 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
-  const { signUp, user, signInWithOAuth } = useAuth();
+  const [pendingVerification, setPendingVerification] = useState(false);
+  const [resendingEmail, setResendingEmail] = useState(false);
+  const { signUp, user, signInWithOAuth, resendConfirmation } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -63,27 +66,66 @@ const Signup = () => {
       
       if (error.message.includes("User already registered")) {
         errorMessage = "An account with this email already exists. Please try logging in instead.";
+      } else if (error.message.includes("Invalid email")) {
+        errorMessage = "Please enter a valid email address.";
+      } else if (error.message.includes("Password")) {
+        errorMessage = "Password must be at least 8 characters long.";
       }
       
       toast({
-        title: "Signup Failed",
+        title: "❌ Signup Failed",
         description: errorMessage,
         variant: "destructive",
         duration: 8000,
       });
+      setPendingVerification(false);
     } else {
       console.log('🔐 [SIGNUP] Signup successful, verification email sent');
-      toast({
-        title: "Account Created Successfully!",
-        description: "Please check your email and click the verification link to complete your registration.",
-        duration: 10000,
-      });
+      setPendingVerification(true);
       
-      // Redirect to login with a message
-      navigate("/login?signup_success=true");
+      toast({
+        title: "🎉 Account Created Successfully!",
+        description: "Please check your email and click the verification link to complete your registration. Don't forget to check your spam folder!",
+        duration: 12000,
+      });
     }
 
     setLoading(false);
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      toast({
+        title: "📧 Email Required",
+        description: "Please enter your email address to resend verification.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setResendingEmail(true);
+    console.log('🔐 [EMAIL_VERIFICATION] User requested resend verification');
+    
+    const { error } = await resendConfirmation(email);
+    
+    if (error) {
+      console.error('🔐 [EMAIL_VERIFICATION] Resend failed:', error);
+      toast({
+        title: "❌ Resend Failed",
+        description: error.message || "Failed to resend verification email. Please try again.",
+        variant: "destructive",
+        duration: 8000,
+      });
+    } else {
+      console.log('🔐 [EMAIL_VERIFICATION] Resend successful');
+      toast({
+        title: "✅ Verification Email Sent!",
+        description: "A new verification email has been sent to your inbox. Please check your email and spam folder.",
+        duration: 10000,
+      });
+    }
+    
+    setResendingEmail(false);
   };
 
   const handleOAuthSignup = async (provider: 'google' | 'github') => {
@@ -95,7 +137,7 @@ const Signup = () => {
     if (error) {
       console.error('🔐 [SIGNUP] OAuth signup failed:', error);
       toast({
-        title: "OAuth Signup Failed",
+        title: "❌ OAuth Signup Failed",
         description: error.message || `Failed to signup with ${provider}. Please try again.`,
         variant: "destructive",
       });
@@ -119,11 +161,46 @@ const Signup = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Email verification pending alert */}
+          {pendingVerification && (
+            <Alert className="mb-6 border-blue-500/50 bg-blue-900/20">
+              <Mail className="h-4 w-4" />
+              <AlertDescription className="text-blue-400">
+                <div className="space-y-3">
+                  <p className="font-medium">📧 Check Your Email!</p>
+                  <p className="text-sm">
+                    We've sent a verification link to <strong>{email}</strong>. 
+                    Please check your inbox and spam folder, then click the link to verify your account.
+                  </p>
+                  <Button
+                    onClick={handleResendVerification}
+                    disabled={resendingEmail}
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-3 bg-blue-900/30 border-blue-600 hover:bg-blue-800/30"
+                  >
+                    {resendingEmail ? (
+                      <>
+                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                        Resending...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="mr-2 h-4 w-4" />
+                        Resend Verification Email
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* OAuth Signup Section */}
           <div className="space-y-4 mb-6">
             <Button
               onClick={() => handleOAuthSignup('google')}
-              disabled={oauthLoading === 'google'}
+              disabled={oauthLoading === 'google' || pendingVerification}
               className="w-full bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
             >
               {oauthLoading === 'google' ? (
@@ -146,7 +223,7 @@ const Signup = () => {
 
             <Button
               onClick={() => handleOAuthSignup('github')}
-              disabled={oauthLoading === 'github'}
+              disabled={oauthLoading === 'github' || pendingVerification}
               className="w-full bg-gray-800 text-white hover:bg-gray-700 border border-gray-600"
             >
               {oauthLoading === 'github' ? (
@@ -184,6 +261,7 @@ const Signup = () => {
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder={t('placeholders.enterFullName')}
                 required
+                disabled={pendingVerification}
                 className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
               />
             </div>
@@ -198,6 +276,7 @@ const Signup = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('placeholders.enterEmail')}
                 required
+                disabled={pendingVerification}
                 className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
               />
             </div>
@@ -214,6 +293,7 @@ const Signup = () => {
                   placeholder={t('placeholders.enterPassword')}
                   required
                   minLength={8}
+                  disabled={pendingVerification}
                   className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500 pr-10"
                 />
                 <button
@@ -239,6 +319,7 @@ const Signup = () => {
                   placeholder={t('placeholders.confirmPassword')}
                   required
                   minLength={8}
+                  disabled={pendingVerification}
                   className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500 pr-10"
                 />
                 <button
@@ -253,10 +334,10 @@ const Signup = () => {
             </div>
             <Button
               type="submit"
-              disabled={loading}
+              disabled={loading || pendingVerification}
               className="tradeiq-button-primary w-full"
             >
-              {loading ? 'Creating Account...' : t('auth.signup.signUp')}
+              {loading ? 'Creating Account...' : pendingVerification ? 'Account Created - Check Email' : t('auth.signup.signUp')}
             </Button>
           </form>
           

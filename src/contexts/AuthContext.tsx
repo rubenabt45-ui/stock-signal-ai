@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -89,48 +90,87 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Always use production domain for email verification
     const redirectUrl = 'https://tradeiqpro.com/verify-email';
     
-    console.log('🔐 [AUTH_FLOW] Sign up with redirect URL:', redirectUrl);
-    console.log('🔐 [AUTH_FLOW] Current hostname:', window.location.hostname);
-    console.log('🔐 [AUTH_FLOW] Using production redirect for all environments');
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: fullName ? { full_name: fullName } : undefined
-      }
+    console.log('🔐 [EMAIL_VERIFICATION] Starting signup process');
+    console.log('🔐 [EMAIL_VERIFICATION] Email:', email);
+    console.log('🔐 [EMAIL_VERIFICATION] Redirect URL:', redirectUrl);
+    console.log('🔐 [EMAIL_VERIFICATION] Current environment:', {
+      hostname: window.location.hostname,
+      origin: window.location.origin,
+      href: window.location.href
     });
     
-    if (error) {
-      console.error('🔐 [AUTH_FLOW] Sign up error:', error);
-    } else {
-      console.log('🔐 [AUTH_FLOW] Sign up successful, verification email sent');
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: fullName ? { full_name: fullName } : undefined
+        }
+      });
+      
+      if (error) {
+        console.error('🔐 [EMAIL_VERIFICATION] Signup error:', error);
+        console.error('🔐 [EMAIL_VERIFICATION] Error details:', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
+        return { error };
+      }
+
+      console.log('🔐 [EMAIL_VERIFICATION] Signup response:', {
+        user: data.user ? 'created' : 'null',
+        session: data.session ? 'active' : 'null',
+        userConfirmed: data.user?.email_confirmed_at ? 'confirmed' : 'pending'
+      });
+
+      if (data.user && !data.user.email_confirmed_at) {
+        console.log('🔐 [EMAIL_VERIFICATION] Email verification required');
+        console.log('🔐 [EMAIL_VERIFICATION] User should check email for verification link');
+      } else if (data.user && data.user.email_confirmed_at) {
+        console.log('🔐 [EMAIL_VERIFICATION] User already verified');
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      console.error('🔐 [EMAIL_VERIFICATION] Signup exception:', error);
+      return { error: { message: 'An unexpected error occurred during signup' } };
     }
-    
-    return { error };
   };
 
   const resendConfirmation = async (email: string) => {
     const redirectUrl = 'https://tradeiqpro.com/verify-email';
     
-    console.log('🔐 [AUTH_FLOW] Resending confirmation with redirect URL:', redirectUrl);
+    console.log('🔐 [EMAIL_VERIFICATION] Resending confirmation email');
+    console.log('🔐 [EMAIL_VERIFICATION] Email:', email);
+    console.log('🔐 [EMAIL_VERIFICATION] Redirect URL:', redirectUrl);
     
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email,
-      options: {
-        emailRedirectTo: redirectUrl
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: redirectUrl
+        }
+      });
+      
+      if (error) {
+        console.error('🔐 [EMAIL_VERIFICATION] Resend error:', error);
+        console.error('🔐 [EMAIL_VERIFICATION] Error details:', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
+        return { error };
       }
-    });
-    
-    if (error) {
-      console.error('🔐 [AUTH_FLOW] Resend confirmation error:', error);
-    } else {
-      console.log('🔐 [AUTH_FLOW] Resend confirmation successful');
+
+      console.log('🔐 [EMAIL_VERIFICATION] Email resent successfully');
+      return { error: null };
+    } catch (error: any) {
+      console.error('🔐 [EMAIL_VERIFICATION] Resend exception:', error);
+      return { error: { message: 'Failed to resend verification email' } };
     }
-    
-    return { error };
   };
 
   const resetPassword = async (email: string) => {

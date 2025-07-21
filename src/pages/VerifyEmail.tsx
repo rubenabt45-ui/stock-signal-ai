@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, RefreshCw, Mail, AlertTriangle } from 'lucide-react';
+import { CheckCircle, XCircle, RefreshCw, Mail, AlertTriangle, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +33,8 @@ const VerifyEmail = () => {
         type,
         redirectTo,
         currentUrl: window.location.href,
-        currentDomain: window.location.hostname
+        currentDomain: window.location.hostname,
+        timestamp: new Date().toISOString()
       });
 
       // Store verification details for debugging
@@ -42,6 +43,8 @@ const VerifyEmail = () => {
       // Validate required parameters
       if (!tokenHash || !type) {
         console.error('🔐 [EMAIL_VERIFICATION] Missing required parameters');
+        console.error('🔐 [EMAIL_VERIFICATION] Token hash:', tokenHash ? 'present' : 'missing');
+        console.error('🔐 [EMAIL_VERIFICATION] Type:', type);
         setStatus('invalid');
         setErrorMessage('Invalid verification link. Required parameters are missing.');
         return;
@@ -72,23 +75,34 @@ const VerifyEmail = () => {
 
         if (error) {
           console.error('🔐 [EMAIL_VERIFICATION] Verification failed:', error);
+          console.error('🔐 [EMAIL_VERIFICATION] Error details:', {
+            message: error.message,
+            status: error.status,
+            name: error.name
+          });
           
           // Handle specific error types
-          if (error.message.includes('expired')) {
-            console.log('🔐 [EMAIL_VERIFICATION] Invalid or expired token');
+          if (error.message.includes('expired') || error.message.includes('Token has expired')) {
+            console.log('🔐 [EMAIL_VERIFICATION_ERROR] Token expired');
             setStatus('expired');
             setErrorMessage('Your verification link has expired. Please request a new verification email.');
-          } else if (error.message.includes('invalid') || error.message.includes('not found')) {
-            console.log('🔐 [EMAIL_VERIFICATION] Invalid or expired token');
+          } else if (error.message.includes('invalid') || error.message.includes('not found') || error.message.includes('Token not found')) {
+            console.log('🔐 [EMAIL_VERIFICATION_ERROR] Invalid or used token');
             setStatus('invalid');
             setErrorMessage('Your verification link is invalid or has already been used. Please request a new verification email.');
           } else {
-            console.log('🔐 [EMAIL_VERIFICATION] Generic verification error');
+            console.log('🔐 [EMAIL_VERIFICATION_ERROR] Generic verification error');
             setStatus('error');
             setErrorMessage(error.message || 'Email verification failed. Please try again or request a new verification email.');
           }
         } else {
-          console.log('🔐 [EMAIL_VERIFICATION] Verification successful');
+          console.log('🔐 [EMAIL_VERIFICATION_SUCCESS] Verification successful');
+          console.log('🔐 [EMAIL_VERIFICATION_SUCCESS] User data:', {
+            userId: data.user?.id,
+            email: data.user?.email,
+            emailConfirmed: data.user?.email_confirmed_at ? 'confirmed' : 'pending'
+          });
+          
           setStatus('success');
           
           // Show success toast with enhanced message
@@ -103,7 +117,7 @@ const VerifyEmail = () => {
           
           // Auto-redirect to login after 3 seconds
           setTimeout(() => {
-            console.log('🔐 [EMAIL_VERIFICATION] Redirecting to login');
+            console.log('🔐 [EMAIL_VERIFICATION_SUCCESS] Redirecting to login');
             navigate('/login?verified=true');
           }, 3000);
         }
@@ -144,14 +158,16 @@ const VerifyEmail = () => {
           {status === 'verifying' && (
             <>
               <div className="flex justify-center">
-                <RefreshCw className="h-16 w-16 text-tradeiq-blue animate-spin" />
+                <div className="p-4 bg-blue-500/20 rounded-full">
+                  <RefreshCw className="h-16 w-16 text-tradeiq-blue animate-spin" />
+                </div>
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-white mb-2">
-                  {t('auth.verifyEmail.verifying.title')}
+                  🔍 Verifying Your Email...
                 </h3>
                 <p className="text-gray-400">
-                  {t('auth.verifyEmail.verifying.description')}
+                  Please wait while we confirm your email address.
                 </p>
               </div>
             </>
@@ -171,14 +187,15 @@ const VerifyEmail = () => {
                 <p className="text-gray-400 mb-4">
                   Your email has been confirmed. Welcome to TradeIQ Pro!
                 </p>
-                <p className="text-sm text-tradeiq-blue mb-4">
-                  Redirecting you to login in 3 seconds...
-                </p>
+                <div className="flex items-center justify-center space-x-2 text-sm text-tradeiq-blue mb-4">
+                  <Clock className="h-4 w-4" />
+                  <span>Redirecting you to login in 3 seconds...</span>
+                </div>
                 <Button 
                   onClick={handleGoToLogin}
                   className="tradeiq-button-primary"
                 >
-                  {t('auth.verifyEmail.success.goToLogin')}
+                  Continue to Login
                 </Button>
               </div>
             </>
@@ -197,6 +214,9 @@ const VerifyEmail = () => {
                 </h3>
                 <p className="text-gray-400 mb-4">
                   {errorMessage}
+                </p>
+                <p className="text-sm text-gray-500 mb-4">
+                  Verification links expire after 24 hours for security reasons.
                 </p>
                 <div className="space-y-3">
                   <Button 
@@ -262,6 +282,7 @@ const VerifyEmail = () => {
                 <li>Token: {verificationDetails.tokenHash ? 'Present' : 'Missing'}</li>
                 <li>Type: {verificationDetails.type || 'N/A'}</li>
                 <li>Status: {status}</li>
+                <li>Time: {new Date().toLocaleTimeString()}</li>
               </ul>
             </div>
           )}
