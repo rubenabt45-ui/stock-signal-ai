@@ -139,6 +139,7 @@
       "email": "Correo Electrónico",
       "password": "Contraseña",
       "submit": "Iniciar Sesión",
+      "signIn": "Iniciar Sesión",
       "forgotPassword": "¿Olvidaste tu contraseña?",
       "noAccount": "¿No tienes una cuenta?",
       "signUp": "Registrarse",
@@ -149,6 +150,13 @@
       "rememberMe": "Recordarme",
       "backToHome": "Volver al Inicio",
       "passwordUpdated": "¡Contraseña actualizada exitosamente! Ahora puedes iniciar sesión con tu nueva contraseña.",
+      "loginFailed": "Inicio de Sesión Fallido",
+      "emailNotConfirmed": "Email No Confirmado",
+      "checkEmail": "Por favor revisa tu email y haz clic en el enlace de verificación antes de iniciar sesión",
+      "invalidCredentials": "Email o contraseña inválidos",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
+      "hasAccount": "¿Ya tienes una cuenta?",
       "errors": {
         "invalidCredentials": "Email o contraseña inválidos",
         "emailNotConfirmed": "Por favor revisa tu email y haz clic en el enlace de verificación antes de iniciar sesión",
@@ -167,7 +175,9 @@
       "password": "Contraseña",
       "confirmPassword": "Confirmar Contraseña",
       "submit": "Crear Cuenta",
+      "signUp": "Registrarse",
       "haveAccount": "¿Ya tienes una cuenta?",
+      "hasAccount": "¿Ya tienes una cuenta?",
       "signIn": "Iniciar sesión",
       "signingUp": "Creando cuenta...",
       "oauthDivider": "O regístrate con",
@@ -241,6 +251,26 @@
         "userNotFound": "No se encontró ninguna cuenta con este email"
       }
     },
+    "resetPasswordRequest": {
+      "title": "Restablece tu Contraseña",
+      "subtitle": "Ingresa tu dirección de email y te enviaremos un enlace para restablecer tu contraseña",
+      "emailLabel": "Dirección de Email",
+      "sendButton": "Enviar Enlace de Restablecimiento",
+      "sending": "Enviando...",
+      "emailSent": "¡Email de Restablecimiento Enviado!",
+      "checkEmail": "Revisa tu email para instrucciones de restablecimiento",
+      "checkEmailTitle": "Revisa tu Email",
+      "emailSentDescription": "Hemos enviado un enlace de restablecimiento de contraseña a {email}. Por favor revisa tu bandeja de entrada y sigue las instrucciones.",
+      "instructionsSent": "Las instrucciones de restablecimiento de contraseña han sido enviadas a tu dirección de email.",
+      "didntReceive": "¿No recibiste el email? Revisa tu carpeta de spam o solicita otro.",
+      "sendAnother": "Enviar Otro Enlace de Restablecimiento",
+      "backToLogin": "Volver al Inicio de Sesión",
+      "emailRequired": "Email Requerido",
+      "enterEmail": "Por favor ingresa tu dirección de email",
+      "error": "Error",
+      "failedToSend": "Fallo al enviar email de restablecimiento",
+      "unexpectedError": "Ocurrió un error inesperado"
+    },
     "verifyEmail": {
       "title": "Verifica tu Email",
       "subtitle": "Por favor revisa tu email y haz clic en el enlace de verificación",
@@ -267,7 +297,9 @@
     "continue": "Continuar",
     "back": "Atrás",
     "retry": "Reintentar",
-    "comingSoon": "Próximamente"
+    "comingSoon": "Próximamente",
+    "home": "Inicio",
+    "pricing": "Precios"
   },
   "navigation": {
     "home": "Inicio",

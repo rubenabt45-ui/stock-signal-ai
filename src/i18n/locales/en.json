@@ -139,6 +139,7 @@
       "email": "Email",
       "password": "Password",
       "submit": "Sign In",
+      "signIn": "Sign In",
       "forgotPassword": "Forgot Password?",
       "noAccount": "Don't have an account?",
       "signUp": "Sign up",
@@ -149,6 +150,13 @@
       "rememberMe": "Remember me",
       "backToHome": "Back to Home",
       "passwordUpdated": "Password updated successfully! You can now sign in with your new password.",
+      "loginFailed": "Login Failed",
+      "emailNotConfirmed": "Email Not Confirmed",
+      "checkEmail": "Please check your email and click the verification link before signing in",
+      "invalidCredentials": "Invalid email or password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "hasAccount": "Already have an account?",
       "errors": {
         "invalidCredentials": "Invalid email or password",
         "emailNotConfirmed": "Please check your email and click the verification link before signing in",
@@ -167,7 +175,9 @@
       "password": "Password",
       "confirmPassword": "Confirm Password",
       "submit": "Create Account",
+      "signUp": "Sign Up",
       "haveAccount": "Already have an account?",
+      "hasAccount": "Already have an account?",
       "signIn": "Sign in",
       "signingUp": "Creating account...",
       "oauthDivider": "Or sign up with",
@@ -241,6 +251,26 @@
         "userNotFound": "No account found with this email address"
       }
     },
+    "resetPasswordRequest": {
+      "title": "Reset Your Password",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password",
+      "emailLabel": "Email Address",
+      "sendButton": "Send Reset Link",
+      "sending": "Sending...",
+      "emailSent": "Reset Email Sent!",
+      "checkEmail": "Check your email for reset instructions",
+      "checkEmailTitle": "Check Your Email",
+      "emailSentDescription": "We've sent a password reset link to {email}. Please check your inbox and follow the instructions.",
+      "instructionsSent": "Password reset instructions have been sent to your email address.",
+      "didntReceive": "Didn't receive the email? Check your spam folder or request another one.",
+      "sendAnother": "Send Another Reset Link",
+      "backToLogin": "Back to Login",
+      "emailRequired": "Email Required",
+      "enterEmail": "Please enter your email address",
+      "error": "Error",
+      "failedToSend": "Failed to send reset email",
+      "unexpectedError": "An unexpected error occurred"
+    },
     "verifyEmail": {
       "title": "Verify Your Email",
       "subtitle": "Please check your email and click the verification link",
@@ -267,7 +297,9 @@
     "continue": "Continue",
     "back": "Back",
     "retry": "Retry",
-    "comingSoon": "Coming Soon"
+    "comingSoon": "Coming Soon",
+    "home": "Home",
+    "pricing": "Pricing"
   },
   "navigation": {
     "home": "Home",

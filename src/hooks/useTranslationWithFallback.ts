@@ -1,3 +1,4 @@
+
 import { useTranslation } from 'react-i18next';
 
 // Comprehensive translation fallbacks mapping
@@ -12,6 +13,8 @@ const TRANSLATION_FALLBACKS: Record<string, string> = {
   'common.back': 'Back',
   'common.retry': 'Retry',
   'common.comingSoon': 'Coming Soon',
+  'common.home': 'Home',
+  'common.pricing': 'Pricing',
   
   // Navigation
   'navigation.home': 'Home',
@@ -65,6 +68,69 @@ const TRANSLATION_FALLBACKS: Record<string, string> = {
   'landing.earlyAccess.email': 'Email Address',
   'landing.earlyAccess.submit': 'Join Waitlist',
   'landing.earlyAccess.success': 'Thanks for joining! We\'ll be in touch soon.',
+  
+  // Authentication
+  'auth.login.title': 'Welcome Back',
+  'auth.login.subtitle': 'Sign in to your TradeIQ account',
+  'auth.login.email': 'Email',
+  'auth.login.password': 'Password',
+  'auth.login.submit': 'Sign In',
+  'auth.login.signIn': 'Sign In',
+  'auth.login.forgotPassword': 'Forgot Password?',
+  'auth.login.noAccount': 'Don\'t have an account?',
+  'auth.login.signUp': 'Sign up',
+  'auth.login.signingIn': 'Signing in...',
+  'auth.login.loginFailed': 'Login Failed',
+  'auth.login.emailNotConfirmed': 'Email Not Confirmed',
+  'auth.login.checkEmail': 'Please check your email and click the verification link before signing in',
+  'auth.login.invalidCredentials': 'Invalid email or password',
+  'auth.login.showPassword': 'Show password',
+  'auth.login.hidePassword': 'Hide password',
+  'auth.login.hasAccount': 'Already have an account?',
+  
+  'auth.signup.title': 'Create Your Account',
+  'auth.signup.subtitle': 'Start your trading journey with TradeIQ',
+  'auth.signup.fullName': 'Full Name',
+  'auth.signup.email': 'Email',
+  'auth.signup.password': 'Password',
+  'auth.signup.confirmPassword': 'Confirm Password',
+  'auth.signup.submit': 'Create Account',
+  'auth.signup.signUp': 'Sign Up',
+  'auth.signup.hasAccount': 'Already have an account?',
+  'auth.signup.signIn': 'Sign in',
+  
+  'auth.resetPasswordRequest.title': 'Reset Your Password',
+  'auth.resetPasswordRequest.subtitle': 'Enter your email address and we\'ll send you a link to reset your password',
+  'auth.resetPasswordRequest.emailLabel': 'Email Address',
+  'auth.resetPasswordRequest.sendButton': 'Send Reset Link',
+  'auth.resetPasswordRequest.sending': 'Sending...',
+  'auth.resetPasswordRequest.emailSent': 'Reset Email Sent!',
+  'auth.resetPasswordRequest.checkEmail': 'Check your email for reset instructions',
+  'auth.resetPasswordRequest.checkEmailTitle': 'Check Your Email',
+  'auth.resetPasswordRequest.emailSentDescription': 'We\'ve sent a password reset link to your email. Please check your inbox and follow the instructions.',
+  'auth.resetPasswordRequest.instructionsSent': 'Password reset instructions have been sent to your email address.',
+  'auth.resetPasswordRequest.didntReceive': 'Didn\'t receive the email? Check your spam folder or request another one.',
+  'auth.resetPasswordRequest.sendAnother': 'Send Another Reset Link',
+  'auth.resetPasswordRequest.backToLogin': 'Back to Login',
+  'auth.resetPasswordRequest.emailRequired': 'Email Required',
+  'auth.resetPasswordRequest.enterEmail': 'Please enter your email address',
+  'auth.resetPasswordRequest.error': 'Error',
+  'auth.resetPasswordRequest.failedToSend': 'Failed to send reset email',
+  'auth.resetPasswordRequest.unexpectedError': 'An unexpected error occurred',
+  
+  'auth.verifyEmail.title': 'Verify Your Email',
+  'auth.verifyEmail.subtitle': 'Please check your email and click the verification link',
+  'auth.verifyEmail.success': 'Email verified successfully!',
+  'auth.verifyEmail.error': 'Email verification failed',
+  'auth.verifyEmail.resend': 'Resend Verification Email',
+  'auth.verifyEmail.backToLogin': 'Back to Login',
+  'auth.verifyEmail.checkEmail': 'We\'ve sent a verification link to your email address. Please check your inbox and click the link to verify your account.',
+  'auth.verifyEmail.verifying': 'Verifying your email...',
+  'auth.verifyEmail.verified': 'Email Verified!',
+  'auth.verifyEmail.verifiedDescription': 'Your email has been successfully verified. You can now sign in to your account.',
+  'auth.verifyEmail.resendSuccess': 'Verification email sent!',
+  'auth.verifyEmail.resendDescription': 'Please check your email for the verification link.',
+  'auth.verifyEmail.resending': 'Sending...',
   
   // Dashboard
   'dashboard.welcomeBack': 'Welcome back',
@@ -125,7 +191,10 @@ const TRANSLATION_FALLBACKS: Record<string, string> = {
   'marketUpdates.liveData.title': 'Live Market Data',
   'marketUpdates.liveData.description': 'Real-time price feeds and market movements across all major exchanges',
   'marketUpdates.smartAlerts.title': 'Smart Alerts',
-  'marketUpdates.smartAlerts.description': 'AI-powered notifications for market opportunities and risk management'
+  'marketUpdates.smartAlerts.description': 'AI-powered notifications for market opportunities and risk management',
+  
+  // Footer
+  'footer.allRightsReserved': 'All rights reserved'
 };
 
 export const useTranslationWithFallback = () => {
@@ -139,22 +208,34 @@ export const useTranslationWithFallback = () => {
       
       // If translation returns the key itself (no translation found) or is empty, use fallback
       if ((translationStr === key || !translationStr || translationStr.trim() === '') && TRANSLATION_FALLBACKS[key]) {
-        console.warn(`Translation missing for key: ${key}, using fallback`);
+        console.warn(`🌐 [I18N_FALLBACK] Translation missing for key: ${key} in language: ${i18n.language}, using fallback`);
         return TRANSLATION_FALLBACKS[key];
+      }
+      
+      // If no fallback exists, warn and return the key
+      if (translationStr === key || !translationStr || translationStr.trim() === '') {
+        console.warn(`🌐 [I18N_MISSING] No translation or fallback found for key: ${key} in language: ${i18n.language}`);
+        // Return a human-readable version of the key as last resort
+        return key.split('.').pop()?.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) || key;
       }
       
       // Ensure we always return a string
       return translationStr;
     } catch (error) {
-      console.warn(`Translation error for key: ${key}`, error);
-      // Return fallback if available, otherwise return the key as last resort
-      return TRANSLATION_FALLBACKS[key] || key;
+      console.error(`🌐 [I18N_ERROR] Translation error for key: ${key}`, error);
+      // Return fallback if available, otherwise return a human-readable version of the key
+      return TRANSLATION_FALLBACKS[key] || key.split('.').pop()?.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) || key;
     }
   };
 
   return { 
     t: tWithFallback, 
     i18n,
-    ready: i18n.isInitialized 
+    ready: i18n.isInitialized,
+    // Helper function to check if a key exists
+    hasKey: (key: string) => {
+      const translation = t(key);
+      return translation !== key && translation && translation.trim() !== '';
+    }
   };
 };
