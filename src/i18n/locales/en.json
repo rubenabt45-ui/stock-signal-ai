@@ -11,11 +11,25 @@
       "signup": "Sign Up",
       "getStarted": "Get Started"
     },
+    "navbar": {
+      "home": "Home",
+      "learnPreview": "Learn",
+      "pricing": "Pricing",
+      "login": "Login",
+      "signUp": "Sign Up"
+    },
     "hero": {
       "title": "Master Trading with AI-Powered Insights",
       "subtitle": "Transform your trading strategy with real-time market analysis, personalized AI recommendations, and comprehensive learning resources.",
       "cta": "Start Trading Smarter",
-      "secondary": "Learn More"
+      "secondary": "Learn More",
+      "joinBeta": "Join Beta",
+      "watchDemo": "Watch Demo",
+      "stats": {
+        "accuracy": "Prediction Accuracy",
+        "speed": "AI Signal Speed",
+        "monitoring": "Real-Time Monitoring"
+      }
     },
     "stats": {
       "accuracy": "95% Accuracy",
@@ -24,7 +38,7 @@
     },
     "about": {
       "title": "About TradeIQ",
-      "description": "TradeIQ combines cutting-edge artificial intelligence with comprehensive market analysis to help traders make informed decisions. Our platform provides real-time insights, personalized recommendations, and educational resources to enhance your trading journey."
+      "description": "TradeIQ combines cutting-edge AI with comprehensive market analysis to help traders make informed decisions. Our platform provides real-time insights, personalized tools, and a thriving trading community."
     },
     "features": {
       "title": "Powerful Features",
@@ -39,6 +53,22 @@
       "learning": {
         "title": "Learning Resources",
         "description": "Comprehensive guides and tutorials to improve your trading skills"
+      },
+      "patternDetection": {
+        "title": "Pattern Detection",
+        "description": "AI-powered pattern recognition to identify profitable trading opportunities"
+      },
+      "trendAnalysis": {
+        "title": "Trend Analysis",
+        "description": "Advanced trend analysis with real-time market sentiment indicators"
+      },
+      "volatilityHeatmaps": {
+        "title": "Volatility Heatmaps",
+        "description": "Visual volatility analysis to optimize entry and exit timing"
+      },
+      "aiInsights": {
+        "title": "AI Insights",
+        "description": "Personalized AI recommendations based on your trading style"
       }
     },
     "benefits": {
@@ -54,12 +84,52 @@
       "support": {
         "title": "Expert Support",
         "description": "Get help from our team of trading experts and analysts"
+      },
+      "reducedSubjectivity": {
+        "title": "Reduced Subjectivity",
+        "description": "Remove emotional bias with data-driven AI analysis and objective market insights"
+      },
+      "fasterDecisions": {
+        "title": "Faster Decisions",
+        "description": "Make quicker trading decisions with real-time AI processing and instant alerts"
+      },
+      "practicalEducation": {
+        "title": "Practical Education",
+        "description": "Learn through real market examples and AI-guided trading scenarios"
+      },
+      "higherPrecision": {
+        "title": "Higher Precision",
+        "description": "Improve your trading accuracy with advanced pattern recognition algorithms"
       }
     },
     "learning": {
       "title": "Master Trading with Our Learning Platform",
       "description": "Access comprehensive courses, tutorials, and real-world examples to enhance your trading skills.",
       "cta": "Explore Learning"
+    },
+    "learningSection": {
+      "title": "Master Trading with Our Learning Platform",
+      "description": "Access comprehensive courses, tutorials, and real-world examples to enhance your trading skills.",
+      "cta": "Explore Learning",
+      "fundamentals": {
+        "title": "Trading Fundamentals",
+        "description": "Learn the basics of market analysis, chart reading, and fundamental concepts"
+      },
+      "patterns": {
+        "title": "Pattern Recognition",
+        "description": "Master technical patterns and learn to identify profitable trading setups"
+      },
+      "riskManagement": {
+        "title": "Risk Management",
+        "description": "Develop proper risk management strategies to protect your capital"
+      }
+    },
+    "earlyAccess": {
+      "title": "Get Early Access",
+      "subtitle": "Be among the first to experience the future of AI-powered trading",
+      "email": "Email Address",
+      "submit": "Join Waitlist",
+      "success": "Thanks for joining! We'll be in touch soon."
     }
   },
   "auth": {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { MobileMenu } from '@/components/MobileMenu';
+import { ErrorFallback } from '@/components/ErrorFallback';
 
-import { useTranslation } from 'react-i18next';
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { 
   TrendingUp, 
   Brain, 
@@ -21,9 +22,21 @@ import {
   Star
 } from 'lucide-react';
 
-const Landing = () => {
+const LandingContent = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, ready } = useTranslationWithFallback();
+
+  // If translations aren't ready yet, show loading state
+  if (!ready) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-gray-300">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // 🚨 BULLETPROOF NAVIGATION HANDLERS
   const handleLogin = () => {
@@ -410,13 +423,13 @@ const Landing = () => {
               <CardContent className="p-4 sm:p-6 lg:p-8">
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                    <Input 
-                      placeholder={t('placeholders.yourName')} 
+                     <Input 
+                      placeholder="Your Name" 
                       className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 sm:h-14 text-base"
                     />
                     <Input 
                       type="email" 
-                      placeholder={t('placeholders.yourEmail')} 
+                      placeholder="Your Email" 
                       className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 sm:h-14 text-base"
                     />
                   </div>
@@ -424,8 +437,8 @@ const Landing = () => {
                     size="lg" 
                     className="w-full py-4 sm:py-6 text-base sm:text-lg hover:scale-105 transform transition-all duration-300 min-h-[48px] sm:min-h-[56px]"
                     onClick={handleSignUp}
-                  >
-                    {t('common.requestEarlyAccess')}
+                   >
+                    Request Early Access
                   </Button>
                   <p className="text-xs sm:text-sm text-gray-400">
                     No spam. Unsubscribe at any time.
@@ -526,6 +539,22 @@ const Landing = () => {
       </footer>
       
     </div>
+  );
+};
+
+// Wrapper component with error boundary
+const Landing = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-gray-300">Loading...</p>
+        </div>
+      </div>
+    }>
+      <LandingContent />
+    </Suspense>
   );
 };
 

@@ -11,11 +11,25 @@
       "signup": "Registrarse",
       "getStarted": "Comenzar"
     },
+    "navbar": {
+      "home": "Inicio",
+      "learnPreview": "Aprender",
+      "pricing": "Precios",
+      "login": "Iniciar Sesión",
+      "signUp": "Registrarse"
+    },
     "hero": {
       "title": "Domina el Trading con Análisis Impulsado por IA",
       "subtitle": "Transforma tu estrategia de trading con análisis de mercado en tiempo real, recomendaciones personalizadas de IA y recursos de aprendizaje integral.",
       "cta": "Comienza a Tradear Más Inteligente",
-      "secondary": "Saber Más"
+      "secondary": "Saber Más",
+      "joinBeta": "Únete al Beta",
+      "watchDemo": "Ver Demo",
+      "stats": {
+        "accuracy": "Precisión de Predicción",
+        "speed": "Velocidad de Señal IA",
+        "monitoring": "Monitoreo en Tiempo Real"
+      }
     },
     "stats": {
       "accuracy": "95% Precisión",
@@ -24,7 +38,7 @@
     },
     "about": {
       "title": "Acerca de TradeIQ",
-      "description": "TradeIQ combina inteligencia artificial de vanguardia con análisis integral del mercado para ayudar a los traders a tomar decisiones informadas. Nuestra plataforma proporciona perspectivas en tiempo real, recomendaciones personalizadas y recursos educativos para mejorar tu experiencia de trading."
+      "description": "TradeIQ combina IA de vanguardia con análisis integral del mercado para ayudar a los traders a tomar decisiones informadas. Nuestra plataforma proporciona perspectivas en tiempo real, herramientas personalizadas y una próspera comunidad de trading."
     },
     "features": {
       "title": "Características Poderosas",
@@ -39,6 +53,22 @@
       "learning": {
         "title": "Recursos de Aprendizaje",
         "description": "Guías y tutoriales comprehensivos para mejorar tus habilidades de trading"
+      },
+      "patternDetection": {
+        "title": "Detección de Patrones",
+        "description": "Reconocimiento de patrones impulsado por IA para identificar oportunidades rentables"
+      },
+      "trendAnalysis": {
+        "title": "Análisis de Tendencias",
+        "description": "Análisis avanzado de tendencias con indicadores de sentimiento del mercado en tiempo real"
+      },
+      "volatilityHeatmaps": {
+        "title": "Mapas de Calor de Volatilidad",
+        "description": "Análisis visual de volatilidad para optimizar el timing de entrada y salida"
+      },
+      "aiInsights": {
+        "title": "Perspectivas de IA",
+        "description": "Recomendaciones personalizadas de IA basadas en tu estilo de trading"
       }
     },
     "benefits": {
@@ -54,12 +84,52 @@
       "support": {
         "title": "Soporte Experto",
         "description": "Obtén ayuda de nuestro equipo de expertos en trading y analistas"
+      },
+      "reducedSubjectivity": {
+        "title": "Subjetividad Reducida",
+        "description": "Elimina el sesgo emocional con análisis de IA basado en datos y perspectivas objetivas del mercado"
+      },
+      "fasterDecisions": {
+        "title": "Decisiones Más Rápidas",
+        "description": "Toma decisiones de trading más rápidas con procesamiento de IA en tiempo real y alertas instantáneas"
+      },
+      "practicalEducation": {
+        "title": "Educación Práctica",
+        "description": "Aprende a través de ejemplos reales del mercado y escenarios de trading guiados por IA"
+      },
+      "higherPrecision": {
+        "title": "Mayor Precisión",
+        "description": "Mejora tu precisión de trading con algoritmos avanzados de reconocimiento de patrones"
       }
     },
     "learning": {
       "title": "Domina el Trading con Nuestra Plataforma de Aprendizaje",
       "description": "Accede a cursos comprehensivos, tutoriales y ejemplos del mundo real para mejorar tus habilidades de trading.",
       "cta": "Explorar Aprendizaje"
+    },
+    "learningSection": {
+      "title": "Domina el Trading con Nuestra Plataforma de Aprendizaje",
+      "description": "Accede a cursos comprehensivos, tutoriales y ejemplos del mundo real para mejorar tus habilidades de trading.",
+      "cta": "Explorar Aprendizaje",
+      "fundamentals": {
+        "title": "Fundamentos de Trading",
+        "description": "Aprende los básicos del análisis de mercado, lectura de gráficos y conceptos fundamentales"
+      },
+      "patterns": {
+        "title": "Reconocimiento de Patrones",
+        "description": "Domina los patrones técnicos y aprende a identificar configuraciones rentables de trading"
+      },
+      "riskManagement": {
+        "title": "Gestión de Riesgo",
+        "description": "Desarrolla estrategias adecuadas de gestión de riesgo para proteger tu capital"
+      }
+    },
+    "earlyAccess": {
+      "title": "Obtén Acceso Temprano",
+      "subtitle": "Sé uno de los primeros en experimentar el futuro del trading impulsado por IA",
+      "email": "Dirección de Email",
+      "submit": "Unirse a Lista de Espera",
+      "success": "¡Gracias por unirte! Te contactaremos pronto."
     }
   },
   "auth": {
