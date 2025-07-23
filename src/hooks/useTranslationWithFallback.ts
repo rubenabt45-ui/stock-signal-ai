@@ -1,7 +1,25 @@
 import { useTranslation } from 'react-i18next';
 
-// Translation fallbacks mapping
+// Comprehensive translation fallbacks mapping
 const TRANSLATION_FALLBACKS: Record<string, string> = {
+  // Common/Global
+  'common.loading': 'Loading...',
+  'common.error': 'Error',
+  'common.success': 'Success',
+  'common.save': 'Save',
+  'common.cancel': 'Cancel',
+  'common.continue': 'Continue',
+  'common.back': 'Back',
+  'common.retry': 'Retry',
+  'common.comingSoon': 'Coming Soon',
+  
+  // Navigation
+  'navigation.home': 'Home',
+  'navigation.learn': 'Learn',
+  'navigation.pricing': 'Pricing',
+  'navigation.about': 'About',
+  
+  // Landing page
   'landing.hero.title': 'Master Trading with AI-Powered Insights',
   'landing.hero.subtitle': 'Transform your trading strategy with real-time market analysis, personalized AI recommendations, and comprehensive learning resources.',
   'landing.hero.joinBeta': 'Join Beta',
@@ -46,7 +64,68 @@ const TRANSLATION_FALLBACKS: Record<string, string> = {
   'landing.earlyAccess.subtitle': 'Be among the first to experience the future of AI-powered trading',
   'landing.earlyAccess.email': 'Email Address',
   'landing.earlyAccess.submit': 'Join Waitlist',
-  'landing.earlyAccess.success': 'Thanks for joining! We\'ll be in touch soon.'
+  'landing.earlyAccess.success': 'Thanks for joining! We\'ll be in touch soon.',
+  
+  // Dashboard
+  'dashboard.welcomeBack': 'Welcome back',
+  'dashboard.subtitle': 'Your AI-powered trading companion',
+  'dashboard.quickActions': 'Quick Actions',
+  'dashboard.recentActivity': 'Recent Activity',
+  'dashboard.marketMonitoring': 'Market Monitoring',
+  'dashboard.patternAccuracy': 'Pattern Accuracy',
+  'dashboard.analysisSpeed': 'Analysis Speed',
+  'dashboard.strategyAI.title': 'StrategyAI',
+  'dashboard.strategyAI.description': 'AI-powered trading analysis and insights',
+  'dashboard.learn.title': 'Learn',
+  'dashboard.learn.description': 'Master trading skills with our educational resources',
+  'dashboard.events.title': 'Economic Events',
+  'dashboard.events.description': 'Track important market events and earnings',
+  'dashboard.marketUpdates.title': 'Market Updates',
+  'dashboard.marketUpdates.description': 'Real-time market data and analysis',
+  'dashboard.plan.pro': 'Pro',
+  'dashboard.plan.free': 'Free',
+  
+  // Learn section
+  'learn.title': 'Learn',
+  'learn.subtitle': 'Master Trading Skills',
+  'learn.comingSoon': 'Coming Soon',
+  
+  // Settings
+  'settings.title': 'Settings',
+  'settings.subtitle': 'Manage your account and preferences',
+  'settings.pro.title': 'Pro Features',
+  'settings.pro.currentPlan': 'Current Plan',
+  'settings.pro.proPlan': 'Pro Plan',
+  'settings.pro.benefits': 'Benefits',
+  'settings.pro.managedBy': 'Managed through Stripe',
+  
+  // Trading Chat
+  'tradingChat.welcome': 'Welcome to StrategyAI! Upload a chart or ask me about trading strategies, market analysis, or any trading-related questions.',
+  
+  // Placeholders
+  'placeholders.enterEmail': 'Enter your email',
+  'placeholders.enterPassword': 'Enter your password',
+  'placeholders.enterFullName': 'Enter your full name',
+  'placeholders.confirmPassword': 'Confirm your password',
+  
+  // Pricing
+  'pricing.getStarted': 'Get Started',
+  'pricing.upgradeToPro': 'Upgrade to Pro',
+  
+  // Economic Events
+  'economicEvents.title': 'Economic Events',
+  'economicEvents.subtitle': 'High-impact macroeconomic events',
+  'economicEvents.comingSoon': 'Coming Soon',
+  'economicEvents.description': 'We\'re building a comprehensive economic calendar with high-impact events, earnings reports, and market-moving announcements.',
+  
+  // Market Updates
+  'marketUpdates.title': 'Real-Time Market Updates',
+  'marketUpdates.subtitle': 'Stay ahead of the market with real-time data, alerts, and AI-powered insights',
+  'marketUpdates.comingSoon': 'Coming Soon',
+  'marketUpdates.liveData.title': 'Live Market Data',
+  'marketUpdates.liveData.description': 'Real-time price feeds and market movements across all major exchanges',
+  'marketUpdates.smartAlerts.title': 'Smart Alerts',
+  'marketUpdates.smartAlerts.description': 'AI-powered notifications for market opportunities and risk management'
 };
 
 export const useTranslationWithFallback = () => {
@@ -54,18 +133,21 @@ export const useTranslationWithFallback = () => {
 
   const tWithFallback = (key: string, options?: any): string => {
     try {
+      // First try to get the translation
       const translation = t(key, options);
+      const translationStr = typeof translation === 'string' ? translation : String(translation);
       
-      // If translation returns the key itself (no translation found), use fallback
-      if (translation === key && TRANSLATION_FALLBACKS[key]) {
+      // If translation returns the key itself (no translation found) or is empty, use fallback
+      if ((translationStr === key || !translationStr || translationStr.trim() === '') && TRANSLATION_FALLBACKS[key]) {
         console.warn(`Translation missing for key: ${key}, using fallback`);
         return TRANSLATION_FALLBACKS[key];
       }
       
       // Ensure we always return a string
-      return typeof translation === 'string' ? translation : String(translation);
+      return translationStr;
     } catch (error) {
       console.warn(`Translation error for key: ${key}`, error);
+      // Return fallback if available, otherwise return the key as last resort
       return TRANSLATION_FALLBACKS[key] || key;
     }
   };

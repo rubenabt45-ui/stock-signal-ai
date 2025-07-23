@@ -10,7 +10,8 @@ import { UpgradeModal } from "@/components/UpgradeModal";
 import { Badge } from "@/components/ui/badge";
 import { ProtectedFeature } from "@/components/ProtectedFeature";
 import ReactMarkdown from 'react-markdown';
-import { useTranslation } from 'react-i18next';
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
+import { PageWrapper } from '@/components/PageWrapper';
 
 interface ChatMessage {
   id: string;
@@ -27,7 +28,7 @@ interface UploadedImage {
 }
 
 const TradingChat = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslationWithFallback();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -265,8 +266,9 @@ const TradingChat = () => {
   };
 
   return (
-    <ProtectedFeature feature="strategy-ai">
-      <div className="flex flex-col h-screen bg-gray-900 text-white">
+    <PageWrapper pageName="TradingChat">
+      <ProtectedFeature feature="strategy-ai">
+        <div className="flex flex-col h-screen bg-gray-900 text-white">
       {/* Header */}
       <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between flex-shrink-0">
         <h1 className="text-xl font-semibold flex items-center gap-2">
@@ -507,7 +509,8 @@ const TradingChat = () => {
           feature="daily messages"
         />
       </div>
-    </ProtectedFeature>
+      </ProtectedFeature>
+    </PageWrapper>
   );
 };
 

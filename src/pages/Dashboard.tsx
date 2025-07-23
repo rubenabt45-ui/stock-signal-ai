@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LanguageSelector } from '@/components/LanguageSelector';
-import { useTranslation } from 'react-i18next';
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
+import { PageWrapper } from '@/components/PageWrapper';
 import { 
   TrendingUp, 
   Brain, 
@@ -23,7 +24,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 const Dashboard = () => {
   const { user } = useAuth();
   const { isPro } = useSubscription();
-  const { t } = useTranslation();
+  const { t } = useTranslationWithFallback();
 
   const quickActions = [
     {
@@ -84,9 +85,10 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-tradeiq-navy p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Welcome Section */}
+    <PageWrapper pageName="Dashboard">
+      <div className="min-h-screen bg-tradeiq-navy p-6">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Welcome Section */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">
@@ -287,6 +289,7 @@ const Dashboard = () => {
         </div>
       </div>
     </div>
+    </PageWrapper>
   );
 };
 

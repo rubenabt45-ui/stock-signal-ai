@@ -9,8 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { useTranslation } from 'react-i18next';
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import BackToHomeButton from "@/components/BackToHomeButton";
+import { PageWrapper } from '@/components/PageWrapper';
 
 const Signup = () => {
   const [fullName, setFullName] = useState("");
@@ -25,7 +26,7 @@ const Signup = () => {
   const [resendingEmail, setResendingEmail] = useState(false);
   const { signUp, user, signInWithOAuth, resendConfirmation } = useAuth();
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t } = useTranslationWithFallback();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -147,7 +148,8 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center p-4">
+    <PageWrapper pageName="Signup">
+      <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center p-4">
       <Card className="tradeiq-card w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
@@ -359,6 +361,7 @@ const Signup = () => {
         </CardContent>
       </Card>
     </div>
+    </PageWrapper>
   );
 };
 

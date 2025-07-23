@@ -1,10 +1,15 @@
 import React from "react";
 import { Calendar } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
+import { PageWrapper } from '@/components/PageWrapper';
 
 const EconomicEvents = () => {
+  const { t } = useTranslationWithFallback();
+
   return (
-    <div className="min-h-screen bg-tradeiq-navy">
+    <PageWrapper pageName="EconomicEvents">
+      <div className="min-h-screen bg-tradeiq-navy">
       {/* Header */}
       <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -12,8 +17,8 @@ const EconomicEvents = () => {
             <div className="flex items-center space-x-3">
               <Calendar className="h-8 w-8 text-tradeiq-blue" />
               <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">Economic Events</h1>
-                <p className="text-sm text-gray-400 font-medium">High-impact macroeconomic events</p>
+                <h1 className="text-2xl font-bold text-white tracking-tight">{t('economicEvents.title')}</h1>
+                <p className="text-sm text-gray-400 font-medium">{t('economicEvents.subtitle')}</p>
               </div>
             </div>
           </div>
@@ -30,17 +35,17 @@ const EconomicEvents = () => {
                   <Calendar className="h-12 w-12 text-tradeiq-blue" />
                 </div>
               </div>
-              <h2 className="text-3xl font-bold text-white mb-4">Economic Events</h2>
-              <p className="text-gray-400 text-lg mb-6">Coming Soon</p>
+              <h2 className="text-3xl font-bold text-white mb-4">{t('economicEvents.title')}</h2>
+              <p className="text-gray-400 text-lg mb-6">{t('economicEvents.comingSoon')}</p>
               <p className="text-gray-500 text-sm max-w-md mx-auto">
-                We're building a comprehensive economic calendar with high-impact events, 
-                earnings reports, and market-moving announcements. Stay tuned for updates!
+                {t('economicEvents.description')}
               </p>
             </CardContent>
           </Card>
         </div>
       </main>
     </div>
+    </PageWrapper>
   );
 };
 

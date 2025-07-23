@@ -258,15 +258,110 @@
       "resending": "Enviando..."
     }
   },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "continue": "Continuar",
+    "back": "Atrás",
+    "retry": "Reintentar",
+    "comingSoon": "Próximamente"
+  },
   "navigation": {
     "home": "Inicio",
     "about": "Acerca de",
     "features": "Características",
     "benefits": "Beneficios",
     "learning": "Aprendizaje",
+    "learn": "Aprender",
     "login": "Iniciar Sesión",
     "signup": "Registrarse",
     "getStarted": "Comenzar"
+  },
+  "dashboard": {
+    "welcomeBack": "Bienvenido de vuelta",
+    "subtitle": "Tu compañero de trading impulsado por IA",
+    "quickActions": "Acciones Rápidas",
+    "recentActivity": "Actividad Reciente",
+    "marketMonitoring": "Monitoreo del Mercado",
+    "patternAccuracy": "Precisión de Patrones",
+    "analysisSpeed": "Velocidad de Análisis",
+    "strategyAI": {
+      "title": "StrategyAI",
+      "description": "Análisis e insights de trading impulsados por IA"
+    },
+    "learn": {
+      "title": "Aprender",
+      "description": "Domina las habilidades de trading con nuestros recursos educativos"
+    },
+    "events": {
+      "title": "Eventos Económicos",
+      "description": "Rastrea eventos importantes del mercado y ganancias"
+    },
+    "marketUpdates": {
+      "title": "Actualizaciones del Mercado",
+      "description": "Datos y análisis del mercado en tiempo real"
+    },
+    "plan": {
+      "pro": "Pro",
+      "free": "Gratis"
+    }
+  },
+  "learn": {
+    "title": "Aprender",
+    "subtitle": "Domina las Habilidades de Trading",
+    "comingSoon": "Próximamente"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Gestiona tu cuenta y preferencias",
+    "pro": {
+      "title": "Características Pro",
+      "currentPlan": "Plan Actual",
+      "proPlan": "Plan Pro",
+      "benefits": "Beneficios",
+      "benefitsList": [
+        "Acceso ilimitado a todas las características",
+        "Soporte al cliente prioritario",
+        "Análisis e insights avanzados",
+        "Acceso temprano a nuevas características"
+      ],
+      "managedBy": "Gestionado a través de Stripe"
+    }
+  },
+  "tradingChat": {
+    "welcome": "¡Bienvenido a StrategyAI! Sube un gráfico o pregúntame sobre estrategias de trading, análisis de mercado o cualquier pregunta relacionada con trading."
+  },
+  "placeholders": {
+    "enterEmail": "Ingresa tu email",
+    "enterPassword": "Ingresa tu contraseña",
+    "enterFullName": "Ingresa tu nombre completo",
+    "confirmPassword": "Confirma tu contraseña"
+  },
+  "pricing": {
+    "getStarted": "Comenzar",
+    "upgradeToPro": "Actualizar a Pro"
+  },
+  "economicEvents": {
+    "title": "Eventos Económicos",
+    "subtitle": "Eventos macroeconómicos de alto impacto",
+    "comingSoon": "Próximamente",
+    "description": "Estamos construyendo un calendario económico integral con eventos de alto impacto, reportes de ganancias y anuncios que mueven el mercado."
+  },
+  "marketUpdates": {
+    "title": "Actualizaciones del Mercado en Tiempo Real",
+    "subtitle": "Mantente adelante del mercado con datos en tiempo real, alertas e insights impulsados por IA",
+    "comingSoon": "Próximamente",
+    "liveData": {
+      "title": "Datos del Mercado en Vivo",
+      "description": "Feeds de precios en tiempo real y movimientos del mercado en todas las bolsas principales"
+    },
+    "smartAlerts": {
+      "title": "Alertas Inteligentes",
+      "description": "Notificaciones impulsadas por IA para oportunidades del mercado y gestión de riesgo"
+    }
   },
   "footer": {
     "company": "Empresa",

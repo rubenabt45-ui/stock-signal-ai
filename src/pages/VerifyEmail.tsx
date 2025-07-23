@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, RefreshCw, Mail, AlertTriangle, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useTranslation } from 'react-i18next';
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
+import { PageWrapper } from '@/components/PageWrapper';
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t } = useTranslationWithFallback();
   const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'expired' | 'invalid'>('verifying');
   const [errorMessage, setErrorMessage] = useState('');
   const [verificationDetails, setVerificationDetails] = useState<{
@@ -288,7 +289,8 @@ const VerifyEmail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center p-4">
+    <PageWrapper pageName="VerifyEmail">
+      <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center p-4">
       <Card className="tradeiq-card w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-white">
@@ -461,6 +463,7 @@ const VerifyEmail = () => {
         </CardContent>
       </Card>
     </div>
+    </PageWrapper>
   );
 };
 

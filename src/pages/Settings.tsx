@@ -2,7 +2,8 @@
 import { Settings as SettingsIcon, Crown, CheckCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
-import { useTranslation } from 'react-i18next';
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
+import { PageWrapper } from '@/components/PageWrapper';
 import PlanModal from "@/components/PlanModal";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileSection } from "@/components/ProfileSection";
@@ -19,7 +20,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 
 const Settings = () => {
   const { user, loading: authLoading } = useAuth();
-  const { t } = useTranslation();
+  const { t } = useTranslationWithFallback();
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -90,7 +91,8 @@ const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-tradeiq-navy">
+    <PageWrapper pageName="Settings">
+      <div className="min-h-screen bg-tradeiq-navy">
       {/* Header */}
       <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -167,7 +169,7 @@ const Settings = () => {
                   <ul className="text-gray-400 text-sm space-y-1">
                     {(() => {
                       try {
-                        const benefits = t('settings.pro.benefitsList', { returnObjects: true }) as string[];
+                        const benefits = t('settings.pro.benefitsList', { returnObjects: true });
                         return Array.isArray(benefits) ? benefits.map((benefit: string, index: number) => (
                           <li key={index}>• {benefit}</li>
                         )) : <li>• Unlimited access to all features</li>;
@@ -212,6 +214,7 @@ const Settings = () => {
         onClose={() => setIsPlanModalOpen(false)}
       />
     </div>
+    </PageWrapper>
   );
 };
 

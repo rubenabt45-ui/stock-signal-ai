@@ -8,8 +8,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { useTranslation } from 'react-i18next';
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import BackToHomeButton from "@/components/BackToHomeButton";
+import { PageWrapper } from '@/components/PageWrapper';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ const Login = () => {
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
   const { signIn, user, resendConfirmation, signInWithOAuth } = useAuth();
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t } = useTranslationWithFallback();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -204,7 +205,8 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center p-4">
+    <PageWrapper pageName="Login">
+      <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center p-4">
       <Card className="tradeiq-card w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
@@ -413,6 +415,7 @@ const Login = () => {
         </CardContent>
       </Card>
     </div>
+    </PageWrapper>
   );
 };
 

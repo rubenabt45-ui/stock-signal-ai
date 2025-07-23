@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ProtectedFeature } from "@/components/ProtectedFeature";
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
+import { PageWrapper } from '@/components/PageWrapper';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -15,22 +17,25 @@ import {
 import { Link } from 'react-router-dom';
 
 const MarketUpdates = () => {
+  const { t } = useTranslationWithFallback();
+
   return (
-    <ProtectedFeature feature="market-updates">
-      <div className="min-h-screen bg-tradeiq-navy p-6">
+    <PageWrapper pageName="MarketUpdates">
+      <ProtectedFeature feature="market-updates">
+        <div className="min-h-screen bg-tradeiq-navy p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-4">
             <BarChart3 className="h-8 w-8 text-tradeiq-blue" />
-            <h1 className="text-3xl font-bold text-white">Real-Time Market Updates</h1>
+            <h1 className="text-3xl font-bold text-white">{t('marketUpdates.title')}</h1>
             <Badge variant="outline" className="text-xs">
               <Construction className="h-3 w-3 mr-1" />
-              Coming Soon
+              {t('marketUpdates.comingSoon')}
             </Badge>
           </div>
           <p className="text-gray-400 text-lg">
-            Stay ahead of the market with real-time data, alerts, and AI-powered insights.
+            {t('marketUpdates.subtitle')}
           </p>
         </div>
 
@@ -40,10 +45,10 @@ const MarketUpdates = () => {
             <CardHeader>
               <div className="flex items-center space-x-2 mb-2">
                 <TrendingUp className="h-6 w-6 text-green-400" />
-                <CardTitle className="text-white">Live Market Data</CardTitle>
+                <CardTitle className="text-white">{t('marketUpdates.liveData.title')}</CardTitle>
               </div>
               <CardDescription className="text-gray-300">
-                Real-time price feeds and market movements across all major exchanges
+                {t('marketUpdates.liveData.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -72,10 +77,10 @@ const MarketUpdates = () => {
             <CardHeader>
               <div className="flex items-center space-x-2 mb-2">
                 <Bell className="h-6 w-6 text-blue-400" />
-                <CardTitle className="text-white">Smart Alerts</CardTitle>
+                <CardTitle className="text-white">{t('marketUpdates.smartAlerts.title')}</CardTitle>
               </div>
               <CardDescription className="text-gray-300">
-                AI-powered notifications for market opportunities and risk management
+                {t('marketUpdates.smartAlerts.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -212,7 +217,8 @@ const MarketUpdates = () => {
           </div>
         </div>
       </div>
-    </ProtectedFeature>
+      </ProtectedFeature>
+    </PageWrapper>
   );
 };
 

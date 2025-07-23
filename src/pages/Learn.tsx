@@ -2,7 +2,8 @@ import { Book, PlayCircle, FileText, TrendingUp, Shield, Brain, Crown } from "lu
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useTranslation } from 'react-i18next';
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
+import { PageWrapper } from '@/components/PageWrapper';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '@/hooks/useSubscription';
 import { ProtectedFeature } from "@/components/ProtectedFeature";
@@ -53,7 +54,7 @@ const resources = [
 ];
 
 const Learn = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslationWithFallback();
   const navigate = useNavigate();
   const { isPro } = useSubscription();
 
@@ -71,8 +72,9 @@ const Learn = () => {
   };
 
   return (
-    <ProtectedFeature feature="learn">
-      <div className="min-h-screen bg-tradeiq-navy">
+    <PageWrapper pageName="Learn">
+      <ProtectedFeature feature="learn">
+        <div className="min-h-screen bg-tradeiq-navy">
       {/* Header */}
       <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -260,7 +262,8 @@ const Learn = () => {
           </div>
         </main>
       </div>
-    </ProtectedFeature>
+      </ProtectedFeature>
+    </PageWrapper>
   );
 };
 

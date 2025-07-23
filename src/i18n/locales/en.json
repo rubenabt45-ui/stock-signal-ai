@@ -258,15 +258,110 @@
       "resending": "Sending..."
     }
   },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "back": "Back",
+    "retry": "Retry",
+    "comingSoon": "Coming Soon"
+  },
   "navigation": {
     "home": "Home",
     "about": "About",
     "features": "Features",
     "benefits": "Benefits",
     "learning": "Learning",
+    "learn": "Learn",
     "login": "Login",
     "signup": "Sign Up",
     "getStarted": "Get Started"
+  },
+  "dashboard": {
+    "welcomeBack": "Welcome back",
+    "subtitle": "Your AI-powered trading companion",
+    "quickActions": "Quick Actions",
+    "recentActivity": "Recent Activity",
+    "marketMonitoring": "Market Monitoring",
+    "patternAccuracy": "Pattern Accuracy",
+    "analysisSpeed": "Analysis Speed",
+    "strategyAI": {
+      "title": "StrategyAI",
+      "description": "AI-powered trading analysis and insights"
+    },
+    "learn": {
+      "title": "Learn",
+      "description": "Master trading skills with our educational resources"
+    },
+    "events": {
+      "title": "Economic Events",
+      "description": "Track important market events and earnings"
+    },
+    "marketUpdates": {
+      "title": "Market Updates",
+      "description": "Real-time market data and analysis"
+    },
+    "plan": {
+      "pro": "Pro",
+      "free": "Free"
+    }
+  },
+  "learn": {
+    "title": "Learn",
+    "subtitle": "Master Trading Skills",
+    "comingSoon": "Coming Soon"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and preferences",
+    "pro": {
+      "title": "Pro Features",
+      "currentPlan": "Current Plan",
+      "proPlan": "Pro Plan",
+      "benefits": "Benefits",
+      "benefitsList": [
+        "Unlimited access to all features",
+        "Priority customer support",
+        "Advanced analytics and insights",
+        "Early access to new features"
+      ],
+      "managedBy": "Managed through Stripe"
+    }
+  },
+  "tradingChat": {
+    "welcome": "Welcome to StrategyAI! Upload a chart or ask me about trading strategies, market analysis, or any trading-related questions."
+  },
+  "placeholders": {
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "enterFullName": "Enter your full name",
+    "confirmPassword": "Confirm your password"
+  },
+  "pricing": {
+    "getStarted": "Get Started",
+    "upgradeToPro": "Upgrade to Pro"
+  },
+  "economicEvents": {
+    "title": "Economic Events",
+    "subtitle": "High-impact macroeconomic events",
+    "comingSoon": "Coming Soon",
+    "description": "We're building a comprehensive economic calendar with high-impact events, earnings reports, and market-moving announcements."
+  },
+  "marketUpdates": {
+    "title": "Real-Time Market Updates",
+    "subtitle": "Stay ahead of the market with real-time data, alerts, and AI-powered insights",
+    "comingSoon": "Coming Soon",
+    "liveData": {
+      "title": "Live Market Data",
+      "description": "Real-time price feeds and market movements across all major exchanges"
+    },
+    "smartAlerts": {
+      "title": "Smart Alerts",
+      "description": "AI-powered notifications for market opportunities and risk management"
+    }
   },
   "footer": {
     "company": "Company",
