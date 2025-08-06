@@ -310,7 +310,8 @@
     "learn": "Aprender",
     "login": "Iniciar Sesión",
     "signup": "Registrarse",
-    "getStarted": "Comenzar"
+    "getStarted": "Comenzar",
+    "settings": "Configuración"
   },
   "dashboard": {
     "welcomeBack": "Bienvenido de vuelta",
@@ -396,6 +397,10 @@
     }
   },
   "footer": {
+    "platform": "Plataforma",
+    "dashboard": "Panel de Control",
+    "learnPreview": "Aprender (Vista Previa)",
+    "pricing": "Precios",
     "company": "Empresa",
     "about": "Acerca de",
     "blog": "Blog",
@@ -408,6 +413,8 @@
     "contact": "Contacto",
     "help": "Centro de Ayuda",
     "community": "Comunidad",
+    "description": "Capacitando a los traders con insights y análisis impulsados por IA. Visítanos en",
+    "rights": "Todos los derechos reservados",
     "allRightsReserved": "Todos los derechos reservados"
   }
 }

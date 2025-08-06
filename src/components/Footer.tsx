@@ -1,9 +1,11 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 
-const Footer = () => {
-  const { t } = useTranslation();
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslationWithFallback } from '../hooks/useTranslationWithFallback';
+import { ErrorBoundary } from './ErrorBoundary';
+
+const FooterContent = () => {
+  const { t } = useTranslationWithFallback();
 
   const handleLinkClick = (linkName: string, path: string) => {
     console.log(`🔗 [FOOTER_NAVIGATION] ${linkName} clicked, navigating to: ${path}`);
@@ -13,25 +15,61 @@ const Footer = () => {
     {
       category: t('footer.platform'),
       links: [
-        { name: t('footer.dashboard'), path: '/app', ariaLabel: 'Navigate to Trading Dashboard' },
-        { name: t('footer.learnPreview'), path: '/learn-preview', ariaLabel: 'Navigate to Learn Preview' },
-        { name: t('footer.pricing'), path: '/pricing', ariaLabel: 'Navigate to Pricing' },
+        { 
+          name: t('footer.dashboard'), 
+          path: '/app', 
+          ariaLabel: 'Navigate to Trading Dashboard' 
+        },
+        { 
+          name: t('footer.learnPreview'), 
+          path: '/learn-preview', 
+          ariaLabel: 'Navigate to Learn Preview' 
+        },
+        { 
+          name: t('footer.pricing'), 
+          path: '/pricing', 
+          ariaLabel: 'Navigate to Pricing' 
+        },
       ]
     },
     {
       category: t('footer.legal'),
       links: [
-        { name: t('footer.privacy'), path: '/privacy-policy', ariaLabel: 'Navigate to Privacy Policy' },
-        { name: t('footer.terms'), path: '/terms-of-service', ariaLabel: 'Navigate to Terms of Service' },
-        { name: t('footer.cookies'), path: '/cookie-policy', ariaLabel: 'Navigate to Cookie Policy' },
+        { 
+          name: t('footer.privacy'), 
+          path: '/privacy-policy', 
+          ariaLabel: 'Navigate to Privacy Policy' 
+        },
+        { 
+          name: t('footer.terms'), 
+          path: '/terms-of-service', 
+          ariaLabel: 'Navigate to Terms of Service' 
+        },
+        { 
+          name: t('footer.cookies'), 
+          path: '/cookie-policy', 
+          ariaLabel: 'Navigate to Cookie Policy' 
+        },
       ]
     },
     {
       category: t('footer.company'),
       links: [
-        { name: t('footer.about'), path: '/about', ariaLabel: 'Navigate to About page' },
-        { name: t('footer.blog'), path: '/blog', ariaLabel: 'Navigate to Blog' },
-        { name: t('footer.careers'), path: '/careers', ariaLabel: 'Navigate to Careers' },
+        { 
+          name: t('footer.about'), 
+          path: '/about', 
+          ariaLabel: 'Navigate to About page' 
+        },
+        { 
+          name: t('footer.blog'), 
+          path: '/blog', 
+          ariaLabel: 'Navigate to Blog' 
+        },
+        { 
+          name: t('footer.careers'), 
+          path: '/careers', 
+          ariaLabel: 'Navigate to Careers' 
+        },
       ]
     }
   ];
@@ -84,6 +122,25 @@ const Footer = () => {
         </div>
       </div>
     </footer>
+  );
+};
+
+const Footer = () => {
+  return (
+    <ErrorBoundary
+      componentName="Footer"
+      fallback={
+        <footer className="border-t border-border bg-background/50 backdrop-blur-sm py-8 px-4">
+          <div className="container mx-auto text-center">
+            <p className="text-sm text-muted-foreground">
+              © 2024 TradeIQ Pro. All rights reserved.
+            </p>
+          </div>
+        </footer>
+      }
+    >
+      <FooterContent />
+    </ErrorBoundary>
   );
 };
 

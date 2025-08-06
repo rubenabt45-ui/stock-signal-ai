@@ -310,7 +310,8 @@
     "learn": "Learn",
     "login": "Login",
     "signup": "Sign Up",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "settings": "Settings"
   },
   "dashboard": {
     "welcomeBack": "Welcome back",
@@ -396,6 +397,10 @@
     }
   },
   "footer": {
+    "platform": "Platform",
+    "dashboard": "Dashboard",
+    "learnPreview": "Learn (Preview)",
+    "pricing": "Pricing",
     "company": "Company",
     "about": "About",
     "blog": "Blog",
@@ -408,6 +413,8 @@
     "contact": "Contact",
     "help": "Help Center",
     "community": "Community",
+    "description": "Empowering traders with AI-powered insights and analysis. Visit us at",
+    "rights": "All rights reserved",
     "allRightsReserved": "All rights reserved"
   }
 }
