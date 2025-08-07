@@ -5,28 +5,36 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, CheckCircle, XCircle, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { TrendingUp, CheckCircle, XCircle, Eye, EyeOff, AlertTriangle, Loader } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useTranslation } from 'react-i18next';
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { supabase } from '@/integrations/supabase/client';
+import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 import BackToHomeButton from '@/components/BackToHomeButton';
+
+type ResetPasswordStatus = 'validating' | 'form' | 'success' | 'error' | 'expired';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t } = useTranslationWithFallback();
   const { updatePassword } = useAuth();
+  
+  // Form state
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<'validating' | 'form' | 'success' | 'error' | 'expired'>('validating');
+  
+  // Flow state
+  const [status, setStatus] = useState<ResetPasswordStatus>('validating');
   const [retryCount, setRetryCount] = useState(0);
   const [tokenValidated, setTokenValidated] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
     const validateTokenAndSession = async () => {
@@ -177,42 +185,47 @@ const ResetPassword = () => {
     };
     
     validateTokenAndSession();
-  }, [searchParams, navigate, toast, t]);
+  }, [searchParams, toast, t]);
+
+  // Countdown for redirect
+  useEffect(() => {
+    if (status === 'success' && countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (status === 'success' && countdown === 0) {
+      navigate('/login?password_updated=true');
+    }
+  }, [status, countdown, navigate]);
 
   const validatePassword = (password: string) => {
-    const minLength = 8;
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumbers = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const requirements = [
+      { test: (pwd: string) => pwd.length >= 8, message: t('auth.resetPassword.passwordTooShort') },
+      { test: (pwd: string) => /[A-Z]/.test(pwd), message: t('auth.resetPassword.passwordNeedsUppercase') },
+      { test: (pwd: string) => /[a-z]/.test(pwd), message: t('auth.resetPassword.passwordNeedsLowercase') },
+      { test: (pwd: string) => /\d/.test(pwd), message: t('auth.resetPassword.passwordNeedsNumber') },
+      { test: (pwd: string) => /[!@#$%^&*(),.?":{}|<>]/.test(pwd), message: t('auth.resetPassword.passwordNeedsSpecial') }
+    ];
     
-    if (password.length < minLength) {
-      return t('auth.resetPassword.passwordTooShort', { minLength });
-    }
-    
-    if (!hasUpperCase) {
-      return t('auth.resetPassword.passwordNeedsUppercase');
-    }
-    
-    if (!hasLowerCase) {
-      return t('auth.resetPassword.passwordNeedsLowercase');
-    }
-    
-    if (!hasNumbers) {
-      return t('auth.resetPassword.passwordNeedsNumber');
-    }
-    
-    if (!hasSpecialChar) {
-      return t('auth.resetPassword.passwordNeedsSpecial');
+    for (const requirement of requirements) {
+      if (!requirement.test(password)) {
+        return requirement.message;
+      }
     }
     
     return null;
   };
 
+  const isPasswordValid = () => {
+    return validatePassword(password) === null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('🔐 [PASSWORD_RESET] Form submission started');
+    
     if (!tokenValidated) {
+      console.error('🔐 [PASSWORD_RESET_FAILED] Token not validated');
       toast({
         title: t('auth.resetPassword.error'),
         description: t('auth.resetPassword.invalidSession'),
@@ -222,6 +235,7 @@ const ResetPassword = () => {
     }
     
     if (password !== confirmPassword) {
+      console.error('🔐 [PASSWORD_RESET_FAILED] Passwords do not match');
       toast({
         title: t('auth.resetPassword.error'),
         description: t('auth.resetPassword.passwordsDoNotMatch'),
@@ -232,6 +246,7 @@ const ResetPassword = () => {
 
     const passwordError = validatePassword(password);
     if (passwordError) {
+      console.error('🔐 [PASSWORD_RESET_FAILED] Password validation failed:', passwordError);
       toast({
         title: t('auth.resetPassword.passwordRequirements'),
         description: passwordError,
@@ -279,10 +294,8 @@ const ResetPassword = () => {
         // Clear the session after successful password reset
         await supabase.auth.signOut();
         
-        // Redirect to login after success
-        setTimeout(() => {
-          navigate('/login?password_updated=true');
-        }, 3000);
+        // Start countdown
+        setCountdown(3);
       }
     } catch (error: any) {
       console.error('🔐 [PASSWORD_RESET_FAILED] Password update exception:', error);
@@ -303,34 +316,40 @@ const ResetPassword = () => {
     navigate('/reset-password-request');
   };
 
+  const handleGoToLogin = () => {
+    navigate('/login?password_updated=true');
+  };
+
+  const renderNavigation = () => (
+    <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
+          <span className="text-xl font-bold">TradeIQ</span>
+          <Badge variant="secondary" className="text-xs">BETA</Badge>
+        </div>
+        
+        <div className="flex items-center space-x-6">
+          <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
+            {t('auth.resetPassword.backToLogin')}
+          </Button>
+        </div>
+      </div>
+    </nav>
+  );
+
   // Show loading state while validating token
   if (status === 'validating') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
-        {/* Navigation */}
-        <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
-              <span className="text-xl font-bold">TradeIQ</span>
-              <Badge variant="secondary" className="text-xs">BETA</Badge>
-            </div>
-            
-            <div className="flex items-center space-x-6">
-              <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
-                {t('auth.resetPassword.backToLogin')}
-              </Button>
-            </div>
-          </div>
-        </nav>
-
+        {renderNavigation()}
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-md mx-auto">
             <Card className="bg-gray-800/50 border-gray-700">
               <CardHeader className="text-center">
                 <div className="flex items-center justify-center mb-4">
                   <div className="p-3 bg-tradeiq-blue/20 rounded-full">
-                    <TrendingUp className="h-8 w-8 text-tradeiq-blue animate-spin" />
+                    <Loader className="h-8 w-8 text-tradeiq-blue animate-spin" />
                   </div>
                 </div>
                 <CardTitle className="text-2xl text-white">
@@ -354,23 +373,7 @@ const ResetPassword = () => {
   if (status === 'expired') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
-        {/* Navigation */}
-        <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
-              <span className="text-xl font-bold">TradeIQ</span>
-              <Badge variant="secondary" className="text-xs">BETA</Badge>
-            </div>
-            
-            <div className="flex items-center space-x-6">
-              <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
-                {t('auth.resetPassword.backToLogin')}
-              </Button>
-            </div>
-          </div>
-        </nav>
-
+        {renderNavigation()}
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-md mx-auto">
             <Card className="bg-gray-800/50 border-gray-700">
@@ -422,23 +425,7 @@ const ResetPassword = () => {
   if (status === 'error') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
-        {/* Navigation */}
-        <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
-              <span className="text-xl font-bold">TradeIQ</span>
-              <Badge variant="secondary" className="text-xs">BETA</Badge>
-            </div>
-            
-            <div className="flex items-center space-x-6">
-              <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
-                {t('auth.resetPassword.backToLogin')}
-              </Button>
-            </div>
-          </div>
-        </nav>
-
+        {renderNavigation()}
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-md mx-auto">
             <Card className="bg-gray-800/50 border-gray-700">
@@ -486,125 +473,162 @@ const ResetPassword = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
-      {/* Navigation */}
-      <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
-            <span className="text-xl font-bold">TradeIQ</span>
-            <Badge variant="secondary" className="text-xs">BETA</Badge>
-          </div>
-          
-          <div className="flex items-center space-x-6">
-            <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
-              {t('auth.resetPassword.backToLogin')}
-            </Button>
+  // Show success screen
+  if (status === 'success') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+        {renderNavigation()}
+        <div className="container mx-auto px-4 py-20">
+          <div className="max-w-md mx-auto">
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardHeader className="text-center">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="p-3 bg-green-500/20 rounded-full">
+                    <CheckCircle className="h-8 w-8 text-green-400" />
+                  </div>
+                </div>
+                <CardTitle className="text-2xl text-white">
+                  {t('auth.resetPassword.passwordUpdated')}
+                </CardTitle>
+              </CardHeader>
+              
+              <CardContent className="text-center space-y-6">
+                <p className="text-green-400">
+                  {t('auth.resetPassword.successMessage')}
+                </p>
+                <p className="text-gray-400 text-sm">
+                  {t('auth.resetPassword.redirectingToLogin')} {countdown > 0 && `(${countdown}s)`}
+                </p>
+                
+                <div className="space-y-3">
+                  <Button 
+                    onClick={handleGoToLogin}
+                    className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90"
+                  >
+                    {t('auth.resetPassword.goToLogin')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <div className="mt-6 text-center">
+              <BackToHomeButton />
+            </div>
           </div>
         </div>
-      </nav>
+      </div>
+    );
+  }
 
-      {/* Content */}
+  // Show password reset form
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+      {renderNavigation()}
+      
       <div className="container mx-auto px-4 py-20">
         <div className="max-w-md mx-auto">
           <Card className="bg-gray-800/50 border-gray-700">
             <CardHeader className="text-center">
               <div className="flex items-center justify-center mb-4">
                 <div className="p-3 bg-tradeiq-blue/20 rounded-full">
-                  {status === 'success' ? (
-                    <CheckCircle className="h-8 w-8 text-green-400" />
-                  ) : (
-                    <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
-                  )}
+                  <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
                 </div>
               </div>
               <CardTitle className="text-2xl text-white">
-                {status === 'success' ? t('auth.resetPassword.passwordUpdated') : t('auth.resetPassword.setNewPassword')}
+                {t('auth.resetPassword.setNewPassword')}
               </CardTitle>
             </CardHeader>
             
             <CardContent>
-              {status === 'success' ? (
-                <div className="text-center space-y-4">
-                  <p className="text-green-400">
-                    {t('auth.resetPassword.successMessage')}
-                  </p>
-                  <p className="text-gray-400 text-sm">
-                    {t('auth.resetPassword.redirectingToLogin')}
-                  </p>
-                  <Button 
-                    onClick={() => navigate('/login')}
-                    className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90"
-                  >
-                    {t('auth.resetPassword.goToLogin')}
-                  </Button>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <label htmlFor="password" className="text-sm font-medium text-gray-300">
+                    {t('auth.resetPassword.newPassword')}
+                  </label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder={t('auth.resetPassword.enterNewPassword')}
+                      className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 pr-10"
+                      required
+                      minLength={8}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <label htmlFor="password" className="text-sm font-medium text-gray-300">
-                      {t('auth.resetPassword.newPassword')}
-                    </label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder={t('auth.resetPassword.enterNewPassword')}
-                        className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 pr-10"
-                        required
-                        minLength={8}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                    <div className="text-xs text-gray-400">
-                      {t('auth.resetPassword.passwordRequirementsHint')}
-                    </div>
-                  </div>
 
-                  <div className="space-y-2">
-                    <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-300">
-                      {t('auth.resetPassword.confirmPassword')}
-                    </label>
-                    <div className="relative">
-                      <Input
-                        id="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder={t('auth.resetPassword.confirmNewPassword')}
-                        className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 pr-10"
-                        required
-                        minLength={8}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
-                      >
-                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </div>
+                {/* Password Strength Indicator */}
+                {password && (
+                  <PasswordStrengthIndicator 
+                    password={password} 
+                    className="bg-gray-700/30 p-3 rounded-lg"
+                  />
+                )}
 
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90"
-                    disabled={loading || !tokenValidated}
-                  >
-                    {loading ? t('auth.resetPassword.updating') : t('auth.resetPassword.updatePassword')}
-                    {retryCount > 0 && ` (${t('auth.resetPassword.attempt')} ${retryCount})`}
-                  </Button>
-                </form>
-              )}
+                <div className="space-y-2">
+                  <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-300">
+                    {t('auth.resetPassword.confirmPassword')}
+                  </label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder={t('auth.resetPassword.confirmNewPassword')}
+                      className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 pr-10"
+                      required
+                      minLength={8}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  
+                  {/* Password Match Validation */}
+                  {confirmPassword && password !== confirmPassword && (
+                    <p className="text-sm text-red-400 flex items-center space-x-1">
+                      <XCircle className="h-3 w-3" />
+                      <span>{t('auth.resetPassword.passwordsDoNotMatch')}</span>
+                    </p>
+                  )}
+                  {confirmPassword && password === confirmPassword && password.length > 0 && (
+                    <p className="text-sm text-green-400 flex items-center space-x-1">
+                      <CheckCircle className="h-3 w-3" />
+                      <span>{t('auth.resetPassword.passwordsMatch')}</span>
+                    </p>
+                  )}
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90"
+                  disabled={loading || !tokenValidated || !isPasswordValid() || password !== confirmPassword}
+                >
+                  {loading ? (
+                    <>
+                      <Loader className="h-4 w-4 mr-2 animate-spin" />
+                      {t('auth.resetPassword.updating')}
+                    </>
+                  ) : (
+                    t('auth.resetPassword.updatePassword')
+                  )}
+                  {retryCount > 0 && ` (${t('auth.resetPassword.attempt')} ${retryCount})`}
+                </Button>
+              </form>
             </CardContent>
           </Card>
           
