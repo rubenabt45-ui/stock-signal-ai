@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -42,7 +42,7 @@ import Careers from "./pages/Careers";
 
 // Diagnostic components
 const LandingRoute = () => {
-  useEffect(() => {
+  React.useEffect(() => {
     console.log('🏠 Landing route component mounted - SUCCESS!');
   }, []);
   return (
@@ -53,7 +53,7 @@ const LandingRoute = () => {
 };
 
 const NotFoundRoute = () => {
-  useEffect(() => {
+  React.useEffect(() => {
     console.log('❌ 404 route matched for path:', window.location.pathname);
   }, []);
   return <NotFound />;
@@ -63,7 +63,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   // Add route debugging
-  useEffect(() => {
+  React.useEffect(() => {
     console.log('🚀 App mounted, current pathname:', window.location.pathname);
     console.log('🚀 App mounted, current href:', window.location.href);
   }, []);
