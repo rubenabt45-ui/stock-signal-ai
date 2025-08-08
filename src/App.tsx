@@ -93,9 +93,9 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <I18nErrorBoundary>
-          <AuthProvider>
+      <AuthProvider>
+        <LanguageProvider>
+          <I18nErrorBoundary>
             <ThemeProvider>
               <TooltipProvider>
                 <BrowserRouter>
@@ -154,9 +154,9 @@ const App = () => {
                 <Sonner />
               </TooltipProvider>
             </ThemeProvider>
-          </AuthProvider>
-        </I18nErrorBoundary>
-      </LanguageProvider>
+          </I18nErrorBoundary>
+        </LanguageProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };
