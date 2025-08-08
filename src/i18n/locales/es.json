@@ -1,4 +1,3 @@
-
 {
   "landing": {
     "nav": {
@@ -106,23 +105,6 @@
       "title": "Domina el Trading con Nuestra Plataforma de Aprendizaje",
       "description": "Accede a cursos comprehensivos, tutoriales y ejemplos del mundo real para mejorar tus habilidades de trading.",
       "cta": "Explorar Aprendizaje"
-    },
-    "learningSection": {
-      "title": "Domina el Trading con Nuestra Plataforma de Aprendizaje",
-      "description": "Accede a cursos comprehensivos, tutoriales y ejemplos del mundo real para mejorar tus habilidades de trading.",
-      "cta": "Explorar Aprendizaje",
-      "fundamentals": {
-        "title": "Fundamentos de Trading",
-        "description": "Aprende los básicos del análisis de mercado, lectura de gráficos y conceptos fundamentales"
-      },
-      "patterns": {
-        "title": "Reconocimiento de Patrones",
-        "description": "Domina los patrones técnicos y aprende a identificar configuraciones rentables de trading"
-      },
-      "riskManagement": {
-        "title": "Gestión de Riesgo",
-        "description": "Desarrolla estrategias adecuadas de gestión de riesgo para proteger tu capital"
-      }
     },
     "earlyAccess": {
       "title": "Obtén Acceso Temprano",
@@ -416,5 +398,180 @@
     "description": "Capacitando a los traders con insights y análisis impulsados por IA. Visítanos en",
     "rights": "Todos los derechos reservados",
     "allRightsReserved": "Todos los derechos reservados"
+  },
+  "legal": {
+    "lastUpdated": "Última actualización",
+    "tableOfContents": "Tabla de Contenidos",
+    "copyright": "© 2025 TradeIQ Pro — INGENIO FINANCIERO DIGITAL, S.A.P.I. DE C.V. Todos los derechos reservados.",
+    "legalMatters": "Asuntos legales",
+    "generalSupport": "Soporte general",
+    "terms": {
+      "title": "Términos y Condiciones",
+      "metaTitle": "Términos y Condiciones | TradeIQ Pro",
+      "metaDescription": "Términos y condiciones para usar la plataforma de trading impulsada por IA de TradeIQ Pro y sus servicios.",
+      "lastUpdated": "2025-01-08",
+      "sections": {
+        "acceptance": {
+          "title": "1. Aceptación de los Términos",
+          "content": "Al acceder y usar TradeIQ Pro, aceptas y accedes a estar obligado por los términos y disposiciones de este acuerdo. Si no estás de acuerdo con cumplir lo anterior, por favor no uses este servicio.\n\nEstos Términos de Servicio constituyen un acuerdo legalmente vinculante entre tú e INGENIO FINANCIERO DIGITAL, S.A.P.I. DE C.V. (\"TradeIQ Pro\", \"nosotros\", \"nuestro\")."
+        },
+        "description": {
+          "title": "2. Descripción del Servicio",
+          "content": "TradeIQ Pro es una plataforma de análisis de trading impulsada por IA que proporciona perspectivas del mercado, análisis técnico y recursos educativos. Nuestro servicio incluye datos de mercado en tiempo real, reconocimiento de patrones, análisis de tendencias y recomendaciones de trading.\n\nLa plataforma está diseñada con fines educativos e informativos para ayudar a los traders a tomar decisiones informadas. No proporcionamos asesoramiento financiero ni garantizamos resultados de trading."
+        },
+        "userObligations": {
+          "title": "3. Obligaciones del Usuario",
+          "content": "Aceptas usar TradeIQ Pro solo para fines legales y de acuerdo con estos Términos. Eres responsable de mantener la confidencialidad de las credenciales de tu cuenta y de todas las actividades que ocurran bajo tu cuenta.\n\nDebes proporcionar información precisa y completa al crear tu cuenta y mantener esta información actualizada. Aceptas no compartir tu cuenta con otros o permitir acceso no autorizado."
+        },
+        "prohibitedUses": {
+          "title": "4. Usos Prohibidos",
+          "content": "No puedes usar nuestro servicio para ningún propósito ilegal o no autorizado. Las actividades prohibidas incluyen pero no se limitan a:\n\n• Intentar obtener acceso no autorizado a nuestros sistemas\n• Distribuir malware o código dañino\n• Participar en actividades fraudulentas\n• Violar derechos de propiedad intelectual\n• Acosar o amenazar a otros usuarios\n• Usar el servicio para manipulación del mercado"
+        },
+        "intellectualProperty": {
+          "title": "5. Propiedad Intelectual",
+          "content": "La plataforma TradeIQ Pro, incluyendo todo el contenido, características y funcionalidad, es propiedad de INGENIO FINANCIERO DIGITAL, S.A.P.I. DE C.V. y está protegida por leyes internacionales de derechos de autor, marcas registradas y otras leyes de propiedad intelectual.\n\nSe te otorga una licencia limitada, no exclusiva, no transferible para usar nuestro servicio solo para uso personal. No puedes reproducir, distribuir o crear trabajos derivados basados en nuestro contenido sin permiso escrito explícito."
+        },
+        "limitationLiability": {
+          "title": "6. Limitación de Responsabilidad",
+          "content": "TradeIQ Pro proporciona herramientas de información y análisis pero no garantiza la precisión de los datos del mercado o el éxito de las decisiones de trading. El trading involucra un riesgo sustancial de pérdida, y debes considerar cuidadosamente tu situación financiera antes de participar en actividades de trading.\n\nNo seremos responsables de ningún daño directo, indirecto, incidental, especial o consecuente que resulte del uso o la incapacidad de usar nuestro servicio. Nuestra responsabilidad total no excederá la cantidad pagada por nuestros servicios en los 12 meses anteriores."
+        },
+        "modifications": {
+          "title": "7. Modificaciones a los Términos",
+          "content": "TradeIQ Pro se reserva el derecho de modificar estos Términos de Servicio en cualquier momento. Notificaremos a los usuarios de cambios significativos a través de nuestra plataforma o por correo electrónico. El uso continuado de nuestro servicio después de tales modificaciones constituye la aceptación de los términos actualizados.\n\nEs tu responsabilidad revisar estos términos periódicamente para cambios."
+        },
+        "termination": {
+          "title": "8. Terminación",
+          "content": "Cualquiera de las partes puede terminar este acuerdo en cualquier momento. TradeIQ Pro se reserva el derecho de suspender o terminar cuentas que violen estos términos o participen en actividades prohibidas.\n\nAl finalizar, tu derecho a usar el servicio cesará inmediatamente, y podemos eliminar los datos de tu cuenta de acuerdo con nuestras políticas de retención de datos."
+        },
+        "governingLaw": {
+          "title": "9. Ley Aplicable",
+          "content": "Estos Términos se regirán e interpretarán de acuerdo con las leyes de México. Cualquier disputa que surja de estos términos se resolverá en los tribunales competentes de México.\n\nSi alguna disposición de estos términos se considera inaplicable, las disposiciones restantes continuarán en pleno vigor y efecto."
+        },
+        "contact": {
+          "title": "10. Información de Contacto",
+          "content": "Si tienes alguna pregunta sobre estos Términos de Servicio, por favor contáctanos:"
+        }
+      }
+    },
+    "privacy": {
+      "title": "Política de Privacidad",
+      "metaTitle": "Política de Privacidad | TradeIQ Pro",
+      "metaDescription": "Aprende cómo TradeIQ Pro recopila, usa y protege tus datos personales y privacidad.",
+      "lastUpdated": "2025-01-08",
+      "sections": {
+        "introduction": {
+          "title": "1. Introducción",
+          "content": "En TradeIQ Pro, respetamos y protegemos tu privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos, divulgamos y protegemos tu información cuando usas nuestra plataforma de trading impulsada por IA.\n\nAl usar nuestro servicio, aceptas la recopilación y uso de información de acuerdo con esta política. Estamos comprometidos a asegurar que tu privacidad esté protegida y solo usaremos tu información como se describe en esta política."
+        },
+        "dataCollection": {
+          "title": "2. Información que Recopilamos",
+          "content": "Recopilamos varios tipos de información de y sobre los usuarios de nuestro servicio:\n\n**Información Personal:** Nombre, dirección de correo electrónico, número de teléfono y otros detalles de contacto que proporcionas al crear una cuenta.\n\n**Datos de Uso:** Información sobre cómo accedes y usas nuestro servicio, incluyendo tu dirección IP, tipo de navegador, páginas visitadas y tiempo pasado en nuestra plataforma.\n\n**Datos de Trading:** Tus preferencias de trading, listas de seguimiento e interacción con nuestras herramientas de análisis de IA.\n\n**Información del Dispositivo:** Información sobre el dispositivo que usas para acceder a nuestro servicio, incluyendo modelo de hardware, sistema operativo e información de red móvil."
+        },
+        "dataUse": {
+          "title": "3. Cómo Usamos Tu Información",
+          "content": "Usamos la información que recopilamos para:\n\n• Proporcionar y mantener nuestro servicio\n• Procesar tu registro de cuenta y gestionar tu cuenta\n• Comunicarnos contigo sobre nuestro servicio, incluyendo actualizaciones y soporte\n• Personalizar tu experiencia y proporcionar recomendaciones de IA personalizadas\n• Analizar patrones de uso para mejorar nuestra plataforma\n• Detectar y prevenir fraude o abuso\n• Cumplir con obligaciones legales\n• Enviar comunicaciones de marketing (con tu consentimiento)"
+        },
+        "dataSharing": {
+          "title": "4. Compartir y Divulgación de Información",
+          "content": "No vendemos, intercambiamos o transferimos de otra manera tu información personal a terceros sin tu consentimiento, excepto como se describe en esta política:\n\n**Proveedores de Servicios:** Podemos compartir información con proveedores de servicios de terceros confiables que nos ayudan a operar nuestra plataforma y conducir nuestro negocio.\n\n**Requisitos Legales:** Podemos divulgar tu información si es requerido por ley o en respuesta a solicitudes válidas por parte de autoridades públicas.\n\n**Transferencias Comerciales:** En el caso de una fusión, adquisición o venta de activos, tu información puede ser transferida como parte de esa transacción.\n\n**Protección de Derechos:** Podemos divulgar información para proteger nuestros derechos, propiedad o seguridad, o la de nuestros usuarios u otros."
+        },
+        "cookies": {
+          "title": "5. Cookies y Tecnologías de Seguimiento",
+          "content": "Usamos cookies y tecnologías de seguimiento similares para rastrear la actividad en nuestro servicio y mantener cierta información. Las cookies son archivos con pequeñas cantidades de datos que pueden incluir un identificador único anónimo.\n\nUsamos cookies para:\n• Funcionalidad esencial del sitio web\n• Análisis para entender cómo se usa nuestro servicio\n• Personalización de contenido y anuncios\n• Seguridad y prevención de fraude\n\nPuedes instruir a tu navegador para que rechace todas las cookies o para indicar cuando se está enviando una cookie. Sin embargo, si no aceptas cookies, es posible que no puedas usar algunas partes de nuestro servicio."
+        },
+        "dataSecurity": {
+          "title": "6. Seguridad de Datos",
+          "content": "Implementamos medidas técnicas y organizacionales apropiadas para proteger tu información personal contra acceso no autorizado, alteración, divulgación o destrucción. Estas medidas incluyen:\n\n• Cifrado de datos en tránsito y en reposo\n• Evaluaciones y auditorías de seguridad regulares\n• Controles de acceso y mecanismos de autenticación\n• Capacitación de empleados sobre protección de datos\n• Procedimientos de respuesta a incidentes\n\nSin embargo, ningún método de transmisión por Internet o almacenamiento electrónico es 100% seguro, y no podemos garantizar seguridad absoluta."
+        },
+        "userRights": {
+          "title": "7. Tus Derechos",
+          "content": "Tienes ciertos derechos con respecto a tu información personal:\n\n**Acceso:** Puedes solicitar acceso a la información personal que tenemos sobre ti.\n\n**Corrección:** Puedes solicitar la corrección de información personal inexacta o incompleta.\n\n**Eliminación:** Puedes solicitar la eliminación de tu información personal, sujeta a ciertas excepciones.\n\n**Portabilidad:** Puedes solicitar una copia de tu información personal en un formato estructurado y legible por máquina.\n\n**Objeción:** Puedes objetar al procesamiento de tu información personal en ciertas circunstancias.\n\nPara ejercer estos derechos, por favor contáctanos usando la información proporcionada a continuación."
+        },
+        "retention": {
+          "title": "8. Retención de Datos",
+          "content": "Retenemos tu información personal durante el tiempo necesario para cumplir los propósitos descritos en esta Política de Privacidad, a menos que la ley requiera o permita un período de retención más largo.\n\nCuando ya no necesitemos tu información personal, la eliminaremos de manera segura o la anonimizaremos. Los datos de la cuenta pueden retenerse por un período razonable después del cierre de la cuenta para cumplir con obligaciones legales y resolver disputas."
+        },
+        "updates": {
+          "title": "9. Actualizaciones de Política",
+          "content": "Podemos actualizar esta Política de Privacidad de vez en cuando. Te notificaremos de cualquier cambio publicando la nueva Política de Privacidad en esta página y actualizando la fecha de \"Última Actualización\".\n\nTe recomendamos que revises esta Política de Privacidad periódicamente para cualquier cambio. Los cambios a esta Política de Privacidad son efectivos cuando se publican en esta página."
+        },
+        "contact": {
+          "title": "10. Contáctanos",
+          "content": "Si tienes alguna pregunta sobre esta Política de Privacidad o nuestras prácticas de datos, por favor contáctanos:"
+        }
+      }
+    },
+    "cookies": {
+      "title": "Política de Cookies",
+      "metaTitle": "Política de Cookies | TradeIQ Pro",
+      "metaDescription": "Aprende sobre cómo TradeIQ Pro usa cookies y tecnologías similares para mejorar tu experiencia.",
+      "lastUpdated": "2025-01-08",
+      "banner": {
+        "title": "Usamos cookies",
+        "description": "Usamos cookies esenciales para que nuestro sitio funcione. Con tu consentimiento, también podemos usar cookies no esenciales para mejorar la experiencia del usuario y analizar el tráfico del sitio web.",
+        "acceptAll": "Aceptar Todo",
+        "rejectNonEssential": "Rechazar No Esenciales",
+        "managePreferences": "Gestionar Preferencias"
+      },
+      "preferences": {
+        "title": "Preferencias de Cookies",
+        "description": "Elige qué cookies quieres aceptar. Puedes cambiar esta configuración en cualquier momento.",
+        "savePreferences": "Guardar Preferencias"
+      },
+      "categories": {
+        "essential": {
+          "title": "Cookies Esenciales",
+          "description": "Estas cookies son necesarias para que el sitio web funcione y no se pueden desactivar. Generalmente solo se establecen en respuesta a acciones realizadas por ti que equivalen a una solicitud de servicios.",
+          "note": "Estas cookies siempre están activas ya que son esenciales para el funcionamiento del sitio web."
+        },
+        "analytics": {
+          "title": "Cookies de Análisis",
+          "description": "Estas cookies nos permiten analizar el tráfico del sitio web y entender cómo los visitantes interactúan con nuestro sitio. Esto nos ayuda a mejorar nuestros servicios.",
+          "purposes": "Usamos estas cookies para",
+          "purpose1": "Medir y analizar el rendimiento del sitio web",
+          "purpose2": "Entender el comportamiento y preferencias del usuario",
+          "purpose3": "Mejorar nuestros servicios y experiencia del usuario"
+        }
+      },
+      "settings": "Configuración de Cookies",
+      "sections": {
+        "introduction": {
+          "title": "1. Introducción",
+          "content": "Esta Política de Cookies explica cómo TradeIQ Pro usa cookies y tecnologías similares cuando visitas nuestro sitio web o usas nuestros servicios. Explica qué son estas tecnologías, por qué las usamos y tus derechos para controlar nuestro uso de ellas.\n\nAl continuar usando nuestro sitio web, consientes nuestro uso de cookies como se describe en esta política."
+        },
+        "whatAreCookies": {
+          "title": "2. Qué Son las Cookies",
+          "content": "Las cookies son pequeños archivos de datos que se colocan en tu computadora o dispositivo móvil cuando visitas un sitio web. Las cookies son ampliamente utilizadas por los propietarios de sitios web para hacer que sus sitios web funcionen de manera más eficiente y para proporcionar información de informes.\n\nLas cookies establecidas por el propietario del sitio web se llaman \"cookies de primera parte\". Las cookies establecidas por partes distintas al propietario del sitio web se llaman \"cookies de terceros\". Las cookies de terceros habilitan características o funcionalidades de terceros en o a través del sitio web."
+        },
+        "typesOfCookies": {
+          "title": "3. Tipos de Cookies que Usamos",
+          "content": "Usamos diferentes tipos de cookies para varios propósitos:\n\n**Cookies de Sesión:** Estas son cookies temporales que permanecen en el archivo de cookies de tu navegador hasta que abandonas el sitio.\n\n**Cookies Persistentes:** Estas cookies permanecen en el archivo de cookies de tu navegador por mucho más tiempo (aunque cuánto tiempo dependerá de la vida útil de la cookie específica).\n\n**Cookies de Primera Parte:** Estas son cookies establecidas directamente por nuestro sitio web.\n\n**Cookies de Terceros:** Estas son cookies establecidas por servicios de terceros que usamos en nuestro sitio web."
+        },
+        "essentialCookies": {
+          "title": "4. Cookies Esenciales",
+          "content": "Estas cookies son estrictamente necesarias para proporcionarte servicios disponibles a través de nuestro sitio web y para usar algunas de sus características, como el acceso a áreas seguras.\n\nLas cookies esenciales incluyen:\n• Cookies de autenticación para identificarte cuando inicias sesión\n• Cookies de seguridad para prevenir el uso fraudulento de credenciales de inicio de sesión\n• Cookies de sesión para recordar tus preferencias durante tu visita\n• Cookies de equilibrio de carga para asegurar que el sitio web funcione sin problemas\n\nDado que estas cookies son estrictamente necesarias para entregar el sitio web, no puedes rechazarlas sin impactar cómo funciona nuestro sitio."
+        },
+        "analyticsCookies": {
+          "title": "5. Cookies de Análisis",
+          "content": "Estas cookies recopilan información que se usa para ayudarnos a entender cómo se está usando nuestro sitio web o qué tan efectivas son nuestras campañas de marketing, o para ayudarnos a personalizar nuestro sitio web para ti.\n\nUsamos cookies de análisis para:\n• Contar visitas y fuentes de tráfico\n• Medir y mejorar el rendimiento del sitio web\n• Entender qué páginas son más y menos populares\n• Ver cómo los visitantes se mueven por el sitio\n• Rastrear el comportamiento y preferencias del usuario\n\nEstas cookies no te identifican personalmente. Toda la información se recopila e informa de forma anónima."
+        },
+        "managingCookies": {
+          "title": "6. Gestión de Cookies",
+          "content": "Tienes varias opciones para gestionar cookies:\n\n**Configuración del Navegador:** La mayoría de los navegadores web te permiten controlar las cookies a través de sus preferencias de configuración. Puedes configurar tu navegador para rechazar cookies o eliminar ciertas cookies.\n\n**Herramienta de Consentimiento de Cookies:** Puedes usar nuestra herramienta de consentimiento de cookies para gestionar tus preferencias para cookies no esenciales.\n\n**Enlaces de Exclusión:** Para algunas cookies de terceros, puedes optar por no participar directamente con el proveedor de servicios.\n\nTen en cuenta que si deshabilitas las cookies, algunas características de nuestro sitio web pueden no funcionar correctamente."
+        },
+        "thirdPartyCookies": {
+          "title": "7. Cookies de Terceros",
+          "content": "Además de nuestras propias cookies, también podemos usar varias cookies de terceros para reportar estadísticas de uso del servicio y entregar anuncios.\n\nLos servicios de terceros que usamos pueden incluir:\n• Google Analytics para análisis del sitio web\n• Plataformas de redes sociales para características de compartir en redes sociales\n• Servicios de marketing y publicidad\n\nEstos terceros pueden usar cookies para recopilar información sobre tus actividades en línea a través de este y otros sitios a lo largo del tiempo para propósitos no publicitarios."
+        },
+        "updates": {
+          "title": "8. Actualizaciones a Esta Política",
+          "content": "Podemos actualizar esta Política de Cookies de vez en cuando para reflejar cambios en las cookies que usamos o por otras razones operacionales, legales o regulatorias.\n\nTe animamos a revisar esta Política de Cookies regularmente para mantenerte informado sobre nuestro uso de cookies y tecnologías relacionadas."
+        },
+        "contact": {
+          "title": "9. Contáctanos",
+          "content": "Si tienes alguna pregunta sobre nuestro uso de cookies o esta Política de Cookies, por favor contáctanos:"
+        }
+      }
+    }
   }
 }
