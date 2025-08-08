@@ -2,13 +2,13 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import Terms from '../pages/legal/Terms';
 import Privacy from '../pages/legal/Privacy';
 import Cookies from '../pages/legal/Cookies';
 
 // Mock the translation hook
-jest.mock('../hooks/useTranslationWithFallback', () => ({
+vi.mock('../hooks/useTranslationWithFallback', () => ({
   useTranslationWithFallback: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
