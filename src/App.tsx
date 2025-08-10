@@ -1,3 +1,4 @@
+
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,7 +10,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PublicRoute from "@/components/PublicRoute";
-import ErrorBoundary from "@/components/ErrorBoundary";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Lazy load pages for better performance
 const Index = lazy(() => import("./pages/Index"));
@@ -21,13 +22,8 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const ResetPasswordRequest = lazy(() => import("./pages/ResetPasswordRequest"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const Pricing = lazy(() => import("./pages/Pricing"));
-const AppLayout = lazy(() => import("@/layouts/AppLayout"));
-const Dashboard = lazy(() => import("./pages/app/Dashboard"));
-const StrategyAI = lazy(() => import("./pages/app/StrategyAI"));
-const MarketUpdates = lazy(() => import("./pages/app/MarketUpdates"));
-const Alerts = lazy(() => import("./pages/app/Alerts"));
-const Learn = lazy(() => import("./pages/app/Learn"));
-const Settings = lazy(() => import("./pages/app/Settings"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -42,7 +38,7 @@ const App = () => (
               <TooltipProvider>
                 <Toaster />
                 <Sonner />
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
                   <Routes>
                     {/* Public routes */}
                     <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
@@ -56,12 +52,9 @@ const App = () => (
                     <Route path="/pricing" element={<PublicRoute><Pricing /></PublicRoute>} />
 
                     {/* App routes - Protected */}
-                    <Route path="/app" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
-                    <Route path="/app/strategy-ai" element={<ProtectedRoute><AppLayout><StrategyAI /></AppLayout></ProtectedRoute>} />
-                    <Route path="/app/market-updates" element={<ProtectedRoute><AppLayout><MarketUpdates /></AppLayout></ProtectedRoute>} />
-                    <Route path="/app/alerts" element={<ProtectedRoute><AppLayout><Alerts /></AppLayout></ProtectedRoute>} />
-                    <Route path="/app/learn" element={<ProtectedRoute><AppLayout><Learn /></AppLayout></ProtectedRoute>} />
-                    <Route path="/app/settings" element={<ProtectedRoute><AppLayout><Settings /></AppLayout></ProtectedRoute>} />
+                    <Route path="/app" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                    <Route path="/app/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                    <Route path="/app/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
                     {/* Not Found */}
                     <Route path="*" element={<PublicRoute><NotFound /></PublicRoute>} />
