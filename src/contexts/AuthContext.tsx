@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -293,13 +292,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithOAuth = async (provider: 'google' | 'github') => {
-    // Use the current origin for redirect URL to avoid redirect_uri_mismatch
-    const redirectTo = `${window.location.origin}/auth/callback`;
+    // Use runtime origin to avoid env mismatch between dev/prod
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const redirectTo = `${origin}/auth/callback`;
     
     console.log('[OAUTH] start', { provider, redirectTo });
     console.log('🔐 [OAuth:start] Attempting OAuth with provider:', provider);
     console.log('🔐 [OAuth:start] Redirect URL:', redirectTo);
-    console.log('🔐 [OAuth:start] Current origin:', window.location.origin);
+    console.log('🔐 [OAuth:start] Current origin:', origin);
     
     const { error, data } = await supabase.auth.signInWithOAuth({
       provider,
@@ -315,6 +315,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       console.log('[OAUTH] start url', provider, data?.url);
       console.log('🔐 [OAuth:start:ok]', provider, data?.url);
+      
+      // If Supabase provides a URL, redirect to it
+      if (data?.url) {
+        window.location.href = data.url;
+      }
     }
     
     return { error };

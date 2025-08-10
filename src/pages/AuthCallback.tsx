@@ -26,11 +26,30 @@ const AuthCallback = () => {
         return;
       }
 
-      // Get session after OAuth callback
+      // *** Key part: exchange the code for a session ***
+      const code = searchParams.get('code');
+      const redirect = searchParams.get('redirect') || '/app';
+
+      if (code) {
+        console.log('🔐 [OAuth:callback:exchange] Exchanging code for session');
+        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        
+        if (exchangeError) {
+          console.error('🔐 [OAuth:callback:exchange_error]', exchangeError);
+          navigate('/login?error=exchange_failed');
+          return;
+        }
+        
+        console.log('🔐 [OAuth:callback:exchange_success] Session established via code exchange');
+        navigate(redirect);
+        return;
+      }
+
+      // Safety: if no code (some providers auto set session), ensure session exists
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
-        console.error('[OAUTH] callback no_session');
+        console.error('[OAUTH] callback session_error');
         console.error('🔐 [OAuth:callback:session_error]', sessionError);
         navigate('/login?error=session_error');
         return;
@@ -44,7 +63,6 @@ const AuthCallback = () => {
       }
 
       console.log('🔐 [OAuth:callback:success] Session established, redirecting to app');
-      const redirect = searchParams.get('redirect') || '/app';
       navigate(redirect);
     };
 
