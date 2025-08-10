@@ -11,6 +11,7 @@ const OAuthDebug = () => {
   const siteUrl = window.location.origin;
   const redirectTo = `${siteUrl}/auth/callback`;
   const supabaseUrl = "https://xnrvqfclyroagzknedhs.supabase.co";
+  const anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhucnZxZmNseXJvYWd6a25lZGhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5Mjg0MTgsImV4cCI6MjA2NDUwNDQxOH0.vIFgqNFnfLVoqtSs4xGWAAVmDiAeIUS3fo6C-1sbQog";
 
   const getUrl = async (provider: 'google' | 'github') => {
     console.log(`[OAUTH-DEBUG] Getting ${provider} URL`, { redirectTo });
@@ -53,7 +54,7 @@ const OAuthDebug = () => {
       const response = await fetch(healthUrl, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
+          'Authorization': `Bearer ${anonKey}`,
         },
       });
       
