@@ -292,28 +292,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithOAuth = async (provider: 'google' | 'github') => {
-    // Determine the correct redirect URL based on environment
-    const isLocalhost = window.location.hostname === 'localhost';
-    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://tradeiqpro.com';
-    const redirectUrl = `${baseUrl}/auth/callback`;
+    const redirectUrl = 'https://tradeiqpro.com/app';
     
     console.log('🔐 [AUTH_FLOW] OAuth sign in with provider:', provider);
     console.log('🔐 [AUTH_FLOW] OAuth redirect URL:', redirectUrl);
-    console.log('🔐 [AUTH_FLOW] Current environment:', { hostname: window.location.hostname, isLocalhost });
     
-    const options = {
-      redirectTo: redirectUrl,
-      ...(provider === 'google' && {
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent'
-        }
-      })
-    };
-
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options
+      options: {
+        redirectTo: redirectUrl
+      }
     });
     
     if (error) {
