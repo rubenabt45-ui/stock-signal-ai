@@ -1,3 +1,4 @@
+
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -7,18 +8,18 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { PublicRoute } from "@/components/PublicRoute";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import PublicRoute from "@/components/PublicRoute";
 import { PageWrapper } from "@/components/PageWrapper";
 import I18nErrorBoundary from "@/components/I18nErrorBoundary";
 
-const Home = lazy(() => import("@/pages/Home"));
+const Home = lazy(() => import("@/pages/Index"));
 const Login = lazy(() => import("@/pages/Login"));
 const Signup = lazy(() => import("@/pages/Signup"));
 const ResetPasswordRequest = lazy(() => import("@/pages/ResetPasswordRequest"));
 const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
-const AppLayout = lazy(() => import("@/pages/app/AppLayout"));
-const AccountSettings = lazy(() => import("@/pages/app/AccountSettings"));
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Settings = lazy(() => import("@/pages/Settings"));
 const VerifyEmail = lazy(() => import("@/pages/VerifyEmail"));
 const AuthCallback = lazy(() => import("@/pages/AuthCallback"));
 
@@ -29,7 +30,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <I18nErrorBoundary>
         <LanguageProvider>
-          <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+          <ThemeProvider>
             <AuthProvider>
               <TooltipProvider>
                 <Toaster />
@@ -48,7 +49,7 @@ function App() {
                         path="/app"
                         element={
                           <ProtectedRoute>
-                            <AppLayout />
+                            <Dashboard />
                           </ProtectedRoute>
                         }
                       />
@@ -56,7 +57,7 @@ function App() {
                         path="/app/account"
                         element={
                           <ProtectedRoute>
-                            <AccountSettings />
+                            <Settings />
                           </ProtectedRoute>
                         }
                       />
