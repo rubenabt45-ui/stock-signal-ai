@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { checkSupabaseHost } from '@/lib/supabasePreflight';
 
 // Log Supabase URL on boot
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xnrvqfclyroagzknedhs.supabase.co';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://xnrvqfclyroagzknedhs.supabase.co';
 console.info('[Supabase]', supabaseUrl);
 
 interface AuthContextType {
@@ -308,7 +308,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     if (!preflightCache.result.ok) {
-      const errorMsg = `Supabase host invalid (${preflightCache.result.reason}). Check NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl}`;
+      const errorMsg = `Supabase host invalid (${preflightCache.result.reason}). Check VITE_SUPABASE_URL: ${supabaseUrl}`;
       console.error('🔐 [OAuth:preflight:failed]', errorMsg, preflightCache.result);
       return { error: { message: errorMsg } };
     }
