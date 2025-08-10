@@ -2,7 +2,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslationWithFallback } from '../hooks/useTranslationWithFallback';
-import { CookieSettingsButton } from './CookieConsent';
 import { ErrorBoundary } from './ErrorBoundary';
 
 const FooterContent = () => {
@@ -104,29 +103,22 @@ const FooterContent = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-border pt-6">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="text-center md:text-left">
-              <p className="text-xs text-muted-foreground">
-                {t('footer.description')}{' '}
-                <a 
-                  href="https://www.tradeiqpro.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  aria-label="Visit TradeIQ Pro website"
-                  className="text-primary hover:text-primary/80 hover:underline transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded px-1 py-0.5"
-                >
-                  www.tradeiqpro.com
-                </a>
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                © 2025 TradeIQ Pro — INGENIO FINANCIERO DIGITAL, S.A.P.I. DE C.V. {t('footer.rights')}
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <CookieSettingsButton />
-            </div>
-          </div>
+        <div className="border-t border-border pt-6 text-center">
+          <p className="text-xs text-muted-foreground">
+            {t('footer.description')}{' '}
+            <a 
+              href="https://www.tradeiqpro.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Visit TradeIQ Pro website"
+              className="text-primary hover:text-primary/80 hover:underline transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded px-1 py-0.5"
+            >
+              www.tradeiqpro.com
+            </a>
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            © 2024 TradeIQ Pro. {t('footer.rights')}
+          </p>
         </div>
       </div>
     </footer>
@@ -141,7 +133,7 @@ const Footer = () => {
         <footer className="border-t border-border bg-background/50 backdrop-blur-sm py-8 px-4">
           <div className="container mx-auto text-center">
             <p className="text-sm text-muted-foreground">
-              © 2025 TradeIQ Pro — INGENIO FINANCIERO DIGITAL, S.A.P.I. DE C.V. All rights reserved.
+              © 2024 TradeIQ Pro. All rights reserved.
             </p>
           </div>
         </footer>
