@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
@@ -15,7 +14,7 @@ const TermsOfService = () => {
           <Link to="/">
             <Button variant="ghost" className="mb-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              {t('common.goBack')}
+              Go Back
             </Button>
           </Link>
           <h1 className="text-3xl font-bold text-foreground mb-2">
