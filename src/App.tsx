@@ -54,8 +54,8 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <I18nErrorBoundary>
-            <LanguageProvider>
-              <AuthProvider>
+            <AuthProvider>
+              <LanguageProvider>
                 <ThemeProvider>
                   <Router>
                     <div className="App">
@@ -100,8 +100,8 @@ function App() {
                     </div>
                   </Router>
                 </ThemeProvider>
-              </AuthProvider>
-            </LanguageProvider>
+              </LanguageProvider>
+            </AuthProvider>
           </I18nErrorBoundary>
         </TooltipProvider>
       </QueryClientProvider>
