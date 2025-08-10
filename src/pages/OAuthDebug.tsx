@@ -10,7 +10,7 @@ const OAuthDebug = () => {
   const [githubHealth, setGithubHealth] = useState<any>(null);
   const siteUrl = window.location.origin;
   const redirectTo = `${siteUrl}/auth/callback`;
-  const supabaseUrl = "https://xnrvqfclyroagzknedhs.supabase.co";
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://xnrvqfclyroagzknedhs.supabase.co";
   const anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhucnZxZmNseXJvYWd6a25lZGhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5Mjg0MTgsImV4cCI6MjA2NDUwNDQxOH0.vIFgqNFnfLVoqtSs4xGWAAVmDiAeIUS3fo6C-1sbQog";
 
   const getUrl = async (provider: 'google' | 'github') => {
@@ -126,7 +126,7 @@ GitHub Health Check:
 ${githubHealth ? JSON.stringify(githubHealth, null, 2) : '(no data)'}
 
 Expected Redirect URI in Provider Settings:
-https://xnrvqfclyroagzknedhs.supabase.co/auth/v1/callback
+${supabaseUrl.replace('https://', '').replace('http://', '')}/auth/v1/callback
 
 Interpretation Guide:
 - status === 302 + location to accounts.google.com/github.com → Supabase OK, check Google consent/testers
