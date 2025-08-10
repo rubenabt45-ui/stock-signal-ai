@@ -10,11 +10,12 @@ const AuthCallback = () => {
 
   useEffect(() => {
     const handleCallback = async () => {
-      // Check for OAuth errors from Google/GitHub
+      // Log provider error signals if Google/GitHub bounced back with an error
       const error = searchParams.get('error');
       const errorDescription = searchParams.get('error_description') || searchParams.get('error_subtype');
       
       if (error) {
+        console.error('[OAUTH] callback error', { error, errorDescription });
         console.error('🔐 [OAuth:callback:error]', error, errorDescription);
         console.error('🔐 [OAuth:callback:error] Full params:', Object.fromEntries(searchParams.entries()));
         
@@ -29,19 +30,22 @@ const AuthCallback = () => {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
+        console.error('[OAUTH] callback no_session');
         console.error('🔐 [OAuth:callback:session_error]', sessionError);
         navigate('/login?error=session_error');
         return;
       }
 
       if (!session) {
+        console.error('[OAUTH] callback no_session');
         console.error('🔐 [OAuth:callback:no_session]');
         navigate('/login?error=callback_no_session');
         return;
       }
 
       console.log('🔐 [OAuth:callback:success] Session established, redirecting to app');
-      navigate('/app');
+      const redirect = searchParams.get('redirect') || '/app';
+      navigate(redirect);
     };
 
     handleCallback();
