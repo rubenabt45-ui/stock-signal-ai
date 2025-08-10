@@ -1,4 +1,5 @@
 
+
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -32,9 +33,9 @@ const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <ThemeProvider>
-          <LanguageProvider>
-            <AuthProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <LanguageProvider>
               <TooltipProvider>
                 <Toaster />
                 <Sonner />
@@ -61,12 +62,13 @@ const App = () => (
                   </Routes>
                 </Suspense>
               </TooltipProvider>
-            </AuthProvider>
-          </LanguageProvider>
-        </ThemeProvider>
+            </LanguageProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </ErrorBoundary>
 );
 
 export default App;
+
