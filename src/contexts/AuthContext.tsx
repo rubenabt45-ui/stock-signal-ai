@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { checkSupabaseHost } from '@/lib/supabasePreflight';
 
 // Log Supabase URL on boot
-console.info('[Supabase]', process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xnrvqfclyroagzknedhs.supabase.co');
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xnrvqfclyroagzknedhs.supabase.co';
+console.info('[Supabase]', supabaseUrl);
 
 interface AuthContextType {
   user: User | null;
@@ -299,9 +300,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithOAuth = async (provider: 'google' | 'github') => {
-    // Get Supabase URL from environment
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xnrvqfclyroagzknedhs.supabase.co';
-    
     // Perform preflight check (cache result to avoid repeated DNS queries)
     if (!preflightCache.checked) {
       console.log('🔐 [OAuth:preflight] Checking Supabase host:', supabaseUrl);
