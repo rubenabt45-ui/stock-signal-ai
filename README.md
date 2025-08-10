@@ -1,48 +1,73 @@
+# Welcome to your Lovable project
 
-# TradeIQ Pro
+## Project info
 
-A comprehensive trading platform with AI-powered analysis and real-time market data.
+**URL**: https://lovable.dev/projects/351714c7-a4c6-4f25-bf5f-a3c37bdee2ed
 
-## Google OAuth Configuration
+## How can I edit this code?
 
-### Required Settings for Google OAuth to work:
+There are several ways of editing your application.
 
-**Google Cloud Console:**
-- **OAuth Consent Screen:** Set to "External" and "In production" (or "Testing" with your email added as a tester)
-- **Authorized Redirect URI:** `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/callback` (ONLY this URI)
-- **Scopes:** Only use non-sensitive scopes (openid, email, profile)
+**Use Lovable**
 
-**Supabase Dashboard:**
-- **Auth → Providers → Google:** Enable with your Client ID and Secret
-- **Auth → URL Configuration:**
-  - Site URL: `https://tradeiqpro.com`
-  - Additional Redirect URLs: `https://tradeiqpro.com/auth/callback`, `http://localhost:3000/auth/callback`, `https://tradeiqpro.com`, `http://localhost:3000`
+Simply visit the [Lovable Project](https://lovable.dev/projects/351714c7-a4c6-4f25-bf5f-a3c37bdee2ed) and start prompting.
 
-### Troubleshooting Google OAuth 403 Errors:
+Changes made via Lovable will be committed automatically to this repo.
 
-- **Consent screen = External and Published** (or Testing with your email whitelisted)
-- **Authorized redirect URI = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/callback`** (exact match required)
-- **If using Google Workspace:** Organization policy may block third-party apps. Test with personal Gmail or request allow-listing from admin.
+**Use your preferred IDE**
 
-## GitHub OAuth Configuration
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-**GitHub Developer Settings → OAuth Apps:**
-- **Authorization callback URL:** `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/callback`
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-**Supabase Dashboard:**
-- **Auth → Providers → GitHub:** Enable with your Client ID and Secret
+Follow these steps:
 
-## OAuth Debugging
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
 
-Visit `/oauth-debug` to test OAuth URL generation and verify configuration without navigation.
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
 
-## Development
+# Step 3: Install the necessary dependencies.
+npm i
 
-```bash
-npm install
+# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
-## Deployment
+**Edit a file directly in GitHub**
 
-The app is configured to work with Supabase authentication and can be deployed to any static hosting service.
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
+
+**Use GitHub Codespaces**
+
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
+
+## What technologies are used for this project?
+
+This project is built with:
+
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+
+## How can I deploy this project?
+
+Simply open [Lovable](https://lovable.dev/projects/351714c7-a4c6-4f25-bf5f-a3c37bdee2ed) and click on Share -> Publish.
+
+## Can I connect a custom domain to my Lovable project?
+
+Yes, you can!
+
+To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)

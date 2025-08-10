@@ -25,15 +25,13 @@ const Login = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // Check for various URL parameters including OAuth errors
+  // Check for various URL parameters
   const verificationError = searchParams.get('verification_error');
   const isVerified = searchParams.get('verified') === 'true';
   const passwordUpdated = searchParams.get('password_updated') === 'true';
   const errorParam = searchParams.get('error');
   const verificationRetry = searchParams.get('verification_retry') === 'true';
   const requestVerification = searchParams.get('request_verification') === 'true';
-  const oauthError = searchParams.get('oauth_error');
-  const oauthDesc = searchParams.get('oauth_desc');
 
   useEffect(() => {
     if (user) {
@@ -42,31 +40,7 @@ const Login = () => {
   }, [user, navigate]);
 
   useEffect(() => {
-    // Handle OAuth errors specifically
-    if (oauthError) {
-      console.error('🔐 [OAuth:error_display]', oauthError, oauthDesc);
-      
-      let errorMessage = "OAuth authentication failed. Please try again.";
-      
-      if (oauthError === 'access_denied') {
-        if (oauthDesc?.includes('access_denied')) {
-          errorMessage = "Google blocked access. This may be due to:\n• Consent screen not published (set to 'In production')\n• Testing mode without adding your email as a tester\n• Google Workspace organization policy blocking third-party apps\n\nTry with a personal Gmail account or contact your admin.";
-        } else {
-          errorMessage = "Access was denied during OAuth authentication.";
-        }
-      } else if (oauthError === 'invalid_request') {
-        errorMessage = "OAuth configuration error. Please check the setup.";
-      }
-      
-      toast({
-        title: "❌ OAuth Authentication Failed",
-        description: errorMessage,
-        variant: "destructive",
-        duration: 15000,
-      });
-    }
-
-    // Handle other status messages
+    // Handle various status messages
     if (isVerified) {
       toast({
         title: "🎉 Email Verified Successfully!",
@@ -123,27 +97,13 @@ const Login = () => {
         variant: "destructive",
         duration: 10000,
       });
-    } else if (errorParam === 'callback_no_session') {
-      toast({
-        title: "❌ OAuth Session Error",
-        description: "OAuth authentication completed but no session was created. Please try again.",
-        variant: "destructive",
-        duration: 10000,
-      });
-    } else if (errorParam === 'session_error') {
-      toast({
-        title: "❌ Session Error",
-        description: "There was an error retrieving your session. Please try logging in again.",
-        variant: "destructive",
-        duration: 10000,
-      });
     }
     
     // Clean up URL parameters
-    if (isVerified || verificationError || passwordUpdated || errorParam || verificationRetry || requestVerification || oauthError) {
+    if (isVerified || verificationError || passwordUpdated || errorParam || verificationRetry || requestVerification) {
       window.history.replaceState({}, document.title, '/login');
     }
-  }, [isVerified, verificationError, passwordUpdated, errorParam, verificationRetry, requestVerification, oauthError, oauthDesc, toast]);
+  }, [isVerified, verificationError, passwordUpdated, errorParam, verificationRetry, requestVerification, toast]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -261,21 +221,39 @@ const Login = () => {
         </CardHeader>
         <CardContent>
           {/* Status Alerts */}
-          {(verificationError || errorParam || oauthError) && (
+          {(verificationError || errorParam) && (
             <Alert className="mb-4 border-red-500/50 bg-red-900/20">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="text-red-400">
-                {oauthError === 'access_denied' && oauthDesc?.includes('access_denied') 
-                  ? "Google blocked access. This may be due to consent screen settings or organization policy. Try with a personal Gmail account."
-                  : oauthError 
-                  ? "OAuth authentication failed. Please try again or contact support."
-                  : verificationError === 'invalid_token' 
+                {verificationError === 'invalid_token' 
                   ? "Your verification link is invalid or expired. Please request a new one below."
                   : errorParam === 'invalid_reset_link'
                   ? "The password reset link is invalid or expired. Please request a new one from the forgot password page."
-                  : errorParam === 'callback_no_session'
-                  ? "OAuth authentication completed but no session was created. Please try again."
                   : "An error occurred. Please try again or request a new verification link."
+                }
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {(isVerified || passwordUpdated) && (
+            <Alert className="mb-4 border-green-500/50 bg-green-900/20">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-green-400">
+                {isVerified 
+                  ? "🎉 Email verified successfully! Welcome to TradeIQ Pro! You can now log in with your credentials."
+                  : "🔒 Password updated successfully! You can now log in with your new password."
+                }
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {(verificationRetry || requestVerification) && (
+            <Alert className="mb-4 border-blue-500/50 bg-blue-900/20">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-blue-400">
+                {verificationRetry 
+                  ? "🔄 Please enter your email and request a new verification link."
+                  : "📧 Please enter your email to receive a new verification link."
                 }
               </AlertDescription>
             </Alert>

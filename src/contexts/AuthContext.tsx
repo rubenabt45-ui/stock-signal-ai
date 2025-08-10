@@ -1,11 +1,7 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { checkSupabaseHost } from '@/lib/supabasePreflight';
-
-// Log Supabase URL on boot
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://xnrvqfclyroagzknedhs.supabase.co';
-console.info('[Supabase]', supabaseUrl);
 
 interface AuthContextType {
   user: User | null;
@@ -29,9 +25,6 @@ export const useAuth = () => {
   }
   return context;
 };
-
-// Cache for preflight check to avoid repeated DNS queries
-let preflightCache: { checked: boolean; result: any } = { checked: false, result: null };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -300,48 +293,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithOAuth = async (provider: 'google' | 'github') => {
-    // Perform preflight check (cache result to avoid repeated DNS queries)
-    if (!preflightCache.checked) {
-      console.log('🔐 [OAuth:preflight] Checking Supabase host:', supabaseUrl);
-      preflightCache.result = await checkSupabaseHost(supabaseUrl);
-      preflightCache.checked = true;
-    }
+    // Use the current origin for redirect URL to avoid redirect_uri_mismatch
+    const redirectUrl = `${window.location.origin}/app`;
     
-    if (!preflightCache.result.ok) {
-      const errorMsg = `Supabase host invalid (${preflightCache.result.reason}). Check VITE_SUPABASE_URL: ${supabaseUrl}`;
-      console.error('🔐 [OAuth:preflight:failed]', errorMsg, preflightCache.result);
-      return { error: { message: errorMsg } };
-    }
+    console.log('🔐 [AUTH_FLOW] OAuth sign in with provider:', provider);
+    console.log('🔐 [AUTH_FLOW] OAuth redirect URL:', redirectUrl);
+    console.log('🔐 [AUTH_FLOW] Current origin:', window.location.origin);
     
-    // Use runtime origin to avoid env mismatch between dev/prod
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const redirectTo = `${origin}/auth/callback`;
-    
-    console.log('[OAUTH] start', { provider, redirectTo });
-    console.log('🔐 [OAuth:start] Attempting OAuth with provider:', provider);
-    console.log('🔐 [OAuth:start] Redirect URL:', redirectTo);
-    console.log('🔐 [OAuth:start] Current origin:', origin);
-    console.log('🔐 [OAuth:start] Supabase URL:', supabaseUrl);
-    
-    const { error, data } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: redirectTo
+        redirectTo: redirectUrl
       }
     });
     
     if (error) {
-      console.error('[OAUTH] start error', provider, error.message);
-      console.error('🔐 [OAuth:start:error]', provider, error.name, error.message);
-      console.error('🔐 [OAuth:start:error] Full error:', JSON.stringify(error, null, 2));
+      console.error('🔐 [AUTH_FLOW] OAuth sign in error:', error);
     } else {
-      console.log('[OAUTH] start url', provider, data?.url);
-      console.log('🔐 [OAuth:start:ok]', provider, data?.url);
-      
-      // If Supabase provides a URL, redirect to it
-      if (data?.url) {
-        window.location.href = data.url;
-      }
+      console.log('🔐 [AUTH_FLOW] OAuth sign in initiated');
     }
     
     return { error };
