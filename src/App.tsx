@@ -9,7 +9,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import { I18nErrorBoundary } from "./components/I18nErrorBoundary";
+import I18nErrorBoundary from "./components/I18nErrorBoundary";
 import "./App.css";
 
 // Lazy load pages for better performance
