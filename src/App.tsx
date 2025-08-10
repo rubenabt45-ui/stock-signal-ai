@@ -51,12 +51,12 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <I18nErrorBoundary>
-              <LanguageProvider>
-                <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <I18nErrorBoundary>
+            <LanguageProvider>
+              <AuthProvider>
+                <ThemeProvider>
                   <Router>
                     <div className="App">
                       <Routes>
@@ -99,12 +99,12 @@ function App() {
                       <Toaster />
                     </div>
                   </Router>
-                </AuthProvider>
-              </LanguageProvider>
-            </I18nErrorBoundary>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
+                </ThemeProvider>
+              </AuthProvider>
+            </LanguageProvider>
+          </I18nErrorBoundary>
+        </TooltipProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }
