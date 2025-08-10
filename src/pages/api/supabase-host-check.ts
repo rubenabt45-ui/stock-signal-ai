@@ -1,13 +1,12 @@
 
-import { NextApiRequest, NextApiResponse } from 'next';
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+// API route for checking Supabase host DNS resolution
+export default async function handler(req: any, res: any) {
   try {
-    const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const envUrl = import.meta.env.VITE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     
     if (!envUrl) {
       return res.status(500).json({ 
-        error: 'NEXT_PUBLIC_SUPABASE_URL not configured',
+        error: 'SUPABASE_URL not configured',
         envUrl: null,
         host: null,
         dnsOk: false 
@@ -40,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   } catch (error: any) {
     console.error('Supabase host check error:', error);
-    return res.status(500).json({
+    return res.json({
       error: error.message,
       envUrl: null,
       host: null,

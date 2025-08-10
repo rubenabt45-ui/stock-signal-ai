@@ -1,6 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { checkSupabaseHost } from '@/lib/supabasePreflight';
+
+// Log Supabase URL on boot
+console.info('[Supabase]', process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xnrvqfclyroagzknedhs.supabase.co');
 
 interface AuthContextType {
   user: User | null;
@@ -24,6 +28,9 @@ export const useAuth = () => {
   }
   return context;
 };
+
+// Cache for preflight check to avoid repeated DNS queries
+let preflightCache: { checked: boolean; result: any } = { checked: false, result: null };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -292,6 +299,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithOAuth = async (provider: 'google' | 'github') => {
+    // Get Supabase URL from environment
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xnrvqfclyroagzknedhs.supabase.co';
+    
+    // Perform preflight check (cache result to avoid repeated DNS queries)
+    if (!preflightCache.checked) {
+      console.log('🔐 [OAuth:preflight] Checking Supabase host:', supabaseUrl);
+      preflightCache.result = await checkSupabaseHost(supabaseUrl);
+      preflightCache.checked = true;
+    }
+    
+    if (!preflightCache.result.ok) {
+      const errorMsg = `Supabase host invalid (${preflightCache.result.reason}). Check NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl}`;
+      console.error('🔐 [OAuth:preflight:failed]', errorMsg, preflightCache.result);
+      return { error: { message: errorMsg } };
+    }
+    
     // Use runtime origin to avoid env mismatch between dev/prod
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const redirectTo = `${origin}/auth/callback`;
@@ -300,6 +323,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('🔐 [OAuth:start] Attempting OAuth with provider:', provider);
     console.log('🔐 [OAuth:start] Redirect URL:', redirectTo);
     console.log('🔐 [OAuth:start] Current origin:', origin);
+    console.log('🔐 [OAuth:start] Supabase URL:', supabaseUrl);
     
     const { error, data } = await supabase.auth.signInWithOAuth({
       provider,
