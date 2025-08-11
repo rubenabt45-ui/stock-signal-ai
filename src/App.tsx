@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { StartupChecklist } from "@/components/StartupChecklist";
 import Landing from './pages/Landing';
 import Learn from './pages/Learn';
 import LearnPreview from './pages/LearnPreview';
@@ -25,6 +26,7 @@ function App() {
       <LanguageProvider>
         <ThemeProvider>
           <TooltipProvider>
+            <StartupChecklist />
             <Router>
               <div className="min-h-screen bg-background text-foreground">
                 <Routes>

@@ -13,6 +13,15 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Check if Stripe testing is enabled
+  const testingEnabled = Deno.env.get('VITE_ENABLE_STRIPE_TEST') === 'true';
+  if (!testingEnabled) {
+    return new Response('Not Found', { 
+      status: 404, 
+      headers: corsHeaders 
+    });
+  }
+
   if (req.method !== 'POST') {
     return new Response('Method not allowed', { 
       status: 405, 
