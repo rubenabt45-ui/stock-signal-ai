@@ -15,6 +15,7 @@ import Pricing from './pages/Pricing';
 import Settings from './pages/Settings';
 import BillingSuccess from "./pages/BillingSuccess";
 import Billing from "./pages/Billing";
+import StripeTestPage from "./pages/StripeTestPage";
 
 function App() {
   const theme = "dark";
@@ -42,6 +43,9 @@ function App() {
                   {/* Billing routes */}
                   <Route path="/billing/success" element={<BillingSuccess />} />
                   <Route path="/billing" element={<Billing />} />
+                  
+                  {/* Developer routes */}
+                  <Route path="/dev/stripe-test" element={<StripeTestPage />} />
                 </Routes>
               </div>
             </Router>
