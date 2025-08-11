@@ -257,8 +257,9 @@ export const useStripeTest = () => {
     console.log('Initial Premium Status:', testResults.isPremiumBefore ? '✅ True' : '❌ False');
     console.log('Final Premium Status:', testResults.isPremiumAfter ? '✅ True' : '❌ False');
     console.log('\nFiles Modified (Logic Only):');
-    console.log('- src/hooks/useStripeTest.ts (new)');
-    console.log('- Updated CTA handlers in existing components');
+    console.log('- src/hooks/useStripeTest.ts (enhanced)');
+    console.log('- src/hooks/useStripeActions.ts (wired CTAs)');
+    console.log('- src/components/StripeTestRunner.tsx (enhanced UI)');
     console.log('\nWebhook Events: Check function logs for stripe-webhook');
   };
 
