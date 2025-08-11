@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Crown, Calendar, CreditCard, ArrowRight, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,11 +15,11 @@ export const SubscriptionDashboard: React.FC = () => {
     error,
     subscribed = false,
     createCheckoutSession,
+    createCustomerPortalSession,
     checkSubscription 
   } = useSubscription() || {};
   const { toast } = useToast();
 
-  // Calculate derived state with safe defaults
   const isPro = subscription_tier === 'pro';
   const isExpired = subscription_end ? new Date(subscription_end) < new Date() : false;
   const daysUntilExpiry = subscription_end ? Math.ceil((new Date(subscription_end).getTime() - new Date().getTime()) / (1000 * 3600 * 24)) : null;
@@ -47,6 +48,33 @@ export const SubscriptionDashboard: React.FC = () => {
       toast({
         title: "Error",
         description: "Failed to start checkout process. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    if (!createCustomerPortalSession) {
+      toast({
+        title: "Error",
+        description: "Portal functionality is not available. Please try refreshing the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      toast({
+        title: "Opening customer portal...",
+        description: "Redirecting you to manage your subscription.",
+      });
+      
+      await createCustomerPortalSession();
+    } catch (error) {
+      console.error('Portal error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to open customer portal. Please try again.",
         variant: "destructive",
       });
     }
@@ -84,7 +112,6 @@ export const SubscriptionDashboard: React.FC = () => {
     }
   };
 
-  // Handle error state
   if (error) {
     return (
       <Card className="border-red-500/30 bg-red-900/10">
@@ -265,6 +292,16 @@ export const SubscriptionDashboard: React.FC = () => {
             </Button>
           )}
           
+          {role === 'pro' && (
+            <Button 
+              onClick={handleManageSubscription}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <CreditCard className="h-4 w-4 mr-2" />
+              Manage Subscription
+            </Button>
+          )}
+          
           <Button 
             variant="outline"
             onClick={handleRefreshStatus}
@@ -280,13 +317,7 @@ export const SubscriptionDashboard: React.FC = () => {
           <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3">
             <p className="text-blue-300 text-sm text-center">
               <CreditCard className="h-4 w-4 inline mr-1" />
-              Subscription managed through Stripe. 
-              <button 
-                onClick={handleUpgrade}
-                className="underline hover:no-underline ml-1"
-              >
-                Manage billing
-              </button>
+              Subscription managed through Stripe. Use the button above to update billing details.
             </p>
           </div>
         )}

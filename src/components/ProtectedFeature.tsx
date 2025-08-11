@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { FeatureLockedScreen } from '@/components/FeatureLockedScreen';
@@ -30,7 +31,7 @@ export const ProtectedFeature: React.FC<ProtectedFeatureProps> = ({
     );
   }
 
-  // Check if user can access the feature - simplified logic
+  // Check if user can access the feature
   const hasAccess = subscription_tier === 'pro';
 
   if (!hasAccess) {

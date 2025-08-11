@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -20,9 +21,9 @@ export const useSubscription = () => {
     error: null
   });
 
-  const checkSubscription = async () => {
+  const checkSubscription = useCallback(async () => {
     if (!user) {
-      setSubscriptionInfo(prev => ({ ...prev, loading: false }));
+      setSubscriptionInfo(prev => ({ ...prev, loading: false, subscribed: false, subscription_tier: 'free' }));
       return;
     }
 
@@ -48,9 +49,9 @@ export const useSubscription = () => {
         error: error instanceof Error ? error.message : 'Failed to check subscription'
       }));
     }
-  };
+  }, [user]);
 
-  const createCheckoutSession = async () => {
+  const createCheckoutSession = useCallback(async () => {
     if (!user) throw new Error('User not authenticated');
     
     try {
@@ -67,9 +68,9 @@ export const useSubscription = () => {
       console.error('Error creating checkout session:', error);
       throw error;
     }
-  };
+  }, [user]);
 
-  const createCustomerPortalSession = async () => {
+  const createCustomerPortalSession = useCallback(async () => {
     if (!user) throw new Error('User not authenticated');
     
     try {
@@ -86,11 +87,11 @@ export const useSubscription = () => {
       console.error('Error creating customer portal session:', error);
       throw error;
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     checkSubscription();
-  }, [user]);
+  }, [checkSubscription]);
 
   return {
     ...subscriptionInfo,

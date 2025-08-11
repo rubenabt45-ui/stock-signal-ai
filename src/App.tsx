@@ -13,7 +13,6 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import PublicRoute from "@/components/PublicRoute";
 import BottomNavigation from "@/components/BottomNavigation";
 import Footer from "@/components/Footer";
-import { DiagnosticWrapper } from "@/components/DiagnosticWrapper";
 import Landing from "./pages/Landing";
 import LearnPreview from "./pages/LearnPreview";
 import Dashboard from "./pages/Dashboard";
@@ -40,34 +39,9 @@ import About from "./pages/About";
 import Blog from "./pages/Blog";
 import Careers from "./pages/Careers";
 
-// Diagnostic components
-const LandingRoute = () => {
-  React.useEffect(() => {
-    console.log('🏠 Landing route component mounted - SUCCESS!');
-  }, []);
-  return (
-    <DiagnosticWrapper routeName="Landing">
-      <Landing />
-    </DiagnosticWrapper>
-  );
-};
-
-const NotFoundRoute = () => {
-  React.useEffect(() => {
-    console.log('❌ 404 route matched for path:', window.location.pathname);
-  }, []);
-  return <NotFound />;
-};
-
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Add route debugging
-  React.useEffect(() => {
-    console.log('🚀 App mounted, current pathname:', window.location.pathname);
-    console.log('🚀 App mounted, current href:', window.location.href);
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -80,8 +54,8 @@ const App = () => {
                 <BrowserRouter>
                   <div className="min-h-screen bg-tradeiq-navy">
                     <Routes>
-                      {/* PUBLIC LANDING PAGES - ZERO AUTH RESTRICTIONS */}
-                      <Route path="/" element={<LandingRoute />} />
+                      {/* PUBLIC LANDING PAGES */}
+                      <Route path="/" element={<Landing />} />
                       <Route path="/learn-preview" element={<LearnPreview />} />
                       <Route path="/pricing" element={<Pricing />} />
                       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -122,7 +96,6 @@ const App = () => {
                          <VerifyEmail />
                        </PublicRoute>
                      } />
-                     
                       
                       {/* PROTECTED APP ROUTES */}
                       <Route path="/app" element={
@@ -161,18 +134,6 @@ const App = () => {
                         </ProtectedRoute>
                       } />
                       
-                      {/* LEGACY COMPATIBILITY ROUTES */}
-                      <Route path="/app/trading-chat" element={
-                        <ProtectedRoute>
-                          <TradingChat />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/app/configuration" element={
-                        <ProtectedRoute>
-                          <Settings />
-                        </ProtectedRoute>
-                      } />
-                      
                       {/* PAYMENT ROUTES */}
                       <Route path="/success" element={
                         <ProtectedRoute>
@@ -185,22 +146,22 @@ const App = () => {
                         </ProtectedRoute>
                       } />
                       
-                      {/* 404 FALLBACK - MUST BE LAST */}
-                      <Route path="*" element={<NotFoundRoute />} />
+                      {/* 404 FALLBACK */}
+                      <Route path="*" element={<NotFound />} />
                     </Routes>
                     
                     {/* CONDITIONAL FOOTER AND NAVIGATION */}
                     <Routes>
-                      {/* Footer for all public pages */}
+                      {/* Footer for public pages */}
                       <Route path="/" element={<Footer />} />
                       <Route path="/learn-preview" element={<Footer />} />
                       <Route path="/pricing" element={<Footer />} />
                       <Route path="/privacy-policy" element={<Footer />} />
                       <Route path="/terms-of-service" element={<Footer />} />
-                      <Route path="/cookie-policy" element={<CookiePolicy />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/blog" element={<Blog />} />
-                      <Route path="/careers" element={<Careers />} />
+                      <Route path="/cookie-policy" element={<Footer />} />
+                      <Route path="/about" element={<Footer />} />
+                      <Route path="/blog" element={<Footer />} />
+                      <Route path="/careers" element={<Footer />} />
                       
                       {/* Footer and bottom nav for app routes */}
                       <Route path="/app/*" element={
