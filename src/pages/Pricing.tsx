@@ -6,13 +6,13 @@ import { Badge } from '@/components/ui/badge';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { useStripeActions } from '@/hooks/useStripeActions';
 
 const Pricing = () => {
-  const { createCheckoutSession, isPro, loading } = useSubscription();
+  const { isPro, loading } = useSubscription();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { handleUpgradeClick } = useStripeActions();
 
   const handleGetStarted = () => {
     if (user) {
@@ -28,20 +28,7 @@ const Pricing = () => {
       return;
     }
 
-    try {
-      toast({
-        title: "Redirecting to checkout...",
-        description: "Please wait while we prepare your subscription.",
-      });
-      
-      await createCheckoutSession();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to start checkout process. Please try again.",
-        variant: "destructive",
-      });
-    }
+    await handleUpgradeClick();
   };
 
   const features = {

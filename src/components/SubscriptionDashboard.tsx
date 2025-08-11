@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from '@/hooks/use-toast';
+import { useStripeActions } from '@/hooks/useStripeActions';
 
 export const SubscriptionDashboard: React.FC = () => {
   const { 
@@ -13,10 +14,10 @@ export const SubscriptionDashboard: React.FC = () => {
     loading = true,
     error,
     subscribed = false,
-    createCheckoutSession,
     checkSubscription 
   } = useSubscription() || {};
   const { toast } = useToast();
+  const { handleUpgradeClick, handleManageSubscriptionClick } = useStripeActions();
 
   // Calculate derived state with safe defaults
   const isPro = subscription_tier === 'pro';
@@ -24,33 +25,6 @@ export const SubscriptionDashboard: React.FC = () => {
   const daysUntilExpiry = subscription_end ? Math.ceil((new Date(subscription_end).getTime() - new Date().getTime()) / (1000 * 3600 * 24)) : null;
   
   const role = isPro && !isExpired ? 'pro' : isExpired ? 'expired' : 'free';
-
-  const handleUpgrade = async () => {
-    if (!createCheckoutSession) {
-      toast({
-        title: "Error",
-        description: "Checkout functionality is not available. Please try refreshing the page.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      toast({
-        title: "Redirecting to checkout...",
-        description: "Please wait while we prepare your subscription.",
-      });
-      
-      await createCheckoutSession();
-    } catch (error) {
-      console.error('Checkout error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to start checkout process. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleRefreshStatus = async () => {
     if (!checkSubscription) {
@@ -256,7 +230,7 @@ export const SubscriptionDashboard: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-3">
           {role !== 'pro' && (
             <Button 
-              onClick={handleUpgrade}
+              onClick={handleUpgradeClick}
               className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
             >
               <Crown className="h-4 w-4 mr-2" />
@@ -282,7 +256,7 @@ export const SubscriptionDashboard: React.FC = () => {
               <CreditCard className="h-4 w-4 inline mr-1" />
               Subscription managed through Stripe. 
               <button 
-                onClick={handleUpgrade}
+                onClick={handleManageSubscriptionClick}
                 className="underline hover:no-underline ml-1"
               >
                 Manage billing

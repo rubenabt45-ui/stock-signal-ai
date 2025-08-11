@@ -5,17 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PageWrapper } from '@/components/PageWrapper';
+import { useStripeActions } from '@/hooks/useStripeActions';
 
 const Billing = () => {
-  const { createCustomerPortalSession, isPro, loading } = useSubscription();
-
-  const handleManageSubscription = async () => {
-    try {
-      await createCustomerPortalSession();
-    } catch (error) {
-      console.error('Error opening customer portal:', error);
-    }
-  };
+  const { isPro, loading } = useSubscription();
+  const { handleManageSubscriptionClick } = useStripeActions();
 
   if (loading) {
     return (
@@ -62,7 +56,7 @@ const Billing = () => {
                 </p>
                 
                 <Button 
-                  onClick={handleManageSubscription}
+                  onClick={handleManageSubscriptionClick}
                   className="bg-tradeiq-blue hover:bg-tradeiq-blue/90"
                 >
                   <CreditCard className="mr-2 h-4 w-4" />
