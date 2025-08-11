@@ -30,11 +30,13 @@ i18n
       escapeValue: false,
     },
     react: {
-      useSuspense: false, // This prevents issues with SSR and ensures proper initialization
+      useSuspense: false,
     },
-  })
-  .catch((error) => {
-    console.error('Failed to initialize i18n:', error);
+    // Add these options to ensure initialization completes
+    load: 'languageOnly',
+    cleanCode: true,
+    // Ensure initialization doesn't hang
+    initImmediate: false,
   });
 
 export default i18n;

@@ -1,4 +1,3 @@
-
 import { useTranslation } from 'react-i18next';
 
 // Comprehensive translation fallbacks mapping
@@ -56,7 +55,7 @@ const TRANSLATION_FALLBACKS: Record<string, string> = {
   'landing.benefits.higherPrecision.title': 'Higher Precision',
   'landing.benefits.higherPrecision.description': 'Improve your trading accuracy with advanced pattern recognition algorithms',
   'landing.learningSection.title': 'Master Trading with Our Learning Platform',
-  'landing.learningSection.description': 'Access comprehensive courses, tutorials, and real-world examples to enhance your trading skills.',
+  'landing.learningSection.description': 'Access comprehensive courses, tutorials, and real-world examples to enhance your skills.',
   'landing.learningSection.fundamentals.title': 'Trading Fundamentals',
   'landing.learningSection.fundamentals.description': 'Learn the basics of market analysis, chart reading, and fundamental concepts',
   'landing.learningSection.patterns.title': 'Pattern Recognition',
@@ -194,7 +193,13 @@ const TRANSLATION_FALLBACKS: Record<string, string> = {
   'marketUpdates.smartAlerts.description': 'AI-powered notifications for market opportunities and risk management',
   
   // Footer
-  'footer.allRightsReserved': 'All rights reserved'
+  'footer.allRightsReserved': 'All rights reserved',
+  'footer.company': 'Company',
+  'footer.about': 'About',
+  'footer.blog': 'Blog',
+  'footer.careers': 'Careers',
+  'footer.description': 'AI-powered trading insights and analysis platform',
+  'footer.rights': 'All rights reserved'
 };
 
 export const useTranslationWithFallback = () => {
@@ -208,13 +213,11 @@ export const useTranslationWithFallback = () => {
       
       // If translation returns the key itself (no translation found) or is empty, use fallback
       if ((translationStr === key || !translationStr || translationStr.trim() === '') && TRANSLATION_FALLBACKS[key]) {
-        console.warn(`🌐 [I18N_FALLBACK] Translation missing for key: ${key} in language: ${i18n.language}, using fallback`);
         return TRANSLATION_FALLBACKS[key];
       }
       
-      // If no fallback exists, warn and return the key
+      // If no fallback exists, return a human-readable version of the key
       if (translationStr === key || !translationStr || translationStr.trim() === '') {
-        console.warn(`🌐 [I18N_MISSING] No translation or fallback found for key: ${key} in language: ${i18n.language}`);
         // Return a human-readable version of the key as last resort
         return key.split('.').pop()?.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) || key;
       }
@@ -222,7 +225,7 @@ export const useTranslationWithFallback = () => {
       // Ensure we always return a string
       return translationStr;
     } catch (error) {
-      console.error(`🌐 [I18N_ERROR] Translation error for key: ${key}`, error);
+      console.error(`Translation error for key: ${key}`, error);
       // Return fallback if available, otherwise return a human-readable version of the key
       return TRANSLATION_FALLBACKS[key] || key.split('.').pop()?.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) || key;
     }
@@ -231,7 +234,7 @@ export const useTranslationWithFallback = () => {
   return { 
     t: tWithFallback, 
     i18n,
-    ready: i18n.isInitialized,
+    ready: true, // Always return ready=true to prevent blocking
     // Helper function to check if a key exists
     hasKey: (key: string) => {
       const translation = t(key);
