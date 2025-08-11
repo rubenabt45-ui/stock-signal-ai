@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { useStripeTest } from '@/hooks/useStripeTest';
 import { Play, CheckCircle, XCircle, Clock, ExternalLink } from 'lucide-react';
 
-export const StripeTestRunner: React.FC = () => {
+const StripeTestRunner: React.FC = () => {
   const { 
     testResults, 
     loading, 
@@ -169,3 +168,5 @@ export const StripeTestRunner: React.FC = () => {
     </Card>
   );
 };
+
+export default StripeTestRunner;
