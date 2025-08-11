@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -42,21 +43,12 @@ export const TradingViewAdvancedChart = ({
   const containerId = `tv-advanced-chart-${symbol}-${Date.now()}`;
 
   useEffect(() => {
-    // Only load TradingView script when component is actually mounted
-    let loadTimeout: NodeJS.Timeout;
-    
     const loadTradingViewScript = () => {
       if (window.TradingView) {
         setIsLoaded(true);
         setIsLoading(false);
         return;
       }
-
-      // Add preconnect for TradingView
-      const preconnect = document.createElement('link');
-      preconnect.rel = 'preconnect';
-      preconnect.href = 'https://s3.tradingview.com';
-      document.head.appendChild(preconnect);
 
       const script = document.createElement('script');
       script.src = 'https://s3.tradingview.com/tv.js';
@@ -74,12 +66,7 @@ export const TradingViewAdvancedChart = ({
       document.head.appendChild(script);
     };
 
-    // Debounce script loading to avoid multiple simultaneous loads
-    loadTimeout = setTimeout(loadTradingViewScript, 100);
-
-    return () => {
-      if (loadTimeout) clearTimeout(loadTimeout);
-    };
+    loadTradingViewScript();
   }, []);
 
   useEffect(() => {

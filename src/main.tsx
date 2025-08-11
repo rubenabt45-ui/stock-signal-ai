@@ -1,10 +1,8 @@
 
-import React from 'react'
 import { createRoot } from 'react-dom/client'
+import App from './App.tsx'
 import './index.css'
 import './i18n/config'
-import { logPerformanceMetrics } from './utils/performanceMetrics'
-import App from './App'
 
 // Initialize theme early to prevent flash
 const initializeTheme = () => {
@@ -32,10 +30,9 @@ const initializeTheme = () => {
 // Apply theme immediately
 initializeTheme();
 
-// Log performance metrics in production
-logPerformanceMetrics();
-
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error('Failed to find the root element');
 
-createRoot(rootElement).render(<App />);
+createRoot(rootElement).render(
+  <App />
+);

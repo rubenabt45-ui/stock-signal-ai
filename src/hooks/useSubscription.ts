@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
 
 export interface SubscriptionInfo {
   subscribed: boolean;
@@ -14,7 +12,6 @@ export interface SubscriptionInfo {
 
 export const useSubscription = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo>({
     subscribed: false,
     subscription_tier: 'free',
@@ -54,17 +51,10 @@ export const useSubscription = () => {
   };
 
   const createCheckoutSession = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to upgrade your account.",
-        variant: "destructive",
-      });
-      throw new Error('User not authenticated');
-    }
+    if (!user) throw new Error('User not authenticated');
     
     try {
-      const { data, error } = await supabase.functions.invoke('stripe-checkout');
+      const { data, error } = await supabase.functions.invoke('create-checkout-session');
       
       if (error) throw error;
       
@@ -75,27 +65,15 @@ export const useSubscription = () => {
       return data;
     } catch (error) {
       console.error('Error creating checkout session:', error);
-      toast({
-        title: "Error",
-        description: "Failed to start checkout process. Please try again.",
-        variant: "destructive",
-      });
       throw error;
     }
   };
 
   const createCustomerPortalSession = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to manage your subscription.",
-        variant: "destructive",
-      });
-      throw new Error('User not authenticated');
-    }
+    if (!user) throw new Error('User not authenticated');
     
     try {
-      const { data, error } = await supabase.functions.invoke('stripe-portal');
+      const { data, error } = await supabase.functions.invoke('customer-portal');
       
       if (error) throw error;
       
@@ -106,11 +84,6 @@ export const useSubscription = () => {
       return data;
     } catch (error) {
       console.error('Error creating customer portal session:', error);
-      toast({
-        title: "Error",
-        description: "Failed to open billing portal. Please try again.",
-        variant: "destructive",
-      });
       throw error;
     }
   };

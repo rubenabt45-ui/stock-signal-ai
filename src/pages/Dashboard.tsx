@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { PageWrapper } from '@/components/PageWrapper';
-import StripeTestRunner from '@/components/StripeTestRunner';
 import { 
   TrendingUp, 
   Brain, 
@@ -86,8 +84,6 @@ const Dashboard = () => {
     }
   ];
 
-  const isDevelopment = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
-
   return (
     <PageWrapper pageName="Dashboard">
       <div className="min-h-screen bg-tradeiq-navy p-6">
@@ -116,14 +112,6 @@ const Dashboard = () => {
             </Badge>
           </div>
         </div>
-
-        {/* Development Test Runner */}
-        {isDevelopment && (
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-white mb-4">🧪 Development Tools</h2>
-            <StripeTestRunner />
-          </div>
-        )}
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

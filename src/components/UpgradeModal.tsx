@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Crown, X, Check } from 'lucide-react';
 import {
@@ -9,7 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useStripeActions } from '@/hooks/useStripeActions';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useToast } from '@/hooks/use-toast';
 
 interface UpgradeModalProps {
   open: boolean;
@@ -22,11 +22,25 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   onClose, 
   feature = "this feature" 
 }) => {
-  const { handleUpgradeClick } = useStripeActions();
+  const { createCheckoutSession, loading } = useSubscription();
+  const { toast } = useToast();
 
   const handleUpgrade = async () => {
-    await handleUpgradeClick();
-    onClose();
+    try {
+      toast({
+        title: "Redirecting to checkout...",
+        description: "Please wait while we prepare your subscription.",
+      });
+      
+      await createCheckoutSession();
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to start checkout process. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const proFeatures = [
@@ -92,9 +106,10 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
           <div className="space-y-3">
             <Button 
               onClick={handleUpgrade}
+              disabled={loading}
               className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90 text-white"
             >
-              Upgrade Now
+              {loading ? 'Processing...' : 'Upgrade Now'}
             </Button>
             
             <Button 
