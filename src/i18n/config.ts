@@ -21,10 +21,12 @@ i18n
   .init({
     resources,
     fallbackLng: 'en',
+    supportedLngs: ['en', 'es'],
     debug: false,
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
+      lookupLocalStorage: 'tiq_lang',
     },
     interpolation: {
       escapeValue: false,
@@ -32,11 +34,13 @@ i18n
     react: {
       useSuspense: false,
     },
-    // Add these options to ensure initialization completes
+    // Ensure initialization completes
     load: 'languageOnly',
     cleanCode: true,
-    // Ensure initialization doesn't hang
     initImmediate: false,
+    // Add namespace support
+    ns: ['translation'],
+    defaultNS: 'translation',
   });
 
 export default i18n;

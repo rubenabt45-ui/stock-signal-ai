@@ -23,64 +23,67 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const { user } = useAuth();
   const { toast } = useToast();
   const [currentLanguage, setCurrentLanguage] = useState('en');
-  const [initialized, setInitialized] = useState(false);
 
+  // Initialize language from localStorage, user profile, or browser
   useEffect(() => {
-    // Don't wait for i18n to be "ready" - initialize immediately
     const initializeLanguage = async () => {
       try {
-        // Set initial language from i18n or fallback to 'en'
-        const initialLang = i18n.language || 'en';
-        setCurrentLanguage(initialLang);
+        let targetLanguage = 'en';
 
+        // 1. Try localStorage first
+        const storedLanguage = localStorage.getItem('tiq_lang');
+        if (storedLanguage && AVAILABLE_LANGUAGES.some(lang => lang.code === storedLanguage)) {
+          targetLanguage = storedLanguage;
+        }
+
+        // 2. If user is authenticated, try to get preference from database
         if (user?.id) {
-          // Try to get user's language preference from database
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('language')
-            .eq('id', user.id)
-            .single();
+          try {
+            const { data: profile } = await supabase
+              .from('user_profiles')
+              .select('language')
+              .eq('id', user.id)
+              .single();
 
-          if (profile?.language && AVAILABLE_LANGUAGES.some(lang => lang.code === profile.language)) {
-            if (i18n.changeLanguage) {
-              await i18n.changeLanguage(profile.language);
-              setCurrentLanguage(profile.language);
+            if (profile?.language && AVAILABLE_LANGUAGES.some(lang => lang.code === profile.language)) {
+              targetLanguage = profile.language;
+              // Update localStorage to match user preference
+              localStorage.setItem('tiq_lang', profile.language);
             }
-            setInitialized(true);
-            return;
+          } catch (dbError) {
+            console.log('Could not fetch user language preference:', dbError);
           }
         }
 
-        // Fallback to localStorage or default
-        const storedLanguage = localStorage.getItem('i18nextLng');
-        const targetLanguage = storedLanguage && AVAILABLE_LANGUAGES.some(lang => lang.code === storedLanguage) 
-          ? storedLanguage 
-          : 'en';
-
-        if (i18n.changeLanguage) {
+        // 3. Apply the language
+        if (i18n.language !== targetLanguage) {
           await i18n.changeLanguage(targetLanguage);
         }
         setCurrentLanguage(targetLanguage);
-        setInitialized(true);
         
       } catch (error) {
         console.error('Language initialization error:', error);
-        // Fallback to English and continue
+        // Fallback to English
         setCurrentLanguage('en');
-        setInitialized(true);
+        try {
+          await i18n.changeLanguage('en');
+        } catch (fallbackError) {
+          console.error('Failed to set fallback language:', fallbackError);
+        }
       }
     };
 
     initializeLanguage();
   }, [user?.id, i18n]);
 
-  // Listen to i18n language changes only if i18n is available and has the methods
+  // Listen to i18n language changes
   useEffect(() => {
-    if (!i18n || typeof i18n.on !== 'function' || typeof i18n.off !== 'function') {
+    if (!i18n || typeof i18n.on !== 'function') {
       return;
     }
 
     const handleLanguageChange = (lng: string) => {
+      console.log('i18n language changed to:', lng);
       setCurrentLanguage(lng);
     };
 
@@ -93,24 +96,22 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [i18n]);
 
   const changeLanguage = async (language: string) => {
-    if (!i18n || typeof i18n.changeLanguage !== 'function') {
-      toast({
-        title: "Language Change Failed",
-        description: "Translation system not ready. Please try again.",
-        variant: "destructive",
-      });
+    if (!AVAILABLE_LANGUAGES.some(lang => lang.code === language)) {
+      console.error('Unsupported language:', language);
       return;
     }
-    
+
     try {
+      console.log('Changing language to:', language);
+      
       // Change language immediately
       await i18n.changeLanguage(language);
       
       // Save to localStorage
-      localStorage.setItem('i18nextLng', language);
+      localStorage.setItem('tiq_lang', language);
 
+      // Save to database if user is authenticated
       if (user?.id) {
-        // Try to save to database, but don't fail if it doesn't work
         try {
           await supabase
             .from('user_profiles')
@@ -121,11 +122,11 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               onConflict: 'id'
             });
         } catch (dbError) {
-          console.log('Database save failed (non-critical):', dbError);
+          console.log('Failed to save language preference to database:', dbError);
         }
       }
 
-      // Show visual feedback
+      // Show feedback
       const languageName = AVAILABLE_LANGUAGES.find(l => l.code === language)?.name;
       toast({
         title: "🌐 Language Updated",

@@ -1,3 +1,4 @@
+
 import { Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +22,9 @@ export const LanguageSelector = ({ variant = 'landing', showText = false }: Lang
 
   const handleLanguageChange = async (languageCode: string) => {
     console.log('🌐 Language selector clicked:', languageCode);
-    await changeLanguage(languageCode);
+    if (languageCode !== currentLanguage) {
+      await changeLanguage(languageCode);
+    }
   };
 
   const getCurrentLanguageDisplay = () => {
