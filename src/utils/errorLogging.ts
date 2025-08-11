@@ -7,6 +7,8 @@ export interface ErrorContext {
   user?: string;
   route?: string;
   action?: string;
+  environment?: string;
+  production?: boolean;
   metadata?: Record<string, any>;
 }
 

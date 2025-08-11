@@ -6,8 +6,16 @@ import { lazy } from 'react';
 
 // Heavy components that should be lazy loaded
 export const LazyStripeTestRunner = lazy(() => import('@/components/StripeTestRunner'));
-export const LazyTradingViewWidget = lazy(() => import('@/components/OptimizedTradingViewWidget'));
-export const LazyUpgradeModal = lazy(() => import('@/components/UpgradeModal'));
+export const LazyTradingViewWidget = lazy(() => 
+  import('@/components/OptimizedTradingViewWidget').then(module => ({ 
+    default: module.OptimizedTradingViewWidget 
+  }))
+);
+export const LazyUpgradeModal = lazy(() => 
+  import('@/components/UpgradeModal').then(module => ({ 
+    default: module.UpgradeModal 
+  }))
+);
 
 // Page-level lazy imports
 export const LazyDashboard = lazy(() => import('@/pages/Dashboard'));

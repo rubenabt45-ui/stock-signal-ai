@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
@@ -6,8 +5,8 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { Analytics } from '@/components/Analytics';
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { PublicRoute } from '@/components/PublicRoute';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import PublicRoute from '@/components/PublicRoute';
 import { Toaster } from '@/components/ui/toaster';
 import { SEOHead } from '@/components/SEOHead';
 import { setupGlobalErrorHandling, errorLogger } from '@/utils/errorLogging';
@@ -76,8 +75,8 @@ const initializeApp = () => {
   
   // Log app initialization
   errorLogger.logInfo('TradeIQ application initialized', {
-    mode: import.meta.env.MODE,
-    prod: import.meta.env.PROD
+    environment: import.meta.env.MODE,
+    production: import.meta.env.PROD
   });
 };
 
