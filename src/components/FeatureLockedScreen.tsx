@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { Lock, Crown, ArrowRight, Calendar, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 
@@ -20,7 +21,7 @@ export const FeatureLockedScreen: React.FC<FeatureLockedScreenProps> = ({
   description,
   icon
 }) => {
-  const { createCheckoutSession, role, daysUntilExpiry } = useSubscriptionStatus();
+  const { createCheckoutSession, subscription_tier, subscribed, subscription_end } = useSubscription();
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -40,6 +41,30 @@ export const FeatureLockedScreen: React.FC<FeatureLockedScreenProps> = ({
       });
     }
   };
+
+  // Determine user role based on subscription status
+  const getUserRole = () => {
+    if (!subscribed) return 'free';
+    if (subscribed && subscription_end) {
+      const endDate = new Date(subscription_end);
+      const now = new Date();
+      if (endDate < now) return 'expired';
+    }
+    return subscription_tier;
+  };
+
+  // Calculate days until expiry
+  const getDaysUntilExpiry = () => {
+    if (!subscription_end) return null;
+    const endDate = new Date(subscription_end);
+    const now = new Date();
+    const diffTime = endDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const role = getUserRole();
+  const daysUntilExpiry = getDaysUntilExpiry();
 
   const getStatusMessage = () => {
     switch (role) {
