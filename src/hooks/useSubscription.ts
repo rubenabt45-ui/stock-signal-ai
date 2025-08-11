@@ -42,7 +42,6 @@ export const useSubscription = () => {
         error: null
       });
     } catch (error) {
-      console.error('Error checking subscription:', error);
       setSubscriptionInfo(prev => ({
         ...prev,
         loading: false,
@@ -65,7 +64,6 @@ export const useSubscription = () => {
       
       return data;
     } catch (error) {
-      console.error('Error creating checkout session:', error);
       throw error;
     }
   }, [user]);
@@ -84,7 +82,6 @@ export const useSubscription = () => {
       
       return data;
     } catch (error) {
-      console.error('Error creating customer portal session:', error);
       throw error;
     }
   }, [user]);
