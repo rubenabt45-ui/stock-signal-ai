@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,15 +19,24 @@ const AVAILABLE_LANGUAGES = [
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { i18n, t } = useTranslation();
+  const { i18n, t, ready } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
+  const [currentLanguage, setCurrentLanguage] = useState('en');
 
   useEffect(() => {
+    // Wait for i18n to be ready before proceeding
+    if (!ready || !i18n) {
+      console.log('🌐 [TRANSLATION_DEBUG] i18n not ready yet, waiting...');
+      return;
+    }
+
     console.log('🌐 [TRANSLATION_DEBUG] LanguageProvider mounted');
     console.log('🌐 [TRANSLATION_DEBUG] Initial i18n language:', i18n.language);
     console.log('🌐 [TRANSLATION_DEBUG] User authenticated:', !!user?.id);
+    
+    // Set initial language from i18n
+    setCurrentLanguage(i18n.language || 'en');
     
     const loadUserLanguage = async () => {
       try {
@@ -42,8 +52,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
           if (profile?.language && AVAILABLE_LANGUAGES.some(lang => lang.code === profile.language)) {
             console.log('🌐 [TRANSLATION_DEBUG] Found user language in database:', profile.language);
-            await i18n.changeLanguage(profile.language);
-            setCurrentLanguage(profile.language);
+            if (i18n.changeLanguage && typeof i18n.changeLanguage === 'function') {
+              await i18n.changeLanguage(profile.language);
+              setCurrentLanguage(profile.language);
+            }
             return;
           }
         }
@@ -57,37 +69,61 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.log('🌐 [TRANSLATION_DEBUG] Using language:', targetLanguage);
         console.log('🌐 [TRANSLATION_DEBUG] Source: localStorage =', storedLanguage);
         
-        await i18n.changeLanguage(targetLanguage);
-        setCurrentLanguage(targetLanguage);
+        if (i18n.changeLanguage && typeof i18n.changeLanguage === 'function') {
+          await i18n.changeLanguage(targetLanguage);
+          setCurrentLanguage(targetLanguage);
+        }
         
       } catch (error) {
         console.error('🌐 [TRANSLATION_DEBUG] Error loading user language:', error);
         // Fallback to English
-        await i18n.changeLanguage('en');
+        if (i18n.changeLanguage && typeof i18n.changeLanguage === 'function') {
+          await i18n.changeLanguage('en');
+        }
         setCurrentLanguage('en');
       }
     };
 
     loadUserLanguage();
-  }, [user?.id, i18n]);
+  }, [user?.id, i18n, ready]);
 
   // Listen to i18n language changes
   useEffect(() => {
+    // Only set up event listeners if i18n is ready and has the required methods
+    if (!ready || !i18n || typeof i18n.on !== 'function' || typeof i18n.off !== 'function') {
+      return;
+    }
+
     const handleLanguageChange = (lng: string) => {
       console.log('🌐 [TRANSLATION_DEBUG] i18n language changed event:', lng);
       setCurrentLanguage(lng);
     };
 
     i18n.on('languageChanged', handleLanguageChange);
-    return () => i18n.off('languageChanged', handleLanguageChange);
-  }, [i18n]);
+    return () => {
+      if (i18n && typeof i18n.off === 'function') {
+        i18n.off('languageChanged', handleLanguageChange);
+      }
+    };
+  }, [i18n, ready]);
 
   const changeLanguage = async (language: string) => {
     console.log('🌐 [TRANSLATION_DEBUG] ====== LANGUAGE CHANGE INITIATED ======');
     console.log('🌐 [TRANSLATION_DEBUG] Previous language:', currentLanguage);
     console.log('🌐 [TRANSLATION_DEBUG] Requested language:', language);
     console.log('🌐 [TRANSLATION_DEBUG] Available languages:', AVAILABLE_LANGUAGES.map(l => l.code));
-    console.log('🌐 [TRANSLATION_DEBUG] Current i18n language before change:', i18n.language);
+    console.log('🌐 [TRANSLATION_DEBUG] Current i18n language before change:', i18n?.language);
+    
+    // Check if i18n is ready and has changeLanguage method
+    if (!i18n || typeof i18n.changeLanguage !== 'function') {
+      console.error('🌐 [TRANSLATION_DEBUG] i18n not ready or changeLanguage method not available');
+      toast({
+        title: "Language Change Failed",
+        description: "Translation system not ready. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     try {
       // Change language immediately

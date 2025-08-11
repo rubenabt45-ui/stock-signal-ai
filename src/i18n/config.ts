@@ -29,6 +29,12 @@ i18n
     interpolation: {
       escapeValue: false,
     },
+    react: {
+      useSuspense: false, // This prevents issues with SSR and ensures proper initialization
+    },
+  })
+  .catch((error) => {
+    console.error('Failed to initialize i18n:', error);
   });
 
 export default i18n;
