@@ -14,12 +14,29 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const widgetRef = useRef<any>(null);
+  const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     setIsLoading(true);
     setError(null);
 
-    // Clean up previous widget
+    // Debounce widget creation to avoid excessive API calls
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      initializeWidget();
+    }, 300);
+
+    return cleanup;
+  }, [symbol]);
+
+  const cleanup = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    
     if (widgetRef.current) {
       try {
         widgetRef.current.remove();
@@ -28,11 +45,16 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
       }
       widgetRef.current = null;
     }
-
+    
     const container = document.getElementById(`tradingview_widget_${symbol}`);
-    if (container) {
-      container.innerHTML = '';
+    if (container && container.parentNode) {
+      container.parentNode.removeChild(container);
     }
+  };
+
+  const initializeWidget = () => {
+    // Clean up previous widget
+    cleanup();
 
     // Create a hidden container for data extraction
     const hiddenContainer = document.createElement('div');
@@ -88,15 +110,6 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
         
         widgetRef.current = widget;
         
-        // Timeout fallback
-        setTimeout(() => {
-          if (isLoading) {
-            setPrice(Math.random() * 200 + 100);
-            setChange((Math.random() - 0.5) * 10);
-            setIsLoading(false);
-          }
-        }, 3000);
-        
       } else {
         // TradingView not available, use mock data
         setTimeout(() => {
@@ -110,22 +123,15 @@ export const useTradingViewWidgetData = (symbol: string): TradingViewWidgetData 
       setIsLoading(false);
     }
 
-    return () => {
-      if (widgetRef.current) {
-        try {
-          widgetRef.current.remove();
-        } catch (e) {
-          console.warn('Error cleaning up widget:', e);
-        }
-        widgetRef.current = null;
+    // Timeout fallback to prevent infinite loading
+    setTimeout(() => {
+      if (isLoading) {
+        setPrice(Math.random() * 200 + 100);
+        setChange((Math.random() - 0.5) * 10);
+        setIsLoading(false);
       }
-      
-      const container = document.getElementById(`tradingview_widget_${symbol}`);
-      if (container && container.parentNode) {
-        container.parentNode.removeChild(container);
-      }
-    };
-  }, [symbol]);
+    }, 5000);
+  };
 
   return { price, change, isLoading, error };
 };

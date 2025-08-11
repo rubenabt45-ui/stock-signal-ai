@@ -1,8 +1,11 @@
 
 import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
 import './index.css'
 import './i18n/config'
+import { logPerformanceMetrics } from './utils/performanceMetrics'
+
+// Lazy load the main App component
+const App = React.lazy(() => import('./App'));
 
 // Initialize theme early to prevent flash
 const initializeTheme = () => {
@@ -30,9 +33,18 @@ const initializeTheme = () => {
 // Apply theme immediately
 initializeTheme();
 
+// Log performance metrics in production
+logPerformanceMetrics();
+
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error('Failed to find the root element');
 
 createRoot(rootElement).render(
-  <App />
+  <React.Suspense fallback={
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+  }>
+    <App />
+  </React.Suspense>
 );
