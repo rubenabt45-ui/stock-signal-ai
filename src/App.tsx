@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { Analytics } from '@/components/Analytics';
 import { LoadingFallback } from '@/components/LoadingFallback';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -90,128 +91,130 @@ function App() {
     <ErrorBoundary>
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <Router>
-              <SEOHead />
-              <Analytics />
-              
-              <Routes>
-                {/* Public routes */}
-                <Route path="/" element={
-                  <PublicRoute>
-                    <Index />
-                  </PublicRoute>
-                } />
+          <ThemeProvider>
+            <AuthProvider>
+              <Router>
+                <SEOHead />
+                <Analytics />
                 
-                <Route path="/login" element={
-                  <PublicRoute>
-                    <Login />
-                  </PublicRoute>
-                } />
-                
-                <Route path="/signup" element={
-                  <PublicRoute>
-                    <Signup />
-                  </PublicRoute>
-                } />
-                
-                <Route path="/reset-password-request" element={
-                  <PublicRoute>
-                    <ResetPasswordRequest />
-                  </PublicRoute>
-                } />
-                
-                <Route path="/reset-password" element={
-                  <PublicRoute>
-                    <ResetPassword />
-                  </PublicRoute>
-                } />
-                
-                <Route path="/verify-email" element={
-                  <PublicRoute>
-                    <VerifyEmail />
-                  </PublicRoute>
-                } />
+                <Routes>
+                  {/* Public routes */}
+                  <Route path="/" element={
+                    <PublicRoute>
+                      <Index />
+                    </PublicRoute>
+                  } />
+                  
+                  <Route path="/login" element={
+                    <PublicRoute>
+                      <Login />
+                    </PublicRoute>
+                  } />
+                  
+                  <Route path="/signup" element={
+                    <PublicRoute>
+                      <Signup />
+                    </PublicRoute>
+                  } />
+                  
+                  <Route path="/reset-password-request" element={
+                    <PublicRoute>
+                      <ResetPasswordRequest />
+                    </PublicRoute>
+                  } />
+                  
+                  <Route path="/reset-password" element={
+                    <PublicRoute>
+                      <ResetPassword />
+                    </PublicRoute>
+                  } />
+                  
+                  <Route path="/verify-email" element={
+                    <PublicRoute>
+                      <VerifyEmail />
+                    </PublicRoute>
+                  } />
 
-                {/* Legal pages */}
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="/terms-of-service" element={<TermsOfService />} />
-                <Route path="/cookie-policy" element={<CookiePolicy />} />
-                
-                {/* Marketing pages */}
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/learn-preview" element={<LearnPreview />} />
-                
-                {/* Payment result pages */}
-                <Route path="/billing/success" element={<BillingSuccess />} />
-                <Route path="/cancel" element={<Cancel />} />
-                <Route path="/success" element={<Success />} />
+                  {/* Legal pages */}
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms-of-service" element={<TermsOfService />} />
+                  <Route path="/cookie-policy" element={<CookiePolicy />} />
+                  
+                  {/* Marketing pages */}
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/learn-preview" element={<LearnPreview />} />
+                  
+                  {/* Payment result pages */}
+                  <Route path="/billing/success" element={<BillingSuccess />} />
+                  <Route path="/cancel" element={<Cancel />} />
+                  <Route path="/success" element={<Success />} />
 
-                {/* Protected app routes */}
-                <Route path="/app" element={
-                  <ProtectedRoute>
-                    <LazyDashboard />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/app/trading-chat" element={
-                  <ProtectedRoute>
-                    <LazyTradingChat />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/app/market-updates" element={
-                  <ProtectedRoute>
-                    <LazyMarketUpdates />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/app/economic-events" element={
-                  <ProtectedRoute>
-                    <LazyEconomicEvents />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/app/news-ai" element={
-                  <ProtectedRoute>
-                    <LazyNewsAI />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/app/learn" element={
-                  <ProtectedRoute>
-                    <LazyLearn />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/app/settings" element={
-                  <ProtectedRoute>
-                    <LazySettings />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/billing" element={
-                  <ProtectedRoute>
-                    <LazyBilling />
-                  </ProtectedRoute>
-                } />
-
-                {/* Development/Test routes - conditionally enabled */}
-                {isStripeTestEnabled && (
-                  <Route path="/dev/stripe-test" element={
+                  {/* Protected app routes */}
+                  <Route path="/app" element={
                     <ProtectedRoute>
-                      <StripeTestPage />
+                      <LazyDashboard />
                     </ProtectedRoute>
                   } />
-                )}
+                  
+                  <Route path="/app/trading-chat" element={
+                    <ProtectedRoute>
+                      <LazyTradingChat />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/app/market-updates" element={
+                    <ProtectedRoute>
+                      <LazyMarketUpdates />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/app/economic-events" element={
+                    <ProtectedRoute>
+                      <LazyEconomicEvents />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/app/news-ai" element={
+                    <ProtectedRoute>
+                      <LazyNewsAI />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/app/learn" element={
+                    <ProtectedRoute>
+                      <LazyLearn />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/app/settings" element={
+                    <ProtectedRoute>
+                      <LazySettings />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/billing" element={
+                    <ProtectedRoute>
+                      <LazyBilling />
+                    </ProtectedRoute>
+                  } />
 
-                {/* 404 fallback */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+                  {/* Development/Test routes - conditionally enabled */}
+                  {isStripeTestEnabled && (
+                    <Route path="/dev/stripe-test" element={
+                      <ProtectedRoute>
+                        <StripeTestPage />
+                      </ProtectedRoute>
+                    } />
+                  )}
 
-              <Toaster />
-            </Router>
-          </AuthProvider>
+                  {/* 404 fallback */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+
+                <Toaster />
+              </Router>
+            </AuthProvider>
+          </ThemeProvider>
         </QueryClientProvider>
       </HelmetProvider>
     </ErrorBoundary>
