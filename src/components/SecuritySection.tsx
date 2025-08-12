@@ -23,8 +23,8 @@ export const SecuritySection = () => {
     // Validate inputs
     if (newPassword.length < 8) {
       toast({
-        title: t('auth.signup.errors.passwordTooShort') || "Password too short",
-        description: t('auth.resetPassword.passwordTooShort', { minLength: 8 }) || "Password must be at least 8 characters long.",
+        title: t('auth.signup.errors.passwordTooShort'),
+        description: t('auth.resetPassword.passwordTooShort', { minLength: 8 }),
         variant: "destructive",
       });
       return;
@@ -32,8 +32,8 @@ export const SecuritySection = () => {
 
     if (newPassword !== confirmPassword) {
       toast({
-        title: t('auth.resetPassword.passwordsDoNotMatch') || "Passwords don't match",
-        description: t('auth.signup.errors.passwordsDoNotMatch') || "New password and confirmation don't match.",
+        title: t('auth.resetPassword.passwordsDoNotMatch'),
+        description: t('auth.signup.errors.passwordsDoNotMatch'),
         variant: "destructive",
       });
       return;
@@ -48,14 +48,14 @@ export const SecuritySection = () => {
       if (error) {
         console.error('Password update error:', error);
         toast({
-          title: t('settings.security.passwordUpdateFailed') || "Password update failed",
-          description: error.message || t('settings.security.passwordUpdateError') || "Failed to update password. Please try again.",
+          title: t('settings.security.passwordUpdateFailed'),
+          description: error.message || t('settings.security.passwordUpdateError'),
           variant: "destructive",
         });
       } else {
         toast({
-          title: t('settings.security.passwordUpdated') || "Password updated",
-          description: t('settings.security.passwordUpdateSuccess') || "Your password has been updated successfully.",
+          title: t('settings.security.passwordUpdated'),
+          description: t('settings.security.passwordUpdateSuccess'),
         });
         // Clear form
         setCurrentPassword('');
@@ -65,8 +65,8 @@ export const SecuritySection = () => {
     } catch (error) {
       console.error('Password update error:', error);
       toast({
-        title: t('settings.security.passwordUpdateFailed') || "Password update failed",
-        description: t('settings.security.unexpectedError') || "An unexpected error occurred. Please try again.",
+        title: t('settings.security.passwordUpdateFailed'),
+        description: t('settings.security.unexpectedError'),
         variant: "destructive",
       });
     } finally {
@@ -79,21 +79,21 @@ export const SecuritySection = () => {
       <CardHeader>
         <div className="flex items-center space-x-3">
           <Shield className="h-5 w-5 text-tradeiq-blue" />
-          <CardTitle className="text-white">{t('settings.security.title') || 'Security'}</CardTitle>
+          <CardTitle className="text-white">{t('settings.security.title')}</CardTitle>
         </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="currentPassword" className="text-white">
-              {t('settings.security.currentPassword') || 'Current Password'}
+              {t('settings.security.currentPassword')}
             </Label>
             <Input
               id="currentPassword"
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder={t('placeholders.enterCurrentPassword') || 'Enter current password'}
+              placeholder={t('placeholders.enterCurrentPassword')}
               className="bg-black/20 border-gray-700 text-white placeholder:text-gray-500 focus:border-tradeiq-blue"
               required
             />
@@ -101,14 +101,14 @@ export const SecuritySection = () => {
 
           <div className="space-y-2">
             <Label htmlFor="newPassword" className="text-white">
-              {t('settings.security.newPassword') || 'New Password'}
+              {t('settings.security.newPassword')}
             </Label>
             <Input
               id="newPassword"
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder={t('placeholders.enterNewPassword') || 'Enter new password'}
+              placeholder={t('placeholders.enterNewPassword')}
               className="bg-black/20 border-gray-700 text-white placeholder:text-gray-500 focus:border-tradeiq-blue"
               required
               minLength={8}
@@ -117,14 +117,14 @@ export const SecuritySection = () => {
 
           <div className="space-y-2">
             <Label htmlFor="confirmPassword" className="text-white">
-              {t('settings.security.confirmPassword') || 'Confirm New Password'}
+              {t('settings.security.confirmPassword')}
             </Label>
             <Input
               id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder={t('placeholders.confirmNewPassword') || 'Confirm new password'}
+              placeholder={t('placeholders.confirmNewPassword')}
               className="bg-black/20 border-gray-700 text-white placeholder:text-gray-500 focus:border-tradeiq-blue"
               required
               minLength={8}
@@ -139,12 +139,12 @@ export const SecuritySection = () => {
             {isLoading ? (
               <>
                 <Loader className="h-4 w-4 mr-2 animate-spin" />
-                {t('settings.security.updating') || 'Updating Password...'}
+                {t('settings.security.updating')}
               </>
             ) : (
               <>
                 <Lock className="h-4 w-4 mr-2" />
-                {t('settings.security.changePassword') || 'Change Password'}
+                {t('settings.security.changePassword')}
               </>
             )}
           </Button>
