@@ -64,7 +64,7 @@ export const LazyOptimizedTradingViewWidget = (props: LazyOptimizedTradingViewWi
 );
 
 interface LazyTradingViewOverviewProps {
-  symbols?: string[];
+  symbols: string[];
   height?: string;
   className?: string;
 }
