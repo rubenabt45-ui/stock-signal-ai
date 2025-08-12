@@ -22,7 +22,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const { i18n, t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [currentLanguage, setCurrentLanguage] = useState('en');
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
 
   // Initialize language from localStorage, user profile, or browser
   useEffect(() => {
@@ -51,12 +51,13 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               localStorage.setItem('tiq_lang', profile.language);
             }
           } catch (dbError) {
-            console.log('Could not fetch user language preference:', dbError);
+            console.warn('Could not fetch user language preference:', dbError);
           }
         }
 
         // 3. Apply the language
         if (i18n.language !== targetLanguage) {
+          console.log('Initializing language to:', targetLanguage);
           await i18n.changeLanguage(targetLanguage);
         }
         setCurrentLanguage(targetLanguage);
@@ -73,7 +74,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     };
 
-    initializeLanguage();
+    // Only initialize if i18n is ready
+    if (i18n.isInitialized) {
+      initializeLanguage();
+    }
   }, [user?.id, i18n]);
 
   // Listen to i18n language changes
@@ -98,13 +102,18 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const changeLanguage = async (language: string) => {
     if (!AVAILABLE_LANGUAGES.some(lang => lang.code === language)) {
       console.error('Unsupported language:', language);
+      toast({
+        title: "Language Change Failed",
+        description: `Language "${language}" is not supported`,
+        variant: "destructive",
+      });
       return;
     }
 
     try {
       console.log('Changing language to:', language);
       
-      // Change language immediately
+      // Change language with proper error handling
       await i18n.changeLanguage(language);
       
       // Save to localStorage
@@ -122,11 +131,11 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               onConflict: 'id'
             });
         } catch (dbError) {
-          console.log('Failed to save language preference to database:', dbError);
+          console.warn('Failed to save language preference to database:', dbError);
         }
       }
 
-      // Show feedback
+      // Show success feedback
       const languageName = AVAILABLE_LANGUAGES.find(l => l.code === language)?.name;
       toast({
         title: "🌐 Language Updated",
@@ -138,7 +147,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error('Language change failed:', error);
       toast({
         title: "Language Change Failed",
-        description: "Could not change interface language. Please try again.",
+        description: `Could not change interface language: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       });
     }

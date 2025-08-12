@@ -299,7 +299,8 @@
     "retry": "Retry",
     "comingSoon": "Coming Soon",
     "home": "Home",
-    "pricing": "Pricing"
+    "pricing": "Pricing",
+    "selectLanguage": "Select Language"
   },
   "navigation": {
     "home": "Home",

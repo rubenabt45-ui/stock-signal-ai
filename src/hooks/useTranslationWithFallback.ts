@@ -1,3 +1,4 @@
+
 import { useTranslation } from 'react-i18next';
 
 // Comprehensive translation fallbacks mapping
@@ -14,6 +15,7 @@ const TRANSLATION_FALLBACKS: Record<string, string> = {
   'common.comingSoon': 'Coming Soon',
   'common.home': 'Home',
   'common.pricing': 'Pricing',
+  'common.selectLanguage': 'Select Language',
   
   // Navigation
   'navigation.home': 'Home',
@@ -213,11 +215,13 @@ export const useTranslationWithFallback = () => {
       
       // If translation returns the key itself (no translation found) or is empty, use fallback
       if ((translationStr === key || !translationStr || translationStr.trim() === '') && TRANSLATION_FALLBACKS[key]) {
+        console.warn(`Using fallback for missing translation key: ${key}`);
         return TRANSLATION_FALLBACKS[key];
       }
       
       // If no fallback exists, return a human-readable version of the key
       if (translationStr === key || !translationStr || translationStr.trim() === '') {
+        console.warn(`No translation or fallback found for key: ${key}`);
         // Return a human-readable version of the key as last resort
         return key.split('.').pop()?.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) || key;
       }
