@@ -51,25 +51,33 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               localStorage.setItem('tiq_lang', profile.language);
             }
           } catch (dbError) {
-            console.warn('Could not fetch user language preference:', dbError);
+            if (import.meta.env.DEV) {
+              console.warn('Could not fetch user language preference:', dbError);
+            }
           }
         }
 
         // 3. Apply the language using the singleton instance
         if (i18n.language !== targetLanguage) {
-          console.log('[i18n] Initializing language to:', targetLanguage);
+          if (import.meta.env.DEV) {
+            console.log('[i18n] Initializing language to:', targetLanguage);
+          }
           await i18n.changeLanguage(targetLanguage);
         }
         setCurrentLanguage(targetLanguage);
         
       } catch (error) {
-        console.error('Language initialization error:', error);
+        if (import.meta.env.DEV) {
+          console.error('Language initialization error:', error);
+        }
         // Fallback to English
         setCurrentLanguage('en');
         try {
           await i18n.changeLanguage('en');
         } catch (fallbackError) {
-          console.error('Failed to set fallback language:', fallbackError);
+          if (import.meta.env.DEV) {
+            console.error('Failed to set fallback language:', fallbackError);
+          }
         }
       }
     };
@@ -83,7 +91,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Listen to i18n language changes using the singleton instance
   useEffect(() => {
     const handleLanguageChange = (lng: string) => {
-      console.log('[i18n] Language changed to:', lng);
+      if (import.meta.env.DEV) {
+        console.log('[i18n] Language changed to:', lng);
+      }
       setCurrentLanguage(lng);
     };
 
@@ -100,7 +110,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
 
     try {
-      console.log('[i18n] Changing language to:', language);
+      if (import.meta.env.DEV) {
+        console.log('[i18n] Changing language to:', language);
+      }
       
       // Use the singleton instance directly
       await i18n.changeLanguage(language);
@@ -120,7 +132,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               onConflict: 'id'
             });
         } catch (dbError) {
-          console.warn('Failed to save language preference to database:', dbError);
+          if (import.meta.env.DEV) {
+            console.warn('Failed to save language preference to database:', dbError);
+          }
         }
       }
 
