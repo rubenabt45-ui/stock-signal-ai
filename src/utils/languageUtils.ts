@@ -1,3 +1,4 @@
+import i18n from '@/i18n/config';
 
 /**
  * Language Utilities for TradeIQ
@@ -61,7 +62,7 @@ export const getSavedLanguage = (): string => {
     const saved = localStorage.getItem('tiq_lang');
     return saved && isLanguageSupported(saved) ? saved : 'en';
   } catch (error) {
-    console.warn('Could not access localStorage for language:', error);
+    console.warn('[i18n] Could not access localStorage for language:', error);
     return 'en';
   }
 };
@@ -75,6 +76,26 @@ export const saveLanguage = (code: string): void => {
       localStorage.setItem('tiq_lang', code);
     }
   } catch (error) {
-    console.warn('Could not save language to localStorage:', error);
+    console.warn('[i18n] Could not save language to localStorage:', error);
+  }
+};
+
+/**
+ * Change language using the singleton instance
+ */
+export const changeLanguageSafely = async (code: string): Promise<boolean> => {
+  try {
+    if (!isLanguageSupported(code)) {
+      console.warn('[i18n] Unsupported language code:', code);
+      return false;
+    }
+    
+    await i18n.changeLanguage(code);
+    saveLanguage(code);
+    console.log('[i18n] Language changed successfully to:', code);
+    return true;
+  } catch (error) {
+    console.error('[i18n] Failed to change language:', error);
+    return false;
   }
 };

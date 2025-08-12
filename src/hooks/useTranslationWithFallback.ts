@@ -1,5 +1,5 @@
-
 import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n/config';
 
 // Comprehensive translation fallbacks mapping
 const TRANSLATION_FALLBACKS: Record<string, string> = {
@@ -205,7 +205,7 @@ const TRANSLATION_FALLBACKS: Record<string, string> = {
 };
 
 export const useTranslationWithFallback = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const tWithFallback = (key: string, options?: any): string => {
     try {
@@ -215,13 +215,13 @@ export const useTranslationWithFallback = () => {
       
       // If translation returns the key itself (no translation found) or is empty, use fallback
       if ((translationStr === key || !translationStr || translationStr.trim() === '') && TRANSLATION_FALLBACKS[key]) {
-        console.warn(`Using fallback for missing translation key: ${key}`);
+        console.warn(`[i18n] Using fallback for missing translation key: ${key}`);
         return TRANSLATION_FALLBACKS[key];
       }
       
       // If no fallback exists, return a human-readable version of the key
       if (translationStr === key || !translationStr || translationStr.trim() === '') {
-        console.warn(`No translation or fallback found for key: ${key}`);
+        console.warn(`[i18n] No translation or fallback found for key: ${key}`);
         // Return a human-readable version of the key as last resort
         return key.split('.').pop()?.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) || key;
       }
@@ -229,7 +229,7 @@ export const useTranslationWithFallback = () => {
       // Ensure we always return a string
       return translationStr;
     } catch (error) {
-      console.error(`Translation error for key: ${key}`, error);
+      console.error(`[i18n] Translation error for key: ${key}`, error);
       // Return fallback if available, otherwise return a human-readable version of the key
       return TRANSLATION_FALLBACKS[key] || key.split('.').pop()?.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) || key;
     }
@@ -237,7 +237,7 @@ export const useTranslationWithFallback = () => {
 
   return { 
     t: tWithFallback, 
-    i18n,
+    i18n, // Use the singleton instance
     ready: true, // Always return ready=true to prevent blocking
     // Helper function to check if a key exists
     hasKey: (key: string) => {

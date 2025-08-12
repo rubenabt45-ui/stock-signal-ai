@@ -2,6 +2,7 @@
 import { Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n/config';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +22,9 @@ export const LanguageSelector = ({ variant = 'landing', showText = false }: Lang
   const { t } = useTranslation();
 
   const handleLanguageChange = async (languageCode: string) => {
-    console.log('🌐 Language selector clicked:', languageCode);
+    console.log('[i18n] Language selector clicked:', languageCode);
+    console.log('[i18n] Singleton instance check:', typeof i18n, 'hasChangeLanguage:', typeof i18n.changeLanguage);
+    
     if (languageCode !== currentLanguage) {
       await changeLanguage(languageCode);
     }

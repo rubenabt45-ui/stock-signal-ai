@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import i18n from '@/i18n/config';
 
 interface LanguageContextType {
   currentLanguage: string;
@@ -19,10 +20,23 @@ const AVAILABLE_LANGUAGES = [
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { i18n, t } = useTranslation();
+  const { i18n: hookI18n } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
+
+  // Diagnostic logging
+  console.log('[i18n] Diagnosis - config i18n:', typeof i18n, i18n && Object.keys(i18n));
+  console.log('[i18n] Diagnosis - hook i18n:', typeof hookI18n, hookI18n && Object.keys(hookI18n));
+  console.log('[i18n] Are they the same instance?', i18n === hookI18n);
+  console.log('[i18n] Current config:', {
+    language: i18n.language,
+    isInitialized: i18n.isInitialized,
+    supportedLngs: i18n.options.supportedLngs,
+    fallbackLng: i18n.options.fallbackLng,
+    defaultNS: i18n.options.defaultNS,
+    ns: i18n.options.ns
+  });
 
   // Initialize language from localStorage, user profile, or browser
   useEffect(() => {
@@ -55,9 +69,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           }
         }
 
-        // 3. Apply the language
+        // 3. Apply the language using the singleton instance
         if (i18n.language !== targetLanguage) {
-          console.log('Initializing language to:', targetLanguage);
+          console.log('[i18n] Initializing language to:', targetLanguage);
           await i18n.changeLanguage(targetLanguage);
         }
         setCurrentLanguage(targetLanguage);
@@ -78,30 +92,24 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (i18n.isInitialized) {
       initializeLanguage();
     }
-  }, [user?.id, i18n]);
+  }, [user?.id]);
 
-  // Listen to i18n language changes
+  // Listen to i18n language changes using the singleton instance
   useEffect(() => {
-    if (!i18n || typeof i18n.on !== 'function') {
-      return;
-    }
-
     const handleLanguageChange = (lng: string) => {
-      console.log('i18n language changed to:', lng);
+      console.log('[i18n] Language changed to:', lng);
       setCurrentLanguage(lng);
     };
 
     i18n.on('languageChanged', handleLanguageChange);
     return () => {
-      if (i18n && typeof i18n.off === 'function') {
-        i18n.off('languageChanged', handleLanguageChange);
-      }
+      i18n.off('languageChanged', handleLanguageChange);
     };
-  }, [i18n]);
+  }, []);
 
   const changeLanguage = async (language: string) => {
     if (!AVAILABLE_LANGUAGES.some(lang => lang.code === language)) {
-      console.error('Unsupported language:', language);
+      console.error('[i18n] Unsupported language:', language);
       toast({
         title: "Language Change Failed",
         description: `Language "${language}" is not supported`,
@@ -111,9 +119,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
 
     try {
-      console.log('Changing language to:', language);
+      console.log('[i18n] Changing language to:', language);
+      console.log('[i18n] Using i18n instance:', typeof i18n, 'hasChangeLanguage:', typeof i18n.changeLanguage);
       
-      // Change language with proper error handling
+      // Use the singleton instance directly
       await i18n.changeLanguage(language);
       
       // Save to localStorage
@@ -144,7 +153,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       });
       
     } catch (error) {
-      console.error('Language change failed:', error);
+      console.error('[i18n] Language change failed:', error);
       toast({
         title: "Language Change Failed",
         description: `Could not change interface language: ${error instanceof Error ? error.message : 'Unknown error'}`,
