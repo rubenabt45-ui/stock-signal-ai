@@ -32,8 +32,8 @@ export default defineConfig(({ mode }) => ({
         manualChunks: {
           // React ecosystem
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          // UI libraries
-          'ui-vendor': ['@radix-ui/react-slot', '@radix-ui/react-dialog', '@radix-ui/react-sheet', '@radix-ui/react-tabs'],
+          // UI libraries - removed @radix-ui/react-sheet as it doesn't exist
+          'ui-vendor': ['@radix-ui/react-slot', '@radix-ui/react-dialog', '@radix-ui/react-tabs'],
           // Data/state management
           'data-vendor': ['@tanstack/react-query', '@supabase/supabase-js'],
           // i18n
