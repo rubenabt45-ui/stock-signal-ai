@@ -1,4 +1,6 @@
+
 import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';
 import i18n from '@/i18n/config';
 
 // Comprehensive translation fallbacks mapping
@@ -205,7 +207,20 @@ const TRANSLATION_FALLBACKS: Record<string, string> = {
 };
 
 export const useTranslationWithFallback = () => {
-  const { t } = useTranslation();
+  const { t, i18n: hookI18n } = useTranslation();
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
+
+  // Listen for language changes
+  useEffect(() => {
+    const handleLanguageChange = (lng: string) => {
+      setCurrentLanguage(lng);
+    };
+
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, []);
 
   const tWithFallback = (key: string, options?: any): string => {
     try {

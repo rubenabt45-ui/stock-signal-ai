@@ -20,23 +20,9 @@ const AVAILABLE_LANGUAGES = [
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { i18n: hookI18n } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
-
-  // Diagnostic logging
-  console.log('[i18n] Diagnosis - config i18n:', typeof i18n, i18n && Object.keys(i18n));
-  console.log('[i18n] Diagnosis - hook i18n:', typeof hookI18n, hookI18n && Object.keys(hookI18n));
-  console.log('[i18n] Are they the same instance?', i18n === hookI18n);
-  console.log('[i18n] Current config:', {
-    language: i18n.language,
-    isInitialized: i18n.isInitialized,
-    supportedLngs: i18n.options.supportedLngs,
-    fallbackLng: i18n.options.fallbackLng,
-    defaultNS: i18n.options.defaultNS,
-    ns: i18n.options.ns
-  });
 
   // Initialize language from localStorage, user profile, or browser
   useEffect(() => {
@@ -110,17 +96,11 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const changeLanguage = async (language: string) => {
     if (!AVAILABLE_LANGUAGES.some(lang => lang.code === language)) {
       console.error('[i18n] Unsupported language:', language);
-      toast({
-        title: "Language Change Failed",
-        description: `Language "${language}" is not supported`,
-        variant: "destructive",
-      });
-      return;
+      return Promise.reject(new Error(`Language "${language}" is not supported`));
     }
 
     try {
       console.log('[i18n] Changing language to:', language);
-      console.log('[i18n] Using i18n instance:', typeof i18n, 'hasChangeLanguage:', typeof i18n.changeLanguage);
       
       // Use the singleton instance directly
       await i18n.changeLanguage(language);
@@ -154,11 +134,13 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
     } catch (error) {
       console.error('[i18n] Language change failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       toast({
         title: "Language Change Failed",
-        description: `Could not change interface language: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        description: `Could not change interface language: ${errorMessage}`,
         variant: "destructive",
       });
+      throw error;
     }
   };
 

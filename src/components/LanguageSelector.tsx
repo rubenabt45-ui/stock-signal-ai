@@ -2,7 +2,6 @@
 import { Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from 'react-i18next';
-import i18n from '@/i18n/config';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,10 +22,14 @@ export const LanguageSelector = ({ variant = 'landing', showText = false }: Lang
 
   const handleLanguageChange = async (languageCode: string) => {
     console.log('[i18n] Language selector clicked:', languageCode);
-    console.log('[i18n] Singleton instance check:', typeof i18n, 'hasChangeLanguage:', typeof i18n.changeLanguage);
     
     if (languageCode !== currentLanguage) {
-      await changeLanguage(languageCode);
+      try {
+        await changeLanguage(languageCode);
+        console.log('[i18n] Language changed successfully to:', languageCode);
+      } catch (error) {
+        console.error('[i18n] Language change failed:', error);
+      }
     }
   };
 
@@ -65,7 +68,7 @@ export const LanguageSelector = ({ variant = 'landing', showText = false }: Lang
         </TooltipTrigger>
         <DropdownMenuContent 
           align="end" 
-          className="w-40 bg-gray-900 border-gray-700 z-[100]"
+          className="w-40 bg-gray-900 border-gray-700 z-[9999]"
         >
           {availableLanguages.map((language) => (
             <DropdownMenuItem
@@ -82,7 +85,7 @@ export const LanguageSelector = ({ variant = 'landing', showText = false }: Lang
         </DropdownMenuContent>
       </DropdownMenu>
       <TooltipContent side="bottom">
-        <p>{t('common.selectLanguage') || 'Select Language'}</p>
+        <p>{t('common.selectLanguage')}</p>
       </TooltipContent>
     </Tooltip>
   );
