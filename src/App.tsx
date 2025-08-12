@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -40,6 +40,19 @@ import Blog from "./pages/Blog";
 import Careers from "./pages/Careers";
 
 const queryClient = new QueryClient();
+
+// Component to handle conditional footer rendering for app routes
+const AppFooterWrapper = () => {
+  const location = useLocation();
+  const isStrategyAI = location.pathname === '/app/strategy-ai';
+  
+  return (
+    <div className={isStrategyAI ? "" : "pb-20"}>
+      {!isStrategyAI && <Footer />}
+      <BottomNavigation />
+    </div>
+  );
+};
 
 const App = () => {
   return (
@@ -163,13 +176,8 @@ const App = () => {
                       <Route path="/blog" element={<Footer />} />
                       <Route path="/careers" element={<Footer />} />
                       
-                      {/* Footer and bottom nav for app routes */}
-                      <Route path="/app/*" element={
-                        <div className="pb-20">
-                          <Footer />
-                          <BottomNavigation />
-                        </div>
-                      } />
+                      {/* Footer and bottom nav for app routes with conditional logic */}
+                      <Route path="/app/*" element={<AppFooterWrapper />} />
                     </Routes>
                   </div>
                 </BrowserRouter>
