@@ -32,15 +32,27 @@ serve(async (req) => {
   try {
     logStep('Checkout session creation started');
 
-    // Get Stripe secret key from environment
+    // Validate required environment variables
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
+    const stripePriceId = Deno.env.get('STRIPE_PRICE_ID_PRO');
+    
     if (!stripeSecretKey) {
       logStep('ERROR: STRIPE_SECRET_KEY not configured');
-      return new Response('Stripe secret key not configured', { 
+      return new Response(JSON.stringify({ error: 'Stripe secret key not configured' }), { 
         status: 500, 
-        headers: corsHeaders 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
+
+    if (!stripePriceId) {
+      logStep('ERROR: STRIPE_PRICE_ID_PRO not configured');
+      return new Response(JSON.stringify({ error: 'Stripe price ID not configured' }), { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    logStep('Environment variables validated', { priceId: stripePriceId });
 
     // Create Supabase client using anon key for user authentication
     const supabaseClient = createClient(
@@ -52,9 +64,9 @@ serve(async (req) => {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       logStep('ERROR: No authorization header provided');
-      return new Response('No authorization header', { 
+      return new Response(JSON.stringify({ error: 'No authorization header' }), { 
         status: 401, 
-        headers: corsHeaders 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
@@ -63,9 +75,9 @@ serve(async (req) => {
     
     if (userError || !userData.user) {
       logStep('ERROR: Authentication failed', { error: userError?.message });
-      return new Response('Authentication failed', { 
+      return new Response(JSON.stringify({ error: 'Authentication failed' }), { 
         status: 401, 
-        headers: corsHeaders 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
@@ -91,29 +103,22 @@ serve(async (req) => {
       logStep('No existing customer found, will create during checkout');
     }
 
-    // Create checkout session with hardcoded redirect URLs
+    // Get origin for redirect URLs
+    const origin = req.headers.get('origin') || 'https://lovable.dev/projects/351714c7-a4c6-4f25-bf5f-a3c37bdee2ed';
+
+    // Create checkout session using the configured price ID
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'TradeIQ Pro Plan',
-              description: 'Unlimited ChartIA access, advanced TradingChat, and priority support',
-            },
-            unit_amount: 999, // $9.99 in cents
-            recurring: {
-              interval: 'month',
-            },
-          },
+          price: stripePriceId,
           quantity: 1,
         },
       ],
       mode: 'subscription',
-      success_url: `https://lovable.dev/projects/351714c7-a4c6-4f25-bf5f-a3c37bdee2ed/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://lovable.dev/projects/351714c7-a4c6-4f25-bf5f-a3c37bdee2ed/pricing`,
+      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/pricing`,
       metadata: {
         user_id: user.id, // This is critical for the webhook
       },
@@ -127,7 +132,8 @@ serve(async (req) => {
     logStep('Checkout session created successfully', { 
       sessionId: session.id, 
       url: session.url,
-      metadata: session.metadata
+      metadata: session.metadata,
+      priceId: stripePriceId
     });
 
     return new Response(JSON.stringify({ 
@@ -151,3 +157,4 @@ serve(async (req) => {
     });
   }
 });
+

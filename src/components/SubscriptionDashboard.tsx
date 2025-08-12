@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Crown, Calendar, CreditCard, ArrowRight, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { Crown, Calendar, CreditCard, ArrowRight, CheckCircle, AlertTriangle, XCircle, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,7 @@ export const SubscriptionDashboard: React.FC = () => {
     loading = true,
     error,
     subscribed = false,
+    stripeConfigured = true,
     createCheckoutSession,
     createCustomerPortalSession,
     checkSubscription 
@@ -45,9 +46,19 @@ export const SubscriptionDashboard: React.FC = () => {
       await createCheckoutSession();
     } catch (error) {
       console.error('Checkout error:', error);
+      
+      let errorMessage = "Failed to start checkout process. Please try again.";
+      if (error instanceof Error) {
+        if (error.message.includes('not configured')) {
+          errorMessage = "Stripe is not properly configured. Please contact support.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to start checkout process. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -72,9 +83,19 @@ export const SubscriptionDashboard: React.FC = () => {
       await createCustomerPortalSession();
     } catch (error) {
       console.error('Portal error:', error);
+      
+      let errorMessage = "Failed to open customer portal. Please try again.";
+      if (error instanceof Error) {
+        if (error.message.includes('not configured')) {
+          errorMessage = "Stripe is not properly configured. Please contact support.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to open customer portal. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -112,6 +133,29 @@ export const SubscriptionDashboard: React.FC = () => {
     }
   };
 
+  if (error && !stripeConfigured) {
+    return (
+      <Card className="border-yellow-500/30 bg-yellow-900/10">
+        <CardContent className="p-6">
+          <div className="text-center space-y-4">
+            <Settings className="h-12 w-12 text-yellow-400 mx-auto" />
+            <h3 className="text-white font-semibold">Stripe Configuration Required</h3>
+            <p className="text-gray-400 text-sm">
+              Stripe payment processing is not configured. Please contact support to enable subscriptions.
+            </p>
+            <Button 
+              onClick={handleRefreshStatus} 
+              variant="outline"
+              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+            >
+              Retry Connection
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (error) {
     return (
       <Card className="border-red-500/30 bg-red-900/10">
@@ -120,7 +164,7 @@ export const SubscriptionDashboard: React.FC = () => {
             <XCircle className="h-12 w-12 text-red-400 mx-auto" />
             <h3 className="text-white font-semibold">Subscription Error</h3>
             <p className="text-gray-400 text-sm">
-              Unable to load subscription information. Please try refreshing.
+              Unable to load subscription information: {error}
             </p>
             <Button 
               onClick={handleRefreshStatus} 
@@ -279,41 +323,43 @@ export const SubscriptionDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          {role !== 'pro' && (
+        {/* Action Buttons - Only show if Stripe is configured */}
+        {stripeConfigured && (
+          <div className="flex flex-col sm:flex-row gap-3">
+            {role !== 'pro' && (
+              <Button 
+                onClick={handleUpgrade}
+                className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
+              >
+                <Crown className="h-4 w-4 mr-2" />
+                {role === 'expired' ? 'Renew Subscription' : 'Upgrade to Pro'}
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            )}
+            
+            {role === 'pro' && (
+              <Button 
+                onClick={handleManageSubscription}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <CreditCard className="h-4 w-4 mr-2" />
+                Manage Subscription
+              </Button>
+            )}
+            
             <Button 
-              onClick={handleUpgrade}
-              className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
-            >
-              <Crown className="h-4 w-4 mr-2" />
-              {role === 'expired' ? 'Renew Subscription' : 'Upgrade to Pro'}
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          )}
-          
-          {role === 'pro' && (
-            <Button 
-              onClick={handleManageSubscription}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+              variant="outline"
+              onClick={handleRefreshStatus}
+              className="border-gray-600 text-gray-300 hover:bg-gray-700"
             >
               <CreditCard className="h-4 w-4 mr-2" />
-              Manage Subscription
+              Refresh Status
             </Button>
-          )}
-          
-          <Button 
-            variant="outline"
-            onClick={handleRefreshStatus}
-            className="border-gray-600 text-gray-300 hover:bg-gray-700"
-          >
-            <CreditCard className="h-4 w-4 mr-2" />
-            Refresh Status
-          </Button>
-        </div>
+          </div>
+        )}
 
         {/* Management Note for Pro Users */}
-        {role === 'pro' && (
+        {role === 'pro' && stripeConfigured && (
           <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3">
             <p className="text-blue-300 text-sm text-center">
               <CreditCard className="h-4 w-4 inline mr-1" />
@@ -321,7 +367,18 @@ export const SubscriptionDashboard: React.FC = () => {
             </p>
           </div>
         )}
+
+        {/* Configuration Warning */}
+        {!stripeConfigured && (
+          <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-3">
+            <p className="text-yellow-300 text-sm text-center">
+              <Settings className="h-4 w-4 inline mr-1" />
+              Payment processing is temporarily unavailable. Please contact support.
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 };
+

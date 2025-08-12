@@ -9,6 +9,7 @@ export interface SubscriptionInfo {
   subscription_end: string | null;
   loading: boolean;
   error: string | null;
+  stripeConfigured: boolean;
 }
 
 export const useSubscription = () => {
@@ -18,12 +19,19 @@ export const useSubscription = () => {
     subscription_tier: 'free',
     subscription_end: null,
     loading: true,
-    error: null
+    error: null,
+    stripeConfigured: true // Assume configured, will be checked server-side
   });
 
   const checkSubscription = useCallback(async () => {
     if (!user) {
-      setSubscriptionInfo(prev => ({ ...prev, loading: false, subscribed: false, subscription_tier: 'free' }));
+      setSubscriptionInfo(prev => ({ 
+        ...prev, 
+        loading: false, 
+        subscribed: false, 
+        subscription_tier: 'free',
+        error: null
+      }));
       return;
     }
 
@@ -32,20 +40,26 @@ export const useSubscription = () => {
       
       const { data, error } = await supabase.functions.invoke('check-subscription');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Subscription check error:', error);
+        throw error;
+      }
       
       setSubscriptionInfo({
         subscribed: data.subscribed || false,
         subscription_tier: data.subscription_tier || 'free',
         subscription_end: data.subscription_end || null,
         loading: false,
-        error: null
+        error: null,
+        stripeConfigured: true
       });
     } catch (error) {
+      console.error('Subscription check failed:', error);
       setSubscriptionInfo(prev => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : 'Failed to check subscription'
+        error: error instanceof Error ? error.message : 'Failed to check subscription',
+        stripeConfigured: false
       }));
     }
   }, [user]);
@@ -56,14 +70,20 @@ export const useSubscription = () => {
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout-session');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Checkout session error:', error);
+        throw error;
+      }
       
       if (data.url) {
         window.open(data.url, '_blank');
+      } else {
+        throw new Error('No checkout URL received');
       }
       
       return data;
     } catch (error) {
+      console.error('Checkout session creation failed:', error);
       throw error;
     }
   }, [user]);
@@ -74,14 +94,20 @@ export const useSubscription = () => {
     try {
       const { data, error } = await supabase.functions.invoke('customer-portal');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Customer portal error:', error);
+        throw error;
+      }
       
       if (data.url) {
         window.open(data.url, '_blank');
+      } else {
+        throw new Error('No portal URL received');
       }
       
       return data;
     } catch (error) {
+      console.error('Customer portal creation failed:', error);
       throw error;
     }
   }, [user]);
@@ -99,3 +125,4 @@ export const useSubscription = () => {
     isFree: subscriptionInfo.subscription_tier === 'free'
   };
 };
+
