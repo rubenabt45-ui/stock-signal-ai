@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +21,9 @@ import {
   ChevronRight,
   Star
 } from 'lucide-react';
+
+// Lazy load heavy components that aren't needed immediately
+const LazyLearnPreview = lazy(() => import('./LearnPreview'));
 
 const LandingContent = () => {
   const navigate = useNavigate();

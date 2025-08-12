@@ -20,9 +20,36 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    // Use esbuild for reliability instead of terser
+    // Use esbuild for reliability and speed
     minify: 'esbuild',
-    // Ensure proper source maps for debugging
-    sourcemap: true,
+    // Disable source maps for production builds
+    sourcemap: mode === 'development',
+    // Modern build target for better tree shaking
+    target: 'es2020',
+    // Aggressive chunk splitting for better caching
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React ecosystem
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          // UI libraries
+          'ui-vendor': ['@radix-ui/react-slot', '@radix-ui/react-dialog', '@radix-ui/react-sheet', '@radix-ui/react-tabs'],
+          // Data/state management
+          'data-vendor': ['@tanstack/react-query', '@supabase/supabase-js'],
+          // i18n
+          'i18n-vendor': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
+          // Chart/trading components (heavy)
+          'trading-vendor': ['recharts'],
+        },
+      },
+    },
+    // Drop console and debugger in production
+    esbuild: mode === 'production' ? {
+      drop: ['console', 'debugger'],
+    } : undefined,
+  },
+  // Enable compression and modern features
+  esbuild: {
+    target: 'es2020',
   },
 }));
