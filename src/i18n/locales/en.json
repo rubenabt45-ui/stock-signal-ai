@@ -351,6 +351,44 @@
   "settings": {
     "title": "Settings",
     "subtitle": "Manage your account and preferences",
+    "preferences": {
+      "title": "Preferences",
+      "theme": "Theme",
+      "refreshInterval": "Data Refresh Interval",
+      "language": "Language",
+      "themes": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "intervals": {
+        "30s": "30 seconds",
+        "1min": "1 minute",
+        "5min": "5 minutes"
+      },
+      "languages": {
+        "en": "English",
+        "es": "Español"
+      },
+      "notes": {
+        "theme": "Theme preference will be applied across the application",
+        "refresh": "Data refresh interval affects real-time updates",
+        "language": "Language changes apply immediately"
+      }
+    },
+    "security": {
+      "title": "Security",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "changePassword": "Change Password",
+      "updating": "Updating Password...",
+      "passwordUpdated": "Password updated",
+      "passwordUpdateSuccess": "Your password has been updated successfully.",
+      "passwordUpdateFailed": "Password update failed",
+      "passwordUpdateError": "Failed to update password. Please try again.",
+      "unexpectedError": "An unexpected error occurred. Please try again."
+    },
     "pro": {
       "title": "Pro Features",
       "currentPlan": "Current Plan",
@@ -372,7 +410,10 @@
     "enterEmail": "Enter your email",
     "enterPassword": "Enter your password",
     "enterFullName": "Enter your full name",
-    "confirmPassword": "Confirm your password"
+    "confirmPassword": "Confirm your password",
+    "enterCurrentPassword": "Enter current password",
+    "enterNewPassword": "Enter new password",
+    "confirmNewPassword": "Confirm new password"
   },
   "pricing": {
     "getStarted": "Get Started",

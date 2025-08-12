@@ -6,7 +6,7 @@
       "about": "Acerca de",
       "features": "Características",
       "benefits": "Beneficios",
-      "learning": "Aprendizaje",
+      "learning": "Aprender",
       "login": "Iniciar Sesión",
       "signup": "Registrarse",
       "getStarted": "Comenzar"
@@ -19,11 +19,11 @@
       "signUp": "Registrarse"
     },
     "hero": {
-      "title": "Domina el Trading con Análisis Impulsado por IA",
-      "subtitle": "Transforma tu estrategia de trading con análisis de mercado en tiempo real, recomendaciones personalizadas de IA y recursos de aprendizaje integral.",
-      "cta": "Comienza a Tradear Más Inteligente",
+      "title": "Domina el Trading con Insights Impulsados por IA",
+      "subtitle": "Transforma tu estrategia de trading con análisis de mercado en tiempo real, recomendaciones personalizadas de IA y recursos de aprendizaje integrales.",
+      "cta": "Comienza a Operar de Manera Inteligente",
       "secondary": "Saber Más",
-      "joinBeta": "Únete al Beta",
+      "joinBeta": "Únete a la Beta",
       "watchDemo": "Ver Demo",
       "stats": {
         "accuracy": "Precisión de Predicción",
@@ -38,13 +38,13 @@
     },
     "about": {
       "title": "Acerca de TradeIQ",
-      "description": "TradeIQ combina IA de vanguardia con análisis integral del mercado para ayudar a los traders a tomar decisiones informadas. Nuestra plataforma proporciona perspectivas en tiempo real, herramientas personalizadas y una próspera comunidad de trading."
+      "description": "TradeIQ combina IA de vanguardia con análisis integral de mercado para ayudar a los traders a tomar decisiones informadas. Nuestra plataforma proporciona insights en tiempo real, herramientas personalizadas y una comunidad de trading próspera."
     },
     "features": {
       "title": "Características Poderosas",
       "ai": {
         "title": "Análisis Impulsado por IA",
-        "description": "Algoritmos avanzados analizan patrones del mercado y proporcionan perspectivas accionables"
+        "description": "Algoritmos avanzados analizan patrones de mercado y proporcionan insights accionables"
       },
       "realtime": {
         "title": "Datos en Tiempo Real",
@@ -52,23 +52,23 @@
       },
       "learning": {
         "title": "Recursos de Aprendizaje",
-        "description": "Guías y tutoriales comprehensivos para mejorar tus habilidades de trading"
+        "description": "Guías integrales y tutoriales para mejorar tus habilidades de trading"
       },
       "patternDetection": {
         "title": "Detección de Patrones",
-        "description": "Reconocimiento de patrones impulsado por IA para identificar oportunidades rentables"
+        "description": "Reconocimiento de patrones impulsado por IA para identificar oportunidades de trading rentables"
       },
       "trendAnalysis": {
         "title": "Análisis de Tendencias",
-        "description": "Análisis avanzado de tendencias con indicadores de sentimiento del mercado en tiempo real"
+        "description": "Análisis avanzado de tendencias con indicadores de sentimiento de mercado en tiempo real"
       },
       "volatilityHeatmaps": {
         "title": "Mapas de Calor de Volatilidad",
-        "description": "Análisis visual de volatilidad para optimizar el timing de entrada y salida"
+        "description": "Análisis visual de volatilidad para optimizar el momento de entrada y salida"
       },
       "aiInsights": {
-        "title": "Perspectivas de IA",
-        "description": "Recomendaciones personalizadas de IA basadas en tu estilo de trading"
+        "title": "Insights de IA",
+        "description": "Recomendaciones de IA personalizadas basadas en tu estilo de trading"
       }
     },
     "benefits": {
@@ -87,7 +87,7 @@
       },
       "reducedSubjectivity": {
         "title": "Subjetividad Reducida",
-        "description": "Elimina el sesgo emocional con análisis de IA basado en datos y perspectivas objetivas del mercado"
+        "description": "Elimina el sesgo emocional con análisis de IA basado en datos e insights objetivos de mercado"
       },
       "fasterDecisions": {
         "title": "Decisiones Más Rápidas",
@@ -95,7 +95,7 @@
       },
       "practicalEducation": {
         "title": "Educación Práctica",
-        "description": "Aprende a través de ejemplos reales del mercado y escenarios de trading guiados por IA"
+        "description": "Aprende a través de ejemplos de mercado reales y escenarios de trading guiados por IA"
       },
       "higherPrecision": {
         "title": "Mayor Precisión",
@@ -104,20 +104,20 @@
     },
     "learning": {
       "title": "Domina el Trading con Nuestra Plataforma de Aprendizaje",
-      "description": "Accede a cursos comprehensivos, tutoriales y ejemplos del mundo real para mejorar tus habilidades de trading.",
+      "description": "Accede a cursos integrales, tutoriales y ejemplos del mundo real para mejorar tus habilidades.",
       "cta": "Explorar Aprendizaje"
     },
     "learningSection": {
       "title": "Domina el Trading con Nuestra Plataforma de Aprendizaje",
-      "description": "Accede a cursos comprehensivos, tutoriales y ejemplos del mundo real para mejorar tus habilidades de trading.",
+      "description": "Accede a cursos integrales, tutoriales y ejemplos del mundo real para mejorar tus habilidades.",
       "cta": "Explorar Aprendizaje",
       "fundamentals": {
         "title": "Fundamentos de Trading",
-        "description": "Aprende los básicos del análisis de mercado, lectura de gráficos y conceptos fundamentales"
+        "description": "Aprende los conceptos básicos del análisis de mercado, lectura de gráficos y conceptos fundamentales"
       },
       "patterns": {
         "title": "Reconocimiento de Patrones",
-        "description": "Domina los patrones técnicos y aprende a identificar configuraciones rentables de trading"
+        "description": "Domina los patrones técnicos y aprende a identificar configuraciones de trading rentables"
       },
       "riskManagement": {
         "title": "Gestión de Riesgo",
@@ -129,14 +129,14 @@
       "subtitle": "Sé uno de los primeros en experimentar el futuro del trading impulsado por IA",
       "email": "Dirección de Email",
       "submit": "Unirse a Lista de Espera",
-      "success": "¡Gracias por unirte! Te contactaremos pronto."
+      "success": "¡Gracias por unirte! Estaremos en contacto pronto."
     }
   },
   "auth": {
     "login": {
       "title": "Bienvenido de Vuelta",
       "subtitle": "Inicia sesión en tu cuenta de TradeIQ",
-      "email": "Correo Electrónico",
+      "email": "Email",
       "password": "Contraseña",
       "submit": "Iniciar Sesión",
       "signIn": "Iniciar Sesión",
@@ -150,7 +150,7 @@
       "rememberMe": "Recordarme",
       "backToHome": "Volver al Inicio",
       "passwordUpdated": "¡Contraseña actualizada exitosamente! Ahora puedes iniciar sesión con tu nueva contraseña.",
-      "loginFailed": "Inicio de Sesión Fallido",
+      "loginFailed": "Error al Iniciar Sesión",
       "emailNotConfirmed": "Email No Confirmado",
       "checkEmail": "Por favor revisa tu email y haz clic en el enlace de verificación antes de iniciar sesión",
       "invalidCredentials": "Email o contraseña inválidos",
@@ -160,18 +160,18 @@
       "errors": {
         "invalidCredentials": "Email o contraseña inválidos",
         "emailNotConfirmed": "Por favor revisa tu email y haz clic en el enlace de verificación antes de iniciar sesión",
-        "tooManyRequests": "Demasiados intentos de inicio de sesión. Por favor intenta más tarde",
-        "userNotFound": "No se encontró ninguna cuenta con este email",
-        "invalidEmail": "Por favor ingresa un email válido",
-        "passwordRequired": "La contraseña es requerida",
-        "signInFailed": "Inicio de sesión fallido. Por favor intenta nuevamente"
+        "tooManyRequests": "Demasiados intentos de inicio de sesión. Por favor intenta de nuevo más tarde",
+        "userNotFound": "No se encontró una cuenta con esta dirección de email",
+        "invalidEmail": "Por favor ingresa una dirección de email válida",
+        "passwordRequired": "Se requiere contraseña",
+        "signInFailed": "Error al iniciar sesión. Por favor intenta de nuevo"
       }
     },
     "signup": {
-      "title": "Crea tu Cuenta",
+      "title": "Crea Tu Cuenta",
       "subtitle": "Comienza tu viaje de trading con TradeIQ",
       "fullName": "Nombre Completo",
-      "email": "Correo Electrónico",
+      "email": "Email",
       "password": "Contraseña",
       "confirmPassword": "Confirmar Contraseña",
       "submit": "Crear Cuenta",
@@ -191,16 +191,16 @@
         "emailExists": "Ya existe una cuenta con este email",
         "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
         "passwordsDoNotMatch": "Las contraseñas no coinciden",
-        "invalidEmail": "Por favor ingresa un email válido",
-        "fullNameRequired": "El nombre completo es requerido",
-        "signUpFailed": "Registro fallido. Por favor intenta nuevamente",
+        "invalidEmail": "Por favor ingresa una dirección de email válida",
+        "fullNameRequired": "Se requiere nombre completo",
+        "signUpFailed": "Error al registrarse. Por favor intenta de nuevo",
         "weakPassword": "La contraseña debe tener al menos 8 caracteres con mayúscula, minúscula, número y carácter especial"
       }
     },
     "resetPassword": {
       "title": "Restablecer Contraseña",
       "subtitle": "Ingresa tu email para restablecer tu contraseña",
-      "email": "Correo Electrónico",
+      "email": "Email",
       "submit": "Enviar Enlace de Restablecimiento",
       "backToLogin": "Volver al Inicio de Sesión",
       "emailSent": "¡Enlace de restablecimiento enviado!",
@@ -225,7 +225,7 @@
       "success": "Contraseña actualizada exitosamente",
       "successDescription": "Tu contraseña ha sido actualizada. Ahora puedes iniciar sesión con tu nueva contraseña.",
       "error": "Error",
-      "updateFailed": "Fallo al actualizar contraseña",
+      "updateFailed": "Error al actualizar contraseña",
       "passwordsDoNotMatch": "Las contraseñas no coinciden",
       "passwordRequirements": "Requisitos de contraseña no cumplidos",
       "passwordTooShort": "La contraseña debe tener al menos {{minLength}} caracteres",
@@ -242,24 +242,24 @@
       "invalidLinkDescription": "Este enlace de restablecimiento de contraseña es inválido o ha sido usado. Por favor solicita uno nuevo.",
       "invalidSession": "Sesión inválida",
       "requestNewLink": "Solicitar Nuevo Enlace",
-      "unexpectedError": "Ocurrió un error inesperado. Por favor intenta nuevamente.",
+      "unexpectedError": "Ocurrió un error inesperado. Por favor intenta de nuevo.",
       "attempt": "Intento",
       "errors": {
-        "invalidEmail": "Por favor ingresa un email válido",
-        "emailRequired": "El email es requerido",
-        "resetFailed": "Fallo al enviar email de restablecimiento. Por favor intenta nuevamente",
-        "userNotFound": "No se encontró ninguna cuenta con este email"
+        "invalidEmail": "Por favor ingresa una dirección de email válida",
+        "emailRequired": "Se requiere email",
+        "resetFailed": "Error al enviar email de restablecimiento. Por favor intenta de nuevo",
+        "userNotFound": "No se encontró una cuenta con esta dirección de email"
       }
     },
     "resetPasswordRequest": {
-      "title": "Restablece tu Contraseña",
+      "title": "Restablece Tu Contraseña",
       "subtitle": "Ingresa tu dirección de email y te enviaremos un enlace para restablecer tu contraseña",
       "emailLabel": "Dirección de Email",
       "sendButton": "Enviar Enlace de Restablecimiento",
       "sending": "Enviando...",
       "emailSent": "¡Email de Restablecimiento Enviado!",
       "checkEmail": "Revisa tu email para instrucciones de restablecimiento",
-      "checkEmailTitle": "Revisa tu Email",
+      "checkEmailTitle": "Revisa Tu Email",
       "emailSentDescription": "Hemos enviado un enlace de restablecimiento de contraseña a {email}. Por favor revisa tu bandeja de entrada y sigue las instrucciones.",
       "instructionsSent": "Las instrucciones de restablecimiento de contraseña han sido enviadas a tu dirección de email.",
       "didntReceive": "¿No recibiste el email? Revisa tu carpeta de spam o solicita otro.",
@@ -268,14 +268,14 @@
       "emailRequired": "Email Requerido",
       "enterEmail": "Por favor ingresa tu dirección de email",
       "error": "Error",
-      "failedToSend": "Fallo al enviar email de restablecimiento",
+      "failedToSend": "Error al enviar email de restablecimiento",
       "unexpectedError": "Ocurrió un error inesperado"
     },
     "verifyEmail": {
-      "title": "Verifica tu Email",
+      "title": "Verifica Tu Email",
       "subtitle": "Por favor revisa tu email y haz clic en el enlace de verificación",
       "success": "¡Email verificado exitosamente!",
-      "error": "Verificación de email fallida",
+      "error": "Error en la verificación del email",
       "resend": "Reenviar Email de Verificación",
       "backToLogin": "Volver al Inicio de Sesión",
       "checkEmail": "Hemos enviado un enlace de verificación a tu dirección de email. Por favor revisa tu bandeja de entrada y haz clic en el enlace para verificar tu cuenta.",
@@ -307,7 +307,7 @@
     "about": "Acerca de",
     "features": "Características",
     "benefits": "Beneficios",
-    "learning": "Aprendizaje",
+    "learning": "Aprender",
     "learn": "Aprender",
     "login": "Iniciar Sesión",
     "signup": "Registrarse",
@@ -319,7 +319,7 @@
     "subtitle": "Tu compañero de trading impulsado por IA",
     "quickActions": "Acciones Rápidas",
     "recentActivity": "Actividad Reciente",
-    "marketMonitoring": "Monitoreo del Mercado",
+    "marketMonitoring": "Monitoreo de Mercado",
     "patternAccuracy": "Precisión de Patrones",
     "analysisSpeed": "Velocidad de Análisis",
     "strategyAI": {
@@ -336,7 +336,7 @@
     },
     "marketUpdates": {
       "title": "Actualizaciones del Mercado",
-      "description": "Datos y análisis del mercado en tiempo real"
+      "description": "Datos de mercado en tiempo real y análisis"
     },
     "plan": {
       "pro": "Pro",
@@ -351,6 +351,44 @@
   "settings": {
     "title": "Configuración",
     "subtitle": "Gestiona tu cuenta y preferencias",
+    "preferences": {
+      "title": "Preferencias",
+      "theme": "Tema",
+      "refreshInterval": "Intervalo de Actualización de Datos",
+      "language": "Idioma",
+      "themes": {
+        "light": "Claro",
+        "dark": "Oscuro",
+        "system": "Sistema"
+      },
+      "intervals": {
+        "30s": "30 segundos",
+        "1min": "1 minuto",
+        "5min": "5 minutos"
+      },
+      "languages": {
+        "en": "English",
+        "es": "Español"
+      },
+      "notes": {
+        "theme": "La preferencia de tema se aplicará en toda la aplicación",
+        "refresh": "El intervalo de actualización de datos afecta las actualizaciones en tiempo real",
+        "language": "Los cambios de idioma se aplican inmediatamente"
+      }
+    },
+    "security": {
+      "title": "Seguridad",
+      "currentPassword": "Contraseña Actual",
+      "newPassword": "Nueva Contraseña",
+      "confirmPassword": "Confirmar Nueva Contraseña",
+      "changePassword": "Cambiar Contraseña",
+      "updating": "Actualizando Contraseña...",
+      "passwordUpdated": "Contraseña actualizada",
+      "passwordUpdateSuccess": "Tu contraseña ha sido actualizada exitosamente.",
+      "passwordUpdateFailed": "Error al actualizar contraseña",
+      "passwordUpdateError": "Error al actualizar contraseña. Por favor intenta de nuevo.",
+      "unexpectedError": "Ocurrió un error inesperado. Por favor intenta de nuevo."
+    },
     "pro": {
       "title": "Características Pro",
       "currentPlan": "Plan Actual",
@@ -372,7 +410,10 @@
     "enterEmail": "Ingresa tu email",
     "enterPassword": "Ingresa tu contraseña",
     "enterFullName": "Ingresa tu nombre completo",
-    "confirmPassword": "Confirma tu contraseña"
+    "confirmPassword": "Confirma tu contraseña",
+    "enterCurrentPassword": "Ingresa contraseña actual",
+    "enterNewPassword": "Ingresa nueva contraseña",
+    "confirmNewPassword": "Confirma nueva contraseña"
   },
   "pricing": {
     "getStarted": "Comenzar",
@@ -389,17 +430,17 @@
     "subtitle": "Mantente adelante del mercado con datos en tiempo real, alertas e insights impulsados por IA",
     "comingSoon": "Próximamente",
     "liveData": {
-      "title": "Datos del Mercado en Vivo",
-      "description": "Feeds de precios en tiempo real y movimientos del mercado en todas las bolsas principales"
+      "title": "Datos de Mercado en Vivo",
+      "description": "Feeds de precios en tiempo real y movimientos de mercado en todos los principales intercambios"
     },
     "smartAlerts": {
       "title": "Alertas Inteligentes",
-      "description": "Notificaciones impulsadas por IA para oportunidades del mercado y gestión de riesgo"
+      "description": "Notificaciones impulsadas por IA para oportunidades de mercado y gestión de riesgo"
     }
   },
   "footer": {
     "platform": "Plataforma",
-    "dashboard": "Panel de Control",
+    "dashboard": "Dashboard",
     "learnPreview": "Aprender (Vista Previa)",
     "pricing": "Precios",
     "company": "Empresa",
@@ -414,7 +455,7 @@
     "contact": "Contacto",
     "help": "Centro de Ayuda",
     "community": "Comunidad",
-    "description": "Capacitando a los traders con insights y análisis impulsados por IA. Visítanos en",
+    "description": "Empoderando a traders con insights y análisis impulsados por IA. Visítanos en",
     "rights": "Todos los derechos reservados",
     "allRightsReserved": "Todos los derechos reservados"
   }
