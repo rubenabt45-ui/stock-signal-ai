@@ -32,7 +32,7 @@ const StripeTest = () => {
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [testing, setTesting] = useState(false);
 
-  const addTestResult = (step: string, status: 'success' | 'error', message: string, details?: any) => {
+  const addTestResult = (step: string, status: 'pending' | 'success' | 'error', message: string, details?: any) => {
     setTestResults(prev => [...prev, { step, status, message, details }]);
   };
 
@@ -272,4 +272,3 @@ const StripeTest = () => {
 };
 
 export default StripeTest;
-

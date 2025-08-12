@@ -1,19 +1,20 @@
+
 import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nextProvider } from 'react-i18next';
-import i18n from './i18n';
+import i18n from './i18n/config';
 import Learn from '@/pages/Learn';
 import LearnPreview from '@/pages/LearnPreview';
-import Home from '@/pages/Home';
+import Home from '@/pages/Index';
 import Pricing from '@/pages/Pricing';
 import Configuration from '@/pages/Configuration';
 import Login from '@/pages/Login';
-import Register from '@/pages/Register';
+import Register from '@/pages/Signup';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import AppLayout from '@/layouts/AppLayout';
-import StrategyAI from '@/pages/StrategyAI';
+import StrategyAI from '@/pages/TradingChat';
 import NewsAI from '@/pages/NewsAI';
 import TradingChat from '@/pages/TradingChat';
 import { useAuth } from "@/contexts/AuthContext";
