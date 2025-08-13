@@ -1,3 +1,4 @@
+
 import { lazy, Suspense, ComponentType } from 'react';
 
 // Lazy load icon sets only when needed to reduce initial bundle
@@ -12,11 +13,20 @@ const IconPlaceholder = ({ className }: { className?: string }) => (
 export const createLazyIcon = (iconName: string): ComponentType<{ className?: string }> => {
   return (props) => (
     <Suspense fallback={<IconPlaceholder className={props.className} />}>
-      <LucideReactIcons.then(icons => {
+      <LazyIconRenderer iconName={iconName} {...props} />
+    </Suspense>
+  );
+};
+
+// Helper component to render the lazy icon
+const LazyIconRenderer = ({ iconName, ...props }: { iconName: string; className?: string }) => {
+  return (
+    <LucideReactIcons>
+      {(icons) => {
         const Icon = (icons as any)[iconName];
         return Icon ? <Icon {...props} /> : <IconPlaceholder {...props} />;
-      })} />
-    </Suspense>
+      }}
+    </LucideReactIcons>
   );
 };
 
