@@ -1,7 +1,9 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { createContextGuard } from '@/utils/providerGuards';
+import { logger } from '@/utils/logger';
 
 interface AuthContextType {
   user: User | null;
@@ -31,15 +33,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.log('🔐 [AUTH_FLOW] AuthProvider: Initializing auth state');
-    }
+    logger.info('🔐 [AUTH_FLOW] AuthProvider: Initializing auth state');
     
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (import.meta.env.DEV) {
-        console.log('🔐 [AUTH_FLOW] Initial session check:', session ? 'authenticated' : 'not authenticated');
-      }
+      logger.info('🔐 [AUTH_FLOW] Initial session check:', session ? 'authenticated' : 'not authenticated');
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -47,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Check subscription status on login
       if (session?.user) {
         setTimeout(() => {
-          supabase.functions.invoke('check-subscription').catch(console.error);
+          supabase.functions.invoke('check-subscription').catch(logger.error);
         }, 0);
       }
     });
@@ -56,9 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (import.meta.env.DEV) {
-        console.log('🔐 [AUTH_FLOW] Auth state changed:', event, session ? 'authenticated' : 'not authenticated');
-      }
+      logger.info('🔐 [AUTH_FLOW] Auth state changed:', event, session ? 'authenticated' : 'not authenticated');
       
       setSession(session);
       setUser(session?.user ?? null);
@@ -67,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Check subscription status on auth state change
       if (session?.user) {
         setTimeout(() => {
-          supabase.functions.invoke('check-subscription').catch(console.error);
+          supabase.functions.invoke('check-subscription').catch(logger.error);
         }, 0);
       }
     });
@@ -76,22 +72,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    if (import.meta.env.DEV) {
-      console.log('🔐 [AUTH_FLOW] Attempting sign in for:', email);
-    }
+    logger.info('🔐 [AUTH_FLOW] Attempting sign in for:', email);
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     
     if (error) {
-      if (import.meta.env.DEV) {
-        console.error('🔐 [AUTH_FLOW] Sign in error:', error);
-      }
+      logger.error('🔐 [AUTH_FLOW] Sign in error:', error);
     } else {
-      if (import.meta.env.DEV) {
-        console.log('🔐 [AUTH_FLOW] Sign in successful');
-      }
+      logger.info('🔐 [AUTH_FLOW] Sign in successful');
     }
     
     return { error };
@@ -101,16 +91,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Always use production domain for email verification
     const redirectUrl = 'https://tradeiqpro.com/verify-email';
     
-    if (import.meta.env.DEV) {
-      console.log('🔐 [EMAIL_VERIFICATION] Starting signup process');
-      console.log('🔐 [EMAIL_VERIFICATION] Email:', email);
-      console.log('🔐 [EMAIL_VERIFICATION] Redirect URL:', redirectUrl);
-      console.log('🔐 [EMAIL_VERIFICATION] Current environment:', {
-        hostname: window.location.hostname,
-        origin: window.location.origin,
-        href: window.location.href
-      });
-    }
+    logger.info('🔐 [EMAIL_VERIFICATION] Starting signup process');
+    logger.info('🔐 [EMAIL_VERIFICATION] Email:', email);
+    logger.info('🔐 [EMAIL_VERIFICATION] Redirect URL:', redirectUrl);
+    logger.debug('🔐 [EMAIL_VERIFICATION] Current environment:', {
+      hostname: window.location.hostname,
+      origin: window.location.origin,
+      href: window.location.href
+    });
     
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -123,46 +111,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       if (error) {
-        if (import.meta.env.DEV) {
-          console.error('🔐 [EMAIL_VERIFICATION] Signup error:', error);
-          console.error('🔐 [EMAIL_VERIFICATION] Error details:', {
-            message: error.message,
-            status: error.status,
-            name: error.name
-          });
-        }
+        logger.error('🔐 [EMAIL_VERIFICATION] Signup error:', error);
+        logger.error('🔐 [EMAIL_VERIFICATION] Error details:', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
         return { error };
       }
 
-      if (import.meta.env.DEV) {
-        console.log('🔐 [EMAIL_VERIFICATION] Signup response:', {
-          user: data.user ? 'created' : 'null',
-          session: data.session ? 'active' : 'null',
-          userConfirmed: data.user?.email_confirmed_at ? 'confirmed' : 'pending'
-        });
+      logger.debug('🔐 [EMAIL_VERIFICATION] Signup response:', {
+        user: data.user ? 'created' : 'null',
+        session: data.session ? 'active' : 'null',
+        userConfirmed: data.user?.email_confirmed_at ? 'confirmed' : 'pending'
+      });
 
-        if (data.user && !data.user.email_confirmed_at) {
-          console.log('🔐 [EMAIL_VERIFICATION] Email verification required');
-          console.log('🔐 [EMAIL_VERIFICATION] User should check email for verification link');
-          
-          // Log email delivery attempt
-          console.log('🔐 [EMAIL_MONITORING] Verification email delivery initiated for:', email);
-          
-          // Optional: Add a small delay and then check if email was delivered
-          setTimeout(() => {
-            console.log('🔐 [EMAIL_MONITORING] Email delivery status check - verification email should have been sent');
-          }, 2000);
-        } else if (data.user && data.user.email_confirmed_at) {
-          console.log('🔐 [EMAIL_VERIFICATION] User already verified');
-        }
+      if (data.user && !data.user.email_confirmed_at) {
+        logger.info('🔐 [EMAIL_VERIFICATION] Email verification required');
+        logger.debug('🔐 [EMAIL_VERIFICATION] User should check email for verification link');
+        
+        // Log email delivery attempt
+        logger.debug('🔐 [EMAIL_MONITORING] Verification email delivery initiated for:', email);
+        
+        // Optional: Add a small delay and then check if email was delivered
+        setTimeout(() => {
+          logger.debug('🔐 [EMAIL_MONITORING] Email delivery status check - verification email should have been sent');
+        }, 2000);
+      } else if (data.user && data.user.email_confirmed_at) {
+        logger.info('🔐 [EMAIL_VERIFICATION] User already verified');
       }
 
       return { error: null };
     } catch (error: any) {
-      if (import.meta.env.DEV) {
-        console.error('🔐 [EMAIL_VERIFICATION] Signup exception:', error);
-        console.error('🔐 [EMAIL_MONITORING] Email delivery failed during signup:', error);
-      }
+      logger.error('🔐 [EMAIL_VERIFICATION] Signup exception:', error);
+      logger.error('🔐 [EMAIL_MONITORING] Email delivery failed during signup:', error);
       return { error: { message: 'An unexpected error occurred during signup' } };
     }
   };
@@ -170,12 +152,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const resendConfirmation = async (email: string) => {
     const redirectUrl = 'https://tradeiqpro.com/verify-email';
     
-    if (import.meta.env.DEV) {
-      console.log('🔐 [EMAIL_VERIFICATION] Resending confirmation email');
-      console.log('🔐 [EMAIL_VERIFICATION] Email:', email);
-      console.log('🔐 [EMAIL_VERIFICATION] Redirect URL:', redirectUrl);
-      console.log('🔐 [EMAIL_MONITORING] Retry attempt for email delivery');
-    }
+    logger.info('🔐 [EMAIL_VERIFICATION] Resending confirmation email');
+    logger.debug('🔐 [EMAIL_VERIFICATION] Email:', email);
+    logger.debug('🔐 [EMAIL_VERIFICATION] Redirect URL:', redirectUrl);
+    logger.debug('🔐 [EMAIL_MONITORING] Retry attempt for email delivery');
     
     // Retry mechanism with exponential backoff
     const maxRetries = 3;
@@ -192,57 +172,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         
         if (error) {
-          if (import.meta.env.DEV) {
-            console.error('🔐 [EMAIL_VERIFICATION] Resend error (attempt ' + (retryCount + 1) + '):', error);
-            console.error('🔐 [EMAIL_VERIFICATION] Error details:', {
-              message: error.message,
-              status: error.status,
-              name: error.name
-            });
-          }
+          logger.error('🔐 [EMAIL_VERIFICATION] Resend error (attempt ' + (retryCount + 1) + '):', error);
+          logger.error('🔐 [EMAIL_VERIFICATION] Error details:', {
+            message: error.message,
+            status: error.status,
+            name: error.name
+          });
           
           retryCount++;
           
           if (retryCount < maxRetries) {
             const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
-            if (import.meta.env.DEV) {
-              console.log('🔐 [EMAIL_MONITORING] Retrying email delivery in ' + delay + 'ms');
-            }
+            logger.debug('🔐 [EMAIL_MONITORING] Retrying email delivery in ' + delay + 'ms');
             await new Promise(resolve => setTimeout(resolve, delay));
             continue;
           }
           
-          if (import.meta.env.DEV) {
-            console.error('🔐 [EMAIL_MONITORING] Email delivery failed after ' + maxRetries + ' attempts');
-          }
+          logger.error('🔐 [EMAIL_MONITORING] Email delivery failed after ' + maxRetries + ' attempts');
           return { error };
         }
 
-        if (import.meta.env.DEV) {
-          console.log('🔐 [EMAIL_VERIFICATION] Email resent successfully');
-          console.log('🔐 [EMAIL_MONITORING] Email delivery successful on attempt ' + (retryCount + 1));
-        }
+        logger.info('🔐 [EMAIL_VERIFICATION] Email resent successfully');
+        logger.debug('🔐 [EMAIL_MONITORING] Email delivery successful on attempt ' + (retryCount + 1));
         return { error: null };
       } catch (error: any) {
-        if (import.meta.env.DEV) {
-          console.error('🔐 [EMAIL_VERIFICATION] Resend exception (attempt ' + (retryCount + 1) + '):', error);
-          console.error('🔐 [EMAIL_MONITORING] Email delivery exception:', error);
-        }
+        logger.error('🔐 [EMAIL_VERIFICATION] Resend exception (attempt ' + (retryCount + 1) + '):', error);
+        logger.error('🔐 [EMAIL_MONITORING] Email delivery exception:', error);
         
         retryCount++;
         
         if (retryCount < maxRetries) {
           const delay = Math.pow(2, retryCount) * 1000;
-          if (import.meta.env.DEV) {
-            console.log('🔐 [EMAIL_MONITORING] Retrying after exception in ' + delay + 'ms');
-          }
+          logger.debug('🔐 [EMAIL_MONITORING] Retrying after exception in ' + delay + 'ms');
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
         }
         
-        if (import.meta.env.DEV) {
-          console.error('🔐 [EMAIL_MONITORING] Email delivery failed with exceptions after ' + maxRetries + ' attempts');
-        }
+        logger.error('🔐 [EMAIL_MONITORING] Email delivery failed with exceptions after ' + maxRetries + ' attempts');
         return { error: { message: 'Failed to resend verification email after multiple attempts' } };
       }
     }
@@ -253,11 +219,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const resetPassword = async (email: string) => {
     const redirectUrl = 'https://tradeiqpro.com/reset-password';
     
-    if (import.meta.env.DEV) {
-      console.log('🔐 [AUTH_FLOW] Password reset request for:', email);
-      console.log('🔐 [AUTH_FLOW] Reset redirect URL:', redirectUrl);
-      console.log('🔐 [EMAIL_MONITORING] Password reset email delivery initiated');
-    }
+    logger.info('🔐 [AUTH_FLOW] Password reset request for:', email);
+    logger.debug('🔐 [AUTH_FLOW] Reset redirect URL:', redirectUrl);
+    logger.debug('🔐 [EMAIL_MONITORING] Password reset email delivery initiated');
     
     // Retry mechanism for password reset emails
     const maxRetries = 3;
@@ -270,53 +234,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         
         if (error) {
-          if (import.meta.env.DEV) {
-            console.error('🔐 [AUTH_FLOW] Password reset error (attempt ' + (retryCount + 1) + '):', error);
-            console.error('🔐 [EMAIL_MONITORING] Password reset email delivery failed:', error);
-          }
+          logger.error('🔐 [AUTH_FLOW] Password reset error (attempt ' + (retryCount + 1) + '):', error);
+          logger.error('🔐 [EMAIL_MONITORING] Password reset email delivery failed:', error);
           
           retryCount++;
           
           if (retryCount < maxRetries) {
             const delay = Math.pow(2, retryCount) * 1000;
-            if (import.meta.env.DEV) {
-              console.log('🔐 [EMAIL_MONITORING] Retrying password reset email in ' + delay + 'ms');
-            }
+            logger.debug('🔐 [EMAIL_MONITORING] Retrying password reset email in ' + delay + 'ms');
             await new Promise(resolve => setTimeout(resolve, delay));
             continue;
           }
           
-          if (import.meta.env.DEV) {
-            console.error('🔐 [EMAIL_MONITORING] Password reset email delivery failed after ' + maxRetries + ' attempts');
-          }
+          logger.error('🔐 [EMAIL_MONITORING] Password reset email delivery failed after ' + maxRetries + ' attempts');
           return { error };
         }
         
-        if (import.meta.env.DEV) {
-          console.log('🔐 [AUTH_FLOW] Password reset email sent successfully');
-          console.log('🔐 [EMAIL_MONITORING] Password reset email delivery successful on attempt ' + (retryCount + 1));
-        }
+        logger.info('🔐 [AUTH_FLOW] Password reset email sent successfully');
+        logger.debug('🔐 [EMAIL_MONITORING] Password reset email delivery successful on attempt ' + (retryCount + 1));
         return { error: null };
       } catch (error: any) {
-        if (import.meta.env.DEV) {
-          console.error('🔐 [AUTH_FLOW] Password reset exception (attempt ' + (retryCount + 1) + '):', error);
-          console.error('🔐 [EMAIL_MONITORING] Password reset email delivery exception:', error);
-        }
+        logger.error('🔐 [AUTH_FLOW] Password reset exception (attempt ' + (retryCount + 1) + '):', error);
+        logger.error('🔐 [EMAIL_MONITORING] Password reset email delivery exception:', error);
         
         retryCount++;
         
         if (retryCount < maxRetries) {
           const delay = Math.pow(2, retryCount) * 1000;
-          if (import.meta.env.DEV) {
-            console.log('🔐 [EMAIL_MONITORING] Retrying after exception in ' + delay + 'ms');
-          }
+          logger.debug('🔐 [EMAIL_MONITORING] Retrying after exception in ' + delay + 'ms');
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
         }
         
-        if (import.meta.env.DEV) {
-          console.error('🔐 [EMAIL_MONITORING] Password reset email delivery failed with exceptions after ' + maxRetries + ' attempts');
-        }
+        logger.error('🔐 [EMAIL_MONITORING] Password reset email delivery failed with exceptions after ' + maxRetries + ' attempts');
         return { error: { message: 'Failed to send password reset email after multiple attempts' } };
       }
     }
@@ -325,25 +275,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updatePassword = async (password: string) => {
-    if (import.meta.env.DEV) {
-      console.log('🔐 [AUTH_FLOW] Updating password');
-      console.log('🔐 [AUTH_FLOW] Password reset completion initiated');
-    }
+    logger.info('🔐 [AUTH_FLOW] Updating password');
+    logger.debug('🔐 [AUTH_FLOW] Password reset completion initiated');
     
     const { error } = await supabase.auth.updateUser({
       password: password
     });
     
     if (error) {
-      if (import.meta.env.DEV) {
-        console.error('🔐 [AUTH_FLOW] Password update error:', error);
-        console.error('🔐 [EMAIL_MONITORING] Password reset completion failed:', error);
-      }
+      logger.error('🔐 [AUTH_FLOW] Password update error:', error);
+      logger.error('🔐 [EMAIL_MONITORING] Password reset completion failed:', error);
     } else {
-      if (import.meta.env.DEV) {
-        console.log('🔐 [AUTH_FLOW] Password updated successfully');
-        console.log('🔐 [EMAIL_MONITORING] Password reset completion successful');
-      }
+      logger.info('🔐 [AUTH_FLOW] Password updated successfully');
+      logger.debug('🔐 [EMAIL_MONITORING] Password reset completion successful');
     }
     
     return { error };
@@ -352,10 +296,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithOAuth = async (provider: 'google' | 'github') => {
     const redirectUrl = 'https://tradeiqpro.com/app';
     
-    if (import.meta.env.DEV) {
-      console.log('🔐 [AUTH_FLOW] OAuth sign in with provider:', provider);
-      console.log('🔐 [AUTH_FLOW] OAuth redirect URL:', redirectUrl);
-    }
+    logger.info('🔐 [AUTH_FLOW] OAuth sign in with provider:', provider);
+    logger.debug('🔐 [AUTH_FLOW] OAuth redirect URL:', redirectUrl);
     
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -365,22 +307,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     
     if (error) {
-      if (import.meta.env.DEV) {
-        console.error('🔐 [AUTH_FLOW] OAuth sign in error:', error);
-      }
+      logger.error('🔐 [AUTH_FLOW] OAuth sign in error:', error);
     } else {
-      if (import.meta.env.DEV) {
-        console.log('🔐 [AUTH_FLOW] OAuth sign in initiated');
-      }
+      logger.info('🔐 [AUTH_FLOW] OAuth sign in initiated');
     }
     
     return { error };
   };
 
   const signOut = async () => {
-    if (import.meta.env.DEV) {
-      console.log('🔐 [AUTH_FLOW] Signing out');
-    }
+    logger.info('🔐 [AUTH_FLOW] Signing out');
     await supabase.auth.signOut();
   };
 

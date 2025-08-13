@@ -1,8 +1,10 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { createContextGuard } from '@/utils/providerGuards';
+import { logger } from '@/utils/logger';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -34,29 +36,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       const defaultTheme: Theme = 'dark';
       
       if (!user?.id) {
-        if (import.meta.env.DEV) {
-          console.log('🎨 No user found, using default theme:', defaultTheme);
-        }
+        logger.debug('🎨 No user found, using default theme:', defaultTheme);
         // Check localStorage for fallback
         const savedTheme = localStorage.getItem('theme') as Theme;
         if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
-          if (import.meta.env.DEV) {
-            console.log('🎨 Using saved theme from localStorage:', savedTheme);
-          }
+          logger.debug('🎨 Using saved theme from localStorage:', savedTheme);
           setThemeState(savedTheme);
         } else {
-          if (import.meta.env.DEV) {
-            console.log('🎨 Setting default theme:', defaultTheme);
-          }
+          logger.debug('🎨 Setting default theme:', defaultTheme);
           setThemeState(defaultTheme);
         }
         return;
       }
 
       try {
-        if (import.meta.env.DEV) {
-          console.log('🎨 Loading user theme for user:', user.id);
-        }
+        logger.debug('🎨 Loading user theme for user:', user.id);
         
         // Use .maybeSingle() instead of .single() to handle missing records gracefully
         const { data, error } = await supabase
@@ -66,33 +60,25 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           .maybeSingle();
 
         if (error) {
-          if (import.meta.env.DEV) {
-            console.log('🎨 Error loading user theme (non-critical):', error);
-            console.log('🎨 Using fallback theme:', defaultTheme);
-          }
+          logger.debug('🎨 Error loading user theme (non-critical):', error);
+          logger.debug('🎨 Using fallback theme:', defaultTheme);
           setThemeState(defaultTheme);
           localStorage.setItem('theme', defaultTheme);
           return;
         }
 
         if (data?.theme && ['light', 'dark', 'system'].includes(data.theme)) {
-          if (import.meta.env.DEV) {
-            console.log('🎨 Loaded user theme successfully:', data.theme);
-          }
+          logger.debug('🎨 Loaded user theme successfully:', data.theme);
           setThemeState(data.theme as Theme);
           localStorage.setItem('theme', data.theme);
         } else {
-          if (import.meta.env.DEV) {
-            console.log('🎨 No user theme found or invalid, using default:', defaultTheme);
-          }
+          logger.debug('🎨 No user theme found or invalid, using default:', defaultTheme);
           setThemeState(defaultTheme);
           localStorage.setItem('theme', defaultTheme);
         }
       } catch (error) {
-        if (import.meta.env.DEV) {
-          console.log('🎨 Exception loading user theme (non-critical):', error);
-          console.log('🎨 Using fallback theme due to exception:', defaultTheme);
-        }
+        logger.debug('🎨 Exception loading user theme (non-critical):', error);
+        logger.debug('🎨 Using fallback theme due to exception:', defaultTheme);
         setThemeState(defaultTheme);
         localStorage.setItem('theme', defaultTheme);
       }
@@ -126,9 +112,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
       // Save to localStorage for persistence
       localStorage.setItem('theme', theme);
-      if (import.meta.env.DEV) {
-        console.log('🎨 Theme applied:', resolvedTheme, '(from setting:', theme + ')');
-      }
+      logger.debug('🎨 Theme applied:', resolvedTheme, '(from setting:', theme + ')');
     };
 
     applyTheme();
@@ -147,9 +131,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     // Save to localStorage immediately
     localStorage.setItem('theme', newTheme);
-    if (import.meta.env.DEV) {
-      console.log('🎨 Theme changed to:', newTheme);
-    }
+    logger.debug('🎨 Theme changed to:', newTheme);
 
     if (user?.id) {
       try {
@@ -164,22 +146,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           });
 
         if (error) {
-          if (import.meta.env.DEV) {
-            console.log('🎨 Could not save theme to database (non-critical):', error);
-          }
+          logger.debug('🎨 Could not save theme to database (non-critical):', error);
         } else {
-          if (import.meta.env.DEV) {
-            console.log('🎨 Theme saved to database successfully');
-          }
+          logger.debug('🎨 Theme saved to database successfully');
           toast({
             title: "Theme updated",
             description: `Theme changed to ${newTheme}`,
           });
         }
       } catch (dbError) {
-        if (import.meta.env.DEV) {
-          console.log('🎨 Database save failed (non-critical):', dbError);
-        }
+        logger.debug('🎨 Database save failed (non-critical):', dbError);
       }
     }
   };

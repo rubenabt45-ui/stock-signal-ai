@@ -1,10 +1,12 @@
 
+import { logger } from '@/utils/logger';
+
 // Provider Guard utilities to prevent context crashes
 export const createContextGuard = (contextName: string, hookName: string) => {
   return (context: any) => {
     if (context === undefined) {
-      console.error(`🚨 [PROVIDER_GUARD] ${hookName} must be used within a ${contextName}`);
-      console.error(`🚨 [PROVIDER_GUARD] This indicates a provider mounting issue in the app root`);
+      logger.error(`🚨 [PROVIDER_GUARD] ${hookName} must be used within a ${contextName}`);
+      logger.error(`🚨 [PROVIDER_GUARD] This indicates a provider mounting issue in the app root`);
       
       // Return safe no-op values to prevent hard crashes
       if (hookName === 'useAuth') {

@@ -22,6 +22,8 @@ export const validateEnvironment = () => {
     hasSupabaseAnonKey: !!SUPABASE_ANON_KEY,
   };
   
-  console.log('[ENV-AUDIT] Client environment validated:', clientEnv);
+  if (import.meta.env.DEV) {
+    console.log('[ENV-AUDIT] Client environment validated:', clientEnv);
+  }
   return clientEnv;
 };
