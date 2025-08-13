@@ -56,14 +56,12 @@ export default defineConfig(({ mode }) => ({
             '@radix-ui/react-select',
             '@radix-ui/react-accordion',
             '@radix-ui/react-avatar',
-            '@radix-ui/react-card',
             '@radix-ui/react-checkbox',
-            '@radix-ui/react-input',
             '@radix-ui/react-label',
             '@radix-ui/react-progress',
             '@radix-ui/react-separator',
             '@radix-ui/react-switch',
-            '@radix-ui/react-textarea'
+            '@radix-ui/react-slider'
           ],
           
           // Data/state management
