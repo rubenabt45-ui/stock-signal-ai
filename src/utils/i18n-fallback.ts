@@ -1,4 +1,3 @@
-
 // Comprehensive translation fallbacks mapping
 export const TRANSLATION_FALLBACKS: Record<string, string> = {
   // Common/Global
@@ -208,11 +207,4 @@ export function createHumanReadableKey(key: string): string {
 
 export function getFallbackTranslation(key: string): string {
   return TRANSLATION_FALLBACKS[key] || createHumanReadableKey(key);
-}
-
-export function handleMissingTranslation(lng: string, ns: string, key: string, fallbackValue?: string): string {
-  if (import.meta.env.DEV) {
-    console.warn(`[i18n] Missing translation: ${lng}.${ns}.${key}`);
-  }
-  return fallbackValue || getFallbackTranslation(key);
 }

@@ -2,7 +2,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { handleMissingTranslation } from '@/utils/i18n-fallback';
+import { getFallbackTranslation } from '@/utils/i18n-fallback';
 
 import en from './locales/en.json';
 import es from './locales/es.json';
@@ -13,6 +13,18 @@ const resources = {
   },
   es: {
     translation: es
+  }
+};
+
+// Missing key handler that matches i18next's expected signature
+const handleMissingTranslation = (
+  lngs: readonly string[], 
+  ns: string, 
+  key: string, 
+  fallbackValue: string
+): void => {
+  if (import.meta.env.DEV) {
+    console.warn(`[i18n] Missing translation: ${lngs[0]}.${ns}.${key}`);
   }
 };
 
