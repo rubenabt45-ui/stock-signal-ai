@@ -1,6 +1,6 @@
-
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useRealTimePrices } from '@/hooks/useRealTimePrices';
+import { createContextGuard } from '@/utils/providerGuards';
 
 interface PriceData {
   currentPrice: number;
@@ -19,6 +19,13 @@ interface RealTimePriceContextType {
 
 const RealTimePriceContext = createContext<RealTimePriceContextType | undefined>(undefined);
 
+const priceGuard = createContextGuard('RealTimePriceProvider', 'useRealTimePriceContext');
+
+export const useRealTimePriceContext = () => {
+  const context = useContext(RealTimePriceContext);
+  return priceGuard(context);
+};
+
 interface RealTimePriceProviderProps {
   children: ReactNode;
 }
@@ -31,12 +38,4 @@ export const RealTimePriceProvider: React.FC<RealTimePriceProviderProps> = ({ ch
       {children}
     </RealTimePriceContext.Provider>
   );
-};
-
-export const useRealTimePriceContext = () => {
-  const context = useContext(RealTimePriceContext);
-  if (context === undefined) {
-    throw new Error('useRealTimePriceContext must be used within a RealTimePriceProvider');
-  }
-  return context;
 };

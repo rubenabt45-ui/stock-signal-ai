@@ -1,14 +1,6 @@
-
 import React, { Suspense, lazy } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import { RealTimePriceProvider } from "@/components/RealTimePriceProvider";
+import { AppProviders } from "@/providers/AppProviders";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PublicRoute from "@/components/PublicRoute";
 import BottomNavigation from "@/components/BottomNavigation";
@@ -41,15 +33,6 @@ const About = lazy(() => import("./pages/About"));
 const Blog = lazy(() => import("./pages/Blog"));
 const Careers = lazy(() => import("./pages/Careers"));
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-    },
-  },
-});
-
 // Loading fallback component
 const PageLoader = () => (
   <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center">
@@ -75,139 +58,127 @@ const AppFooterWrapper = () => {
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ThemeProvider>
-          <LanguageProvider>
-            <RealTimePriceProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <div className="min-h-screen bg-tradeiq-navy">
-                    <Suspense fallback={<PageLoader />}>
-                      <Routes>
-                        {/* PUBLIC LANDING PAGES */}
-                        <Route path="/" element={<Landing />} />
-                        <Route path="/learn-preview" element={<LearnPreview />} />
-                        <Route path="/pricing" element={<Pricing />} />
-                        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                        <Route path="/terms-of-service" element={<TermsOfService />} />
-                        <Route path="/cookie-policy" element={<CookiePolicy />} />
-                        <Route path="/about" element={<About />} />
-                        <Route path="/blog" element={<Blog />} />
-                        <Route path="/careers" element={<Careers />} />
-                        
-                        {/* AUTHENTICATION ROUTES */}
-                        <Route path="/login" element={
-                          <PublicRoute>
-                            <Login />
-                          </PublicRoute>
-                        } />
-                        <Route path="/signup" element={
-                          <PublicRoute>
-                            <Signup />
-                          </PublicRoute>
-                        } />
-                        <Route path="/forgot-password" element={
-                          <PublicRoute>
-                            <ForgotPassword />
-                         </PublicRoute>
-                       } />
-                       <Route path="/reset-password-request" element={
-                         <PublicRoute>
-                           <ResetPasswordRequest />
-                         </PublicRoute>
-                       } />
-                       <Route path="/reset-password" element={
-                         <PublicRoute>
-                           <ResetPassword />
-                         </PublicRoute>
-                       } />
-                       <Route path="/verify-email" element={
-                         <PublicRoute>
-                           <VerifyEmail />
-                         </PublicRoute>
-                       } />
-                        
-                        {/* PROTECTED APP ROUTES */}
-                        <Route path="/app" element={
-                          <ProtectedRoute>
-                            <Dashboard />
-                          </ProtectedRoute>
-                        } />
-                        <Route path="/app/strategy-ai" element={
-                          <ProtectedRoute>
-                            <TradingChat />
-                          </ProtectedRoute>
-                        } />
-                        <Route path="/app/learn" element={
-                          <ProtectedRoute>
-                            <Learn />
-                          </ProtectedRoute>
-                        } />
-                        <Route path="/app/events" element={
-                          <ProtectedRoute>
-                            <EconomicEvents />
-                          </ProtectedRoute>
-                        } />
-                        <Route path="/app/market-updates" element={
-                          <ProtectedRoute>
-                            <MarketUpdates />
-                          </ProtectedRoute>
-                        } />
-                        <Route path="/app/favorites" element={
-                          <ProtectedRoute>
-                            <Favorites />
-                          </ProtectedRoute>
-                        } />
-                        <Route path="/app/settings" element={
-                          <ProtectedRoute>
-                            <Settings />
-                          </ProtectedRoute>
-                        } />
-                        
-                        {/* PAYMENT ROUTES */}
-                        <Route path="/success" element={
-                          <ProtectedRoute>
-                            <Success />
-                          </ProtectedRoute>
-                        } />
-                        <Route path="/cancel" element={
-                          <ProtectedRoute>
-                            <Cancel />
-                          </ProtectedRoute>
-                        } />
-                        
-                        {/* 404 FALLBACK */}
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                    </Suspense>
-                    
-                    {/* CONDITIONAL FOOTER AND NAVIGATION */}
-                    <Routes>
-                      {/* Footer for public pages */}
-                      <Route path="/" element={<Footer />} />
-                      <Route path="/learn-preview" element={<Footer />} />
-                      <Route path="/pricing" element={<Footer />} />
-                      <Route path="/privacy-policy" element={<Footer />} />
-                      <Route path="/terms-of-service" element={<Footer />} />
-                      <Route path="/cookie-policy" element={<Footer />} />
-                      <Route path="/about" element={<Footer />} />
-                      <Route path="/blog" element={<Footer />} />
-                      <Route path="/careers" element={<Footer />} />
-                      
-                      {/* Footer and bottom nav for app routes with conditional logic */}
-                      <Route path="/app/*" element={<AppFooterWrapper />} />
-                    </Routes>
-                  </div>
-                </BrowserRouter>
-              </TooltipProvider>
-            </RealTimePriceProvider>
-          </LanguageProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <AppProviders>
+      <BrowserRouter>
+        <div className="min-h-screen bg-tradeiq-navy">
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              {/* PUBLIC LANDING PAGES */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/learn-preview" element={<LearnPreview />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
+              <Route path="/cookie-policy" element={<CookiePolicy />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/careers" element={<Careers />} />
+              
+              {/* AUTHENTICATION ROUTES */}
+              <Route path="/login" element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              } />
+              <Route path="/signup" element={
+                <PublicRoute>
+                  <Signup />
+                </PublicRoute>
+              } />
+              <Route path="/forgot-password" element={
+                <PublicRoute>
+                 <ForgotPassword />
+               </PublicRoute>
+             } />
+             <Route path="/reset-password-request" element={
+               <PublicRoute>
+                 <ResetPasswordRequest />
+               </PublicRoute>
+             } />
+             <Route path="/reset-password" element={
+               <PublicRoute>
+                 <ResetPassword />
+               </PublicRoute>
+             } />
+             <Route path="/verify-email" element={
+               <PublicRoute>
+                 <VerifyEmail />
+               </PublicRoute>
+             } />
+              
+              {/* PROTECTED APP ROUTES */}
+              <Route path="/app" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/app/strategy-ai" element={
+                <ProtectedRoute>
+                  <TradingChat />
+                </ProtectedRoute>
+              } />
+              <Route path="/app/learn" element={
+                <ProtectedRoute>
+                  <Learn />
+                </ProtectedRoute>
+              } />
+              <Route path="/app/events" element={
+                <ProtectedRoute>
+                  <EconomicEvents />
+                </ProtectedRoute>
+              } />
+              <Route path="/app/market-updates" element={
+                <ProtectedRoute>
+                  <MarketUpdates />
+                </ProtectedRoute>
+              } />
+              <Route path="/app/favorites" element={
+                <ProtectedRoute>
+                  <Favorites />
+                </ProtectedRoute>
+              } />
+              <Route path="/app/settings" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              
+              {/* PAYMENT ROUTES */}
+              <Route path="/success" element={
+                <ProtectedRoute>
+                  <Success />
+                </ProtectedRoute>
+              } />
+              <Route path="/cancel" element={
+                <ProtectedRoute>
+                  <Cancel />
+                </ProtectedRoute>
+              } />
+              
+              {/* 404 FALLBACK */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+          
+          {/* CONDITIONAL FOOTER AND NAVIGATION */}
+          <Routes>
+            {/* Footer for public pages */}
+            <Route path="/" element={<Footer />} />
+            <Route path="/learn-preview" element={<Footer />} />
+            <Route path="/pricing" element={<Footer />} />
+            <Route path="/privacy-policy" element={<Footer />} />
+            <Route path="/terms-of-service" element={<Footer />} />
+            <Route path="/cookie-policy" element={<Footer />} />
+            <Route path="/about" element={<Footer />} />
+            <Route path="/blog" element={<Footer />} />
+            <Route path="/careers" element={<Footer />} />
+            
+            {/* Footer and bottom nav for app routes with conditional logic */}
+            <Route path="/app/*" element={<AppFooterWrapper />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </AppProviders>
   );
 };
 

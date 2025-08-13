@@ -1,10 +1,10 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import i18n from '@/i18n/config';
+import { createContextGuard } from '@/utils/providerGuards';
 
 interface LanguageContextType {
   currentLanguage: string;
@@ -18,6 +18,13 @@ const AVAILABLE_LANGUAGES = [
 ];
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+const languageGuard = createContextGuard('LanguageProvider', 'useLanguage');
+
+export const useLanguage = (): LanguageContextType => {
+  const context = useContext(LanguageContext);
+  return languageGuard(context);
+};
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -169,12 +176,4 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       {children}
     </LanguageContext.Provider>
   );
-};
-
-export const useLanguage = (): LanguageContextType => {
-  const context = useContext(LanguageContext);
-  if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
-  return context;
 };
