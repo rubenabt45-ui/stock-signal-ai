@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/utils/logger';
 import { STRIPE_SANDBOX } from '@/config/env';
+import { checkProAccess } from '@/utils/premium-gating';
 
 export interface SubscriptionInfo {
   subscribed: boolean;
@@ -13,17 +14,6 @@ export interface SubscriptionInfo {
   loading: boolean;
   error?: string;
 }
-
-// Helper function to check if user has pro access
-const checkProAccess = (profile: any) => {
-  if (!profile) return false;
-  
-  const isPro = profile.subscription_tier === 'pro';
-  const hasActiveStatus = ['active', 'trialing'].includes(profile.subscription_status);
-  const hasValidEnd = !profile.subscription_end || new Date(profile.subscription_end) > new Date();
-  
-  return isPro && hasActiveStatus && hasValidEnd;
-};
 
 export const useSubscription = () => {
   const { user } = useAuth();
@@ -66,9 +56,8 @@ export const useSubscription = () => {
         return;
       }
     
-      const isPro = checkProAccess(profile);
+      const isPro = checkProAccess({ ...profile, loading: false } as SubscriptionInfo);
       
-      // Ensure subscription_tier is properly typed
       const subscriptionTier: 'free' | 'pro' = profile?.subscription_tier === 'pro' ? 'pro' : 'free';
       
       setSubscriptionInfo({
@@ -129,7 +118,6 @@ export const useSubscription = () => {
 
       logger.debug('[STRIPE] Checkout session created successfully');
       
-      // Open Stripe checkout in a new tab
       window.open(data.url, '_blank');
       
       return data;
@@ -168,7 +156,6 @@ export const useSubscription = () => {
 
       logger.debug('[STRIPE] Portal session created successfully');
       
-      // Open Stripe portal in a new tab
       window.open(data.url, '_blank');
       
       return data;

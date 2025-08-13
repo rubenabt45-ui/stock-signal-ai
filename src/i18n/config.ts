@@ -2,6 +2,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { handleMissingTranslation } from '@/utils/i18n-fallback';
 
 import en from './locales/en.json';
 import es from './locales/es.json';
@@ -24,7 +25,7 @@ if (!i18n.isInitialized) {
       resources,
       fallbackLng: 'en',
       supportedLngs: ['en', 'es'],
-      debug: import.meta.env.DEV, // Only enable debug in development
+      debug: false, // Always disable debug in production
       detection: {
         order: ['localStorage', 'navigator'],
         caches: ['localStorage'],
@@ -36,35 +37,21 @@ if (!i18n.isInitialized) {
       react: {
         useSuspense: false,
       },
-      // Ensure initialization completes immediately
       load: 'languageOnly',
       cleanCode: true,
       initImmediate: false,
-      // Add namespace support
       ns: ['translation'],
       defaultNS: 'translation',
-      // Add missing common translations directly to prevent raw keys
-      missingKeyHandler: (lng, ns, key, fallbackValue) => {
-        if (import.meta.env.DEV) {
-          console.warn(`[i18n] Missing translation: ${lng}.${ns}.${key}`);
-        }
-        return fallbackValue || key.split('.').pop() || key;
-      }
+      missingKeyHandler: handleMissingTranslation
     });
 }
 
-// Log configuration for debugging only in development
+// Only log in development
 if (import.meta.env.DEV) {
-  console.log('[i18n] Final config:', {
+  console.log('[i18n] Configuration initialized:', {
     lng: i18n.language,
-    fallbackLng: i18n.options.fallbackLng,
     supportedLngs: i18n.options.supportedLngs,
-    load: i18n.options.load,
-    ns: i18n.options.ns,
-    defaultNS: i18n.options.defaultNS,
-    isInitialized: i18n.isInitialized,
-    resources: Object.keys(resources),
-    hasChangeLanguage: typeof i18n.changeLanguage
+    resources: Object.keys(resources)
   });
 }
 
