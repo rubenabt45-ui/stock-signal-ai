@@ -52,9 +52,12 @@ export const useSubscription = () => {
       
       const isPro = checkProAccess(profile);
       
+      // Ensure subscription_tier is properly typed
+      const subscriptionTier: 'free' | 'pro' = profile?.subscription_tier === 'pro' ? 'pro' : 'free';
+      
       setSubscriptionInfo({
         subscribed: isPro,
-        subscription_tier: profile?.subscription_tier || 'free',
+        subscription_tier: subscriptionTier,
         subscription_status: profile?.subscription_status || 'inactive',
         subscription_end: profile?.subscription_end || null,
         loading: false,
