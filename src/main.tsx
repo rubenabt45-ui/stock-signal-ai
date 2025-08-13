@@ -3,6 +3,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import { measurePerformance, setupPreconnections } from "./utils/performance";
+
+// Set up preconnections and performance monitoring
+setupPreconnections();
+measurePerformance();
 
 // Remove initial loader once React is ready
 const removeInitialLoader = () => {

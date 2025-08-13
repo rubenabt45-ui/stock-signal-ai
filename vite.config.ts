@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { visualizer } from 'rollup-plugin-visualizer';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -13,6 +14,13 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     mode === 'development' && componentTagger(),
+    // Bundle analyzer - generates report in production builds
+    mode === 'production' && visualizer({
+      filename: 'dist/bundle-report.html',
+      open: false,
+      gzipSize: true,
+      brotliSize: true
+    }),
   ].filter(Boolean),
   resolve: {
     alias: {
@@ -26,30 +34,84 @@ export default defineConfig(({ mode }) => ({
     sourcemap: mode === 'development',
     // Modern build target for better tree shaking
     target: 'es2020',
+    // CSS code splitting
+    cssCodeSplit: true,
     // Aggressive chunk splitting for better caching
     rollupOptions: {
       output: {
+        // Manual chunk splitting for optimal caching
         manualChunks: {
-          // React ecosystem
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          // UI libraries - removed @radix-ui/react-sheet as it doesn't exist
-          'ui-vendor': ['@radix-ui/react-slot', '@radix-ui/react-dialog', '@radix-ui/react-tabs'],
+          // React ecosystem - core framework
+          'react-vendor': ['react', 'react-dom'],
+          'react-router': ['react-router-dom'],
+          
+          // UI libraries - separate heavy UI components
+          'radix-vendor': [
+            '@radix-ui/react-slot', 
+            '@radix-ui/react-dialog', 
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-popover',
+            '@radix-ui/react-toast',
+            '@radix-ui/react-select',
+            '@radix-ui/react-accordion',
+            '@radix-ui/react-avatar',
+            '@radix-ui/react-badge',
+            '@radix-ui/react-button',
+            '@radix-ui/react-card',
+            '@radix-ui/react-checkbox',
+            '@radix-ui/react-input',
+            '@radix-ui/react-label',
+            '@radix-ui/react-progress',
+            '@radix-ui/react-separator',
+            '@radix-ui/react-switch',
+            '@radix-ui/react-textarea'
+          ],
+          
           // Data/state management
           'data-vendor': ['@tanstack/react-query', '@supabase/supabase-js'],
-          // i18n
+          
+          // i18n - separate internationalization
           'i18n-vendor': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
-          // Chart/trading components (heavy)
-          'trading-vendor': ['recharts'],
+          
+          // Chart/trading components (heavy) - only loaded when needed
+          'chart-vendor': ['recharts'],
+          
+          // Form handling
+          'form-vendor': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          
+          // Animation and motion
+          'motion-vendor': ['framer-motion'],
+          
+          // Utilities
+          'util-vendor': ['date-fns', 'clsx', 'class-variance-authority', 'tailwind-merge']
         },
+        // Optimize chunk size limits
+        chunkSizeWarningLimit: 1000,
       },
     },
     // Drop console and debugger in production
     esbuild: mode === 'production' ? {
       drop: ['console', 'debugger'],
+      legalComments: 'none'
     } : undefined,
   },
   // Enable compression and modern features
   esbuild: {
     target: 'es2020',
   },
+  // Optimize dependencies
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@supabase/supabase-js',
+      '@tanstack/react-query'
+    ],
+    exclude: [
+      // Exclude heavy libraries that should be loaded on demand
+      'recharts'
+    ]
+  }
 }));

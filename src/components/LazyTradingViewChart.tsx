@@ -1,7 +1,7 @@
 
 import { lazy, Suspense } from 'react';
 
-// Lazy load TradingView components only when needed
+// Lazy load TradingView components only when needed - optimized imports
 const TradingViewAdvancedChart = lazy(() => 
   import('./TradingViewAdvancedChart').then(module => ({
     default: module.TradingViewAdvancedChart
@@ -20,7 +20,13 @@ const TradingViewOverview = lazy(() =>
   }))
 );
 
-// Loading fallback for charts
+const MarketOverview = lazy(() => 
+  import('./MarketOverview').then(module => ({
+    default: module.MarketOverview
+  }))
+);
+
+// Reuse existing loading fallback for consistency
 const ChartLoader = ({ height = "600px", className = "" }) => (
   <div 
     className={`flex items-center justify-center bg-black/5 rounded-xl border border-gray-700/20 ${className}`}
@@ -72,5 +78,18 @@ interface LazyTradingViewOverviewProps {
 export const LazyTradingViewOverview = (props: LazyTradingViewOverviewProps) => (
   <Suspense fallback={<ChartLoader height={props.height} className={props.className} />}>
     <TradingViewOverview {...props} />
+  </Suspense>
+);
+
+interface LazyMarketOverviewProps {
+  symbols?: string[];
+  theme?: "dark" | "light";
+  height?: number;
+  className?: string;
+}
+
+export const LazyMarketOverview = (props: LazyMarketOverviewProps) => (
+  <Suspense fallback={<ChartLoader height={`${props.height || 400}px`} className={props.className} />}>
+    <MarketOverview {...props} />
   </Suspense>
 );

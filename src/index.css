@@ -1,129 +1,78 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-display: swap; /* Improve font loading performance */
+  }
+}
+
+@layer base {
   :root {
-    --background: 255 255 255; /* Pure white background */
-    --foreground: 15 23 42; /* slate-900 */
+    --background: 220 18% 8%;
+    --foreground: 210 40% 98%;
+    --card: 220 18% 10%;
+    --card-foreground: 210 40% 98%;
+    --popover: 220 18% 10%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 220 18% 15%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 18% 15%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 220 18% 15%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 18% 15%;
+    --input: 220 18% 15%;
+    --ring: 217 91% 60%;
+    --radius: 0.75rem;
 
-    --card: 255 255 255; /* Pure white cards */
-    --card-foreground: 15 23 42;
-
-    --popover: 255 255 255;
-    --popover-foreground: 15 23 42;
-
-    --primary: 29 78 216; /* Professional blue #1D4ED8 */
-    --primary-foreground: 255 255 255;
-
-    --secondary: 248 250 252; /* slate-50 */
-    --secondary-foreground: 51 65 85; /* slate-600 */
-
-    --muted: 248 250 252;
-    --muted-foreground: 100 116 139; /* slate-500 */
-
-    --accent: 241 245 249; /* slate-100 */
-    --accent-foreground: 51 65 85;
-
-    --destructive: 239 68 68; /* red-500 */
-    --destructive-foreground: 255 255 255;
-
-    --border: 226 232 240; /* slate-200 */
-    --input: 255 255 255;
-    --ring: 29 78 216;
-
-    --radius: 1rem; /* Larger radius for premium look */
-
-    --sidebar-background: 210 20% 98%;
-    --sidebar-foreground: 222 84% 5%;
-    --sidebar-primary: 213 93% 58%;
-    --sidebar-primary-foreground: 210 20% 98%;
-    --sidebar-accent: 210 10% 92%;
-    --sidebar-accent-foreground: 222 84% 5%;
-    --sidebar-border: 210 20% 89%;
-    --sidebar-ring: 213 93% 58%;
-
-    /* TradeIQ Premium Theme Variables */
-    --tradeiq-navy: 249 250 251; /* Light gray background */
-    --tradeiq-blue: 29 78 216; /* Professional blue */
-    --tradeiq-blue-light: 59 130 246; /* blue-500 */
-    --tradeiq-success: 34 197 94; /* green-500 */
-    --tradeiq-danger: 239 68 68; /* red-500 */
-    --tradeiq-warning: 245 158 11; /* amber-500 */
-    --tradeiq-muted: 100 116 139; /* slate-500 */
-
-    /* Premium Typography Colors */
-    --text-primary: 15 23 42; /* slate-900 */
-    --text-secondary: 51 65 85; /* slate-600 */
-    --text-tertiary: 100 116 139; /* slate-500 */
-    --text-placeholder: 148 163 184; /* slate-400 */
-
-    /* Premium UI Variables */
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-
-    /* Gradient Variables */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(59 130 246) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(34 197 94) 0%, hsl(16 185 129) 100%);
-    --gradient-background: linear-gradient(135deg, hsl(249 250 251) 0%, hsl(255 255 255) 100%);
+    /* TradeIQ Brand Colors */
+    --tradeiq-navy: 220 18% 8%;
+    --tradeiq-blue: 217 91% 60%;
+    --tradeiq-success: 142 76% 36%;
+    --tradeiq-warning: 38 92% 50%;
+    --tradeiq-danger: 0 84% 60%;
   }
 
-  .dark {
-    --background: 210 50% 7%;
-    --foreground: 210 20% 98%;
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 217 91% 60%;
 
-    --card: 210 50% 7%;
-    --card-foreground: 210 20% 98%;
-
-    --popover: 210 50% 7%;
-    --popover-foreground: 210 20% 98%;
-
-    --primary: 213 93% 58%;
-    --primary-foreground: 210 20% 98%;
-
-    --secondary: 210 40% 12%;
-    --secondary-foreground: 210 20% 98%;
-
-    --muted: 210 40% 12%;
-    --muted-foreground: 215 16% 47%;
-
-    --accent: 210 40% 12%;
-    --accent-foreground: 210 20% 98%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 20% 98%;
-
-    --border: 210 40% 12%;
-    --input: 210 40% 12%;
-    --ring: 213 93% 58%;
-    
-    --sidebar-background: 210 50% 7%;
-    --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 213 93% 58%;
-    --sidebar-primary-foreground: 210 20% 98%;
-    --sidebar-accent: 210 40% 12%;
-    --sidebar-accent-foreground: 210 20% 98%;
-    --sidebar-border: 210 40% 12%;
-    --sidebar-ring: 213 93% 58%;
-
-    /* TradeIQ Dark Theme Variables */
-    --tradeiq-navy: 210 50% 7%;
-    --tradeiq-blue: 213 93% 58%;
-    --tradeiq-blue-light: 213 93% 65%;
-    --tradeiq-success: 142 71% 45%;
-    --tradeiq-danger: 0 84% 60%;
+    /* TradeIQ Brand Colors - Light Theme */
+    --tradeiq-navy: 0 0% 100%;
+    --tradeiq-blue: 217 91% 60%;
+    --tradeiq-success: 142 76% 36%;
     --tradeiq-warning: 38 92% 50%;
-    --tradeiq-muted: 215 16% 47%;
-
-    /* Dark Theme Typography Colors */
-    --text-primary: 210 20% 98%;
-    --text-secondary: 215 16% 47%;
-    --text-tertiary: 215 16% 65%;
-    --text-placeholder: 215 16% 47%;
+    --tradeiq-danger: 0 84% 60%;
   }
 }
 
@@ -131,397 +80,50 @@
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-    font-variant-numeric: lining-nums;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
-    font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: -0.025em;
-  }
-
-  .font-display {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
   }
 }
 
-/* Premium TradeIQ Styling */
-.tradeiq-gradient {
-  background: var(--gradient-background);
-}
-
-.tradeiq-card {
-  @apply bg-white border border-slate-200 rounded-2xl shadow-xl backdrop-blur-sm;
-  box-shadow: var(--shadow-lg);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.tradeiq-card:hover {
-  box-shadow: var(--shadow-xl);
-  transform: translateY(-2px);
-}
-
-.dark .tradeiq-card {
-  @apply bg-slate-900/95 border-slate-800 shadow-2xl;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-}
-
-.tradeiq-button-primary {
-  @apply bg-primary text-primary-foreground font-semibold rounded-xl px-6 py-3;
-  background: var(--gradient-primary);
-  box-shadow: var(--shadow-lg);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.tradeiq-button-primary:hover {
-  box-shadow: var(--shadow-xl);
-  transform: translateY(-2px) scale(1.02);
-}
-
-.tradeiq-button-secondary {
-  @apply bg-secondary text-secondary-foreground font-medium border border-slate-200 rounded-xl px-6 py-3;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.tradeiq-button-secondary:hover {
-  @apply bg-slate-100 border-slate-300;
-  transform: translateY(-1px);
-}
-
-.premium-input {
-  @apply bg-white border border-slate-200 rounded-xl px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20;
-  transition: all 0.2s ease-in-out;
-}
-
-.premium-input:focus {
-  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
-}
-
-.chart-grid {
-  stroke: hsl(var(--border));
-}
-
-.buy-signal {
-  @apply text-green-500 font-semibold;
-  color: hsl(var(--tradeiq-success));
-}
-
-.sell-signal {
-  @apply text-red-500 font-semibold;
-  color: hsl(var(--tradeiq-danger));
-}
-
-.hold-signal {
-  @apply text-amber-500 font-semibold;
-  color: hsl(var(--tradeiq-warning));
-}
-
-/* Premium Section Styles */
-.premium-section {
-  @apply bg-white rounded-2xl border border-slate-200 p-8 shadow-lg;
-  transition: all 0.3s ease-in-out;
-}
-
-.premium-section:hover {
-  @apply shadow-xl;
-  transform: translateY(-1px);
-}
-
-.premium-header {
-  @apply border-b border-slate-200 pb-6 mb-6;
-}
-
-.premium-divider {
-  @apply border-slate-200 my-8;
-}
-
-/* Animated Elements */
-.fade-in {
-  animation: fadeInUp 0.6s ease-out forwards;
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.scale-in {
-  animation: scaleIn 0.4s ease-out forwards;
-  opacity: 0;
-  transform: scale(0.95);
-}
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Enhanced Typography */
-.text-gradient {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.premium-title {
-  @apply text-3xl font-bold text-slate-900 tracking-tight;
-  font-family: 'Space Grotesk', sans-serif;
-}
-
-.premium-subtitle {
-  @apply text-lg text-slate-600 font-medium;
-}
-
-.premium-description {
-  @apply text-slate-500 leading-relaxed;
-}
-
-/* Light mode specific overrides */
-.light .tradeiq-card {
-  background: hsl(var(--card) / 0.95);
-  border: 1px solid hsl(var(--border));
-  box-shadow: 0 2px 8px hsl(var(--foreground) / 0.08);
-}
-
-/* Typography utilities for semantic color usage */
-.text-primary {
-  color: hsl(var(--text-primary));
-}
-
-.text-secondary {
-  color: hsl(var(--text-secondary));
-}
-
-.text-tertiary {
-  color: hsl(var(--text-tertiary));
-}
-
-.text-placeholder {
-  color: hsl(var(--text-placeholder));
-}
-
-/* Light theme background override for main content areas */
-.light .bg-tradeiq-navy {
-  background: hsl(var(--background));
-}
-
-/* Enhanced light theme specific styles */
-.light {
-  /* Override card backgrounds for better contrast */
-  --card: 255 255 255;
-  --card-foreground: 222 84% 5%;
-  
-  /* Input styling for light theme */
-  --input: 255 255 255;
-  
-  /* Border colors for light theme */
-  --border: 220 13% 91%;
-}
-
-.light .tradeiq-card {
-  background: white;
-  border: 1px solid hsl(220 13% 91%);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* Ensure proper text colors in light theme */
-.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
-  color: hsl(var(--text-primary));
-}
-
-.light p, .light span {
-  color: hsl(var(--text-secondary));
-}
-
-.light .text-white {
-  color: hsl(var(--text-primary)) !important;
-}
-
-.light .text-gray-400 {
-  color: hsl(var(--text-tertiary)) !important;
-}
-
-.light .text-gray-500 {
-  color: hsl(var(--text-placeholder)) !important;
-}
-
-.light .text-gray-600 {
-  color: hsl(var(--text-secondary)) !important;
-}
-
-/* Mobile Responsiveness Enhancements */
-@media (max-width: 640px) {
-  /* Improve button sizes on mobile */
-  .tradeiq-button-primary {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    min-height: 44px; /* iOS touch target minimum */
+/* Custom utility classes */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
   
-  /* Better spacing for mobile cards */
   .tradeiq-card {
-    margin: 0.5rem;
-    padding: 1rem;
+    @apply bg-gradient-to-br from-gray-900/80 to-gray-800/60 backdrop-blur-sm border border-gray-700/30;
   }
   
-  /* Responsive typography */
-  .premium-title {
-    font-size: 1.875rem; /* 30px */
-    line-height: 1.2;
-  }
-  
-  .premium-description {
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-  
-  /* Mobile navigation improvements */
-  .bottom-nav-item {
-    min-height: 60px;
-    padding: 0.5rem;
-  }
-  
-  /* Better modal/dialog sizing on mobile */
-  .dialog-content {
-    width: 95vw;
-    max-width: 400px;
-    margin: 1rem;
-  }
-  
-  /* PDF viewer mobile optimization */
-  .pdf-viewer {
-    width: 100vw;
-    height: 100vh;
-    padding: 0;
-  }
-  
-  /* Chat input mobile optimization */
-  .chat-input-container {
-    padding: 1rem;
-    border-radius: 0;
-  }
-  
-  /* Ensure touch targets are accessible */
-  button, .btn, [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
-}
-
-/* Clean styles - mobile menu styles moved to dedicated file */
-
-.mobile-nav-item:hover,
-.mobile-nav-item:focus {
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translateX(4px);
-}
-
-/* Prevent iOS scroll bounce */
-body.menu-open {
-  position: fixed !important;
-  width: 100% !important;
-  overflow: hidden !important;
-  top: 0 !important;
-  -webkit-overflow-scrolling: touch;
-}
-  
-  /* Landing page specific mobile optimizations */
-  .landing-nav {
-    padding: 0.75rem 1rem;
-  }
-  
-  .landing-hero {
-    padding: 3rem 1rem;
-  }
-  
-  .landing-section {
-    padding: 3rem 1rem;
-  }
-  
-  /* Prevent horizontal scroll */
-  .container {
-    overflow-x: hidden;
-  }
-  
-  /* Responsive grid adjustments */
-  .grid-responsive {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  /* Mobile card optimizations */
-  .mobile-card {
-    min-height: 120px;
-    padding: 1rem;
-  }
-  
-  /* Form optimizations */
-  input, textarea, select {
-    font-size: 16px; /* Prevents zoom on iOS */
-    min-height: 44px;
+  .tradeiq-glow {
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
   }
 }
 
-/* Tablet Responsiveness */
-@media (min-width: 641px) and (max-width: 1024px) {
-  /* Tablet specific optimizations */
-  .tablet-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+/* Performance optimizations */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
   }
-  
-  .tablet-text {
-    font-size: 1.125rem;
-    line-height: 1.6;
-  }
-  
-  /* Better touch targets for tablets */
-  button, .btn, [role="button"] {
-    min-height: 48px;
-    min-width: 48px;
+  to {
+    transform: rotate(360deg);
   }
 }
 
-/* Large mobile (iPhone 14 Pro Max, etc.) */
-@media (min-width: 375px) and (max-width: 430px) {
-  .large-mobile-hero {
-    font-size: 2.5rem;
-    line-height: 1.1;
-  }
-  
-  .large-mobile-subtitle {
-    font-size: 1.25rem;
-    line-height: 1.5;
-  }
-}
-
-/* Small mobile (iPhone SE) */
-@media (max-width: 374px) {
-  .small-mobile-hero {
-    font-size: 2rem;
-    line-height: 1.1;
-    margin-bottom: 1rem;
-  }
-  
-  .small-mobile-padding {
-    padding: 0.5rem;
-  }
-  
-  .small-mobile-text {
-    font-size: 0.875rem;
-  }
+/* Optimize critical rendering path */
+.initial-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: hsl(var(--tradeiq-navy));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
 }
