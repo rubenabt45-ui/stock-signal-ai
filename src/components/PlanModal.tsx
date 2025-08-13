@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { X, Check, Zap, MessageSquare, TrendingUp, Star, Settings } from 'lucide-react';
+import { X, Check, Zap, MessageSquare, TrendingUp, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSubscription } from '@/hooks/useSubscription';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,11 +20,10 @@ interface PlanModalProps {
 
 const PlanModal: React.FC<PlanModalProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
-  const { createCheckoutSession, loading, stripeConfigured } = useSubscription();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleUpgrade = async () => {
+  const startCheckout = async () => {
     if (!user) {
       toast({
         title: "Authentication required",
@@ -36,147 +35,167 @@ const PlanModal: React.FC<PlanModalProps> = ({ isOpen, onClose }) => {
       return;
     }
 
-    if (!stripeConfigured) {
-      toast({
-        title: "Service unavailable",
-        description: "Payment processing is temporarily unavailable. Please try again later.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!createCheckoutSession) {
-      toast({
-        title: "Error",
-        description: "Checkout functionality is not available. Please try refreshing the page.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       console.log('Starting checkout process for user:', user.id);
       
-      toast({
-        title: "Redirecting to checkout...",
-        description: "Please wait while we prepare your subscription.",
-      });
+      // Get the current session token
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      await createCheckoutSession();
-      onClose();
+      if (sessionError || !session?.access_token) {
+        console.error('Session error:', sessionError);
+        throw new Error('Failed to get authentication session');
+      }
+
+      console.log('Retrieved session token, calling Edge Function');
+      
+      // Call the Edge Function to create checkout session with Authorization header
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Failed to create checkout session');
+      }
+
+      if (!data?.url) {
+        console.error('No checkout URL returned:', data);
+        throw new Error('No checkout URL received');
+      }
+
+      console.log('Checkout session created successfully:', data.sessionId);
+      
+      // Open Stripe checkout in a new tab
+      window.open(data.url, '_blank');
       
     } catch (error) {
       console.error('Checkout error:', error);
       
-      let errorMessage = "There was an error processing your payment. Please try again.";
-      if (error instanceof Error) {
-        if (error.message.includes('not configured')) {
-          errorMessage = "Payment processing is not properly configured. Please contact support.";
-        } else {
-          errorMessage = error.message;
-        }
-      }
-      
       toast({
         title: "Checkout failed",
-        description: errorMessage,
+        description: error instanceof Error ? error.message : "There was an error processing your payment. Please try again.",
         variant: "destructive",
       });
     }
   };
 
-  const proFeatures = [
-    "Unlimited StrategyAI messages",
-    "Complete chat history",
-    "Priority customer support",
-    "Early access to new features",
-    "Advanced trading insights"
-  ];
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md tradeiq-card border-tradeiq-blue/30">
+      <DialogContent className="max-w-4xl bg-tradeiq-navy border-gray-800/50 text-white">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Star className="h-6 w-6 text-tradeiq-blue" />
-              <DialogTitle className="text-xl font-bold text-white">
-                Upgrade to Pro
-              </DialogTitle>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="text-gray-400 hover:text-white"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <DialogTitle className="text-2xl font-bold text-center text-white">
+            Choose Your Plan
+          </DialogTitle>
         </DialogHeader>
         
-        <div className="py-4">
-          <div className="text-center mb-6">
-            <p className="text-gray-300 mb-2">
-              Unlock unlimited access to all TradeIQ features.
-            </p>
-            <p className="text-gray-400 text-sm">
-              Upgrade to Pro for unlimited access and more features.
-            </p>
-          </div>
-
-          <div className="bg-gray-900/50 rounded-lg p-4 mb-6">
-            <div className="text-center mb-4">
-              <div className="text-3xl font-bold text-white">
-                $9.99<span className="text-lg font-normal text-gray-400">/month</span>
-              </div>
-              <div className="text-sm text-gray-400 mt-1">Cancel anytime</div>
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
+          {/* Free Plan */}
+          <div className="tradeiq-card p-6 relative">
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-bold text-white mb-2">Free Plan</h3>
+              <div className="text-3xl font-bold text-gray-400">$0</div>
+              <div className="text-sm text-gray-400">Forever</div>
             </div>
             
-            <ul className="space-y-2">
-              {proFeatures.map((feature, index) => (
-                <li key={index} className="flex items-center text-sm">
-                  <Check className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
-                  <span className="text-gray-300">{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            {!stripeConfigured ? (
-              <>
-                <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-3 mb-3">
-                  <div className="flex items-center space-x-2 text-yellow-300">
-                    <Settings className="h-4 w-4" />
-                    <span className="text-sm">Payment processing temporarily unavailable</span>
-                  </div>
+            <div className="space-y-4 mb-6">
+              <div className="flex items-start space-x-3">
+                <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium">Limited ChartIA Access</div>
+                  <div className="text-gray-400 text-sm">3 analyses per day</div>
                 </div>
-                <Button 
-                  disabled
-                  className="w-full bg-gray-600 text-gray-400 cursor-not-allowed"
-                >
-                  Service Unavailable
-                </Button>
-              </>
-            ) : (
-              <Button 
-                onClick={handleUpgrade}
-                disabled={loading || !user}
-                className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90 text-white"
-              >
-                {loading ? 'Processing...' : user ? 'Upgrade Now' : 'Sign In Required'}
-              </Button>
-            )}
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium">Access to NewsAI</div>
+                  <div className="text-gray-400 text-sm">Basic news analysis</div>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium">Basic TradingChat</div>
+                  <div className="text-gray-400 text-sm">No memory or asset tracking</div>
+                </div>
+              </div>
+            </div>
             
             <Button 
-              onClick={onClose}
-              variant="outline"
-              className="w-full border-gray-600 text-gray-300 hover:bg-gray-800"
+              variant="outline" 
+              className="w-full border-gray-600 text-gray-400 hover:bg-gray-800"
+              disabled
             >
-              Maybe Later
+              Current Plan
             </Button>
           </div>
+
+          {/* Pro Plan */}
+          <div className="tradeiq-card p-6 relative border-2 border-tradeiq-blue">
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+              <div className="bg-tradeiq-blue text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                <Star className="h-3 w-3" />
+                <span>Most Popular</span>
+              </div>
+            </div>
+            
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-bold text-white mb-2">Pro Plan</h3>
+              <div className="text-3xl font-bold text-tradeiq-blue">$9.99</div>
+              <div className="text-sm text-gray-400">per month</div>
+            </div>
+            
+            <div className="space-y-4 mb-6">
+              <div className="flex items-start space-x-3">
+                <Zap className="h-5 w-5 text-tradeiq-blue mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium">Unlimited ChartIA Access</div>
+                  <div className="text-gray-400 text-sm">Unlimited analyses and insights</div>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <TrendingUp className="h-5 w-5 text-tradeiq-blue mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium">Real-time NewsAI</div>
+                  <div className="text-gray-400 text-sm">Save favorites & advanced filtering</div>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <MessageSquare className="h-5 w-5 text-tradeiq-blue mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium">Advanced TradingChat</div>
+                  <div className="text-gray-400 text-sm">Memory & asset tracking</div>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3">
+                <Check className="h-5 w-5 text-tradeiq-blue mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium">Priority Support</div>
+                  <div className="text-gray-400 text-sm">24/7 dedicated assistance</div>
+                </div>
+              </div>
+            </div>
+            
+            <Button 
+              onClick={startCheckout}
+              className="w-full bg-tradeiq-blue hover:bg-blue-600 text-white font-medium"
+              disabled={!user}
+            >
+              {user ? 'Upgrade to Pro' : 'Sign In Required'}
+            </Button>
+          </div>
+        </div>
+        
+        <div className="text-center mt-6 text-gray-400 text-sm">
+          <p>Cancel anytime. No hidden fees. Secure payment with Stripe.</p>
         </div>
       </DialogContent>
     </Dialog>
@@ -184,4 +203,3 @@ const PlanModal: React.FC<PlanModalProps> = ({ isOpen, onClose }) => {
 };
 
 export default PlanModal;
-
