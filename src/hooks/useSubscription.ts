@@ -35,68 +35,68 @@ export const useSubscription = () => {
     loading: true,
   });
 
-  useEffect(() => {
-    const fetchSubscriptionInfo = async () => {
-      if (!user?.id) {
-        setSubscriptionInfo({
-          subscribed: false,
-          subscription_tier: 'free',
-          subscription_status: 'inactive',
-          subscription_end: null,
-          loading: false,
-        });
-        return;
-      }
+  const fetchSubscriptionInfo = async () => {
+    if (!user?.id) {
+      setSubscriptionInfo({
+        subscribed: false,
+        subscription_tier: 'free',
+        subscription_status: 'inactive',
+        subscription_end: null,
+        loading: false,
+      });
+      return;
+    }
 
-      try {
-        logger.debug('[SUBSCRIPTION] Fetching subscription info for user:', user.id);
-        
-        const { data: profile, error } = await supabase
-          .from('user_profiles')
-          .select('subscription_tier, subscription_status, subscription_end')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (error) {
-          logger.error('[SUBSCRIPTION] Error fetching subscription info:', error);
-          setSubscriptionInfo(prev => ({ 
-            ...prev, 
-            loading: false, 
-            error: error.message 
-          }));
-          return;
-        }
+    try {
+      logger.debug('[SUBSCRIPTION] Fetching subscription info for user:', user.id);
       
-        const isPro = checkProAccess(profile);
-        
-        // Ensure subscription_tier is properly typed
-        const subscriptionTier: 'free' | 'pro' = profile?.subscription_tier === 'pro' ? 'pro' : 'free';
-        
-        setSubscriptionInfo({
-          subscribed: isPro,
-          subscription_tier: subscriptionTier,
-          subscription_status: profile?.subscription_status || 'inactive',
-          subscription_end: profile?.subscription_end || null,
-          loading: false,
-        });
+      const { data: profile, error } = await supabase
+        .from('user_profiles')
+        .select('subscription_tier, subscription_status, subscription_end')
+        .eq('id', user.id)
+        .maybeSingle();
 
-        logger.debug('[SUBSCRIPTION] Subscription info updated:', {
-          subscribed: isPro,
-          tier: subscriptionTier,
-          status: profile?.subscription_status,
-          end: profile?.subscription_end
-        });
-        
-      } catch (error: any) {
-        logger.error('[SUBSCRIPTION] Exception fetching subscription info:', error);
+      if (error) {
+        logger.error('[SUBSCRIPTION] Error fetching subscription info:', error);
         setSubscriptionInfo(prev => ({ 
           ...prev, 
           loading: false, 
           error: error.message 
         }));
+        return;
       }
-    };
+    
+      const isPro = checkProAccess(profile);
+      
+      // Ensure subscription_tier is properly typed
+      const subscriptionTier: 'free' | 'pro' = profile?.subscription_tier === 'pro' ? 'pro' : 'free';
+      
+      setSubscriptionInfo({
+        subscribed: isPro,
+        subscription_tier: subscriptionTier,
+        subscription_status: profile?.subscription_status || 'inactive',
+        subscription_end: profile?.subscription_end || null,
+        loading: false,
+      });
 
+      logger.debug('[SUBSCRIPTION] Subscription info updated:', {
+        subscribed: isPro,
+        tier: subscriptionTier,
+        status: profile?.subscription_status,
+        end: profile?.subscription_end
+      });
+      
+    } catch (error: any) {
+      logger.error('[SUBSCRIPTION] Exception fetching subscription info:', error);
+      setSubscriptionInfo(prev => ({ 
+        ...prev, 
+        loading: false, 
+        error: error.message 
+      }));
+    }
+  };
+
+  useEffect(() => {
     fetchSubscriptionInfo();
   }, [user?.id]);
 
@@ -128,6 +128,10 @@ export const useSubscription = () => {
       }
 
       logger.debug('[STRIPE] Checkout session created successfully');
+      
+      // Open Stripe checkout in a new tab
+      window.open(data.url, '_blank');
+      
       return data;
     } catch (error: any) {
       logger.error('[STRIPE] Exception creating checkout session:', error);
@@ -163,6 +167,10 @@ export const useSubscription = () => {
       }
 
       logger.debug('[STRIPE] Portal session created successfully');
+      
+      // Open Stripe portal in a new tab
+      window.open(data.url, '_blank');
+      
       return data;
     } catch (error: any) {
       logger.error('[STRIPE] Exception creating portal session:', error);
@@ -170,10 +178,17 @@ export const useSubscription = () => {
     }
   };
 
+  // Computed values for backward compatibility
+  const isPro = subscriptionInfo.subscription_tier === 'pro' && subscriptionInfo.subscribed;
+
   return {
     ...subscriptionInfo,
+    isPro,
     createCheckoutSession,
     createPortalSession,
+    // Aliases for backward compatibility
+    createCustomerPortalSession: createPortalSession,
+    checkSubscription: fetchSubscriptionInfo,
     checkProAccess: () => checkProAccess(subscriptionInfo),
   };
 };
