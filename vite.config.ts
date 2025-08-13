@@ -56,7 +56,6 @@ export default defineConfig(({ mode }) => ({
             '@radix-ui/react-select',
             '@radix-ui/react-accordion',
             '@radix-ui/react-avatar',
-            '@radix-ui/react-badge',
             '@radix-ui/react-button',
             '@radix-ui/react-card',
             '@radix-ui/react-checkbox',
@@ -86,8 +85,6 @@ export default defineConfig(({ mode }) => ({
           // Utilities
           'util-vendor': ['date-fns', 'clsx', 'class-variance-authority', 'tailwind-merge']
         },
-        // Optimize chunk size limits
-        chunkSizeWarningLimit: 1000,
       },
     },
     // Drop console and debugger in production
@@ -95,6 +92,8 @@ export default defineConfig(({ mode }) => ({
       drop: ['console', 'debugger'],
       legalComments: 'none'
     } : undefined,
+    // Moved chunkSizeWarningLimit to the correct location
+    chunkSizeWarningLimit: 1000,
   },
   // Enable compression and modern features
   esbuild: {
