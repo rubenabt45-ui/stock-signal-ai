@@ -2,10 +2,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { createStripeCheckout, createStripePortal, redirectToStripe, checkProAccess } from '@/utils/stripeUtils';
 
 export interface SubscriptionInfo {
   subscribed: boolean;
   subscription_tier: 'free' | 'pro';
+  subscription_status: string;
   subscription_end: string | null;
   loading: boolean;
   error: string | null;
@@ -16,6 +18,7 @@ export const useSubscription = () => {
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo>({
     subscribed: false,
     subscription_tier: 'free',
+    subscription_status: 'inactive',
     subscription_end: null,
     loading: true,
     error: null
@@ -23,25 +26,42 @@ export const useSubscription = () => {
 
   const checkSubscription = useCallback(async () => {
     if (!user) {
-      setSubscriptionInfo(prev => ({ ...prev, loading: false, subscribed: false, subscription_tier: 'free' }));
+      setSubscriptionInfo(prev => ({ 
+        ...prev, 
+        loading: false, 
+        subscribed: false, 
+        subscription_tier: 'free',
+        subscription_status: 'inactive'
+      }));
       return;
     }
 
     try {
       setSubscriptionInfo(prev => ({ ...prev, loading: true, error: null }));
       
-      const { data, error } = await supabase.functions.invoke('check-subscription');
+      // Get user profile from user_profiles table
+      const { data: profile, error } = await supabase
+        .from('user_profiles')
+        .select('is_pro, subscription_tier, subscription_status, subscription_end')
+        .eq('id', user.id)
+        .single();
       
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        throw error;
+      }
+      
+      const isPro = checkProAccess(profile);
       
       setSubscriptionInfo({
-        subscribed: data.subscribed || false,
-        subscription_tier: data.subscription_tier || 'free',
-        subscription_end: data.subscription_end || null,
+        subscribed: isPro,
+        subscription_tier: profile?.subscription_tier || 'free',
+        subscription_status: profile?.subscription_status || 'inactive',
+        subscription_end: profile?.subscription_end || null,
         loading: false,
         error: null
       });
     } catch (error) {
+      console.error('[SUBSCRIPTION] Check failed:', error);
       setSubscriptionInfo(prev => ({
         ...prev,
         loading: false,
@@ -54,16 +74,12 @@ export const useSubscription = () => {
     if (!user) throw new Error('User not authenticated');
     
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout-session');
-      
-      if (error) throw error;
-      
-      if (data.url) {
-        window.open(data.url, '_blank');
+      const url = await createStripeCheckout();
+      if (url) {
+        redirectToStripe(url);
       }
-      
-      return data;
     } catch (error) {
+      console.error('[SUBSCRIPTION] Checkout failed:', error);
       throw error;
     }
   }, [user]);
@@ -72,16 +88,12 @@ export const useSubscription = () => {
     if (!user) throw new Error('User not authenticated');
     
     try {
-      const { data, error } = await supabase.functions.invoke('customer-portal');
-      
-      if (error) throw error;
-      
-      if (data.url) {
-        window.open(data.url, '_blank');
+      const url = await createStripePortal();
+      if (url) {
+        redirectToStripe(url);
       }
-      
-      return data;
     } catch (error) {
+      console.error('[SUBSCRIPTION] Portal failed:', error);
       throw error;
     }
   }, [user]);
@@ -95,7 +107,11 @@ export const useSubscription = () => {
     checkSubscription,
     createCheckoutSession,
     createCustomerPortalSession,
-    isPro: subscriptionInfo.subscription_tier === 'pro',
-    isFree: subscriptionInfo.subscription_tier === 'free'
+    isPro: checkProAccess({ 
+      is_pro: subscriptionInfo.subscribed,
+      subscription_tier: subscriptionInfo.subscription_tier,
+      subscription_status: subscriptionInfo.subscription_status
+    }),
+    isFree: !subscriptionInfo.subscribed
   };
 };

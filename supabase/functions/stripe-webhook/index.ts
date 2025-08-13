@@ -59,7 +59,7 @@ async function verifyStripeSignature(
       .join('');
 
     const isValid = expectedSig === v1;
-    logStep('Signature verification', { isValid, expectedSig: expectedSig.substring(0, 10) + '...', received: v1.substring(0, 10) + '...' });
+    logStep('Signature verification', { isValid });
     
     return isValid;
   } catch (error) {
@@ -68,74 +68,49 @@ async function verifyStripeSignature(
   }
 }
 
-// Function to create or update user profile
-async function upsertUserProfile(supabase: any, userId: string, isPro: boolean, eventType: string) {
-  logStep('Starting user profile upsert', { userId, isPro, eventType });
+// Function to update user profile with subscription data
+async function updateUserProfile(supabase: any, userId: string, subscriptionData: any) {
+  logStep('Starting user profile update', { userId, subscriptionData });
 
   try {
-    // First, check if user exists in auth.users
-    const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(userId);
-    
-    if (authError) {
-      logStep('ERROR: Failed to fetch auth user', { error: authError.message, userId });
-      throw new Error(`Auth user not found: ${authError.message}`);
-    }
-
-    if (!authUser.user) {
-      logStep('ERROR: Auth user not found', { userId });
-      throw new Error('Auth user not found');
-    }
-
-    logStep('Auth user found', { userId, email: authUser.user.email });
-
-    // Upsert user profile with comprehensive data
-    const profileData = {
-      id: userId,
-      is_pro: isPro,
-      full_name: authUser.user.user_metadata?.full_name || authUser.user.email?.split('@')[0] || '',
-      username: authUser.user.user_metadata?.username || null,
-      avatar_url: authUser.user.user_metadata?.avatar_url || null,
-      updated_at: new Date().toISOString(),
-      created_at: new Date().toISOString()
-    };
-
-    logStep('Attempting upsert with data', profileData);
-
+    // Update user_profiles table using service role key (bypasses RLS)
     const { data, error } = await supabase
       .from('user_profiles')
-      .upsert(profileData, { 
+      .upsert({
+        id: userId,
+        is_pro: subscriptionData.is_pro,
+        subscription_tier: subscriptionData.subscription_tier,
+        subscription_status: subscriptionData.subscription_status,
+        subscription_end: subscriptionData.subscription_end,
+        stripe_customer_id: subscriptionData.stripe_customer_id,
+        updated_at: new Date().toISOString(),
+      }, { 
         onConflict: 'id',
         ignoreDuplicates: false 
       })
       .select();
 
     if (error) {
-      logStep('ERROR: Failed to upsert user profile', { 
+      logStep('ERROR: Failed to update user profile', { 
         error: error.message, 
         details: error.details,
-        hint: error.hint,
-        code: error.code,
-        userId, 
-        isPro, 
-        eventType 
+        userId 
       });
-      throw new Error(`Database upsert failed: ${error.message}`);
+      throw new Error(`Database update failed: ${error.message}`);
     }
 
-    logStep('Successfully upserted user profile', { 
+    logStep('Successfully updated user profile', { 
       userId, 
-      isPro,
-      eventType,
-      upsertedProfile: data?.[0] || 'No data returned'
+      subscriptionData,
+      updatedProfile: data?.[0] || 'No data returned'
     });
 
     return data?.[0];
   } catch (error) {
-    logStep('ERROR: User profile upsert failed', { 
+    logStep('ERROR: User profile update failed', { 
       error: error.message, 
       userId, 
-      isPro, 
-      eventType 
+      subscriptionData 
     });
     throw error;
   }
@@ -159,11 +134,22 @@ serve(async (req) => {
   try {
     logStep('Webhook function started');
 
-    // Get webhook secret from environment
+    // Validate environment variables
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
     if (!webhookSecret) {
       logStep('ERROR: STRIPE_WEBHOOK_SECRET not configured');
       return new Response('Webhook secret not configured', { 
+        status: 500, 
+        headers: corsHeaders 
+      });
+    }
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      logStep('ERROR: Supabase configuration missing');
+      return new Response('Supabase configuration missing', { 
         status: 500, 
         headers: corsHeaders 
       });
@@ -198,16 +184,12 @@ serve(async (req) => {
     logStep('Parsed Stripe event', { type: event.type, id: event.id });
 
     // Initialize Supabase client with service role for admin access
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
       }
-    );
+    });
 
     // Handle checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
@@ -232,25 +214,14 @@ serve(async (req) => {
         });
       }
 
-      await upsertUserProfile(supabase, userId, true, 'checkout.session.completed');
-
-      // Send welcome email
-      try {
-        const { data: authUser } = await supabase.auth.admin.getUserById(userId);
-        if (authUser.user?.email) {
-          await supabase.functions.invoke('send-subscription-email', {
-            body: {
-              to: authUser.user.email,
-              type: 'payment_success',
-              data: {
-                amount: session.amount_total || 999
-              }
-            }
-          });
-        }
-      } catch (emailError) {
-        logStep('WARNING: Failed to send welcome email', { error: emailError.message });
-      }
+      // Update user profile to Pro
+      await updateUserProfile(supabase, userId, {
+        is_pro: true,
+        subscription_tier: 'pro',
+        subscription_status: 'active',
+        subscription_end: session.subscription ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null, // 30 days from now
+        stripe_customer_id: session.customer
+      });
 
       return new Response('Checkout session processed successfully', { 
         status: 200, 
@@ -258,20 +229,36 @@ serve(async (req) => {
       });
     }
 
-    // Handle invoice.paid event (recurring payments)
-    if (event.type === 'invoice.paid') {
-      const invoice = event.data.object;
-      logStep('Processing invoice paid', { 
-        invoiceId: invoice.id,
-        subscriptionId: invoice.subscription,
-        customerId: invoice.customer 
+    // Handle customer.subscription.updated event
+    if (event.type === 'customer.subscription.updated') {
+      const subscription = event.data.object;
+      logStep('Processing subscription updated', { 
+        subscriptionId: subscription.id,
+        status: subscription.status,
+        customerId: subscription.customer 
       });
 
-      // For invoice.paid, we need to get the subscription to access metadata
-      // Since we can't access Stripe API directly, we'll just log this for now
-      logStep('Invoice paid event processed (no user update without subscription metadata)');
+      const userId = subscription.metadata?.user_id;
+      if (!userId) {
+        logStep('ERROR: No user_id found in subscription metadata');
+        return new Response('No user ID in metadata', { 
+          status: 400, 
+          headers: corsHeaders 
+        });
+      }
 
-      return new Response('Invoice paid processed successfully', { 
+      const subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+      const isActive = ['active', 'trialing'].includes(subscription.status);
+
+      await updateUserProfile(supabase, userId, {
+        is_pro: isActive,
+        subscription_tier: isActive ? 'pro' : 'free',
+        subscription_status: subscription.status,
+        subscription_end: subscriptionEnd,
+        stripe_customer_id: subscription.customer
+      });
+
+      return new Response('Subscription update processed successfully', { 
         status: 200, 
         headers: corsHeaders 
       });
@@ -282,42 +269,25 @@ serve(async (req) => {
       const subscription = event.data.object;
       logStep('Processing subscription deleted', { 
         subscriptionId: subscription.id,
-        metadata: subscription.metadata,
         customerId: subscription.customer 
       });
 
-      // Extract user ID from metadata
       const userId = subscription.metadata?.user_id;
       if (!userId) {
-        logStep('ERROR: No user_id found in subscription metadata', { 
-          metadata: subscription.metadata,
-          subscriptionId: subscription.id 
-        });
+        logStep('ERROR: No user_id found in subscription metadata');
         return new Response('No user ID in metadata', { 
           status: 400, 
           headers: corsHeaders 
         });
       }
 
-      await upsertUserProfile(supabase, userId, false, 'customer.subscription.deleted');
-
-      // Send cancellation email
-      try {
-        const { data: authUser } = await supabase.auth.admin.getUserById(userId);
-        if (authUser.user?.email) {
-          await supabase.functions.invoke('send-subscription-email', {
-            body: {
-              to: authUser.user.email,
-              type: 'subscription_canceled',
-              data: {
-                subscription_end: new Date(subscription.current_period_end * 1000).toLocaleDateString()
-              }
-            }
-          });
-        }
-      } catch (emailError) {
-        logStep('WARNING: Failed to send cancellation email', { error: emailError.message });
-      }
+      await updateUserProfile(supabase, userId, {
+        is_pro: false,
+        subscription_tier: 'free',
+        subscription_status: 'canceled',
+        subscription_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        stripe_customer_id: subscription.customer
+      });
 
       return new Response('Subscription deletion processed successfully', { 
         status: 200, 
@@ -334,7 +304,7 @@ serve(async (req) => {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep('ERROR: Webhook processing failed', { error: errorMessage, stack: error instanceof Error ? error.stack : undefined });
+    logStep('ERROR: Webhook processing failed', { error: errorMessage });
     
     return new Response('Internal server error', { 
       status: 500, 
