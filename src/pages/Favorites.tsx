@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -164,16 +165,16 @@ const Favorites = () => {
             </div>
           )}
         </div>
-      </div>
 
-      {/* Add Symbol Modal */}
-      <AddSymbolModal
-        isOpen={isAddModalOpen}
-        onClose={handleCloseAddModal}
-        onAddSymbol={handleAddSymbol}
-        existingSymbols={favorites?.map(f => f.symbol) || []}
-      />
-    </div>
+        {/* Add Symbol Modal */}
+        <AddSymbolModal
+          isOpen={isAddModalOpen}
+          onClose={handleCloseAddModal}
+          onAddSymbol={handleAddSymbol}
+          existingSymbols={favorites?.map(f => f.symbol) || []}
+        />
+      </div>
+    </PageWrapper>
   );
 };
 
