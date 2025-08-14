@@ -2,6 +2,7 @@
 import React from 'react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { FeatureLockedScreen } from '@/components/FeatureLockedScreen';
+import { TradingChatDemo } from '@/pages/TradingChatDemo';
 
 interface ProtectedFeatureProps {
   feature: 'strategy-ai' | 'market-updates' | 'learn' | 'all-features';
@@ -35,7 +36,12 @@ export const ProtectedFeature: React.FC<ProtectedFeatureProps> = ({
   const hasAccess = subscription_tier === 'pro';
 
   if (!hasAccess) {
-    // Use custom fallback or default locked screen
+    // Special handling for StrategyAI - show demo instead of locked screen
+    if (feature === 'strategy-ai') {
+      return <TradingChatDemo />;
+    }
+
+    // Use custom fallback or default locked screen for other features
     if (fallback) {
       return <>{fallback}</>;
     }

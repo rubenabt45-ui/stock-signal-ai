@@ -6,7 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from '@/hooks/use-toast';
-import { useTranslation } from 'react-i18next';
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
+import { useNavigate } from 'react-router-dom';
 
 interface FeatureLockedScreenProps {
   feature: string;
@@ -23,7 +24,8 @@ export const FeatureLockedScreen: React.FC<FeatureLockedScreenProps> = ({
 }) => {
   const { createCheckoutSession, subscription_tier, subscribed, subscription_end } = useSubscription();
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t } = useTranslationWithFallback();
+  const navigate = useNavigate();
 
   const handleUpgrade = async () => {
     try {
@@ -40,6 +42,10 @@ export const FeatureLockedScreen: React.FC<FeatureLockedScreenProps> = ({
         variant: "destructive",
       });
     }
+  };
+
+  const handleViewPricing = () => {
+    navigate('/pricing');
   };
 
   // Determine user role based on subscription status
@@ -73,21 +79,24 @@ export const FeatureLockedScreen: React.FC<FeatureLockedScreenProps> = ({
           title: t('features.locked.subscriptionExpired.title'),
           message: t('features.locked.subscriptionExpired.message'),
           action: t('features.locked.subscriptionExpired.action'),
-          variant: "destructive" as const
+          variant: "destructive" as const,
+          showPricing: false
         };
       case 'free':
         return {
           title: t('features.locked.proFeature.title'),
           message: t('features.locked.proFeature.message'),
           action: t('features.locked.proFeature.action'),
-          variant: "default" as const
+          variant: "default" as const,
+          showPricing: true
         };
       default:
         return {
           title: t('features.locked.accessRestricted.title'),
           message: t('features.locked.accessRestricted.message'),
           action: t('features.locked.accessRestricted.action'),
-          variant: "default" as const
+          variant: "default" as const,
+          showPricing: true
         };
     }
   };
@@ -165,14 +174,35 @@ export const FeatureLockedScreen: React.FC<FeatureLockedScreenProps> = ({
 
           {/* Action Buttons */}
           <div className="space-y-3">
-            <Button 
-              onClick={handleUpgrade}
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white"
-            >
-              <Crown className="h-4 w-4 mr-2" />
-              {statusInfo.action}
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
+            {statusInfo.showPricing ? (
+              <>
+                <Button 
+                  onClick={handleUpgrade}
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                >
+                  <Crown className="h-4 w-4 mr-2" />
+                  Unlock {title} Pro
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
+                  onClick={handleViewPricing}
+                >
+                  See Plans & Benefits
+                </Button>
+              </>
+            ) : (
+              <Button 
+                onClick={handleUpgrade}
+                className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+              >
+                <Crown className="h-4 w-4 mr-2" />
+                {statusInfo.action}
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            )}
             
             <Button 
               variant="outline"

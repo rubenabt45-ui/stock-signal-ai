@@ -1,9 +1,8 @@
-
 {
   "landing": {
     "nav": {
       "home": "Inicio",
-      "about": "Acerca de",
+      "about": "Acerca de", 
       "features": "Características",
       "benefits": "Beneficios",
       "learning": "Aprender",
@@ -300,7 +299,9 @@
     "comingSoon": "Próximamente",
     "home": "Inicio",
     "pricing": "Precios",
-    "selectLanguage": "Seleccionar Idioma"
+    "selectLanguage": "Seleccionar Idioma",
+    "cancelAnytime": "Cancelar en cualquier momento",
+    "goBack": "Volver al panel"
   },
   "navigation": {
     "home": "Inicio",
@@ -403,8 +404,48 @@
       "managedBy": "Gestionado a través de Stripe"
     }
   },
+  "features": {
+    "locked": {
+      "redirecting": "Redirigiendo al checkout...",
+      "redirectingDescription": "Por favor espera mientras preparamos tu suscripción.",
+      "checkoutError": "Error al iniciar el proceso de checkout. Por favor intenta de nuevo.",
+      "proFeature": {
+        "title": "Característica Pro – Solo para Suscriptores",
+        "message": "Necesitas un plan Pro para usar esta característica.",
+        "action": "Actualizar a Pro"
+      },
+      "subscriptionExpired": {
+        "title": "Suscripción Expirada",
+        "message": "Tu suscripción Pro ha expirado. Renueva para continuar accediendo a las características premium.",
+        "action": "Renovar Suscripción"
+      },
+      "accessRestricted": {
+        "title": "Acceso Restringido",
+        "message": "Esta característica requiere una suscripción Pro activa.",
+        "action": "Ver Planes"
+      },
+      "benefits": {
+        "title": "Con Pro obtienes:",
+        "unlimited": "Análisis de estrategia de IA ilimitado",
+        "realtime": "Acceso a datos en tiempo real",
+        "learning": "Sugerencias de aprendizaje personalizadas",
+        "support": "Soporte prioritario",
+        "insights": "Insights de trading avanzados"
+      },
+      "pricing": {
+        "monthly": "$19",
+        "period": "/mes"
+      },
+      "expired": "Expiró hace {{days}} día{{plural}}"
+    }
+  },
   "tradingChat": {
-    "welcome": "¡Bienvenido a StrategyAI! Sube un gráfico o pregúntame sobre estrategias de trading, análisis de mercado o cualquier pregunta relacionada con trading."
+    "welcome": "¡Bienvenido a StrategyAI! Sube un gráfico o pregúntame sobre estrategias de trading, análisis de mercado o cualquier pregunta relacionada con trading.",
+    "freeMode": {
+      "dailyLimitReached": "Has usado tu análisis diario gratuito. Actualiza para desbloquear acceso ilimitado.",
+      "analysesRemaining": "{{count}} análisis gratuito restante hoy",
+      "demoMode": "Modo Demo: Este es un análisis de muestra para mostrar las capacidades de StrategyAI"
+    }
   },
   "placeholders": {
     "enterEmail": "Ingresa tu email",

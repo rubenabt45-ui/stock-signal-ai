@@ -1,3 +1,4 @@
+
 // Comprehensive translation fallbacks mapping
 export const TRANSLATION_FALLBACKS: Record<string, string> = {
   // Common/Global
@@ -13,6 +14,8 @@ export const TRANSLATION_FALLBACKS: Record<string, string> = {
   'common.home': 'Home',
   'common.pricing': 'Pricing',
   'common.selectLanguage': 'Select Language',
+  'common.cancelAnytime': 'Cancel anytime',
+  'common.goBack': 'Back to dashboard',
   
   // Navigation
   'navigation.home': 'Home',
@@ -163,8 +166,34 @@ export const TRANSLATION_FALLBACKS: Record<string, string> = {
   'settings.pro.benefits': 'Benefits',
   'settings.pro.managedBy': 'Managed through Stripe',
   
+  // Features Locked
+  'features.locked.redirecting': 'Redirecting to checkout...',
+  'features.locked.redirectingDescription': 'Please wait while we prepare your subscription.',
+  'features.locked.checkoutError': 'Failed to start checkout process. Please try again.',
+  'features.locked.proFeature.title': 'Pro Feature – Only for Subscribers',
+  'features.locked.proFeature.message': 'You need a Pro plan to use this feature.',
+  'features.locked.proFeature.action': 'Upgrade to Pro',
+  'features.locked.subscriptionExpired.title': 'Subscription Expired',
+  'features.locked.subscriptionExpired.message': 'Your Pro subscription has expired. Renew to continue accessing premium features.',
+  'features.locked.subscriptionExpired.action': 'Renew Subscription',
+  'features.locked.accessRestricted.title': 'Access Restricted',
+  'features.locked.accessRestricted.message': 'This feature requires an active Pro subscription.',
+  'features.locked.accessRestricted.action': 'View Plans',
+  'features.locked.benefits.title': 'With Pro you get:',
+  'features.locked.benefits.unlimited': 'Unlimited AI strategy analysis',
+  'features.locked.benefits.realtime': 'Real-time data access',
+  'features.locked.benefits.learning': 'Personalized learning suggestions',
+  'features.locked.benefits.support': 'Priority support',
+  'features.locked.benefits.insights': 'Advanced trading insights',
+  'features.locked.pricing.monthly': '$19',
+  'features.locked.pricing.period': '/month',
+  'features.locked.expired': 'Expired {{days}} day{{plural}} ago',
+  
   // Trading Chat
   'tradingChat.welcome': 'Welcome to StrategyAI! Upload a chart or ask me about trading strategies, market analysis, or any trading-related questions.',
+  'tradingChat.freeMode.dailyLimitReached': 'You\'ve used your free daily analysis. Upgrade to unlock unlimited access.',
+  'tradingChat.freeMode.analysesRemaining': '{{count}} free analysis remaining today',
+  'tradingChat.freeMode.demoMode': 'Demo Mode: This is a sample analysis to show StrategyAI\'s capabilities',
   
   // Placeholders
   'placeholders.enterEmail': 'Enter your email',

@@ -1,4 +1,3 @@
-
 {
   "landing": {
     "nav": {
@@ -300,7 +299,9 @@
     "comingSoon": "Coming Soon",
     "home": "Home",
     "pricing": "Pricing",
-    "selectLanguage": "Select Language"
+    "selectLanguage": "Select Language",
+    "cancelAnytime": "Cancel anytime",
+    "goBack": "Back to dashboard"
   },
   "navigation": {
     "home": "Home",
@@ -403,8 +404,48 @@
       "managedBy": "Managed through Stripe"
     }
   },
+  "features": {
+    "locked": {
+      "redirecting": "Redirecting to checkout...",
+      "redirectingDescription": "Please wait while we prepare your subscription.",
+      "checkoutError": "Failed to start checkout process. Please try again.",
+      "proFeature": {
+        "title": "Pro Feature – Only for Subscribers",
+        "message": "You need a Pro plan to use this feature.",
+        "action": "Upgrade to Pro"
+      },
+      "subscriptionExpired": {
+        "title": "Subscription Expired",
+        "message": "Your Pro subscription has expired. Renew to continue accessing premium features.",
+        "action": "Renew Subscription"
+      },
+      "accessRestricted": {
+        "title": "Access Restricted",
+        "message": "This feature requires an active Pro subscription.",
+        "action": "View Plans"
+      },
+      "benefits": {
+        "title": "With Pro you get:",
+        "unlimited": "Unlimited AI strategy analysis",
+        "realtime": "Real-time data access",
+        "learning": "Personalized learning suggestions",
+        "support": "Priority support",
+        "insights": "Advanced trading insights"
+      },
+      "pricing": {
+        "monthly": "$19",
+        "period": "/month"
+      },
+      "expired": "Expired {{days}} day{{plural}} ago"
+    }
+  },
   "tradingChat": {
-    "welcome": "Welcome to StrategyAI! Upload a chart or ask me about trading strategies, market analysis, or any trading-related questions."
+    "welcome": "Welcome to StrategyAI! Upload a chart or ask me about trading strategies, market analysis, or any trading-related questions.",
+    "freeMode": {
+      "dailyLimitReached": "You've used your free daily analysis. Upgrade to unlock unlimited access.",
+      "analysesRemaining": "{{count}} free analysis remaining today",
+      "demoMode": "Demo Mode: This is a sample analysis to show StrategyAI's capabilities"
+    }
   },
   "placeholders": {
     "enterEmail": "Enter your email",
