@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Search, TrendingUp, DollarSign, Activity, BarChart3, Zap, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -93,7 +94,7 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({ onAssetSelect, s
           <Card
             key={symbol}
             className={`cursor-pointer transition-all hover:scale-105 ${
-              selectedSymbol === symbol 
+              selectedAsset === symbol 
                 ? 'ring-2 ring-tradeiq-blue bg-tradeiq-blue/10' 
                 : 'tradeiq-card hover:bg-gray-800/80'
             }`}
