@@ -57,13 +57,13 @@ const TradingChat = () => {
     messageCount 
   } = useConversationMemory();
 
-  // Initialize daily message limits
+  // Initialize daily analysis limits
   const {
-    messageCount: dailyMessageCount,
-    maxMessages,
-    canSendMessage,
-    remainingMessages,
-    incrementMessageCount,
+    analysisCount,
+    maxAnalysisPerDay,
+    canUseAnalysis,
+    remainingAnalysis,
+    recordAnalysisUsage,
     isPro
   } = useDailyMessages();
 
@@ -87,8 +87,8 @@ const TradingChat = () => {
   const handleSendMessage = async () => {
     if (!inputMessage.trim() && uploadedImages.length === 0) return;
 
-    // Check daily message limit for free users
-    if (!canSendMessage) {
+    // Check daily analysis limit for free users
+    if (!canUseAnalysis) {
       setShowUpgradeModal(true);
       return;
     }
@@ -120,9 +120,9 @@ const TradingChat = () => {
     setUploadedImages([]);
     setIsLoading(true);
 
-    // Increment message count for free users
+    // Record analysis usage for free users
     if (!isPro) {
-      await incrementMessageCount();
+      await recordAnalysisUsage();
     }
 
     try {
@@ -281,7 +281,7 @@ const TradingChat = () => {
           )}
           {!isPro && (
             <Badge variant="outline" className="text-xs border-yellow-500 text-yellow-400">
-              {remainingMessages}/{maxMessages} messages left
+              {remainingAnalysis}/{maxAnalysisPerDay} analyses left today
             </Badge>
           )}
           {isPro && (
@@ -316,6 +316,13 @@ const TradingChat = () => {
       {showMemoryNotification && (
         <div className="bg-green-600 text-white px-4 py-2 text-center text-sm animate-pulse">
           🧠 Memory activated: I'll remember everything we discuss here!
+        </div>
+      )}
+
+      {/* Daily Limit Notification for Free Users */}
+      {!isPro && remainingAnalysis <= 1 && remainingAnalysis > 0 && (
+        <div className="bg-orange-600 text-white px-4 py-2 text-center text-sm">
+          ⚠️ {remainingAnalysis} analysis remaining today. Upgrade to Pro for unlimited access!
         </div>
       )}
 
@@ -435,7 +442,11 @@ const TradingChat = () => {
           <div className="flex-1">
             <Input
               type="text"
-              placeholder={t('tradingChat.placeholder')}
+              placeholder={
+                !canUseAnalysis 
+                  ? `Daily limit reached (${analysisCount}/${maxAnalysisPerDay}). Upgrade for unlimited access.`
+                  : t('tradingChat.placeholder')
+              }
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => {
@@ -445,7 +456,7 @@ const TradingChat = () => {
                 }
               }}
               className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
-              disabled={isLoading}
+              disabled={isLoading || !canUseAnalysis}
             />
           </div>
 
@@ -462,7 +473,7 @@ const TradingChat = () => {
             variant="outline"
             size="icon"
             onClick={() => fileInputRef.current?.click()}
-            disabled={uploadedImages.length >= 3 || isLoading}
+            disabled={uploadedImages.length >= 3 || isLoading || !canUseAnalysis}
             className="border-gray-600 hover:bg-gray-700 text-gray-300 flex-shrink-0"
           >
             <Paperclip className="h-4 w-4" />
@@ -472,7 +483,7 @@ const TradingChat = () => {
           <Button
             variant="outline"
             size="icon"
-            disabled={isLoading}
+            disabled={isLoading || !canUseAnalysis}
             className="border-gray-600 hover:bg-gray-700 text-gray-300 flex-shrink-0"
           >
             <Mic className="h-4 w-4" />
@@ -481,7 +492,7 @@ const TradingChat = () => {
           {/* Send Button */}
           <Button
             onClick={handleSendMessage}
-            disabled={isLoading || (!inputMessage.trim() && uploadedImages.length === 0)}
+            disabled={isLoading || (!inputMessage.trim() && uploadedImages.length === 0) || !canUseAnalysis}
             className="bg-blue-600 hover:bg-blue-700 text-white flex-shrink-0"
           >
             {isLoading ? (
@@ -506,7 +517,7 @@ const TradingChat = () => {
         <UpgradeModal
           open={showUpgradeModal}
           onClose={() => setShowUpgradeModal(false)}
-          feature="daily messages"
+          feature="unlimited daily analyses"
         />
       </div>
       </ProtectedFeature>

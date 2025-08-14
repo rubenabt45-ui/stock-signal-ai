@@ -13,7 +13,13 @@ export const TradingChatDemo: React.FC = () => {
   const { t } = useTranslationWithFallback();
   const navigate = useNavigate();
   const { isPro } = useSubscription();
-  const { canUseFreeAnalysis, hasUsedFreeAnalysis, getTimeUntilNextFreeAnalysis, recordFreeAnalysisUsage } = useDailyMessages();
+  const { 
+    canUseAnalysis, 
+    analysisCount, 
+    maxAnalysisPerDay, 
+    remainingAnalysis, 
+    recordAnalysisUsage 
+  } = useDailyMessages();
   const [showDemo, setShowDemo] = useState(false);
 
   // Sample demo analysis
@@ -30,14 +36,14 @@ export const TradingChatDemo: React.FC = () => {
   };
 
   const handleViewDemo = async () => {
-    if (!canUseFreeAnalysis && !isPro) {
+    if (!canUseAnalysis && !isPro) {
       // Show upgrade message if daily limit reached
       return;
     }
     
     if (!isPro) {
       // Record usage for free users
-      await recordFreeAnalysisUsage();
+      await recordAnalysisUsage();
     }
     
     setShowDemo(true);
@@ -46,8 +52,6 @@ export const TradingChatDemo: React.FC = () => {
   const handleUpgrade = () => {
     navigate('/pricing');
   };
-
-  const hoursUntilNext = getTimeUntilNextFreeAnalysis();
 
   if (showDemo) {
     return (
@@ -114,15 +118,16 @@ export const TradingChatDemo: React.FC = () => {
                 <Lock className="h-12 w-12 text-orange-400 mx-auto" />
                 <h3 className="text-xl font-bold text-white">Want Real-Time Analysis?</h3>
                 <p className="text-gray-300">
-                  This was just a demo. You've used your daily free analysis. Upgrade to Pro for unlimited AI analysis of any symbol, real-time data, and personalized insights.
+                  This was just a demo. You have {remainingAnalysis} analysis remaining today. 
+                  Upgrade to Pro for unlimited AI analysis of any symbol, real-time data, and personalized insights.
                 </p>
                 <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center space-x-2 text-yellow-400">
                     <Clock className="h-4 w-4" />
                     <span className="text-sm">
-                      {hoursUntilNext 
-                        ? `Next free analysis in ${hoursUntilNext} hours`
-                        : 'You can use another free analysis now!'
+                      {remainingAnalysis > 0 
+                        ? `${remainingAnalysis} of ${maxAnalysisPerDay} analyses remaining today`
+                        : 'Daily limit reached. Resets at midnight.'
                       }
                     </span>
                   </div>
@@ -187,20 +192,20 @@ export const TradingChatDemo: React.FC = () => {
             <div className="bg-gray-700/50 rounded-lg p-4">
               <div className="flex items-center justify-center space-x-2 mb-2">
                 <Clock className="h-4 w-4 text-blue-400" />
-                <span className="text-sm font-medium text-white">Free Daily Analysis</span>
+                <span className="text-sm font-medium text-white">Daily Analysis Limit</span>
               </div>
-              {canUseFreeAnalysis ? (
-                <p className="text-green-400 text-sm">✓ You have 1 free analysis available today</p>
+              {canUseAnalysis ? (
+                <p className="text-green-400 text-sm">
+                  ✓ {remainingAnalysis} of {maxAnalysisPerDay} analyses remaining today
+                </p>
               ) : (
                 <div className="text-center">
                   <p className="text-orange-400 text-sm">
-                    You've used your free daily analysis
+                    Daily limit reached ({analysisCount}/{maxAnalysisPerDay})
                   </p>
-                  {hoursUntilNext && (
-                    <p className="text-gray-400 text-xs mt-1">
-                      Next free analysis in {hoursUntilNext} hours
-                    </p>
-                  )}
+                  <p className="text-gray-400 text-xs mt-1">
+                    Resets at midnight. Upgrade for unlimited access.
+                  </p>
                 </div>
               )}
             </div>
@@ -211,24 +216,24 @@ export const TradingChatDemo: React.FC = () => {
             <Card className="bg-gray-700/50 border-gray-600">
               <CardContent className="p-4">
                 <h3 className="text-white font-semibold mb-2">
-                  {canUseFreeAnalysis || isPro ? 'AI Analysis Demo' : 'Daily Limit Reached'}
+                  {canUseAnalysis || isPro ? 'AI Analysis Demo' : 'Daily Limit Reached'}
                 </h3>
                 <p className="text-gray-300 text-sm mb-4">
-                  {canUseFreeAnalysis || isPro 
+                  {canUseAnalysis || isPro 
                     ? 'View a sample AI analysis to understand StrategyAI\'s capabilities'
-                    : 'You\'ve used your free daily analysis. Upgrade for unlimited access.'
+                    : 'You\'ve used your 3 free daily analyses. Upgrade for unlimited access.'
                   }
                 </p>
                 <Button 
-                  onClick={canUseFreeAnalysis || isPro ? handleViewDemo : handleUpgrade}
+                  onClick={canUseAnalysis || isPro ? handleViewDemo : handleUpgrade}
                   className={`w-full ${
-                    canUseFreeAnalysis || isPro 
+                    canUseAnalysis || isPro 
                       ? 'bg-blue-600 hover:bg-blue-700' 
                       : 'bg-orange-600 hover:bg-orange-700'
                   } text-white`}
-                  disabled={!canUseFreeAnalysis && !isPro}
+                  disabled={!canUseAnalysis && !isPro}
                 >
-                  {canUseFreeAnalysis || isPro ? (
+                  {canUseAnalysis || isPro ? (
                     <>
                       <Brain className="h-4 w-4 mr-2" />
                       View Sample Analysis
@@ -247,7 +252,7 @@ export const TradingChatDemo: React.FC = () => {
               <CardContent className="p-4">
                 <h3 className="text-white font-semibold mb-2">Unlock Full StrategyAI</h3>
                 <ul className="text-gray-300 text-sm space-y-1 mb-4 text-left">
-                  <li>• Unlimited AI analysis for any symbol</li>
+                  <li>• Unlimited AI analysis for any symbol (vs 3/day free)</li>
                   <li>• Real-time market data integration</li>
                   <li>• Personalized trading recommendations</li>
                   <li>• Advanced pattern recognition</li>

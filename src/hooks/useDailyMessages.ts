@@ -6,9 +6,11 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { logger } from '@/utils/logger';
 
 interface DailyUsage {
-  hasUsedFreeAnalysis: boolean;
+  analysisCount: number;
+  maxAnalysisPerDay: number;
+  canUseAnalysis: boolean;
+  remainingAnalysis: number;
   lastAnalysisDate: string | null;
-  canUseFreeAnalysis: boolean;
   loading: boolean;
 }
 
@@ -16,23 +18,30 @@ export const useDailyMessages = () => {
   const { user } = useAuth();
   const { isPro } = useSubscription();
   const [dailyUsage, setDailyUsage] = useState<DailyUsage>({
-    hasUsedFreeAnalysis: false,
+    analysisCount: 0,
+    maxAnalysisPerDay: 3,
+    canUseAnalysis: true,
+    remainingAnalysis: 3,
     lastAnalysisDate: null,
-    canUseFreeAnalysis: true,
     loading: true
   });
 
-  // Check if user can use free analysis (once per 24h for free users)
-  const checkFreeAnalysisUsage = async () => {
+  // Check daily analysis usage for free users (3 per 24h)
+  const checkDailyAnalysisUsage = async () => {
     if (!user?.id || isPro) {
-      setDailyUsage(prev => ({ ...prev, loading: false, canUseFreeAnalysis: true }));
+      setDailyUsage(prev => ({ 
+        ...prev, 
+        loading: false, 
+        canUseAnalysis: true, 
+        remainingAnalysis: isPro ? 999 : 3 
+      }));
       return;
     }
 
     try {
       const { data: profile, error } = await supabase
         .from('user_profiles')
-        .select('last_free_analysis_at')
+        .select('daily_message_count, daily_message_reset')
         .eq('id', user.id)
         .single();
 
@@ -42,24 +51,47 @@ export const useDailyMessages = () => {
         return;
       }
 
-      const lastAnalysisDate = profile?.last_free_analysis_at;
-      const now = new Date();
-      const lastAnalysis = lastAnalysisDate ? new Date(lastAnalysisDate) : null;
+      const today = new Date().toDateString();
+      const lastReset = profile?.daily_message_reset;
+      const currentCount = profile?.daily_message_count || 0;
       
-      // Check if 24 hours have passed since last free analysis
-      const canUse = !lastAnalysis || (now.getTime() - lastAnalysis.getTime()) >= 24 * 60 * 60 * 1000;
+      // Check if we need to reset the counter (new day)
+      const needsReset = !lastReset || new Date(lastReset).toDateString() !== today;
+      
+      let finalCount = currentCount;
+      if (needsReset) {
+        // Reset counter for new day
+        const { error: updateError } = await supabase
+          .from('user_profiles')
+          .update({ 
+            daily_message_count: 0,
+            daily_message_reset: new Date().toISOString().split('T')[0]
+          })
+          .eq('id', user.id);
+
+        if (!updateError) {
+          finalCount = 0;
+        }
+      }
+      
+      const maxAnalysis = 3;
+      const remaining = Math.max(0, maxAnalysis - finalCount);
+      const canUse = remaining > 0;
       
       setDailyUsage({
-        hasUsedFreeAnalysis: !!lastAnalysis,
-        lastAnalysisDate,
-        canUseFreeAnalysis: canUse,
+        analysisCount: finalCount,
+        maxAnalysisPerDay: maxAnalysis,
+        canUseAnalysis: canUse,
+        remainingAnalysis: remaining,
+        lastAnalysisDate: lastReset,
         loading: false
       });
       
       logger.debug('[DAILY_USAGE] Usage check complete:', {
-        lastAnalysis: lastAnalysisDate,
+        count: finalCount,
+        remaining,
         canUse,
-        hoursSinceLastUse: lastAnalysis ? (now.getTime() - lastAnalysis.getTime()) / (1000 * 60 * 60) : null
+        needsReset
       });
       
     } catch (error) {
@@ -68,15 +100,24 @@ export const useDailyMessages = () => {
     }
   };
 
-  // Record free analysis usage
-  const recordFreeAnalysisUsage = async () => {
+  // Record analysis usage (increment counter)
+  const recordAnalysisUsage = async () => {
     if (!user?.id || isPro) return true;
 
     try {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('daily_message_count')
+        .eq('id', user.id)
+        .single();
+
+      const newCount = (profile?.daily_message_count || 0) + 1;
+
       const { error } = await supabase
         .from('user_profiles')
         .update({ 
-          last_free_analysis_at: new Date().toISOString()
+          daily_message_count: newCount,
+          daily_message_reset: new Date().toISOString().split('T')[0]
         })
         .eq('id', user.id);
 
@@ -88,12 +129,12 @@ export const useDailyMessages = () => {
       // Update local state
       setDailyUsage(prev => ({
         ...prev,
-        hasUsedFreeAnalysis: true,
-        lastAnalysisDate: new Date().toISOString(),
-        canUseFreeAnalysis: false
+        analysisCount: newCount,
+        remainingAnalysis: Math.max(0, prev.maxAnalysisPerDay - newCount),
+        canUseAnalysis: newCount < prev.maxAnalysisPerDay
       }));
 
-      logger.debug('[DAILY_USAGE] Free analysis usage recorded');
+      logger.debug('[DAILY_USAGE] Analysis usage recorded:', newCount);
       return true;
       
     } catch (error) {
@@ -102,30 +143,47 @@ export const useDailyMessages = () => {
     }
   };
 
-  // Get time until next free analysis
-  const getTimeUntilNextFreeAnalysis = () => {
+  // Get time until reset (24h from last reset)
+  const getTimeUntilReset = () => {
     if (isPro || !dailyUsage.lastAnalysisDate) return null;
     
-    const lastAnalysis = new Date(dailyUsage.lastAnalysisDate);
-    const nextAllowed = new Date(lastAnalysis.getTime() + 24 * 60 * 60 * 1000);
+    const lastReset = new Date(dailyUsage.lastAnalysisDate);
+    const nextReset = new Date(lastReset);
+    nextReset.setDate(nextReset.getDate() + 1);
+    nextReset.setHours(0, 0, 0, 0); // Reset at midnight
+    
     const now = new Date();
     
-    if (now >= nextAllowed) return null;
+    if (now >= nextReset) return null;
     
-    const msRemaining = nextAllowed.getTime() - now.getTime();
+    const msRemaining = nextReset.getTime() - now.getTime();
     const hoursRemaining = Math.ceil(msRemaining / (1000 * 60 * 60));
     
     return hoursRemaining;
   };
 
   useEffect(() => {
-    checkFreeAnalysisUsage();
+    checkDailyAnalysisUsage();
   }, [user?.id, isPro]);
 
   return {
-    ...dailyUsage,
-    recordFreeAnalysisUsage,
-    getTimeUntilNextFreeAnalysis,
-    refreshUsage: checkFreeAnalysisUsage
+    // Analysis-specific properties
+    analysisCount: dailyUsage.analysisCount,
+    maxAnalysisPerDay: dailyUsage.maxAnalysisPerDay,
+    canUseAnalysis: dailyUsage.canUseAnalysis,
+    remainingAnalysis: dailyUsage.remainingAnalysis,
+    recordAnalysisUsage,
+    
+    // Legacy properties for backward compatibility
+    hasUsedFreeAnalysis: dailyUsage.analysisCount > 0,
+    lastAnalysisDate: dailyUsage.lastAnalysisDate,
+    canUseFreeAnalysis: dailyUsage.canUseAnalysis,
+    recordFreeAnalysisUsage: recordAnalysisUsage,
+    getTimeUntilNextFreeAnalysis: getTimeUntilReset,
+    
+    // General properties
+    loading: dailyUsage.loading,
+    refreshUsage: checkDailyAnalysisUsage,
+    isPro
   };
 };
