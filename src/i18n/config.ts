@@ -37,7 +37,7 @@ if (!i18n.isInitialized) {
       resources,
       fallbackLng: 'en',
       supportedLngs: ['en', 'es'],
-      debug: false, // Always disable debug in production
+      debug: import.meta.env.DEV, // Only enable debug in development
       detection: {
         order: ['localStorage', 'navigator'],
         caches: ['localStorage'],

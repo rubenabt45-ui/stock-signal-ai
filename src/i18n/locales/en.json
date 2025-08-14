@@ -297,10 +297,15 @@
     "continue": "Continue",
     "back": "Back",
     "retry": "Retry",
-    "comingSoon": "Coming Soon",
+    "comingSoon": "Available Soon",
     "home": "Home",
     "pricing": "Pricing",
-    "selectLanguage": "Select Language"
+    "selectLanguage": "Select Language",
+    "noData": "No data available",
+    "tryAgain": "Try again",
+    "close": "Close",
+    "confirm": "Confirm",
+    "delete": "Delete"
   },
   "navigation": {
     "home": "Home",
@@ -346,7 +351,14 @@
   "learn": {
     "title": "Learn",
     "subtitle": "Master Trading Skills",
-    "comingSoon": "Coming Soon"
+    "description": "Our comprehensive learning platform is being developed with expert-curated content covering trading fundamentals, technical analysis, and risk management. Interactive lessons and real-world examples will help you build confidence in your trading decisions.",
+    "features": {
+      "comprehensive": "Comprehensive curriculum covering all trading aspects",
+      "interactive": "Interactive lessons with real market examples", 
+      "expertled": "Expert-led content from professional traders",
+      "practical": "Practical exercises to apply your knowledge"
+    },
+    "availability": "Full learning platform launching Q2 2024"
   },
   "settings": {
     "title": "Settings",
@@ -404,7 +416,12 @@
     }
   },
   "tradingChat": {
-    "welcome": "Welcome to StrategyAI! Upload a chart or ask me about trading strategies, market analysis, or any trading-related questions."
+    "welcome": "Welcome to StrategyAI! Upload a chart or ask me about trading strategies, market analysis, or any trading-related questions.",
+    "placeholder": "Ask about trading strategies, upload a chart, or request market analysis...",
+    "uploading": "Uploading chart...",
+    "analyzing": "Analyzing...",
+    "error": "Sorry, I encountered an error. Please try again.",
+    "retry": "Retry Analysis"
   },
   "placeholders": {
     "enterEmail": "Enter your email",
@@ -417,26 +434,58 @@
   },
   "pricing": {
     "getStarted": "Get Started",
-    "upgradeToPro": "Upgrade to Pro"
+    "upgradeToPro": "Upgrade to Pro",
+    "free": {
+      "title": "Free",
+      "price": "$0",
+      "features": [
+        "Basic AI analysis",
+        "Limited chart access",
+        "Community support"
+      ]
+    },
+    "pro": {
+      "title": "Pro",
+      "price": "$29",
+      "features": [
+        "Advanced AI insights",
+        "Unlimited charts",
+        "Priority support",
+        "Advanced patterns"
+      ]
+    }
   },
   "economicEvents": {
     "title": "Economic Events",
     "subtitle": "High-impact macroeconomic events",
-    "comingSoon": "Coming Soon",
-    "description": "We're building a comprehensive economic calendar with high-impact events, earnings reports, and market-moving announcements."
+    "description": "Stay informed about market-moving events with our comprehensive economic calendar. Track earnings reports, Federal Reserve announcements, GDP releases, and other key indicators that impact trading decisions.",
+    "features": {
+      "realtime": "Real-time event updates and notifications",
+      "filtered": "Filter by impact level and asset class",
+      "historical": "Historical data and trend analysis",
+      "alerts": "Custom alerts for important events"
+    },
+    "availability": "Economic calendar launching in early 2024"
   },
   "marketUpdates": {
-    "title": "Real-Time Market Updates",
+    "title": "Real-Time Market Updates", 
     "subtitle": "Stay ahead of the market with real-time data, alerts, and AI-powered insights",
-    "comingSoon": "Coming Soon",
+    "description": "Get instant access to market movements, breaking news, and AI-generated insights. Our advanced algorithms monitor global markets 24/7 to identify opportunities and risks.",
     "liveData": {
       "title": "Live Market Data",
       "description": "Real-time price feeds and market movements across all major exchanges"
     },
     "smartAlerts": {
-      "title": "Smart Alerts",
+      "title": "Smart Alerts", 
       "description": "AI-powered notifications for market opportunities and risk management"
-    }
+    },
+    "features": {
+      "monitoring": "24/7 market monitoring across global exchanges",
+      "analysis": "AI-powered sentiment and technical analysis",
+      "alerts": "Intelligent alerts for trading opportunities",
+      "news": "Real-time news integration and impact analysis"
+    },
+    "availability": "Real-time updates available with Pro subscription"
   },
   "footer": {
     "platform": "Platform",

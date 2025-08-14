@@ -1,223 +1,136 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ProtectedFeature } from "@/components/ProtectedFeature";
+
+import React from "react";
+import { TrendingUp, Zap, Bell, Globe } from "lucide-react";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { PageWrapper } from '@/components/PageWrapper';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Clock, 
-  Bell,
-  Zap,
-  Activity,
-  Construction
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 const MarketUpdates = () => {
   const { t } = useTranslationWithFallback();
 
+  const features = [
+    {
+      icon: Globe,
+      title: t('marketUpdates.features.monitoring'),
+      description: t('marketUpdates.features.monitoring')
+    },
+    {
+      icon: TrendingUp,
+      title: t('marketUpdates.features.analysis'),
+      description: t('marketUpdates.features.analysis')
+    },
+    {
+      icon: Bell,
+      title: t('marketUpdates.features.alerts'),
+      description: t('marketUpdates.features.alerts')
+    },
+    {
+      icon: Zap,
+      title: t('marketUpdates.features.news'),
+      description: t('marketUpdates.features.news')
+    }
+  ];
+
   return (
     <PageWrapper pageName="MarketUpdates">
-      <ProtectedFeature feature="market-updates">
-        <div className="min-h-screen bg-tradeiq-navy p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="min-h-screen bg-tradeiq-navy">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-4">
-            <BarChart3 className="h-8 w-8 text-tradeiq-blue" />
-            <h1 className="text-3xl font-bold text-white">{t('marketUpdates.title')}</h1>
-            <Badge variant="outline" className="text-xs">
-              <Construction className="h-3 w-3 mr-1" />
-              {t('marketUpdates.comingSoon')}
-            </Badge>
+        <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
+                <div>
+                  <h1 className="text-2xl font-bold text-white tracking-tight">{t('marketUpdates.title')}</h1>
+                  <p className="text-sm text-gray-400 font-medium">{t('marketUpdates.subtitle')}</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="text-gray-400 text-lg">
-            {t('marketUpdates.subtitle')}
-          </p>
-        </div>
+        </header>
 
-        {/* Coming Soon Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <Card className="tradeiq-card">
-            <CardHeader>
-              <div className="flex items-center space-x-2 mb-2">
-                <TrendingUp className="h-6 w-6 text-green-400" />
-                <CardTitle className="text-white">{t('marketUpdates.liveData.title')}</CardTitle>
-              </div>
-              <CardDescription className="text-gray-300">
-                {t('marketUpdates.liveData.description')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center text-gray-300 text-sm">
-                  <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                  Live price updates for stocks, forex, crypto
-                </div>
-                <div className="flex items-center text-gray-300 text-sm">
-                  <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                  Volume and volatility indicators
-                </div>
-                <div className="flex items-center text-gray-300 text-sm">
-                  <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                  Market sentiment analysis
-                </div>
-                <div className="flex items-center text-gray-300 text-sm">
-                  <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                  Custom watchlists and portfolios
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="tradeiq-card">
-            <CardHeader>
-              <div className="flex items-center space-x-2 mb-2">
-                <Bell className="h-6 w-6 text-blue-400" />
-                <CardTitle className="text-white">{t('marketUpdates.smartAlerts.title')}</CardTitle>
-              </div>
-              <CardDescription className="text-gray-300">
-                {t('marketUpdates.smartAlerts.description')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center text-gray-300 text-sm">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
-                  Price breakout alerts
-                </div>
-                <div className="flex items-center text-gray-300 text-sm">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
-                  Pattern recognition notifications
-                </div>
-                <div className="flex items-center text-gray-300 text-sm">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
-                  Volume spike alerts
-                </div>
-                <div className="flex items-center text-gray-300 text-sm">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
-                  News sentiment triggers
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Feature Preview */}
-        <Card className="tradeiq-card mb-8">
-          <CardHeader className="text-center">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <Activity className="h-8 w-8 text-tradeiq-blue" />
-              <CardTitle className="text-2xl text-white">Market Dashboard Preview</CardTitle>
+        {/* Content */}
+        <main className="container mx-auto px-4 py-12 pb-24">
+          <div className="max-w-4xl mx-auto">
+            {/* Description */}
+            <div className="text-center mb-12">
+              <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mx-auto">
+                {t('marketUpdates.description')}
+              </p>
             </div>
-            <CardDescription className="text-gray-300 text-lg">
-              Get a glimpse of what's coming to TradeIQ Pro
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-gray-800/50 rounded-lg p-8 text-center">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-400 mb-2">+2.4%</div>
-                  <div className="text-gray-400 text-sm">S&P 500</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-red-400 mb-2">-0.8%</div>
-                  <div className="text-gray-400 text-sm">NASDAQ</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-400 mb-2">+1.2%</div>
-                  <div className="text-gray-400 text-sm">DOW JONES</div>
-                </div>
-              </div>
-              
-              <div className="aspect-video bg-gradient-to-r from-gray-700 to-gray-600 rounded-xl flex items-center justify-center mb-6">
-                <div className="text-center">
-                  <BarChart3 className="h-16 w-16 text-tradeiq-blue mx-auto mb-4" />
-                  <p className="text-xl text-gray-300">Interactive Market Charts</p>
-                  <p className="text-gray-400">Real-time data visualization coming soon</p>
-                </div>
-              </div>
+
+            {/* Main Features */}
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <Card className="tradeiq-card">
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="p-3 bg-tradeiq-blue/20 rounded-lg">
+                      <Zap className="h-6 w-6 text-tradeiq-blue" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-2">{t('marketUpdates.liveData.title')}</h3>
+                      <p className="text-gray-400 text-sm">{t('marketUpdates.liveData.description')}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="tradeiq-card">
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="p-3 bg-tradeiq-blue/20 rounded-lg">
+                      <Bell className="h-6 w-6 text-tradeiq-blue" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-2">{t('marketUpdates.smartAlerts.title')}</h3>
+                      <p className="text-gray-400 text-sm">{t('marketUpdates.smartAlerts.description')}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          <Card className="tradeiq-card">
-            <CardHeader>
-              <Zap className="h-6 w-6 text-yellow-400 mb-2" />
-              <CardTitle className="text-white text-lg">Lightning Fast</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-gray-300">
-                Sub-second data updates ensure you never miss a market movement
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className="tradeiq-card">
-            <CardHeader>
-              <Activity className="h-6 w-6 text-purple-400 mb-2" />
-              <CardTitle className="text-white text-lg">AI-Powered</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-gray-300">
-                Machine learning algorithms identify patterns and opportunities automatically
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className="tradeiq-card">
-            <CardHeader>
-              <Clock className="h-6 w-6 text-green-400 mb-2" />
-              <CardTitle className="text-white text-lg">24/7 Monitoring</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-gray-300">
-                Round-the-clock market surveillance across global exchanges
-              </CardDescription>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* CTA Section */}
-        <Card className="tradeiq-card border-tradeiq-blue/50">
-          <CardContent className="p-8 text-center">
-            <h3 className="text-2xl font-bold text-white mb-4">Want Early Access?</h3>
-            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-              Be among the first to experience real-time market updates when this feature launches. 
-              Pro members get priority access to all new features.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/pricing">
-                <Button size="lg" className="px-8 py-3">
-                  Upgrade to Pro
-                </Button>
-              </Link>
-              <Link to="/app/strategy-ai">
-                <Button variant="outline" size="lg" className="px-8 py-3">
-                  Try StrategyAI Instead
-                </Button>
-              </Link>
+            {/* Additional Features */}
+            <div className="grid md:grid-cols-2 gap-6 mb-12">
+              {features.map((feature, index) => (
+                <Card key={index} className="tradeiq-card">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="p-3 bg-tradeiq-blue/20 rounded-lg">
+                        <feature.icon className="h-6 w-6 text-tradeiq-blue" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-semibold mb-2">{feature.title}</h3>
+                        <p className="text-gray-400 text-sm">{feature.description}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Disclaimer */}
-        <div className="mt-8 p-4 bg-gray-800/30 rounded-lg">
-          <p className="text-xs text-gray-400 text-center">
-            Disclaimer: TradeIQ provides educational content and market analysis tools. 
-            None of the information provided should be considered financial advice or a recommendation to invest. 
-            Always do your own research and consult with a financial advisor before making investment decisions.
-          </p>
+            {/* Availability Notice */}
+            <div className="text-center">
+              <Card className="tradeiq-card border-green-500/30">
+                <CardContent className="p-8">
+                  <div className="flex justify-center mb-4">
+                    <div className="p-4 bg-green-500/20 rounded-full">
+                      <TrendingUp className="h-8 w-8 text-green-500" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-4">Pro Feature Available</h3>
+                  <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+                    {t('marketUpdates.availability')}
+                  </p>
+                  <div className="text-sm text-gray-400">
+                    Upgrade to Pro to access real-time market data and AI-powered insights
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
+        </main>
       </div>
-      </ProtectedFeature>
     </PageWrapper>
   );
 };

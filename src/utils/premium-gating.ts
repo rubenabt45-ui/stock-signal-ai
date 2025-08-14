@@ -21,11 +21,13 @@ export const isPremiumFeature = (featureName: string): boolean => {
   // Define which features require premium access
   const premiumFeatures = [
     'advanced-analysis',
-    'unlimited-charts',
+    'unlimited-charts', 
     'priority-support',
     'custom-alerts',
     'export-data',
-    'advanced-patterns'
+    'advanced-patterns',
+    'real-time-data',
+    'market-updates'
   ];
   
   return premiumFeatures.includes(featureName);
@@ -38,7 +40,9 @@ export const getPremiumGatingMessage = (featureName: string): string => {
     'priority-support': 'Priority support is available for Pro subscribers',
     'custom-alerts': 'Custom alerts require a Pro subscription',
     'export-data': 'Data export features require a Pro subscription',
-    'advanced-patterns': 'Advanced pattern recognition requires a Pro subscription'
+    'advanced-patterns': 'Advanced pattern recognition requires a Pro subscription',
+    'real-time-data': 'Real-time market data requires a Pro subscription',
+    'market-updates': 'Live market updates require a Pro subscription'
   };
   
   return messages[featureName] || 'This feature requires a Pro subscription';
