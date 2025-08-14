@@ -1,295 +1,247 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LanguageSelector } from '@/components/LanguageSelector';
-import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
-import { PageWrapper } from '@/components/PageWrapper';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   TrendingUp, 
-  Brain, 
-  Calendar, 
-  BarChart3, 
-  MessageCircle, 
-  BookOpen,
-  ChevronRight,
+  TrendingDown, 
+  DollarSign, 
   Activity,
+  Eye,
+  BarChart3,
+  PieChart,
+  Zap,
   Clock,
-  Star
+  Star,
+  Bell,
+  Calendar,
+  Users,
+  Target,
+  Lightbulb,
+  MessageSquare,
+  ChevronRight,
+  BookOpen,
+  Newspaper
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useSubscription } from '@/hooks/useSubscription';
+import { useAuth } from '@/contexts/auth/auth.provider';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { isPro } = useSubscription();
-  const { t } = useTranslationWithFallback();
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-  const quickActions = [
-    {
-      title: t('dashboard.strategyAI.title'),
-      description: t('dashboard.strategyAI.description'),
-      icon: Brain,
-      link: "/app/strategy-ai",
-      color: "text-blue-400",
-      bgColor: "bg-blue-500/20"
-    },
-    {
-      title: t('dashboard.learn.title'),
-      description: t('dashboard.learn.description'),
-      icon: BookOpen,
-      link: "/app/learn",
-      color: "text-green-400",
-      bgColor: "bg-green-500/20"
-    },
-    {
-      title: t('dashboard.events.title'),
-      description: t('dashboard.events.description'),
-      icon: Calendar,
-      link: "/app/events",
-      color: "text-purple-400",
-      bgColor: "bg-purple-500/20",
-      badge: t('learn.comingSoon')
-    },
-    {
-      title: t('dashboard.marketUpdates.title'),
-      description: t('dashboard.marketUpdates.description'),
-      icon: BarChart3,
-      link: "/app/market-updates",
-      color: "text-orange-400",
-      bgColor: "bg-orange-500/20",
-      badge: "Future"
-    }
-  ];
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every minute
 
-  const recentActivity = [
-    {
-      title: "StrategyAI Session",
-      description: "Analyzed AAPL chart patterns",
-      time: "2 hours ago",
-      icon: MessageCircle
-    },
-    {
-      title: "Learn Module Completed",
-      description: "Risk Management Fundamentals",
-      time: "1 day ago",
-      icon: BookOpen
-    },
-    {
-      title: "Market Alert",
-      description: "SPY reached support level",
-      time: "3 days ago",
-      icon: TrendingUp
-    }
-  ];
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatDate = (date: Date): string => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    };
+    return date.toLocaleDateString(undefined, options);
+  };
+
+  const formatTime = (date: Date): string => {
+    const options: Intl.DateTimeFormatOptions = {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    };
+    return date.toLocaleTimeString(undefined, options);
+  };
 
   return (
-    <PageWrapper pageName="Dashboard">
-      <div className="min-h-screen bg-tradeiq-navy p-6">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Welcome Section */}
+    <div className="min-h-screen bg-tradeiq-navy p-6">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Header Section */}
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">
-              {t('dashboard.welcomeBack')}{user?.email ? `, ${user.email.split('@')[0]}` : ''}
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold text-white tracking-tight">
+              {user ? `Welcome back, ${user.email}!` : 'Welcome to TradeIQ'}
             </h1>
-            <p className="text-gray-400">
-              {t('dashboard.subtitle')}
+            <p className="text-sm text-gray-400">
+              {formatDate(currentTime)} • {formatTime(currentTime)}
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <LanguageSelector variant="app" />
-            <Badge variant={isPro ? "default" : "secondary"} className="px-3 py-1">
-              {isPro ? (
-                <>
-                  <Star className="h-3 w-3 mr-1" />
-                  {t('dashboard.plan.pro')}
-                </>
-              ) : (
-                t('dashboard.plan.free')
-              )}
-            </Badge>
+            <Button variant="outline" size="sm" className="border-gray-700/50 text-gray-300 hover:bg-black/30 hover:border-tradeiq-blue/50 rounded-xl">
+              <Bell className="h-4 w-4 mr-2" />
+              Notifications
+            </Button>
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Overview Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="tradeiq-card">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-blue-500/20 rounded-lg">
-                  <Activity className="h-6 w-6 text-blue-400" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-2xl font-bold text-white">24/7</p>
-                  <p className="text-gray-400 text-sm">{t('dashboard.marketMonitoring')}</p>
-                </div>
-              </div>
+            <CardHeader>
+              <CardTitle className="text-white flex items-center space-x-2">
+                <TrendingUp className="h-4 w-4 text-green-500" />
+                <span>Total Investments</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-white">$5,450.20</div>
+              <p className="text-gray-400">+2.5% vs last month</p>
             </CardContent>
           </Card>
 
           <Card className="tradeiq-card">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-green-500/20 rounded-lg">
-                  <TrendingUp className="h-6 w-6 text-green-400" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-2xl font-bold text-white">95%</p>
-                  <p className="text-gray-400 text-sm">{t('dashboard.patternAccuracy')}</p>
-                </div>
-              </div>
+            <CardHeader>
+              <CardTitle className="text-white flex items-center space-x-2">
+                <TrendingDown className="h-4 w-4 text-red-500" />
+                <span>Portfolio Value</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-white">$12,345.67</div>
+              <p className="text-gray-400">-1.3% vs last month</p>
             </CardContent>
           </Card>
 
           <Card className="tradeiq-card">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-purple-500/20 rounded-lg">
-                  <Clock className="h-6 w-6 text-purple-400" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-2xl font-bold text-white">&lt; 1s</p>
-                  <p className="text-gray-400 text-sm">{t('dashboard.analysisSpeed')}</p>
-                </div>
-              </div>
+            <CardHeader>
+              <CardTitle className="text-white flex items-center space-x-2">
+                <DollarSign className="h-4 w-4 text-blue-500" />
+                <span>Available Balance</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-white">$2,500.00</div>
+              <p className="text-gray-400">Ready to invest</p>
+            </CardContent>
+          </Card>
+
+          <Card className="tradeiq-card">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center space-x-2">
+                <Activity className="h-4 w-4 text-yellow-500" />
+                <span>Recent Activity</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-white">3 Transactions</div>
+              <p className="text-gray-400">View all activity</p>
             </CardContent>
           </Card>
         </div>
+
+        {/* Tabs Section */}
+        <Tabs defaultValue="analytics" className="space-y-4">
+          <TabsList className="bg-tradeiq-card rounded-xl p-1 w-full flex justify-between">
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-tradeiq-blue data-[state=active]:text-white rounded-xl transition-all">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger value="performance" className="data-[state=active]:bg-tradeiq-blue data-[state=active]:text-white rounded-xl transition-all">
+              <PieChart className="h-4 w-4 mr-2" />
+              Performance
+            </TabsTrigger>
+            <TabsTrigger value="watchlist" className="data-[state=active]:bg-tradeiq-blue data-[state=active]:text-white rounded-xl transition-all">
+              <Eye className="h-4 w-4 mr-2" />
+              Watchlist
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="analytics" className="bg-tradeiq-card rounded-xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Portfolio Analytics</h2>
+            <p className="text-gray-400">Detailed insights into your investment portfolio.</p>
+          </TabsContent>
+          <TabsContent value="performance" className="bg-tradeiq-card rounded-xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Investment Performance</h2>
+            <p className="text-gray-400">Track your investment gains and losses over time.</p>
+          </TabsContent>
+          <TabsContent value="watchlist" className="bg-tradeiq-card rounded-xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Your Watchlist</h2>
+            <p className="text-gray-400">Keep an eye on your favorite assets.</p>
+          </TabsContent>
+        </Tabs>
 
         {/* Quick Actions */}
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-6">{t('dashboard.quickActions')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {quickActions.map((action, index) => (
-              <Card key={index} className="tradeiq-card hover:border-tradeiq-blue/50 transition-all duration-300 hover:transform hover:scale-105">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className={`p-2 ${action.bgColor} rounded-lg`}>
-                      <action.icon className={`h-6 w-6 ${action.color}`} />
-                    </div>
-                    {action.badge && (
-                      <Badge variant="outline" className="text-xs">
-                        {action.badge}
-                      </Badge>
-                    )}
-                  </div>
-                  <CardTitle className="text-white text-lg">{action.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-gray-300 mb-4">
-                    {action.description}
-                  </CardDescription>
-                  <Link to={action.link}>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full"
-                      disabled={action.badge === t('learn.comingSoon') || action.badge === "Future"}
-                    >
-                      {action.badge === t('learn.comingSoon') || action.badge === "Future" ? action.badge : t('pricing.getStarted')}
-                      {!action.badge && <ChevronRight className="ml-2 h-4 w-4" />}
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
+        <div className="space-y-3">
+          <h2 className="text-2xl font-bold text-white">Quick Actions</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <Card className="tradeiq-card hover:bg-tradeiq-blue/10 transition-colors duration-200 cursor-pointer">
+              <CardContent className="flex items-center space-x-4">
+                <Zap className="h-6 w-6 text-tradeiq-blue" />
+                <div className="space-y-1">
+                  <h3 className="text-lg font-semibold text-white">Start Trading</h3>
+                  <p className="text-gray-400 text-sm">Explore market opportunities</p>
+                </div>
+                <ChevronRight className="ml-auto h-5 w-5 text-gray-500" />
+              </CardContent>
+            </Card>
+
+            <Card className="tradeiq-card hover:bg-tradeiq-blue/10 transition-colors duration-200 cursor-pointer">
+              <CardContent className="flex items-center space-x-4">
+                <Clock className="h-6 w-6 text-tradeiq-blue" />
+                <div className="space-y-1">
+                  <h3 className="text-lg font-semibold text-white">Set Price Alerts</h3>
+                  <p className="text-gray-400 text-sm">Never miss a market move</p>
+                </div>
+                <ChevronRight className="ml-auto h-5 w-5 text-gray-500" />
+              </CardContent>
+            </Card>
+
+            <Card className="tradeiq-card hover:bg-tradeiq-blue/10 transition-colors duration-200 cursor-pointer">
+              <CardContent className="flex items-center space-x-4">
+                <Star className="h-6 w-6 text-tradeiq-blue" />
+                <div className="space-y-1">
+                  <h3 className="text-lg font-semibold text-white">Add to Favorites</h3>
+                  <p className="text-gray-400 text-sm">Track your favorite assets</p>
+                </div>
+                <ChevronRight className="ml-auto h-5 w-5 text-gray-500" />
+              </CardContent>
+            </Card>
           </div>
         </div>
 
-        {/* Recent Activity & Pro Features */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Activity */}
-          <Card className="tradeiq-card">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <Activity className="h-5 w-5 mr-2" />
-                {t('dashboard.recentActivity')}
-              </CardTitle>
-              <CardDescription className="text-gray-400">
-                Your latest trading activities and updates
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentActivity.map((activity, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-gray-800/30 rounded-lg">
-                    <div className="p-1 bg-tradeiq-blue/20 rounded">
-                      <activity.icon className="h-4 w-4 text-tradeiq-blue" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-white text-sm font-medium">{activity.title}</p>
-                      <p className="text-gray-400 text-xs">{activity.description}</p>
-                      <p className="text-gray-500 text-xs mt-1">{activity.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Educational Resources */}
+        <div className="space-y-3">
+          <h2 className="text-2xl font-bold text-white">Learn & Grow</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <Card className="tradeiq-card hover:bg-tradeiq-blue/10 transition-colors duration-200 cursor-pointer">
+              <CardContent className="flex items-center space-x-4">
+                <BookOpen className="h-6 w-6 text-tradeiq-blue" />
+                <div className="space-y-1">
+                  <h3 className="text-lg font-semibold text-white">Trading Courses</h3>
+                  <p className="text-gray-400 text-sm">Master the art of trading</p>
+                </div>
+                <ChevronRight className="ml-auto h-5 w-5 text-gray-500" />
+              </CardContent>
+            </Card>
 
-          {/* Pro Features / Upgrade */}
-          <Card className="tradeiq-card">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <Star className="h-5 w-5 mr-2" />
-                {isPro ? 'Pro Features' : 'Upgrade to Pro'}
-              </CardTitle>
-              <CardDescription className="text-gray-400">
-                {isPro ? 'You have access to all premium features' : 'Unlock advanced trading tools and unlimited access'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isPro ? (
-                <div className="space-y-3">
-                  <div className="flex items-center text-green-400 text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                    Unlimited StrategyAI messages
-                  </div>
-                  <div className="flex items-center text-green-400 text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                    Complete chat history
-                  </div>
-                  <div className="flex items-center text-green-400 text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                    Priority support
-                  </div>
-                  <div className="flex items-center text-green-400 text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                    Early access to new features
-                  </div>
+            <Card className="tradeiq-card hover:bg-tradeiq-blue/10 transition-colors duration-200 cursor-pointer">
+              <CardContent className="flex items-center space-x-4">
+                <Newspaper className="h-6 w-6 text-tradeiq-blue" />
+                <div className="space-y-1">
+                  <h3 className="text-lg font-semibold text-white">Market News</h3>
+                  <p className="text-gray-400 text-sm">Stay updated with the latest trends</p>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
-                      Unlimited StrategyAI messages
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
-                      Complete chat history
-                    </div>
-                    <div className="flex items-center text-gray-300 text-sm">
-                      <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
-                      Priority support
-                    </div>
-                  </div>
-                  <Link to="/pricing">
-                    <Button className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90">
-                      Upgrade to Pro
-                      <ChevronRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
+                <ChevronRight className="ml-auto h-5 w-5 text-gray-500" />
+              </CardContent>
+            </Card>
+
+            <Card className="tradeiq-card hover:bg-tradeiq-blue/10 transition-colors duration-200 cursor-pointer">
+              <CardContent className="flex items-center space-x-4">
+                <MessageSquare className="h-6 w-6 text-tradeiq-blue" />
+                <div className="space-y-1">
+                  <h3 className="text-lg font-semibold text-white">Community Forum</h3>
+                  <p className="text-gray-400 text-sm">Connect with fellow traders</p>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <ChevronRight className="ml-auto h-5 w-5 text-gray-500" />
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
-    </PageWrapper>
   );
 };
 

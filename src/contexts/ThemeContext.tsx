@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/auth/auth.provider';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,11 +13,13 @@ interface ThemeProviderProps {
 
 interface ThemeProviderState {
   theme: Theme;
+  actualTheme: 'dark' | 'light';
   setTheme: (theme: Theme) => void;
 }
 
 const initialState: ThemeProviderState = {
   theme: 'system',
+  actualTheme: 'dark',
   setTheme: () => null,
 };
 
@@ -31,24 +34,23 @@ export function ThemeProvider({
   const [theme, setThemeState] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
+  const [actualTheme, setActualTheme] = useState<'dark' | 'light'>('dark');
   const { user } = useAuth();
 
   useEffect(() => {
     const root = window.document.documentElement;
-
     root.classList.remove('light', 'dark');
 
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
-        .matches
-        ? 'dark'
-        : 'light';
+    let resolvedTheme: 'dark' | 'light';
 
-      root.classList.add(systemTheme);
-      return;
+    if (theme === 'system') {
+      resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    } else {
+      resolvedTheme = theme;
     }
 
-    root.classList.add(theme);
+    root.classList.add(resolvedTheme);
+    setActualTheme(resolvedTheme);
   }, [theme]);
 
   // Load user's preferred theme from profile
@@ -101,6 +103,7 @@ export function ThemeProvider({
 
   const value = {
     theme,
+    actualTheme,
     setTheme,
   };
 

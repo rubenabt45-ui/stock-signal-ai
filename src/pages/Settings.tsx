@@ -12,8 +12,13 @@ const Settings = () => {
     <PageWrapper pageName="Settings">
       <div className="min-h-screen bg-tradeiq-navy p-6">
         <div className="max-w-4xl mx-auto space-y-8">
-          <SettingsHeader user={user} />
-          <SettingsSections />
+          <SettingsHeader />
+          <SettingsSections 
+            user={user}
+            userProfile={null}
+            onProfileUpdate={() => {}}
+            isPro={false}
+          />
         </div>
       </div>
     </PageWrapper>

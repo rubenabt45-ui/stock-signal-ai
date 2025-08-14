@@ -1,13 +1,27 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import i18n from '@/i18n/config';
 import { useAuth } from '@/contexts/auth/auth.provider';
 import { supabase } from '@/integrations/supabase/client';
 
+export interface Language {
+  code: string;
+  name: string;
+}
+
 interface LanguageContextType {
+  currentLanguage: string;
   language: string;
+  changeLanguage: (lang: string) => Promise<void>;
   setLanguage: (lang: string) => void;
+  availableLanguages: Language[];
   loading: boolean;
 }
+
+const availableLanguages: Language[] = [
+  { code: 'en', name: 'English' },
+  { code: 'es', name: 'Español' },
+];
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
@@ -82,8 +96,19 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  const changeLanguage = async (lang: string) => {
+    await setLanguage(lang);
+  };
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, loading }}>
+    <LanguageContext.Provider value={{ 
+      currentLanguage: language,
+      language, 
+      changeLanguage,
+      setLanguage, 
+      availableLanguages,
+      loading 
+    }}>
       {children}
     </LanguageContext.Provider>
   );

@@ -5,4 +5,4 @@ import { useSupabaseFavorites } from './useSupabaseFavorites';
 export const useFavorites = useSupabaseFavorites;
 
 // Export types for backward compatibility
-export type { CategoryFilter } from '@/pages/Favorites';
+export type { CategoryFilter } from '@/types/favorites';

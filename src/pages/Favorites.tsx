@@ -18,6 +18,9 @@ import { PageWrapper } from '@/components/PageWrapper';
 import { AddSymbolModal } from '@/components/AddSymbolModal';
 import { LivePriceBadge } from '@/components/LivePriceBadge';
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
+import { CategoryFilter, FavoriteInput } from '@/types/favorites';
+
+export type { CategoryFilter };
 
 const Favorites = () => {
   const { user } = useAuth();
@@ -42,7 +45,12 @@ const Favorites = () => {
 
   const handleAddSymbol = async (symbol: string) => {
     if (user) {
-      await addFavorite(symbol);
+      const favoriteInput: FavoriteInput = {
+        symbol,
+        name: symbol,
+        category: 'stocks'
+      };
+      await addFavorite(favoriteInput);
       handleCloseAddModal();
     } else {
       console.warn('User not logged in, cannot add favorite.');
@@ -163,8 +171,9 @@ const Favorites = () => {
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}
         onAddSymbol={handleAddSymbol}
+        existingSymbols={favorites?.map(f => f.symbol) || []}
       />
-    </PageWrapper>
+    </div>
   );
 };
 

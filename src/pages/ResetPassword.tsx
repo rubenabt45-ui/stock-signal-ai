@@ -1,140 +1,163 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ChartCandlestick, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '@/contexts/auth/auth.provider';
+import { supabase } from '@/integrations/supabase/client';
+import { CheckCircle, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
-import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
-import { LanguageSelector } from '@/components/LanguageSelector';
+import { useToast } from '@/hooks/use-toast';
 
 const ResetPassword = () => {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState<'success' | 'error'>('error');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { updatePassword } = useAuth();
-  const { t } = useTranslationWithFallback();
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
 
   useEffect(() => {
-    // Check if token is present in URL
     const token = searchParams.get('token');
+
     if (!token) {
-      setAlertMessage(t('resetPassword.invalidToken'));
-      setAlertType('error');
-      setShowAlert(true);
+      setError('Invalid or missing token');
     }
-  }, [searchParams, t]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (password !== confirmPassword) {
-      setAlertMessage(t('resetPassword.passwordsNotMatch'));
-      setAlertType('error');
-      setShowAlert(true);
-      return;
-    }
-
-    if (password.length < 8) {
-      setAlertMessage(t('resetPassword.passwordTooShort'));
-      setAlertType('error');
-      setShowAlert(true);
-      return;
-    }
-
-    try {
-      await updatePassword(password);
-      setAlertMessage(t('resetPassword.passwordUpdated'));
-      setAlertType('success');
-      setShowAlert(true);
-      setTimeout(() => {
-        navigate('/login');
-      }, 3000);
-    } catch (error: any) {
-      setAlertMessage(error.message || t('resetPassword.updateFailed'));
-      setAlertType('error');
-      setShowAlert(true);
-    }
-  };
+  }, [searchParams]);
 
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    setPasswordVisible(!passwordVisible);
   };
 
   const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
+    setConfirmPasswordVisible(!confirmPasswordVisible);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (passwordStrength < 3) {
+      setError('Password is too weak. Please choose a stronger password.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: password
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Password Reset Successful",
+        description: "Your password has been updated successfully.",
+        variant: "default",
+      });
+
+      navigate('/app/login');
+    } catch (error: any) {
+      setError(error.message);
+      toast({
+        title: "Password Reset Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <LanguageSelector />
-      <Card className="tradeiq-card w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <ChartCandlestick className="h-6 w-6 mb-2" />
-          <CardTitle className="text-2xl text-white">{t('resetPassword.title')}</CardTitle>
-          <CardDescription className="text-gray-400">{t('resetPassword.subtitle')}</CardDescription>
+    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <Card className="w-full max-w-md bg-gray-800 border-gray-700">
+        <CardHeader className="flex flex-col items-center space-y-2 pb-4">
+          <CardTitle className="text-3xl font-bold text-white">Reset Password</CardTitle>
+          <CardDescription className="text-gray-400">Enter your new password below</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4">
-          {showAlert && (
-            <Alert variant={alertType}>
-              <AlertDescription>{alertMessage}</AlertDescription>
+        <CardContent className="space-y-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          <div className="grid gap-2">
-            <Label htmlFor="password" className="text-white">{t('resetPassword.newPassword')}</Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="tradeiq-input pr-10"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
-                onClick={togglePasswordVisibility}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="password" className="text-gray-300">
+                New Password
+              </Label>
+              <div className="relative">
+                <Input
+                  type={passwordVisible ? 'text' : 'password'}
+                  id="password"
+                  className="bg-gray-700 border-gray-600 text-white"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                >
+                  {passwordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </div>
             </div>
-            <PasswordStrengthIndicator password={password} />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="confirmPassword" className="text-white">{t('resetPassword.confirmPassword')}</Label>
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="tradeiq-input pr-10"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
-                onClick={toggleConfirmPasswordVisibility}
-              >
-                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
+            <div>
+              <Label htmlFor="confirmPassword" className="text-gray-300">
+                Confirm New Password
+              </Label>
+              <div className="relative">
+                <Input
+                  type={confirmPasswordVisible ? 'text' : 'password'}
+                  id="confirmPassword"
+                  className="bg-gray-700 border-gray-600 text-white"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleConfirmPasswordVisibility}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                >
+                  {confirmPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </div>
             </div>
-          </div>
-          <Button className="bg-tradeiq-blue text-white hover:bg-tradeiq-blue/90" onClick={handleSubmit}>
-            {t('resetPassword.resetButton')}
-          </Button>
+            <PasswordStrengthIndicator 
+              password={password}
+              onStrengthChange={setPasswordStrength}
+            />
+            <Button disabled={loading} className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90 text-white">
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M12 4V2m0 16v2m8-8h2M4 12H2M17.66 6.34l1.42-1.42M4.93 18.37l1.42-1.42M19.07 17.66l-1.42 1.42M6.34 4.93L4.93 6.34" /></svg>
+                  Updating...
+                </>
+              ) : (
+                'Reset Password'
+              )}
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>
