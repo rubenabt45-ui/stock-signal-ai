@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Plus, Edit3, Check, Filter, BarChart3, LogIn, RefreshCw } from "lucide-react";
@@ -10,10 +11,9 @@ import { AddSymbolModal } from "@/components/AddSymbolModal";
 import { FilterDropdown } from "@/components/FilterDropdown";
 import { MarketOverview } from "@/components/MarketOverview";
 import { useFavorites } from "@/hooks/useFavorites";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth/auth.provider";
 import { ChartCandlestick } from "lucide-react";
-
-export type CategoryFilter = 'all' | 'stocks' | 'crypto' | 'forex' | 'indices' | 'commodities' | 'etf';
+import { CategoryFilter } from "@/types/favorites";
 
 const Favorites = () => {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -49,8 +49,8 @@ const Favorites = () => {
     setIsEditMode(!isEditMode);
   };
 
-  const handleAddSymbol = async (symbol: string, name: string, category: CategoryFilter) => {
-    const success = await addFavorite({ symbol, name, category });
+  const handleAddSymbol = async (favoriteInput: { symbol: string; name: string; category: CategoryFilter }) => {
+    const success = await addFavorite(favoriteInput);
     if (success) {
       setIsAddModalOpen(false);
     }

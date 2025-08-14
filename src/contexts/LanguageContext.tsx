@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './AuthContext';
+import { useAuth } from './auth/auth.provider';
 import { useToast } from '@/hooks/use-toast';
 import i18n from '@/i18n/config';
 import { createContextGuard } from '@/utils/providerGuards';
@@ -50,14 +50,14 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           try {
             const { data: profile } = await supabase
               .from('user_profiles')
-              .select('language')
+              .select('preferred_language')
               .eq('id', user.id)
               .single();
 
-            if (profile?.language && AVAILABLE_LANGUAGES.some(lang => lang.code === profile.language)) {
-              targetLanguage = profile.language;
+            if (profile?.preferred_language && AVAILABLE_LANGUAGES.some(lang => lang.code === profile.preferred_language)) {
+              targetLanguage = profile.preferred_language;
               // Update localStorage to match user preference
-              localStorage.setItem('tiq_lang', profile.language);
+              localStorage.setItem('tiq_lang', profile.preferred_language);
             }
           } catch (dbError) {
             logger.warn('Could not fetch user language preference:', dbError);
@@ -124,7 +124,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             .from('user_profiles')
             .upsert({ 
               id: user.id, 
-              language 
+              preferred_language: language 
             }, {
               onConflict: 'id'
             });

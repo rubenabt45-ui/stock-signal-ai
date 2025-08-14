@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth/auth.provider';
 import { logger } from '@/utils/logger';
 import { STRIPE_SANDBOX } from '@/config/env';
 import { checkProAccess } from '@/utils/premium-gating';
@@ -42,7 +42,7 @@ export const useSubscription = () => {
       
       const { data: profile, error } = await supabase
         .from('user_profiles')
-        .select('subscription_tier, subscription_status, subscription_end')
+        .select('subscription_tier, subscription_status, subscription_expires_at')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -64,7 +64,7 @@ export const useSubscription = () => {
         subscribed: isPro,
         subscription_tier: subscriptionTier,
         subscription_status: profile?.subscription_status || 'inactive',
-        subscription_end: profile?.subscription_end || null,
+        subscription_end: profile?.subscription_expires_at || null,
         loading: false,
       });
 
@@ -72,7 +72,7 @@ export const useSubscription = () => {
         subscribed: isPro,
         tier: subscriptionTier,
         status: profile?.subscription_status,
-        end: profile?.subscription_end
+        end: profile?.subscription_expires_at
       });
       
     } catch (error: any) {

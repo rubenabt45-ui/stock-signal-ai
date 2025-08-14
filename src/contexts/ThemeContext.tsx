@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from './auth/auth.provider';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { createContextGuard } from '@/utils/providerGuards';
@@ -55,7 +55,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         // Use .maybeSingle() instead of .single() to handle missing records gracefully
         const { data, error } = await supabase
           .from('user_profiles')
-          .select('theme')
+          .select('preferred_theme')
           .eq('id', user.id)
           .maybeSingle();
 
@@ -67,10 +67,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        if (data?.theme && ['light', 'dark', 'system'].includes(data.theme)) {
-          logger.debug('🎨 Loaded user theme successfully:', data.theme);
-          setThemeState(data.theme as Theme);
-          localStorage.setItem('theme', data.theme);
+        if (data?.preferred_theme && ['light', 'dark', 'system'].includes(data.preferred_theme)) {
+          logger.debug('🎨 Loaded user theme successfully:', data.preferred_theme);
+          setThemeState(data.preferred_theme as Theme);
+          localStorage.setItem('theme', data.preferred_theme);
         } else {
           logger.debug('🎨 No user theme found or invalid, using default:', defaultTheme);
           setThemeState(defaultTheme);
@@ -140,7 +140,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           .from('user_profiles')
           .upsert({ 
             id: user.id, 
-            theme: newTheme 
+            preferred_theme: newTheme 
           }, {
             onConflict: 'id'
           });
