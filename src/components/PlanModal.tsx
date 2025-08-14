@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { X, Check, Zap, MessageSquare, TrendingUp, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth/auth.provider';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,7 @@ import { Bell, Edit3, Trash2, Plus, Volume2, Mail, Settings } from 'lucide-react
 import { useUserAlerts, UserAlert } from '@/hooks/useUserAlerts';
 import { AddAlertModal } from '@/components/AddAlertModal';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth/auth.provider';
 import { useToast } from '@/hooks/use-toast';
 
 export const NotificationsSection = () => {
