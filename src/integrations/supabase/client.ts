@@ -1,20 +1,11 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_URL, SUPABASE_ANON_KEY, IS_DEVELOPMENT } from '@/config/env';
 
-// Provide fallback values for development to prevent crashes
-const supabaseUrl = SUPABASE_URL || (IS_DEVELOPMENT ? 'https://placeholder.supabase.co' : '');
-const supabaseKey = SUPABASE_ANON_KEY || (IS_DEVELOPMENT ? 'placeholder-key' : '');
+// Use the actual project credentials
+const supabaseUrl = 'https://xnrvqfclyroagzknedhs.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhucnZxZmNseXJvYWd6a25lZGhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5Mjg0MTgsImV4cCI6MjA2NDUwNDQxOH0.vIFgqNFnfLVoqtSs4xGWAAVmDiAeIUS3fo6C-1sbQog';
 
-if (!supabaseUrl || !supabaseKey) {
-  if (IS_DEVELOPMENT) {
-    console.warn('⚠️ [SUPABASE] Missing environment variables - using development fallbacks');
-  } else {
-    throw new Error('Missing required Supabase configuration. Please check your environment variables.');
-  }
-}
-
-export const supabase = createClient(supabaseUrl, supabaseKey, {
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
@@ -22,9 +13,4 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 // Log initialization status
-if (IS_DEVELOPMENT) {
-  console.log('🔌 [SUPABASE] Client initialized:', {
-    url: supabaseUrl.includes('placeholder') ? 'PLACEHOLDER' : 'CONFIGURED',
-    hasRealConfig: !supabaseUrl.includes('placeholder')
-  });
-}
+console.log('🔌 [SUPABASE] Client initialized with project:', supabaseUrl);
