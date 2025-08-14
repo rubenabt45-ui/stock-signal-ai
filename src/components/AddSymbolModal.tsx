@@ -1,185 +1,174 @@
 
-import { useState, useMemo } from "react";
-import { Search, X, Plus } from "lucide-react";
-import { useTranslation } from 'react-i18next';
+import { useState } from "react";
+import { Plus, X, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { CategoryFilter } from "@/pages/Favorites";
-
-// Expanded asset database (reusing from AssetSelection)
-const allAssets = [
-  // Stocks
-  { symbol: "AAPL", name: "Apple Inc.", category: "stocks" as const },
-  { symbol: "MSFT", name: "Microsoft Corp.", category: "stocks" as const },
-  { symbol: "GOOGL", name: "Alphabet Inc. Class A", category: "stocks" as const },
-  { symbol: "TSLA", name: "Tesla Inc.", category: "stocks" as const },
-  { symbol: "NVDA", name: "NVIDIA Corp.", category: "stocks" as const },
-  { symbol: "AMZN", name: "Amazon.com Inc.", category: "stocks" as const },
-  { symbol: "META", name: "Meta Platforms Inc.", category: "stocks" as const },
-  
-  // Crypto
-  { symbol: "BTCUSD", name: "Bitcoin", category: "crypto" as const },
-  { symbol: "ETHUSD", name: "Ethereum", category: "crypto" as const },
-  { symbol: "SOLUSD", name: "Solana", category: "crypto" as const },
-  { symbol: "ADAUSD", name: "Cardano", category: "crypto" as const },
-  
-  // Forex
-  { symbol: "EURUSD", name: "Euro / US Dollar", category: "forex" as const },
-  { symbol: "GBPUSD", name: "British Pound / US Dollar", category: "forex" as const },
-  { symbol: "USDJPY", name: "US Dollar / Japanese Yen", category: "forex" as const },
-  
-  // Indices
-  { symbol: "SPX", name: "S&P 500 Index", category: "indices" as const },
-  { symbol: "IXIC", name: "NASDAQ Composite", category: "indices" as const },
-  { symbol: "DJI", name: "Dow Jones Industrial Average", category: "indices" as const },
-  
-  // Commodities
-  { symbol: "XAUUSD", name: "Gold Spot", category: "commodities" as const },
-  { symbol: "USOIL", name: "Crude Oil WTI", category: "commodities" as const },
-  
-  // ETFs
-  { symbol: "SPY", name: "SPDR S&P 500 ETF Trust", category: "etf" as const },
-  { symbol: "QQQ", name: "Invesco QQQ Trust", category: "etf" as const },
-];
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CategoryFilter, FavoriteInput } from "@/types/favorites";
 
 interface AddSymbolModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddSymbol: (symbol: string, name: string, category: CategoryFilter) => void;
+  onAddSymbol: (favoriteInput: FavoriteInput) => Promise<void>;
   existingSymbols: string[];
 }
 
-export const AddSymbolModal = ({ 
-  isOpen, 
-  onClose, 
-  onAddSymbol, 
-  existingSymbols 
-}: AddSymbolModalProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const { t } = useTranslation();
+const categories = [
+  { key: 'stocks' as const, label: 'Stocks', emoji: '📈' },
+  { key: 'crypto' as const, label: 'Crypto', emoji: '💰' },
+  { key: 'forex' as const, label: 'Forex', emoji: '🌐' },
+  { key: 'indices' as const, label: 'Indices', emoji: '📊' },
+  { key: 'commodities' as const, label: 'Commodities', emoji: '⚙️' },
+  { key: 'etf' as const, label: 'ETFs', emoji: '📊' },
+];
 
-  const filteredAssets = useMemo(() => {
-    if (!searchTerm) {
-      return allAssets.slice(0, 20); // Show top 20 popular assets
-    }
+export const AddSymbolModal = ({ isOpen, onClose, onAddSymbol, existingSymbols }: AddSymbolModalProps) => {
+  const [symbol, setSymbol] = useState('');
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState<CategoryFilter>('stocks');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-    return allAssets.filter(asset => 
-      (asset.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       asset.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      !existingSymbols.includes(asset.symbol)
-    ).slice(0, 50);
-  }, [searchTerm, existingSymbols]);
-
-  const handleAddSymbol = (asset: typeof allAssets[0]) => {
-    onAddSymbol(asset.symbol, asset.name, asset.category);
-    setSearchTerm("");
-    // Don't close modal immediately - let user add multiple symbols
+  const resetForm = () => {
+    setSymbol('');
+    setName('');
+    setCategory('stocks');
+    setError('');
   };
 
   const handleClose = () => {
-    setSearchTerm("");
+    resetForm();
     onClose();
   };
 
-  const categoryColors = {
-    stocks: "text-blue-400",
-    crypto: "text-orange-400", 
-    forex: "text-green-400",
-    indices: "text-purple-400",
-    commodities: "text-yellow-400",
-    etf: "text-cyan-400",
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!symbol.trim() || !name.trim()) {
+      setError('Symbol and name are required');
+      return;
+    }
+
+    if (existingSymbols.includes(symbol.toUpperCase())) {
+      setError('Symbol already exists in your favorites');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      await onAddSymbol({
+        symbol: symbol.toUpperCase(),
+        name: name.trim(),
+        category,
+      });
+      handleClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add symbol');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="tradeiq-card max-w-2xl max-h-[80vh] flex flex-col bg-tradeiq-navy border-gray-700">
+      <DialogContent className="tradeiq-card border-gray-700 max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-white text-xl flex items-center">
-            <Plus className="h-5 w-5 mr-2 text-tradeiq-blue" />
-            Add Symbol to Watchlist
+          <DialogTitle className="text-white flex items-center space-x-2">
+            <Plus className="h-5 w-5 text-tradeiq-blue" />
+            <span>Add Symbol to Favorites</span>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 overflow-hidden flex flex-col space-y-4">
-          {/* Search Input */}
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="text-red-400 text-sm bg-red-400/10 p-3 rounded-lg border border-red-400/20">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="symbol" className="text-gray-300">
+              Symbol *
+            </Label>
             <Input
-              type="text"
-              placeholder={t('placeholders.searchStocks')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-12 bg-black/30 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-tradeiq-blue focus:ring-1 focus:ring-tradeiq-blue"
+              id="symbol"
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+              placeholder="e.g., AAPL, BTCUSD"
+              className="bg-gray-800 border-gray-600"
+              required
             />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm("")}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            )}
           </div>
 
-          {/* Results */}
-          <div className="flex-1 overflow-y-auto space-y-2 pr-2">
-            {filteredAssets.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>No results found for "{searchTerm}"</p>
-                <p className="text-xs mt-1">Try searching for stocks, crypto, or forex</p>
-              </div>
-            ) : (
-              filteredAssets.map((asset) => (
-                <div
-                  key={asset.symbol}
-                  className="flex items-center justify-between p-3 bg-black/20 hover:bg-black/40 border border-gray-800/50 hover:border-tradeiq-blue/50 rounded-xl transition-all duration-200"
-                >
-                  <div className="flex items-center space-x-3 flex-1">
-                    <Badge 
-                      variant="outline" 
-                      className={`text-xs border-gray-600/50 ${categoryColors[asset.category]} border-opacity-30`}
-                    >
-                      {asset.category}
-                    </Badge>
-                    <div>
-                      <div className="font-bold text-white">{asset.symbol}</div>
-                      <div className="text-xs text-gray-400 truncate max-w-[300px]">
-                        {asset.name}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Button
-                    onClick={() => handleAddSymbol(asset)}
-                    disabled={existingSymbols.includes(asset.symbol)}
-                    className="tradeiq-button-primary h-8 px-3"
-                  >
-                    {existingSymbols.includes(asset.symbol) ? 'Added' : 'Add'}
-                  </Button>
-                </div>
-              ))
-            )}
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-gray-300">
+              Name *
+            </Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g., Apple Inc."
+              className="bg-gray-800 border-gray-600"
+              required
+            />
           </div>
 
-          {/* Close Button */}
-          <div className="flex justify-end pt-4 border-t border-gray-800">
+          <div className="space-y-2">
+            <Label htmlFor="category" className="text-gray-300">
+              Category
+            </Label>
+            <Select value={category} onValueChange={(value) => setCategory(value as CategoryFilter)}>
+              <SelectTrigger className="bg-gray-800 border-gray-600">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="tradeiq-card border-gray-700">
+                {categories.map((cat) => (
+                  <SelectItem key={cat.key} value={cat.key}>
+                    <span className="flex items-center space-x-2">
+                      <span>{cat.emoji}</span>
+                      <span>{cat.label}</span>
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex space-x-3 pt-4">
             <Button
+              type="button"
               variant="outline"
               onClick={handleClose}
-              className="text-gray-400 border-gray-700 hover:bg-gray-800"
+              className="flex-1 border-gray-600 hover:bg-gray-800"
+              disabled={isLoading}
             >
-              Done
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="flex-1 tradeiq-button-primary"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Adding...' : 'Add Symbol'}
             </Button>
           </div>
-        </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

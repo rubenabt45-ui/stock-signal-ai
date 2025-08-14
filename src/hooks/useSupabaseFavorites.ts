@@ -1,16 +1,10 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { CategoryFilter } from '@/pages/Favorites';
+import { useAuth } from '@/contexts/auth/auth.provider';
+import { CategoryFilter, FavoriteInput, FavoriteItem } from '@/types/favorites';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-
-interface FavoriteItem {
-  symbol: string;
-  name: string;
-  category: CategoryFilter;
-}
 
 interface SupabaseFavoriteItem {
   id: string;
@@ -21,7 +15,7 @@ interface SupabaseFavoriteItem {
 }
 
 // Default favorites for new users
-const defaultFavorites: FavoriteItem[] = [
+const defaultFavorites: FavoriteInput[] = [
   { symbol: 'AAPL', name: 'Apple Inc.', category: 'stocks' },
   { symbol: 'MSFT', name: 'Microsoft Corp.', category: 'stocks' },
   { symbol: 'GOOGL', name: 'Alphabet Inc.', category: 'stocks' },
@@ -69,9 +63,13 @@ export const useSupabaseFavorites = () => {
 
       if (data && data.length > 0) {
         const favoritesData = data.map(item => ({
+          id: item.id,
+          user_id: item.user_id,
           symbol: item.symbol,
           name: item.name,
           category: item.category as CategoryFilter,
+          created_at: item.created_at,
+          display_order: item.display_order,
         }));
         setFavorites(favoritesData);
       } else {
@@ -114,7 +112,15 @@ export const useSupabaseFavorites = () => {
         throw insertError;
       }
 
-      setFavorites(defaultFavorites);
+      const favoritesData = defaultFavorites.map((fav, index) => ({
+        ...fav,
+        id: `temp-${index}`,
+        user_id: user.id,
+        created_at: new Date().toISOString(),
+        display_order: index,
+      }));
+
+      setFavorites(favoritesData);
       console.log('✅ Default favorites initialized');
     } catch (err) {
       console.error('❌ Error initializing defaults:', err);
@@ -122,7 +128,7 @@ export const useSupabaseFavorites = () => {
   };
 
   // Add favorite
-  const addFavorite = async (item: FavoriteItem) => {
+  const addFavorite = async (item: FavoriteInput) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -160,7 +166,15 @@ export const useSupabaseFavorites = () => {
         throw insertError;
       }
 
-      setFavorites(prev => [...prev, item]);
+      const newFavorite: FavoriteItem = {
+        ...item,
+        id: `temp-${Date.now()}`,
+        user_id: user.id,
+        created_at: new Date().toISOString(),
+        display_order: favorites.length,
+      };
+
+      setFavorites(prev => [...prev, newFavorite]);
       toast({
         title: "Added to Favorites",
         description: `${item.symbol} has been added to your watchlist`,

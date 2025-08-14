@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
@@ -43,6 +43,42 @@ export type Database = {
           id?: string
           symbol?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          current_period_end: string | null
+          email: string | null
+          full_name: string | null
+          plan_tier: string | null
+          subscription_status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          email?: string | null
+          full_name?: string | null
+          plan_tier?: string | null
+          subscription_status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          email?: string | null
+          full_name?: string | null
+          plan_tier?: string | null
+          subscription_status?: string | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -161,10 +197,13 @@ export type Database = {
           id: string
           is_pro: boolean
           language: string | null
+          preferred_language: string | null
+          preferred_theme: string | null
           refresh_interval: string | null
           sound_enabled: boolean | null
           stripe_customer_id: string | null
           subscription_end: string | null
+          subscription_expires_at: string | null
           subscription_status: string | null
           subscription_tier: string | null
           theme: string | null
@@ -182,10 +221,13 @@ export type Database = {
           id: string
           is_pro?: boolean
           language?: string | null
+          preferred_language?: string | null
+          preferred_theme?: string | null
           refresh_interval?: string | null
           sound_enabled?: boolean | null
           stripe_customer_id?: string | null
           subscription_end?: string | null
+          subscription_expires_at?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
           theme?: string | null
@@ -203,10 +245,13 @@ export type Database = {
           id?: string
           is_pro?: boolean
           language?: string | null
+          preferred_language?: string | null
+          preferred_theme?: string | null
           refresh_interval?: string | null
           sound_enabled?: boolean | null
           stripe_customer_id?: string | null
           subscription_end?: string | null
+          subscription_expires_at?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
           theme?: string | null

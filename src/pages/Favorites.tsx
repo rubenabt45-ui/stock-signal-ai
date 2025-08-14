@@ -13,7 +13,7 @@ import { MarketOverview } from "@/components/MarketOverview";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useAuth } from "@/contexts/auth/auth.provider";
 import { ChartCandlestick } from "lucide-react";
-import { CategoryFilter } from "@/types/favorites";
+import { CategoryFilter, FavoriteInput } from "@/types/favorites";
 
 const Favorites = () => {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -49,7 +49,7 @@ const Favorites = () => {
     setIsEditMode(!isEditMode);
   };
 
-  const handleAddSymbol = async (favoriteInput: { symbol: string; name: string; category: CategoryFilter }) => {
+  const handleAddSymbol = async (favoriteInput: FavoriteInput) => {
     const success = await addFavorite(favoriteInput);
     if (success) {
       setIsAddModalOpen(false);
