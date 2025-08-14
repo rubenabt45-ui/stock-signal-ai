@@ -1,15 +1,19 @@
 
 import React, { useState } from 'react';
-import { Brain, Zap, TrendingUp, ArrowRight, Lock } from 'lucide-react';
+import { Brain, Zap, TrendingUp, ArrowRight, Lock, Clock, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { useNavigate } from 'react-router-dom';
+import { useDailyMessages } from '@/hooks/useDailyMessages';
+import { useSubscription } from '@/hooks/useSubscription';
 
 export const TradingChatDemo: React.FC = () => {
   const { t } = useTranslationWithFallback();
   const navigate = useNavigate();
+  const { isPro } = useSubscription();
+  const { canUseFreeAnalysis, hasUsedFreeAnalysis, getTimeUntilNextFreeAnalysis, recordFreeAnalysisUsage } = useDailyMessages();
   const [showDemo, setShowDemo] = useState(false);
 
   // Sample demo analysis
@@ -25,13 +29,25 @@ export const TradingChatDemo: React.FC = () => {
     ]
   };
 
-  const handleViewDemo = () => {
+  const handleViewDemo = async () => {
+    if (!canUseFreeAnalysis && !isPro) {
+      // Show upgrade message if daily limit reached
+      return;
+    }
+    
+    if (!isPro) {
+      // Record usage for free users
+      await recordFreeAnalysisUsage();
+    }
+    
     setShowDemo(true);
   };
 
   const handleUpgrade = () => {
     navigate('/pricing');
   };
+
+  const hoursUntilNext = getTimeUntilNextFreeAnalysis();
 
   if (showDemo) {
     return (
@@ -40,10 +56,15 @@ export const TradingChatDemo: React.FC = () => {
           {/* Demo Header */}
           <div className="text-center space-y-4">
             <Badge className="bg-blue-600 text-white px-4 py-2">
-              {t('tradingChat.freeMode.demoMode')}
+              {isPro ? 'Pro Mode' : 'Demo Mode'}
             </Badge>
-            <h1 className="text-3xl font-bold text-white">StrategyAI Analysis Demo</h1>
-            <p className="text-gray-400">Sample analysis showing StrategyAI's capabilities</p>
+            <h1 className="text-3xl font-bold text-white">StrategyAI Analysis {isPro ? '' : 'Demo'}</h1>
+            <p className="text-gray-400">
+              {isPro 
+                ? 'Full AI-powered analysis with unlimited access'
+                : 'Sample analysis showing StrategyAI\'s capabilities'
+              }
+            </p>
           </div>
 
           {/* Demo Analysis Card */}
@@ -86,32 +107,46 @@ export const TradingChatDemo: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Upgrade Call-to-Action */}
-          <Card className="bg-gradient-to-r from-orange-600/20 to-blue-600/20 border-orange-500/30">
-            <CardContent className="p-6 text-center space-y-4">
-              <Lock className="h-12 w-12 text-orange-400 mx-auto" />
-              <h3 className="text-xl font-bold text-white">Want Real-Time Analysis?</h3>
-              <p className="text-gray-300">
-                This was just a demo. Upgrade to Pro for unlimited AI analysis of any symbol, real-time data, and personalized insights.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button 
-                  onClick={handleUpgrade}
-                  className="bg-orange-600 hover:bg-orange-700 text-white"
-                >
-                  Unlock StrategyAI Pro
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => navigate('/pricing')}
-                  className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                >
-                  See All Features
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Upgrade Call-to-Action for Free Users */}
+          {!isPro && (
+            <Card className="bg-gradient-to-r from-orange-600/20 to-blue-600/20 border-orange-500/30">
+              <CardContent className="p-6 text-center space-y-4">
+                <Lock className="h-12 w-12 text-orange-400 mx-auto" />
+                <h3 className="text-xl font-bold text-white">Want Real-Time Analysis?</h3>
+                <p className="text-gray-300">
+                  This was just a demo. You've used your daily free analysis. Upgrade to Pro for unlimited AI analysis of any symbol, real-time data, and personalized insights.
+                </p>
+                <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
+                  <div className="flex items-center justify-center space-x-2 text-yellow-400">
+                    <Clock className="h-4 w-4" />
+                    <span className="text-sm">
+                      {hoursUntilNext 
+                        ? `Next free analysis in ${hoursUntilNext} hours`
+                        : 'You can use another free analysis now!'
+                      }
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button 
+                    onClick={handleUpgrade}
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                  >
+                    <Crown className="h-4 w-4 mr-2" />
+                    Unlock Unlimited Analysis
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => navigate('/pricing')}
+                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                  >
+                    See All Pro Features
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Back Button */}
           <div className="text-center">
@@ -120,7 +155,7 @@ export const TradingChatDemo: React.FC = () => {
               onClick={() => setShowDemo(false)}
               className="text-gray-400 hover:text-white"
             >
-              ← Back to Demo Options
+              ← Back to StrategyAI Options
             </Button>
           </div>
         </div>
@@ -147,20 +182,63 @@ export const TradingChatDemo: React.FC = () => {
             </p>
           </div>
 
+          {/* Usage Status for Free Users */}
+          {!isPro && (
+            <div className="bg-gray-700/50 rounded-lg p-4">
+              <div className="flex items-center justify-center space-x-2 mb-2">
+                <Clock className="h-4 w-4 text-blue-400" />
+                <span className="text-sm font-medium text-white">Free Daily Analysis</span>
+              </div>
+              {canUseFreeAnalysis ? (
+                <p className="text-green-400 text-sm">✓ You have 1 free analysis available today</p>
+              ) : (
+                <div className="text-center">
+                  <p className="text-orange-400 text-sm">
+                    You've used your free daily analysis
+                  </p>
+                  {hoursUntilNext && (
+                    <p className="text-gray-400 text-xs mt-1">
+                      Next free analysis in {hoursUntilNext} hours
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Demo Options */}
           <div className="space-y-4">
             <Card className="bg-gray-700/50 border-gray-600">
               <CardContent className="p-4">
-                <h3 className="text-white font-semibold mb-2">Free Demo Analysis</h3>
+                <h3 className="text-white font-semibold mb-2">
+                  {canUseFreeAnalysis || isPro ? 'AI Analysis Demo' : 'Daily Limit Reached'}
+                </h3>
                 <p className="text-gray-300 text-sm mb-4">
-                  View a sample AI analysis to understand StrategyAI's capabilities
+                  {canUseFreeAnalysis || isPro 
+                    ? 'View a sample AI analysis to understand StrategyAI\'s capabilities'
+                    : 'You\'ve used your free daily analysis. Upgrade for unlimited access.'
+                  }
                 </p>
                 <Button 
-                  onClick={handleViewDemo}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={canUseFreeAnalysis || isPro ? handleViewDemo : handleUpgrade}
+                  className={`w-full ${
+                    canUseFreeAnalysis || isPro 
+                      ? 'bg-blue-600 hover:bg-blue-700' 
+                      : 'bg-orange-600 hover:bg-orange-700'
+                  } text-white`}
+                  disabled={!canUseFreeAnalysis && !isPro}
                 >
-                  <Brain className="h-4 w-4 mr-2" />
-                  View Sample Analysis
+                  {canUseFreeAnalysis || isPro ? (
+                    <>
+                      <Brain className="h-4 w-4 mr-2" />
+                      View Sample Analysis
+                    </>
+                  ) : (
+                    <>
+                      <Crown className="h-4 w-4 mr-2" />
+                      Upgrade for Unlimited Access
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>
@@ -173,11 +251,13 @@ export const TradingChatDemo: React.FC = () => {
                   <li>• Real-time market data integration</li>
                   <li>• Personalized trading recommendations</li>
                   <li>• Advanced pattern recognition</li>
+                  <li>• Complete chat history</li>
                 </ul>
                 <Button 
                   onClick={handleUpgrade}
                   className="w-full bg-orange-600 hover:bg-orange-700 text-white"
                 >
+                  <Crown className="h-4 w-4 mr-2" />
                   Unlock Pro Features
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>

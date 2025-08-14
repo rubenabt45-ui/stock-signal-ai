@@ -1,106 +1,131 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth/auth.provider';
 import { useSubscription } from '@/hooks/useSubscription';
+import { logger } from '@/utils/logger';
+
+interface DailyUsage {
+  hasUsedFreeAnalysis: boolean;
+  lastAnalysisDate: string | null;
+  canUseFreeAnalysis: boolean;
+  loading: boolean;
+}
 
 export const useDailyMessages = () => {
   const { user } = useAuth();
   const { isPro } = useSubscription();
-  const [messageCount, setMessageCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [canSendMessage, setCanSendMessage] = useState(true);
+  const [dailyUsage, setDailyUsage] = useState<DailyUsage>({
+    hasUsedFreeAnalysis: false,
+    lastAnalysisDate: null,
+    canUseFreeAnalysis: true,
+    loading: true
+  });
 
-  const MAX_FREE_MESSAGES = 5;
-
-  const fetchMessageCount = async () => {
-    if (!user) {
-      setLoading(false);
+  // Check if user can use free analysis (once per 24h for free users)
+  const checkFreeAnalysisUsage = async () => {
+    if (!user?.id || isPro) {
+      setDailyUsage(prev => ({ ...prev, loading: false, canUseFreeAnalysis: true }));
       return;
     }
 
     try {
-      const { data, error } = await supabase
+      const { data: profile, error } = await supabase
         .from('user_profiles')
-        .select('daily_message_count, daily_message_reset')
+        .select('last_free_analysis_at')
         .eq('id', user.id)
-        .maybeSingle();
+        .single();
 
-      if (error) throw error;
-
-      // If no user profile exists, return with default values
-      if (!data) {
-        setMessageCount(0);
-        setLoading(false);
+      if (error) {
+        logger.error('[DAILY_USAGE] Error fetching usage:', error);
+        setDailyUsage(prev => ({ ...prev, loading: false }));
         return;
       }
 
-      const today = new Date().toDateString();
-      const resetDate = data.daily_message_reset ? new Date(data.daily_message_reset).toDateString() : null;
-
-      // Reset count if it's a new day
-      if (resetDate !== today) {
-        await supabase
-          .from('user_profiles')
-          .update({
-            daily_message_count: 0,
-            daily_message_reset: new Date().toISOString().split('T')[0]
-          })
-          .eq('id', user.id);
-        
-        setMessageCount(0);
-      } else {
-        setMessageCount(data.daily_message_count || 0);
-      }
+      const lastAnalysisDate = profile?.last_free_analysis_at;
+      const now = new Date();
+      const lastAnalysis = lastAnalysisDate ? new Date(lastAnalysisDate) : null;
+      
+      // Check if 24 hours have passed since last free analysis
+      const canUse = !lastAnalysis || (now.getTime() - lastAnalysis.getTime()) >= 24 * 60 * 60 * 1000;
+      
+      setDailyUsage({
+        hasUsedFreeAnalysis: !!lastAnalysis,
+        lastAnalysisDate,
+        canUseFreeAnalysis: canUse,
+        loading: false
+      });
+      
+      logger.debug('[DAILY_USAGE] Usage check complete:', {
+        lastAnalysis: lastAnalysisDate,
+        canUse,
+        hoursSinceLastUse: lastAnalysis ? (now.getTime() - lastAnalysis.getTime()) / (1000 * 60 * 60) : null
+      });
+      
     } catch (error) {
-      console.error('Error fetching message count:', error);
-    } finally {
-      setLoading(false);
+      logger.error('[DAILY_USAGE] Exception checking usage:', error);
+      setDailyUsage(prev => ({ ...prev, loading: false }));
     }
   };
 
-  const incrementMessageCount = async () => {
-    if (!user || isPro) return true;
+  // Record free analysis usage
+  const recordFreeAnalysisUsage = async () => {
+    if (!user?.id || isPro) return true;
 
     try {
-      const newCount = messageCount + 1;
-      
       const { error } = await supabase
         .from('user_profiles')
-        .update({
-          daily_message_count: newCount,
-          daily_message_reset: new Date().toISOString().split('T')[0]
+        .update({ 
+          last_free_analysis_at: new Date().toISOString()
         })
         .eq('id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        logger.error('[DAILY_USAGE] Error recording usage:', error);
+        return false;
+      }
 
-      setMessageCount(newCount);
+      // Update local state
+      setDailyUsage(prev => ({
+        ...prev,
+        hasUsedFreeAnalysis: true,
+        lastAnalysisDate: new Date().toISOString(),
+        canUseFreeAnalysis: false
+      }));
+
+      logger.debug('[DAILY_USAGE] Free analysis usage recorded');
       return true;
+      
     } catch (error) {
-      console.error('Error incrementing message count:', error);
+      logger.error('[DAILY_USAGE] Exception recording usage:', error);
       return false;
     }
   };
 
-  useEffect(() => {
-    fetchMessageCount();
-  }, [user]);
+  // Get time until next free analysis
+  const getTimeUntilNextFreeAnalysis = () => {
+    if (isPro || !dailyUsage.lastAnalysisDate) return null;
+    
+    const lastAnalysis = new Date(dailyUsage.lastAnalysisDate);
+    const nextAllowed = new Date(lastAnalysis.getTime() + 24 * 60 * 60 * 1000);
+    const now = new Date();
+    
+    if (now >= nextAllowed) return null;
+    
+    const msRemaining = nextAllowed.getTime() - now.getTime();
+    const hoursRemaining = Math.ceil(msRemaining / (1000 * 60 * 60));
+    
+    return hoursRemaining;
+  };
 
   useEffect(() => {
-    if (isPro) {
-      setCanSendMessage(true);
-    } else {
-      setCanSendMessage(messageCount < MAX_FREE_MESSAGES);
-    }
-  }, [messageCount, isPro]);
+    checkFreeAnalysisUsage();
+  }, [user?.id, isPro]);
 
   return {
-    messageCount,
-    maxMessages: MAX_FREE_MESSAGES,
-    canSendMessage,
-    remainingMessages: Math.max(0, MAX_FREE_MESSAGES - messageCount),
-    incrementMessageCount,
-    loading,
-    isPro
+    ...dailyUsage,
+    recordFreeAnalysisUsage,
+    getTimeUntilNextFreeAnalysis,
+    refreshUsage: checkFreeAnalysisUsage
   };
 };
