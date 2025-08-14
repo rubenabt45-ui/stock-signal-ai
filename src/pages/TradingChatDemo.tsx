@@ -252,7 +252,7 @@ export const TradingChatDemo: React.FC = () => {
               <CardContent className="p-4">
                 <h3 className="text-white font-semibold mb-2">Unlock Full StrategyAI</h3>
                 <ul className="text-gray-300 text-sm space-y-1 mb-4 text-left">
-                  <li>• Unlimited AI analysis for any symbol (vs 3/day free)</li>
+                  <li>• Unlimited AI analysis for any symbol (vs {maxAnalysisPerDay}/day free)</li>
                   <li>• Real-time market data integration</li>
                   <li>• Personalized trading recommendations</li>
                   <li>• Advanced pattern recognition</li>

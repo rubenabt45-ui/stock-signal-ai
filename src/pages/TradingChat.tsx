@@ -1,71 +1,45 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, X, Bot, User, Loader2, Mic, RotateCcw, Crown } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { TradingAIService } from "@/services/tradingAIService";
-import { useConversationMemory } from "@/hooks/useConversationMemory";
-import { useDailyMessages } from "@/hooks/useDailyMessages";
-import { UpgradeModal } from "@/components/UpgradeModal";
-import { Badge } from "@/components/ui/badge";
-import { ProtectedFeature } from "@/components/ProtectedFeature";
-import ReactMarkdown from 'react-markdown';
-import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
-import { PageWrapper } from '@/components/PageWrapper';
 
-interface ChatMessage {
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Send, Bot, User, Loader2, Brain, Lock, Crown, Clock, AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useAuth } from '@/contexts/auth/auth.provider';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useDailyMessages } from '@/hooks/useDailyMessages';
+import { UpgradeModal } from '@/components/UpgradeModal';
+import { enhancedAIService } from '@/services/enhancedAIService';
+import { logger } from '@/utils/logger';
+import { useNavigate } from 'react-router-dom';
+
+interface Message {
   id: string;
-  type: 'user' | 'assistant';
   content: string;
+  sender: 'user' | 'ai';
   timestamp: Date;
-  images?: string[];
+  isStreaming?: boolean;
 }
 
-interface UploadedImage {
-  id: string;
-  file: File;
-  preview: string;
-}
-
-const TradingChat = () => {
-  const { t } = useTranslationWithFallback();
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      type: 'assistant',
-      content: t('tradingChat.welcome'),
-      timestamp: new Date()
-    }
-  ]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showMemoryNotification, setShowMemoryNotification] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-
-  // Initialize conversation memory
+export const TradingChat: React.FC = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { isPro } = useSubscription();
   const { 
-    context: memoryContext, 
-    addMessage: addToMemory, 
-    getContextForAI, 
-    resetMemory, 
-    activateMemory,
-    isMemoryActive,
-    messageCount 
-  } = useConversationMemory();
-
-  // Initialize daily analysis limits
-  const {
     analysisCount,
     maxAnalysisPerDay,
     canUseAnalysis,
     remainingAnalysis,
     recordAnalysisUsage,
-    isPro
+    loading: usageLoading
   } = useDailyMessages();
+  
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -75,454 +49,272 @@ const TradingChat = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Show memory activation notification on first message
   useEffect(() => {
-    if (!isMemoryActive && messages.length > 3) {
-      activateMemory();
-      setShowMemoryNotification(true);
-      setTimeout(() => setShowMemoryNotification(false), 4000);
+    if (!user) {
+      navigate('/login');
     }
-  }, [messages.length, isMemoryActive, activateMemory]);
+  }, [user, navigate]);
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() && uploadedImages.length === 0) return;
+  const handleSendMessage = useCallback(async () => {
+    if (!input.trim() || isLoading || usageLoading) return;
 
-    // Check daily analysis limit for free users
-    if (!canUseAnalysis) {
+    // Check if user can send analysis for free users
+    if (!isPro && !canUseAnalysis) {
       setShowUpgradeModal(true);
       return;
     }
 
-    const userMessage: ChatMessage = {
+    const userMessage: Message = {
       id: Date.now().toString(),
-      type: 'user',
-      content: inputMessage || 'Chart analysis request',
+      content: input.trim(),
+      sender: 'user',
       timestamp: new Date(),
-      images: uploadedImages.length > 0 ? uploadedImages.map(img => img.preview) : undefined
     };
 
     setMessages(prev => [...prev, userMessage]);
-    
-    // Add to conversation memory
-    addToMemory({
-      id: userMessage.id,
-      type: userMessage.type,
-      content: userMessage.content,
-      timestamp: userMessage.timestamp,
-      images: userMessage.images
-    });
-
-    const currentMessage = inputMessage;
-    const currentImages = [...uploadedImages];
-    
-    // Clear input and images immediately after sending
-    setInputMessage('');
-    setUploadedImages([]);
+    setInput('');
     setIsLoading(true);
 
-    // Record analysis usage for free users
+    // Record usage for free users
     if (!isPro) {
-      await recordAnalysisUsage();
+      const recorded = await recordAnalysisUsage();
+      if (!recorded) {
+        logger.error('[TRADING_CHAT] Failed to record analysis usage');
+      }
     }
 
     try {
-      let aiResponse: string;
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: '',
+        sender: 'ai',
+        timestamp: new Date(),
+        isStreaming: true,
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+
+      const response = await enhancedAIService.analyzeMarketQuery(userMessage.content);
       
-      // Get conversation context for AI
-      const conversationContext = getContextForAI();
+      // Simulate streaming effect
+      const words = response.split(' ');
+      let currentContent = '';
       
-      // If there are images, process each one
-      if (currentImages.length > 0) {
-        console.log(`🖼️ Processing ${currentImages.length} images for analysis...`);
+      for (let i = 0; i < words.length; i++) {
+        currentContent += (i > 0 ? ' ' : '') + words[i];
         
-        let combinedAnalysis = '';
+        setMessages(prev => prev.map(msg => 
+          msg.id === aiMessage.id 
+            ? { ...msg, content: currentContent }
+            : msg
+        ));
         
-        for (let i = 0; i < currentImages.length; i++) {
-          const image = currentImages[i];
-          console.log(`📊 Analyzing chart ${i + 1} of ${currentImages.length}...`);
-          
-          const chartAnalysis = await TradingAIService.analyzeChartWithAI(
-            currentMessage || `Please analyze this trading chart ${i + 1} and provide a complete strategy analysis.`,
-            image.preview,
-            conversationContext
-          );
-          
-          // Format each analysis with clear labeling
-          combinedAnalysis += `## Chart Analysis ${i + 1}\n\n${chartAnalysis}`;
-          
-          // Add separator between analyses (except for the last one)
-          if (i < currentImages.length - 1) {
-            combinedAnalysis += '\n\n---\n\n';
-          }
-        }
-        
-        aiResponse = combinedAnalysis;
-      } else {
-        console.log('💬 Sending text message to GPT with conversation context...');
-        aiResponse = await TradingAIService.getGPTResponse(currentMessage, undefined, conversationContext);
+        // Small delay for streaming effect
+        await new Promise(resolve => setTimeout(resolve, 50));
       }
 
-      console.log('✅ Received AI response:', aiResponse);
+      // Mark streaming as complete
+      setMessages(prev => prev.map(msg => 
+        msg.id === aiMessage.id 
+          ? { ...msg, isStreaming: false }
+          : msg
+      ));
 
-      const assistantMessage: ChatMessage = {
-        id: Date.now().toString() + '-ai',
-        type: 'assistant',
-        content: aiResponse,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, assistantMessage]);
-      
-      // Add assistant response to memory
-      addToMemory({
-        id: assistantMessage.id,
-        type: assistantMessage.type,
-        content: assistantMessage.content,
-        timestamp: assistantMessage.timestamp
-      });
-      
     } catch (error) {
-      console.error('💥 Error getting AI response:', error);
+      logger.error('[TRADING_CHAT] Error getting AI response:', error);
       
-      const errorMessage: ChatMessage = {
-        id: Date.now().toString() + '-error',
-        type: 'assistant',
-        content: 'Sorry, I encountered an error processing your request. Please check your API key settings and try again.',
-        timestamp: new Date()
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: 'Sorry, I encountered an error processing your request. Please try again.',
+        sender: 'ai',
+        timestamp: new Date(),
       };
-      
+
       setMessages(prev => [...prev, errorMessage]);
-      
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to get AI response. Please check your settings.",
-      });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [input, isLoading, usageLoading, isPro, canUseAnalysis, recordAnalysisUsage]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    
-    if (uploadedImages.length + files.length > 3) {
-      toast({
-        variant: "destructive",
-        title: "Too Many Images",
-        description: "Maximum 3 images allowed",
-      });
-      return;
-    }
-
-    files.forEach(file => {
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          variant: "destructive",
-          title: "File Too Large",
-          description: "Images must be under 5MB",
-        });
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        const newImage: UploadedImage = {
-          id: Date.now().toString() + Math.random(),
-          file,
-          preview: reader.result as string
-        };
-        setUploadedImages(prev => [...prev, newImage]);
-      };
-      reader.readAsDataURL(file);
-    });
-
-    e.target.value = '';
-  };
-
-  const removeImage = (imageId: string) => {
-    setUploadedImages(prev => prev.filter(img => img.id !== imageId));
-  };
-
-  const clearChat = () => {
-    if (window.confirm('Clear all chat history? This cannot be undone.')) {
-      setMessages([{
-        id: '1',
-        type: 'assistant',
-        content: 'Chat cleared. How can I help you today?',
-        timestamp: new Date()
-      }]);
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
   };
 
-  const handleResetMemory = () => {
-    if (window.confirm('Reset conversation memory? This will clear all stored context but keep visible messages.')) {
-      resetMemory();
-      toast({
-        title: "Memory Reset",
-        description: "Conversation memory has been cleared.",
-      });
-    }
-  };
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white">Please log in to access StrategyAI</div>
+      </div>
+    );
+  }
 
   return (
-    <PageWrapper pageName="TradingChat">
-      <ProtectedFeature feature="strategy-ai">
-        <div className="flex flex-col h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gray-900 flex flex-col">
       {/* Header */}
-      <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between flex-shrink-0">
-        <h1 className="text-xl font-semibold flex items-center gap-2">
-          <Bot className="h-6 w-6 text-blue-400" />
-          Strategy AI
-          {isMemoryActive && (
-            <span className="text-xs bg-green-600 px-2 py-1 rounded-full">
-              🧠 Memory: {messageCount}
-            </span>
-          )}
+      <div className="bg-gray-800 border-b border-gray-700 p-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Brain className="h-8 w-8 text-blue-400" />
+            <div>
+              <h1 className="text-2xl font-bold text-white">StrategyAI</h1>
+              <p className="text-gray-400 text-sm">Your AI Trading Assistant</p>
+            </div>
+          </div>
+          
           {!isPro && (
-            <Badge variant="outline" className="text-xs border-yellow-500 text-yellow-400">
-              {remainingAnalysis}/{maxAnalysisPerDay} analyses left today
-            </Badge>
-          )}
-          {isPro && (
-            <Badge className="text-xs bg-tradeiq-blue text-white">
-              <Crown className="h-3 w-3 mr-1" />
-              Pro
-            </Badge>
-          )}
-        </h1>
-        <div className="flex gap-2">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleResetMemory}
-            className="text-gray-400 hover:text-white"
-            title="Reset Memory"
-          >
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={clearChat}
-            className="text-gray-400 hover:text-white"
-          >
-            Clear Chat
-          </Button>
-        </div>
-      </div>
-
-      {/* Memory Activation Notification */}
-      {showMemoryNotification && (
-        <div className="bg-green-600 text-white px-4 py-2 text-center text-sm animate-pulse">
-          🧠 Memory activated: I'll remember everything we discuss here!
-        </div>
-      )}
-
-      {/* Daily Limit Notification for Free Users */}
-      {!isPro && remainingAnalysis <= 1 && remainingAnalysis > 0 && (
-        <div className="bg-orange-600 text-white px-4 py-2 text-center text-sm">
-          ⚠️ {remainingAnalysis} analysis remaining today. Upgrade to Pro for unlimited access!
-        </div>
-      )}
-
-      {/* Chat Messages - Scrollable with bottom padding for input, disclaimer and navigation */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-64">
-        {messages.map(message => (
-          <div key={message.id} className={`flex items-start gap-3 ${
-            message.type === 'user' ? 'flex-row-reverse' : ''
-          }`}>
-            {/* Avatar */}
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-              message.type === 'user' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-700 text-gray-300'
-            }`}>
-              {message.type === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
-            </div>
-
-            {/* Message Bubble */}
-            <div className={`max-w-[70%] rounded-lg p-3 ${
-              message.type === 'user'
-                ? 'bg-blue-600 text-white ml-auto'
-                : 'bg-gray-800 text-gray-100'
-            }`}>
-              {message.images && message.images.length > 0 && (
-                <div className="mb-2 flex flex-wrap gap-2">
-                  {message.images.map((image, index) => (
-                    <img 
-                      key={index}
-                      src={image} 
-                      alt={`Chart ${index + 1}`} 
-                      className="max-w-[150px] max-h-[100px] object-contain rounded-md cursor-pointer hover:opacity-80 transition-opacity"
-                      onClick={() => window.open(image, '_blank')}
-                    />
-                  ))}
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <div className="flex items-center space-x-2">
+                  <Clock className="h-4 w-4 text-yellow-400" />
+                  <span className="text-sm font-medium text-white">
+                    {remainingAnalysis} of {maxAnalysisPerDay} analyses remaining
+                  </span>
                 </div>
-              )}
-              <div className="text-sm">
-                {message.type === 'assistant' ? (
-                  <ReactMarkdown
-                    components={{
-                      p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                      strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
-                      em: ({ children }) => <em className="italic">{children}</em>,
-                      ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                      ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
-                      li: ({ children }) => <li className="text-gray-200">{children}</li>,
-                      h1: ({ children }) => <h1 className="text-lg font-bold mb-2 text-white">{children}</h1>,
-                      h2: ({ children }) => <h2 className="text-md font-semibold mb-2 text-white">{children}</h2>,
-                      h3: ({ children }) => <h3 className="text-sm font-semibold mb-1 text-white">{children}</h3>,
-                      code: ({ children }) => <code className="bg-gray-700 px-1 py-0.5 rounded text-blue-300 text-xs">{children}</code>,
-                      pre: ({ children }) => <pre className="bg-gray-700 p-2 rounded text-blue-300 text-xs overflow-x-auto mb-2">{children}</pre>,
-                      hr: () => <hr className="border-gray-600 my-4" />
-                    }}
-                  >
-                    {message.content}
-                  </ReactMarkdown>
-                ) : (
-                  <div className="whitespace-pre-wrap">
-                    {message.content}
-                  </div>
-                )}
+                <p className="text-xs text-gray-400">Resets daily at midnight</p>
               </div>
-              <div className="text-xs opacity-70 mt-2">
-                {message.timestamp.toLocaleTimeString()}
-              </div>
+              <Button 
+                onClick={() => setShowUpgradeModal(true)}
+                className="bg-orange-600 hover:bg-orange-700 text-white"
+              >
+                <Crown className="h-4 w-4 mr-2" />
+                Upgrade
+              </Button>
             </div>
-          </div>
-        ))}
-
-        {/* Loading Indicator */}
-        {isLoading && (
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
-              <Bot className="h-4 w-4 text-gray-300" />
-            </div>
-            <div className="bg-gray-800 rounded-lg p-3 flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
-              <span className="text-sm text-gray-300">{t('tradingChat.analyzing')}</span>
-            </div>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
+          )}
+        </div>
       </div>
 
-      {/* Input Bar - Fixed at Bottom with high z-index */}
-      <div className="fixed bottom-20 left-0 right-0 bg-gray-800 border-t-2 border-blue-500 p-4 z-[60] shadow-lg">
-        {/* Image Previews */}
-        {uploadedImages.length > 0 && (
-          <div className="mb-3 flex gap-2 flex-wrap">
-            {uploadedImages.map(image => (
-              <div key={image.id} className="relative">
-                <img 
-                  src={image.preview} 
-                  alt="Preview" 
-                  className="w-16 h-16 object-cover rounded-md border border-gray-600"
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeImage(image.id)}
-                  className="absolute -top-1 -right-1 h-5 w-5 bg-red-600 hover:bg-red-700 text-white rounded-full p-0"
+      {/* Usage Warning for Free Users */}
+      {!isPro && remainingAnalysis <= 1 && remainingAnalysis > 0 && (
+        <Alert className="m-4 border-yellow-500/30 bg-yellow-900/10">
+          <AlertTriangle className="h-4 w-4 text-yellow-400" />
+          <AlertDescription className="text-yellow-300">
+            You have {remainingAnalysis} analysis remaining today. Upgrade to Pro for unlimited access.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Messages */}
+      <div className="flex-1 overflow-hidden">
+        <div className="max-w-4xl mx-auto h-full flex flex-col">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.length === 0 && (
+              <Card className="bg-gray-800 border-gray-700">
+                <CardContent className="p-6 text-center">
+                  <Brain className="h-12 w-12 text-blue-400 mx-auto mb-4" />
+                  <h3 className="text-white text-lg font-semibold mb-2">
+                    Welcome to StrategyAI!
+                  </h3>
+                  <p className="text-gray-400 mb-4">
+                    Ask me anything about trading, market analysis, or specific stocks.
+                  </p>
+                  {!isPro && (
+                    <div className="bg-gray-700/50 rounded-lg p-3">
+                      <p className="text-yellow-400 text-sm">
+                        ✨ Free Plan: {maxAnalysisPerDay} analyses per day
+                      </p>
+                      <p className="text-gray-400 text-xs mt-1">
+                        Upgrade to Pro for unlimited analyses and advanced features
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-lg p-4 ${
+                    message.sender === 'user'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-800 text-gray-100 border border-gray-700'
+                  }`}
                 >
-                  <X className="h-3 w-3" />
-                </Button>
+                  <div className="flex items-start space-x-2">
+                    {message.sender === 'ai' && (
+                      <Bot className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                    )}
+                    {message.sender === 'user' && (
+                      <User className="h-5 w-5 text-blue-100 mt-0.5 flex-shrink-0" />
+                    )}
+                    <div className="flex-1">
+                      <p className="whitespace-pre-wrap">{message.content}</p>
+                      {message.isStreaming && (
+                        <Loader2 className="h-4 w-4 animate-spin text-blue-400 mt-2" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-xs opacity-70 mt-2">
+                    {message.timestamp.toLocaleTimeString()}
+                  </div>
+                </div>
               </div>
             ))}
-            <div className="text-xs text-gray-400 self-end">
-              {3 - uploadedImages.length} more allowed
-            </div>
-          </div>
-        )}
-
-        {/* Input Row */}
-        <div className="flex items-center gap-2">
-          <div className="flex-1">
-            <Input
-              type="text"
-              placeholder={
-                !canUseAnalysis 
-                  ? `Daily limit reached (${analysisCount}/${maxAnalysisPerDay}). Upgrade for unlimited access.`
-                  : t('tradingChat.placeholder')
-              }
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-              className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
-              disabled={isLoading || !canUseAnalysis}
-            />
+            <div ref={messagesEndRef} />
           </div>
 
-          {/* File Upload Button */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/png,image/jpeg,image/jpg"
-            onChange={handleImageUpload}
-            multiple
-            className="hidden"
-          />
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadedImages.length >= 3 || isLoading || !canUseAnalysis}
-            className="border-gray-600 hover:bg-gray-700 text-gray-300 flex-shrink-0"
-          >
-            <Paperclip className="h-4 w-4" />
-          </Button>
-
-          {/* Microphone Button */}
-          <Button
-            variant="outline"
-            size="icon"
-            disabled={isLoading || !canUseAnalysis}
-            className="border-gray-600 hover:bg-gray-700 text-gray-300 flex-shrink-0"
-          >
-            <Mic className="h-4 w-4" />
-          </Button>
-
-          {/* Send Button */}
-          <Button
-            onClick={handleSendMessage}
-            disabled={isLoading || (!inputMessage.trim() && uploadedImages.length === 0) || !canUseAnalysis}
-            className="bg-blue-600 hover:bg-blue-700 text-white flex-shrink-0"
-          >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+          {/* Input Area */}
+          <div className="p-4 bg-gray-800 border-t border-gray-700">
+            {!isPro && !canUseAnalysis ? (
+              <Card className="bg-orange-900/20 border-orange-500/30">
+                <CardContent className="p-4 text-center">
+                  <Lock className="h-8 w-8 text-orange-400 mx-auto mb-2" />
+                  <h3 className="text-white font-semibold mb-2">Daily Limit Reached</h3>
+                  <p className="text-gray-300 text-sm mb-4">
+                    You've used all {maxAnalysisPerDay} daily analyses. Upgrade to Pro for unlimited access or wait until tomorrow.
+                  </p>
+                  <Button 
+                    onClick={() => setShowUpgradeModal(true)}
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                  >
+                    <Crown className="h-4 w-4 mr-2" />
+                    Upgrade to Pro
+                  </Button>
+                </CardContent>
+              </Card>
             ) : (
-              <Send className="h-4 w-4" />
+              <div className="flex space-x-2">
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder={
+                    isPro 
+                      ? "Ask about any stock, crypto, or trading strategy..." 
+                      : `Ask me anything (${remainingAnalysis} analyses left today)...`
+                  }
+                  className="flex-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                  disabled={isLoading}
+                />
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={isLoading || !input.trim()}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             )}
-          </Button>
+          </div>
         </div>
       </div>
 
-      {/* Investment Disclaimer - Fixed at very bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 px-4 py-2 z-[50]">
-        <p className="text-xs text-gray-400 text-center leading-relaxed">
-          <strong className="text-yellow-400">Disclaimer:</strong> TradeIQ provides educational content and market analysis tools. 
-          None of the information provided should be considered financial advice or a recommendation to invest. 
-          Always do your own research and consult with a financial advisor before making investment decisions.
-        </p>
-      </div>
-
-        {/* Upgrade Modal */}
-        <UpgradeModal
-          open={showUpgradeModal}
-          onClose={() => setShowUpgradeModal(false)}
-          feature="unlimited daily analyses"
-        />
-      </div>
-      </ProtectedFeature>
-    </PageWrapper>
+      <UpgradeModal 
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        feature="StrategyAI analysis"
+      />
+    </div>
   );
 };
-
-export default TradingChat;
