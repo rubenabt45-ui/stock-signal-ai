@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Bot, User, Loader2, Brain, Lock, Crown, Clock, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import { useAuth } from '@/contexts/auth/auth.provider';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useDailyMessages } from '@/hooks/useDailyMessages';
 import { UpgradeModal } from '@/components/UpgradeModal';
-import { enhancedAIService } from '@/services/enhancedAIService';
+import { analyzeMarketQuery } from '@/services/aiService';
 import { logger } from '@/utils/logger';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,7 +21,7 @@ interface Message {
   isStreaming?: boolean;
 }
 
-export const TradingChat: React.FC = () => {
+const TradingChat: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { isPro } = useSubscription();
@@ -94,7 +93,7 @@ export const TradingChat: React.FC = () => {
 
       setMessages(prev => [...prev, aiMessage]);
 
-      const response = await enhancedAIService.analyzeMarketQuery(userMessage.content);
+      const response = await analyzeMarketQuery(userMessage.content);
       
       // Simulate streaming effect
       const words = response.split(' ');
@@ -318,3 +317,5 @@ export const TradingChat: React.FC = () => {
     </div>
   );
 };
+
+export default TradingChat;
