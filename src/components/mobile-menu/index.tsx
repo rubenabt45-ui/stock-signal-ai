@@ -1,172 +1,136 @@
-
-// Remove or significantly reduce production logging in MobileMenu
-import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, Home, TrendingUp, BookOpen, Settings, LogOut, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/auth/auth.provider';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 
-// Reduced logging for production
-const logMobileMenuAction = (action: string, data?: any) => {
-  if (import.meta.env.DEV) {
-    console.log(`🍔 [MobileMenu] ${action}`, data);
-  }
-};
+interface MobileMenuProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
-export const MobileMenu: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
+const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const { isPro } = useSubscription();
+  const { t } = useTranslationWithFallback();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
-  // Close menu when route changes
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location.pathname]);
+  const menuItems = [
+    {
+      href: '/app',
+      label: t('mobileMenu.home'),
+      icon: Home,
+    },
+    {
+      href: '/app/strategy-ai',
+      label: t('mobileMenu.strategyAI'),
+      icon: Brain,
+    },
+    {
+      href: '/app/learn',
+      label: t('mobileMenu.learn'),
+      icon: BookOpen,
+    },
+    {
+      href: '/app/market-updates',
+      label: t('mobileMenu.marketUpdates'),
+      icon: TrendingUp,
+    },
+    {
+      href: '/app/favorites',
+      label: t('mobileMenu.favorites'),
+      icon: Star,
+    },
+    {
+      href: '/app/settings',
+      label: t('mobileMenu.settings'),
+      icon: Settings,
+    },
+  ];
 
-  // Prevent body scroll when menu is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      logMobileMenuAction('BODY_SCROLL_DISABLED');
-    } else {
-      document.body.style.overflow = '';
-      logMobileMenuAction('BODY_SCROLL_ENABLED');
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await signOut();
+      console.log('User signed out successfully');
+      navigate('/login');
+    } catch (error) {
+      console.error('Sign out failed:', error);
+    } finally {
+      setIsSigningOut(false);
     }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  const toggleMenu = () => {
-    const newIsOpen = !isOpen;
-    setIsOpen(newIsOpen);
-    logMobileMenuAction(newIsOpen ? 'MENU_OPENED' : 'MENU_CLOSED');
   };
 
-  // Navigation items for authenticated users
-  const appNavItems = [
-    { to: '/app', label: 'Dashboard' },
-    { to: '/app/strategy-ai', label: 'StrategyAI' },
-    { to: '/app/learn', label: 'Learn' },
-    { to: '/app/events', label: 'Events' },
-    { to: '/app/market-updates', label: 'Market Updates' },
-    { to: '/app/favorites', label: 'Favorites' },
-    { to: '/app/settings', label: 'Settings' }
-  ];
-
-  // Navigation items for public pages
-  const publicNavItems = [
-    { to: '/', label: 'Home' },
-    { to: '/learn-preview', label: 'Learn' },
-    { to: '/pricing', label: 'Pricing' },
-    { to: '/about', label: 'About' }
-  ];
-
-  const navItems = user ? appNavItems : publicNavItems;
-
   return (
-    <>
-      {/* Menu Toggle Button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="md:hidden p-2"
-        onClick={toggleMenu}
-        aria-label="Toggle menu"
-      >
-        {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </Button>
-
-      {/* Mobile Menu Overlay */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 z-50 md:hidden"
-          onClick={() => setIsOpen(false)}
-        >
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/50" />
-          
-          {/* Menu Panel */}
-          <div 
-            className="absolute top-0 left-0 w-64 h-full bg-tradeiq-navy border-r border-gray-700 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex flex-col h-full">
-              {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-gray-700">
-                <h2 className="text-lg font-semibold text-white">Menu</h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsOpen(false)}
-                  className="p-2"
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-
-              {/* Navigation */}
-              <nav className="flex-1 p-4">
-                <ul className="space-y-2">
-                  {navItems.map((item) => (
-                    <li key={item.to}>
-                      <Link
-                        to={item.to}
-                        className={cn(
-                          "block px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                          location.pathname === item.to
-                            ? "bg-tradeiq-blue text-white"
-                            : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                        )}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-
-              {/* Auth Actions */}
-              <div className="p-4 border-t border-gray-700">
-                {user ? (
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-400 truncate">
-                      {user.email}
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => {
-                        // Implement sign out
-                        setIsOpen(false);
-                      }}
-                    >
-                      Sign Out
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <Link to="/login" onClick={() => setIsOpen(false)}>
-                      <Button variant="outline" size="sm" className="w-full">
-                        Login
-                      </Button>
-                    </Link>
-                    <Link to="/signup" onClick={() => setIsOpen(false)}>
-                      <Button size="sm" className="w-full">
-                        Sign Up
-                      </Button>
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+    <div
+      className={cn(
+        'fixed inset-0 z-50 bg-tradeiq-navy text-white transition-transform duration-300 transform origin-top',
+        isOpen ? 'scale-100 opacity-100' : 'scale-y-0 opacity-0',
+        '-translate-y-1',
       )}
-    </>
+    >
+      <div className="p-4 flex items-center justify-between">
+        <span className="font-bold text-xl">{t('mobileMenu.menu')}</span>
+        <Button variant="ghost" size="icon" onClick={onClose}>
+          <X className="h-6 w-6" />
+        </Button>
+      </div>
+
+      <nav className="p-4 space-y-2">
+        {menuItems.map((item) => (
+          <Link
+            key={item.href}
+            to={item.href}
+            className={cn(
+              'flex items-center space-x-3 p-3 rounded-md hover:bg-gray-800/50 transition-colors duration-200',
+              location.pathname === item.href ? 'bg-gray-800/50 font-medium' : 'font-normal',
+            )}
+            onClick={onClose}
+          >
+            <item.icon className="h-5 w-5" />
+            <span>{item.label}</span>
+          </Link>
+        ))}
+      </nav>
+
+      <div className="p-4 mt-4 space-y-2 border-t border-gray-800">
+        <Badge variant={isPro ? 'default' : 'secondary'} className="w-full justify-center px-3 py-1">
+          {isPro ? (
+            <>
+              <Star className="h-3 w-3 mr-1" />
+              {t('dashboard.plan.pro')}
+            </>
+          ) : (
+            t('dashboard.plan.free')
+          )}
+        </Badge>
+        <Button
+          variant="destructive"
+          className="w-full justify-center"
+          onClick={handleSignOut}
+          disabled={isSigningOut}
+        >
+          {isSigningOut ? (
+            <>
+              <LogOut className="mr-2 h-4 w-4 animate-spin" />
+              {t('mobileMenu.signingOut')}
+            </>
+          ) : (
+            <>
+              <LogOut className="mr-2 h-4 w-4" />
+              {t('mobileMenu.signOut')}
+            </>
+          )}
+        </Button>
+      </div>
+    </div>
   );
 };
+
+export default MobileMenu;

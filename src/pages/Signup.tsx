@@ -1,367 +1,266 @@
-
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, ChartCandlestick, Github, Mail, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ChartCandlestick, Eye, EyeOff, Github } from 'lucide-react';
+import { useAuth } from '@/contexts/auth/auth.provider';
+import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
-import BackToHomeButton from "@/components/BackToHomeButton";
-import { PageWrapper } from '@/components/PageWrapper';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 const Signup = () => {
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [oauthLoading, setOauthLoading] = useState<string | null>(null);
-  const [pendingVerification, setPendingVerification] = useState(false);
-  const [resendingEmail, setResendingEmail] = useState(false);
-  const { signUp, user, signInWithOAuth, resendConfirmation } = useAuth();
-  const { toast } = useToast();
-  const { t } = useTranslationWithFallback();
   const navigate = useNavigate();
+  const { signUp, signInWithOAuth } = useAuth();
+  const { t } = useTranslationWithFallback();
 
   useEffect(() => {
-    if (user) {
-      navigate("/app");
+    // Redirect if already logged in
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      navigate('/app');
     }
-  }, [user, navigate]);
+  }, [navigate]);
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    const strength = calculatePasswordStrength(value);
+    setPasswordStrength(strength);
+  };
+
+  const calculatePasswordStrength = (password: string) => {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSymbols = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    let strength = 0;
+    if (password.length >= minLength) strength += 1;
+    if (hasUpperCase) strength += 1;
+    if (hasLowerCase) strength += 1;
+    if (hasNumbers) strength += 1;
+    if (hasSymbols) strength += 1;
+
+    return strength;
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (password !== confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive",
-      });
+
+    if (!fullName) {
+      setError(t('signup.fullNameRequired'));
       return;
     }
 
-    if (password.length < 8) {
-      toast({
-        title: "Error",
-        description: "Password must be at least 8 characters long",
-        variant: "destructive",
-      });
+    if (password !== confirmPassword) {
+      setError(t('signup.passwordsNotMatch'));
       return;
     }
 
     setLoading(true);
-    console.log('🔐 [SIGNUP] Attempting signup for:', email);
+    setError(null);
 
-    const { error } = await signUp(email, password, fullName);
+    try {
+      const response = await signUp(email, password, fullName);
 
-    if (error) {
-      console.error('🔐 [SIGNUP] Signup failed:', error);
-      let errorMessage = error.message;
-      
-      if (error.message.includes("User already registered")) {
-        errorMessage = "An account with this email already exists. Please try logging in instead.";
-      } else if (error.message.includes("Invalid email")) {
-        errorMessage = "Please enter a valid email address.";
-      } else if (error.message.includes("Password")) {
-        errorMessage = "Password must be at least 8 characters long.";
+      if (response?.error) {
+        setError(response.error.message || t('signup.defaultError'));
+      } else {
+        setSuccess(true);
+        // Optionally redirect or show a success message
+        // navigate('/verify-email');
       }
-      
-      toast({
-        title: "❌ Signup Failed",
-        description: errorMessage,
-        variant: "destructive",
-        duration: 8000,
-      });
-      setPendingVerification(false);
-    } else {
-      console.log('🔐 [SIGNUP] Signup successful, verification email sent');
-      setPendingVerification(true);
-      
-      toast({
-        title: "🎉 Account Created Successfully!",
-        description: "Please check your email and click the verification link to complete your registration. Don't forget to check your spam folder!",
-        duration: 12000,
-      });
+    } catch (err: any) {
+      setError(err.message || t('signup.defaultError'));
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
-  };
-
-  const handleResendVerification = async () => {
-    if (!email) {
-      toast({
-        title: "📧 Email Required",
-        description: "Please enter your email address to resend verification.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setResendingEmail(true);
-    console.log('🔐 [EMAIL_VERIFICATION] User requested resend verification');
-    
-    const { error } = await resendConfirmation(email);
-    
-    if (error) {
-      console.error('🔐 [EMAIL_VERIFICATION] Resend failed:', error);
-      toast({
-        title: "❌ Resend Failed",
-        description: error.message || "Failed to resend verification email. Please try again.",
-        variant: "destructive",
-        duration: 8000,
-      });
-    } else {
-      console.log('🔐 [EMAIL_VERIFICATION] Resend successful');
-      toast({
-        title: "✅ Verification Email Sent!",
-        description: "A new verification email has been sent to your inbox. Please check your email and spam folder.",
-        duration: 10000,
-      });
-    }
-    
-    setResendingEmail(false);
   };
 
   const handleOAuthSignup = async (provider: 'google' | 'github') => {
-    setOauthLoading(provider);
-    console.log('🔐 [SIGNUP] Attempting OAuth signup with:', provider);
+    setLoading(true);
+    setError(null);
 
-    const { error } = await signInWithOAuth(provider);
+    try {
+      const response = await signInWithOAuth(provider);
 
-    if (error) {
-      console.error('🔐 [SIGNUP] OAuth signup failed:', error);
-      toast({
-        title: "❌ OAuth Signup Failed",
-        description: error.message || `Failed to signup with ${provider}. Please try again.`,
-        variant: "destructive",
-      });
+      if (response?.error) {
+        setError(response.error.message || t('signup.defaultError'));
+      } else {
+        // OAuth signup successful, the user is redirected automatically
+        setSuccess(true);
+      }
+    } catch (err: any) {
+      setError(err.message || t('signup.defaultError'));
+    } finally {
+      setLoading(false);
     }
-
-    setOauthLoading(null);
   };
 
   return (
-    <PageWrapper pageName="Signup">
-      <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center p-4">
+    <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <Card className="tradeiq-card w-full max-w-md">
-        <CardHeader className="text-center space-y-4">
-          <div className="flex justify-center">
-            <ChartCandlestick className="h-12 w-12 text-tradeiq-blue" />
-          </div>
-          <CardTitle className="text-2xl font-bold text-white">
-            {t('auth.signup.title')}
-          </CardTitle>
-          <CardDescription className="text-gray-400">
-            {t('auth.signup.subtitle')}
-          </CardDescription>
+        <CardHeader className="space-y-1">
+          <ChartCandlestick className="h-6 w-6 text-tradeiq-blue mx-auto" />
+          <CardTitle className="text-2xl text-center">{t('signup.createAccount')}</CardTitle>
+          <CardDescription className="text-center text-gray-400">{t('signup.subtitle')}</CardDescription>
         </CardHeader>
-        <CardContent>
-          {/* Email verification pending alert */}
-          {pendingVerification && (
-            <Alert className="mb-6 border-blue-500/50 bg-blue-900/20">
-              <Mail className="h-4 w-4" />
-              <AlertDescription className="text-blue-400">
-                <div className="space-y-3">
-                  <p className="font-medium">📧 Check Your Email!</p>
-                  <p className="text-sm">
-                    We've sent a verification link to <strong>{email}</strong>. 
-                    Please check your inbox and spam folder, then click the link to verify your account.
-                  </p>
-                  <Button
-                    onClick={handleResendVerification}
-                    disabled={resendingEmail}
-                    variant="outline"
-                    size="sm"
-                    className="w-full mt-3 bg-blue-900/30 border-blue-600 hover:bg-blue-800/30"
-                  >
-                    {resendingEmail ? (
-                      <>
-                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                        Resending...
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="mr-2 h-4 w-4" />
-                        Resend Verification Email
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </AlertDescription>
+        <CardContent className="space-y-4">
+          <LanguageSelector />
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-
-          {/* OAuth Signup Section */}
-          <div className="space-y-4 mb-6">
-            <Button
-              onClick={() => handleOAuthSignup('google')}
-              disabled={oauthLoading === 'google' || pendingVerification}
-              className="w-full bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
-            >
-              {oauthLoading === 'google' ? (
-                <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
-                  Creating account...
-                </>
-              ) : (
-                <>
-                  <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                  </svg>
-                  Sign up with Google
-                </>
-              )}
-            </Button>
-
-            <Button
-              onClick={() => handleOAuthSignup('github')}
-              disabled={oauthLoading === 'github' || pendingVerification}
-              className="w-full bg-gray-800 text-white hover:bg-gray-700 border border-gray-600"
-            >
-              {oauthLoading === 'github' ? (
-                <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white" />
-                  Creating account...
-                </>
-              ) : (
-                <>
-                  <Github className="mr-2 h-4 w-4" />
-                  Sign up with GitHub
-                </>
-              )}
-            </Button>
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-gray-800 px-2 text-gray-400">Or continue with email</span>
-            </div>
-          </div>
-
-          <form onSubmit={handleSignup} className="space-y-4 mt-6">
-            <div className="space-y-2">
-              <label htmlFor="fullName" className="text-sm font-medium text-gray-300">
-                {t('auth.signup.fullName')}
-              </label>
+          {success && (
+            <Alert>
+              <AlertDescription>{t('signup.successMessage')}</AlertDescription>
+            </Alert>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="fullName">{t('signup.fullName')}</Label>
               <Input
-                id="fullName"
                 type="text"
+                id="fullName"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder={t('placeholders.enterFullName')}
+                placeholder={t('signup.fullNamePlaceholder')}
                 required
-                disabled={pendingVerification}
-                className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
               />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-300">
-                {t('auth.signup.email')}
-              </label>
+            <div>
+              <Label htmlFor="email">{t('signup.email')}</Label>
               <Input
-                id="email"
                 type="email"
+                id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('placeholders.enterEmail')}
+                placeholder={t('signup.emailPlaceholder')}
                 required
-                disabled={pendingVerification}
-                className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
               />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-gray-300">
-                {t('auth.signup.password')}
-              </label>
+            <div>
+              <Label htmlFor="password">{t('signup.password')}</Label>
               <div className="relative">
                 <Input
+                  type={showPassword ? 'text' : 'password'}
                   id="password"
-                  type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={t('placeholders.enterPassword')}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
+                  placeholder={t('signup.passwordPlaceholder')}
                   required
-                  minLength={8}
-                  disabled={pendingVerification}
-                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500 pr-10"
                 />
-                <button
+                <Button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
+                  onClick={togglePasswordVisibility}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+                </Button>
               </div>
+              <PasswordStrengthIndicator strength={passwordStrength} />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-300">
-                {t('auth.signup.confirmPassword')}
-              </label>
+            <div>
+              <Label htmlFor="confirmPassword">{t('signup.confirmPassword')}</Label>
               <div className="relative">
                 <Input
+                  type={showConfirmPassword ? 'text' : 'password'}
                   id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder={t('placeholders.confirmPassword')}
+                  placeholder={t('signup.confirmPasswordPlaceholder')}
                   required
-                  minLength={8}
-                  disabled={pendingVerification}
-                  className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500 pr-10"
                 />
-                <button
+                <Button
                   type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
+                  onClick={toggleConfirmPasswordVisibility}
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+                </Button>
               </div>
             </div>
-            <Button
-              type="submit"
-              disabled={loading || pendingVerification}
-              className="tradeiq-button-primary w-full"
-            >
-              {loading ? 'Creating Account...' : pendingVerification ? 'Account Created - Check Email' : t('auth.signup.signUp')}
+            <Button disabled={loading} type="submit" className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90">
+              {loading ? t('common.loading') : t('signup.signUp')}
             </Button>
           </form>
-          
-          <div className="mt-6 text-center">
-            <p className="text-gray-400 text-sm">
-              {t('auth.signup.hasAccount')}{" "}
-              <Link
-                to="/login"
-                className="text-tradeiq-blue hover:text-blue-400 font-medium"
-              >
-                {t('auth.signup.signIn')}
-              </Link>
-            </p>
+          <div className="relative py-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-tradeiq-navy px-2 text-gray-500">{t('signup.or')}</span>
+            </div>
           </div>
-          
-          <div className="mt-4">
-            <BackToHomeButton />
+          <Button
+            variant="outline"
+            className="w-full hover:bg-gray-800/50 border-gray-700/50 text-gray-300"
+            onClick={() => handleOAuthSignup('google')}
+            disabled={loading}
+          >
+            {loading ? (
+              t('common.loading')
+            ) : (
+              <>
+                <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                  <path
+                    fill="currentColor"
+                    d="M23.5 12.5h-.03v-.91h-.01c-.1-.64-.16-1.3-.16-1.97 0-.67.06-1.33.16-1.97h.01v-.91h.03c0-.47-.36-.83-.83-.83H.83c-.47 0-.83.36-.83.83v.91h.01c.1.64.16 1.3.16 1.97 0 .67-.06 1.33-.16 1.97h-.01v.91h-.03c0 .47.36.83.83.83h22.67c.47 0 .83-.36.83-.83ZM7.6 17.45c-1.84 0-3.34-1.5-3.34-3.34s1.5-3.34 3.34-3.34 3.34 1.5 3.34 3.34-1.5 3.34-3.34 3.34Zm8.83 0c-.92 0-1.76-.35-2.41-.94l1.69-1.69c.28.18.6.28.95.28 1.03 0 1.86-.84 1.86-1.86s-.84-1.86-1.86-1.86-1.86.84-1.86 1.86c0 .35.1.67.28.95l-1.69 1.69c-.59-.65-.94-1.49-.94-2.41 0-1.84 1.5-3.34 3.34-3.34s3.34 1.5 3.34 3.34-1.5 3.34-3.34 3.34Zm-4.42 2.17c-2.67 0-5.18-1.05-7.07-2.93l1.41-1.41c1.5 1.5 3.54 2.34 5.66 2.34s4.16-.84 5.66-2.34l1.41 1.41c-1.88 1.89-4.4 2.93-7.07 2.93Z"
+                  />
+                </svg>
+                {t('signup.signUpWithGoogle')}
+              </>
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full hover:bg-gray-800/50 border-gray-700/50 text-gray-300"
+            onClick={() => handleOAuthSignup('github')}
+            disabled={loading}
+          >
+            {loading ? (
+              t('common.loading')
+            ) : (
+              <>
+                <Github className="mr-2 h-4 w-4" />
+                {t('signup.signUpWithGithub')}
+              </>
+            )}
+          </Button>
+          <div className="text-center text-sm text-gray-500">
+            <Link to="/login" className="hover:text-tradeiq-blue">
+              {t('signup.alreadyHaveAccount')}
+            </Link>
           </div>
         </CardContent>
       </Card>
     </div>
-    </PageWrapper>
   );
 };
 

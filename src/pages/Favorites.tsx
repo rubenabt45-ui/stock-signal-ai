@@ -1,286 +1,170 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Plus, Edit3, Check, Filter, BarChart3, LogIn, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { FavoritesList } from "@/components/FavoritesList";
-import { AddSymbolModal } from "@/components/AddSymbolModal";
-import { FilterDropdown } from "@/components/FilterDropdown";
-import { MarketOverview } from "@/components/MarketOverview";
-import { useFavorites } from "@/hooks/useFavorites";
-import { useAuth } from "@/contexts/AuthContext";
-import { ChartCandlestick } from "lucide-react";
-
-export type CategoryFilter = 'all' | 'stocks' | 'crypto' | 'forex' | 'indices' | 'commodities' | 'etf';
+import React, { useEffect, useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { 
+  Star, 
+  Search, 
+  TrendingUp, 
+  Plus,
+  Trash2,
+  GripVertical,
+  RefreshCw
+} from 'lucide-react';
+import { useAuth } from '@/contexts/auth/auth.provider';
+import { useFavorites } from '@/hooks/useFavorites';
+import { PageWrapper } from '@/components/PageWrapper';
+import { AddSymbolModal } from '@/components/AddSymbolModal';
+import { LivePriceBadge } from '@/components/LivePriceBadge';
+import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 
 const Favorites = () => {
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
-  const { favorites, loading, error, addFavorite, removeFavorite, reorderFavorites, refetch } = useFavorites();
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const { favorites, loading, addFavorite, removeFavorite, reorderFavorites, refreshFavorites } = useFavorites();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { t } = useTranslationWithFallback();
 
-  // Get market overview symbols from favorites
-  const getMarketOverviewSymbols = () => {
-    if (!user || favorites.length === 0) {
-      return ['NASDAQ:AAPL', 'NASDAQ:MSFT', 'NASDAQ:TSLA', 'NASDAQ:NVDA', 'NASDAQ:AMZN'];
+  useEffect(() => {
+    if (!loading && favorites) {
+      console.log('Favorites loaded:', favorites);
     }
-    
-    // Format favorite symbols for TradingView
-    return favorites.slice(0, 8).map(fav => {
-      const symbol = fav.symbol.toUpperCase();
-      // Add exchange prefix if not present
-      if (!symbol.includes(':')) {
-        return `NASDAQ:${symbol}`;
-      }
-      return symbol;
-    });
+  }, [favorites, loading]);
+
+  const handleOpenAddModal = () => {
+    setIsAddModalOpen(true);
   };
 
-  const filteredFavorites = favorites.filter(fav => 
-    categoryFilter === 'all' || fav.category === categoryFilter
+  const handleCloseAddModal = () => {
+    setIsAddModalOpen(false);
+  };
+
+  const handleAddSymbol = async (symbol: string) => {
+    if (user) {
+      await addFavorite(symbol);
+      handleCloseAddModal();
+    } else {
+      console.warn('User not logged in, cannot add favorite.');
+    }
+  };
+
+  const handleRemoveSymbol = async (symbol: string) => {
+    if (user) {
+      await removeFavorite(symbol);
+    } else {
+      console.warn('User not logged in, cannot remove favorite.');
+    }
+  };
+
+  const handleReorder = async (newOrder: string[]) => {
+    if (user) {
+      await reorderFavorites(newOrder);
+    } else {
+      console.warn('User not logged in, cannot reorder favorites.');
+    }
+  };
+
+  const handleRefresh = async () => {
+    if (user) {
+      await refreshFavorites();
+    } else {
+      console.warn('User not logged in, cannot refresh favorites.');
+    }
+  };
+
+  const filteredFavorites = favorites?.filter(fav =>
+    fav.symbol.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleEditToggle = () => {
-    if (!user) return;
-    setIsEditMode(!isEditMode);
-  };
-
-  const handleAddSymbol = async (symbol: string, name: string, category: CategoryFilter) => {
-    const success = await addFavorite({ symbol, name, category });
-    if (success) {
-      setIsAddModalOpen(false);
-    }
-  };
-
-  const handleSymbolClick = (symbol: string) => {
-    if (!isEditMode && user) {
-      navigate(`/?symbol=${symbol}`);
-    }
-  };
-
-  const handleRefresh = () => {
-    refetch();
-  };
-
   return (
-    <TooltipProvider>
-      <div className="min-h-screen bg-tradeiq-navy">
-        {/* Header */}
-        <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <ChartCandlestick className="h-8 w-8 text-tradeiq-blue" />
-                <div>
-                  <h1 className="text-2xl font-bold text-white tracking-tight">TradeIQ</h1>
-                  <p className="text-sm text-gray-400 font-medium">Favorites</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Link to="/">
-                  <Button variant="outline" className="border-gray-700 hover:bg-gray-800 text-gray-300">
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    Chart IA
-                  </Button>
-                </Link>
-                
-                {user && (
-                  <>
-                    <FilterDropdown 
-                      selectedCategory={categoryFilter}
-                      onCategoryChange={setCategoryFilter}
-                    />
-                    
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleRefresh}
-                          disabled={loading}
-                          className="border-gray-700 hover:bg-gray-800"
-                        >
-                          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Refresh favorites</p>
-                      </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleEditToggle}
-                          className="border-gray-700 hover:bg-gray-800"
-                        >
-                          {isEditMode ? (
-                            <>
-                              <Check className="h-4 w-4 mr-1" />
-                              Done
-                            </>
-                          ) : (
-                            <>
-                              <Edit3 className="h-4 w-4 mr-1" />
-                              Edit
-                            </>
-                          )}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{isEditMode ? 'Finish editing' : 'Edit favorites order'}</p>
-                      </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          onClick={() => setIsAddModalOpen(true)}
-                          className="tradeiq-button-primary"
-                          size="sm"
-                        >
-                          <Plus className="h-4 w-4 mr-1" />
-                          Add
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Add symbol to favorites</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </>
-                )}
-                
-                {!user && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={() => navigate('/login')}
-                        className="tradeiq-button-primary"
-                        size="sm"
-                      >
-                        <LogIn className="h-4 w-4 mr-1" />
-                        Login
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Login to manage favorites</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-              </div>
+    <PageWrapper pageName="Favorites">
+      <div className="min-h-screen bg-tradeiq-navy p-6">
+        <div className="max-w-5xl mx-auto space-y-6">
+          {/* Header Section */}
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold text-white">{t('favorites.title')}</h1>
+            <div className="flex space-x-4">
+              <Button
+                variant="outline"
+                onClick={handleRefresh}
+                className="border-gray-700/50 text-gray-300 hover:bg-black/30 hover:border-tradeiq-blue/50 rounded-xl"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                {t('favorites.refresh')}
+              </Button>
+              <Button onClick={handleOpenAddModal} className="tradeiq-button-primary">
+                <Plus className="h-4 w-4 mr-2" />
+                {t('favorites.addSymbol')}
+              </Button>
             </div>
           </div>
-        </header>
 
-        {/* Main Content */}
-        <main className="container mx-auto px-4 py-6 space-y-6">
-          <Card className="tradeiq-card">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-white text-lg">
-                  My Watchlist
-                  {user && (
-                    <Badge variant="secondary" className="ml-2 bg-tradeiq-blue/20 text-tradeiq-blue">
-                      {filteredFavorites.length}
-                    </Badge>
-                  )}
-                </CardTitle>
-                {categoryFilter !== 'all' && (
-                  <Badge variant="outline" className="border-gray-600 text-gray-300">
-                    {categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}
-                  </Badge>
-                )}
+          {/* Search Input */}
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder={t('favorites.searchPlaceholder')}
+              className="bg-tradeiq-card border-gray-700 text-white rounded-xl pl-12"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Search className="absolute left-4 top-3 h-5 w-5 text-gray-400" />
+          </div>
+
+          {/* Favorites List */}
+          {loading ? (
+            <div className="flex items-center justify-center min-h-[200px]">
+              <div className="text-center text-white">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tradeiq-blue mx-auto mb-3"></div>
+                <p>{t('favorites.loading')}</p>
               </div>
-              {error && (
-                <div className="text-red-400 text-sm bg-red-400/10 p-3 rounded-lg border border-red-400/20">
-                  Error: {error}
-                </div>
-              )}
-            </CardHeader>
-            <CardContent>
-              {!user ? (
-                <div className="text-center py-12 text-gray-500">
-                  <LogIn className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg mb-2">Login Required</p>
-                  <p className="text-sm mb-4">
-                    Please log in to view and manage your favorites
-                  </p>
-                  <Button
-                    onClick={() => navigate('/login')}
-                    className="tradeiq-button-primary"
-                  >
-                    <LogIn className="h-4 w-4 mr-2" />
-                    Login to Continue
-                  </Button>
-                </div>
-              ) : filteredFavorites.length === 0 && !loading ? (
-                <div className="text-center py-12 text-gray-500">
-                  <ChartCandlestick className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg mb-2">No favorites yet</p>
-                  <p className="text-sm mb-4">
-                    {categoryFilter === 'all' 
-                      ? "Add your first symbol to start tracking" 
-                      : `No ${categoryFilter} symbols in your watchlist`
-                    }
-                  </p>
-                  <Button
-                    onClick={() => setIsAddModalOpen(true)}
-                    className="tradeiq-button-primary"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Symbol
-                  </Button>
-                </div>
-              ) : (
-                <FavoritesList
-                  favorites={filteredFavorites}
-                  loading={loading}
-                  isEditMode={isEditMode}
-                  onRemove={removeFavorite}
-                  onReorder={reorderFavorites}
-                  onSymbolClick={handleSymbolClick}
-                />
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Market Overview Section */}
-          {user && favorites.length > 0 && (
-            <Card className="tradeiq-card">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-white text-lg flex items-center space-x-2">
-                  <BarChart3 className="h-5 w-5 text-tradeiq-blue" />
-                  <span>📈 Market Overview</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <MarketOverview 
-                  symbols={getMarketOverviewSymbols()}
-                  height={450}
-                  className="w-full"
-                />
-              </CardContent>
-            </Card>
+            </div>
+          ) : filteredFavorites && filteredFavorites.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredFavorites.map((favorite) => (
+                <Card key={favorite.id} className="tradeiq-card rounded-2xl">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-white flex items-center space-x-2">
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                        <span>{favorite.symbol}</span>
+                      </CardTitle>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveSymbol(favorite.symbol)}
+                        className="hover:bg-red-500/20 text-red-500"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <CardDescription className="text-gray-400">
+                        <LivePriceBadge symbol={favorite.symbol} />
+                      </CardDescription>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center min-h-[200px]">
+              <p className="text-gray-500">{t('favorites.noFavorites')}</p>
+            </div>
           )}
-        </main>
-
-        {/* Add Symbol Modal */}
-        {user && (
-          <AddSymbolModal
-            isOpen={isAddModalOpen}
-            onClose={() => setIsAddModalOpen(false)}
-            onAddSymbol={handleAddSymbol}
-            existingSymbols={favorites.map(f => f.symbol)}
-          />
-        )}
+        </div>
       </div>
-    </TooltipProvider>
+
+      {/* Add Symbol Modal */}
+      <AddSymbolModal
+        isOpen={isAddModalOpen}
+        onClose={handleCloseAddModal}
+        onAddSymbol={handleAddSymbol}
+      />
+    </PageWrapper>
   );
 };
 
