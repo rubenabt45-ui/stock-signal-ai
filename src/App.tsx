@@ -13,7 +13,6 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Favorites = lazy(() => import("./pages/Favorites"));
 const TradingChat = lazy(() => import("./pages/TradingChat"));
 const Learn = lazy(() => import("./pages/Learn"));
-const EconomicEvents = lazy(() => import("./pages/EconomicEvents"));
 const MarketUpdates = lazy(() => import("./pages/MarketUpdates"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Success = lazy(() => import("./pages/Success"));
@@ -120,11 +119,6 @@ const App = () => {
               <Route path="/app/learn" element={
                 <ProtectedRoute>
                   <Learn />
-                </ProtectedRoute>
-              } />
-              <Route path="/app/events" element={
-                <ProtectedRoute>
-                  <EconomicEvents />
                 </ProtectedRoute>
               } />
               <Route path="/app/market-updates" element={
