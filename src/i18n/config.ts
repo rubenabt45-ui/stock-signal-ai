@@ -2,7 +2,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { getFallbackTranslation } from '@/utils/i18n-fallback';
 
 import en from './locales/en.json';
 import es from './locales/es.json';
@@ -37,7 +36,7 @@ if (!i18n.isInitialized) {
       resources,
       fallbackLng: 'en',
       supportedLngs: ['en', 'es'],
-      debug: import.meta.env.DEV, // Only enable debug in development
+      debug: false, // Always disable debug to prevent console spam
       detection: {
         order: ['localStorage', 'navigator'],
         caches: ['localStorage'],
@@ -55,6 +54,9 @@ if (!i18n.isInitialized) {
       ns: ['translation'],
       defaultNS: 'translation',
       missingKeyHandler: handleMissingTranslation
+    })
+    .catch((error) => {
+      console.error('[i18n] Initialization failed:', error);
     });
 }
 

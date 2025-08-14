@@ -5,6 +5,7 @@ import { createContextGuard } from '@/utils/providerGuards';
 import { logger } from '@/utils/logger';
 import { AuthState, authReducer, initialAuthState } from './auth.state';
 import { AuthActions, createAuthActions } from './auth.actions';
+import { IS_DEVELOPMENT } from '@/config/env';
 
 interface AuthContextType extends AuthState, AuthActions {}
 
@@ -24,17 +25,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     logger.info('🔐 [AUTH_FLOW] AuthProvider: Initializing auth state');
     
+    // Skip auth initialization if using placeholder Supabase config
+    const isPlaceholderConfig = supabase.supabaseUrl?.includes('placeholder');
+    
+    if (isPlaceholderConfig && IS_DEVELOPMENT) {
+      logger.warn('🔐 [AUTH_FLOW] Using placeholder Supabase config - skipping auth initialization');
+      dispatch({ type: 'SET_SESSION', session: null });
+      return;
+    }
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       logger.info('🔐 [AUTH_FLOW] Initial session check:', session ? 'authenticated' : 'not authenticated');
       dispatch({ type: 'SET_SESSION', session });
       
       // Check subscription status on login
-      if (session?.user) {
+      if (session?.user && !isPlaceholderConfig) {
         setTimeout(() => {
           supabase.functions.invoke('check-subscription').catch(logger.error);
         }, 0);
       }
+    }).catch((error) => {
+      logger.error('🔐 [AUTH_FLOW] Failed to get initial session:', error);
+      dispatch({ type: 'SET_SESSION', session: null });
     });
 
     // Listen for auth changes
@@ -46,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'SET_SESSION', session });
       
       // Check subscription status on auth state change
-      if (session?.user) {
+      if (session?.user && !isPlaceholderConfig) {
         setTimeout(() => {
           supabase.functions.invoke('check-subscription').catch(logger.error);
         }, 0);

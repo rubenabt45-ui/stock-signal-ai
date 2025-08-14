@@ -16,14 +16,14 @@ export const STRIPE_SANDBOX = import.meta.env.VITE_STRIPE_SANDBOX === 'true';
 export const IS_DEVELOPMENT = import.meta.env.DEV;
 export const IS_PRODUCTION = import.meta.env.PROD;
 
-// Validate required environment variables
+// Validate required environment variables in production only
 const requiredEnvVars = {
   VITE_SUPABASE_URL: SUPABASE_URL,
   VITE_SUPABASE_ANON_KEY: SUPABASE_ANON_KEY,
 };
 
 // Only validate in production builds
-if (IS_PRODUCTION) {
+if (IS_PRODUCTION && !IS_DEVELOPMENT) {
   const missingVars = Object.entries(requiredEnvVars)
     .filter(([, value]) => !value)
     .map(([key]) => key);
