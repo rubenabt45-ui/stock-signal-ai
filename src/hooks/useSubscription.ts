@@ -1,141 +1,181 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/auth/auth.provider';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/utils/logger';
+import { STRIPE_SANDBOX } from '@/config/env';
+import { checkProAccess } from '@/utils/premium-gating';
 
-interface SubscriptionData {
+export interface SubscriptionInfo {
+  subscribed: boolean;
   subscription_tier: 'free' | 'pro';
-  subscription_status: string | null;
-  subscription_id: string | null;
-  subscription_expires_at: string | null;
-  customer_id: string | null;
+  subscription_status: string;
+  subscription_end: string | null;
+  loading: boolean;
+  error?: string;
 }
 
 export const useSubscription = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const [subscription, setSubscription] = useState<SubscriptionData>({
+  const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo>({
+    subscribed: false,
     subscription_tier: 'free',
-    subscription_status: null,
-    subscription_id: null,
-    subscription_expires_at: null,
-    customer_id: null,
+    subscription_status: 'inactive',
+    subscription_end: null,
+    loading: true,
   });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      loadSubscription();
-    } else {
-      setSubscription({
+  const fetchSubscriptionInfo = async () => {
+    if (!user?.id) {
+      setSubscriptionInfo({
+        subscribed: false,
         subscription_tier: 'free',
-        subscription_status: null,
-        subscription_id: null,
-        subscription_expires_at: null,
-        customer_id: null,
+        subscription_status: 'inactive',
+        subscription_end: null,
+        loading: false,
       });
-      setLoading(false);
-    }
-  }, [user]);
-
-  const loadSubscription = async () => {
-    if (!user) {
-      setLoading(false);
       return;
     }
 
     try {
-      setError(null);
-      const { data, error } = await supabase
+      logger.debug('[SUBSCRIPTION] Fetching subscription info for user:', user.id);
+      
+      const { data: profile, error } = await supabase
         .from('user_profiles')
-        .select('subscription_tier, subscription_status, subscription_id, subscription_expires_at, customer_id')
+        .select('subscription_tier, subscription_status, subscription_end')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        console.error('Error loading subscription:', error);
-        setError('Failed to load subscription data');
-      } else if (data) {
-        setSubscription({
-          subscription_tier: data.subscription_tier || 'free',
-          subscription_status: data.subscription_status,
-          subscription_id: data.subscription_id,
-          subscription_expires_at: data.subscription_expires_at,
-          customer_id: data.customer_id,
-        });
+        logger.error('[SUBSCRIPTION] Error fetching subscription info:', error);
+        setSubscriptionInfo(prev => ({ 
+          ...prev, 
+          loading: false, 
+          error: error.message 
+        }));
+        return;
       }
-    } catch (error) {
-      console.error('Error:', error);
-      setError('Failed to load subscription data');
-    } finally {
-      setLoading(false);
+    
+      const isPro = checkProAccess({ ...profile, loading: false } as SubscriptionInfo);
+      
+      const subscriptionTier: 'free' | 'pro' = profile?.subscription_tier === 'pro' ? 'pro' : 'free';
+      
+      setSubscriptionInfo({
+        subscribed: isPro,
+        subscription_tier: subscriptionTier,
+        subscription_status: profile?.subscription_status || 'inactive',
+        subscription_end: profile?.subscription_end || null,
+        loading: false,
+      });
+
+      logger.debug('[SUBSCRIPTION] Subscription info updated:', {
+        subscribed: isPro,
+        tier: subscriptionTier,
+        status: profile?.subscription_status,
+        end: profile?.subscription_end
+      });
+      
+    } catch (error: any) {
+      logger.error('[SUBSCRIPTION] Exception fetching subscription info:', error);
+      setSubscriptionInfo(prev => ({ 
+        ...prev, 
+        loading: false, 
+        error: error.message 
+      }));
     }
   };
 
+  useEffect(() => {
+    fetchSubscriptionInfo();
+  }, [user?.id]);
+
   const createCheckoutSession = async () => {
-    if (!user) {
-      throw new Error('User must be logged in');
+    if (!STRIPE_SANDBOX) {
+      logger.warn('[STRIPE] Stripe sandbox mode is disabled - checkout not available');
+      throw new Error('Stripe integration is not enabled in this environment');
+    }
+
+    if (!user?.id) {
+      throw new Error('User must be authenticated to create checkout session');
     }
 
     try {
+      logger.info('[STRIPE] Creating checkout session for user:', user.id);
+      
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: { userId: user.id }
       });
 
-      if (error) throw error;
-
-      if (data?.url) {
-        window.open(data.url, '_blank');
+      if (error) {
+        logger.error('[STRIPE] Error creating checkout session:', error);
+        throw error;
       }
-    } catch (error) {
-      console.error('Checkout error:', error);
+
+      if (!data?.url) {
+        logger.error('[STRIPE] No checkout URL returned from function');
+        throw new Error('Failed to create checkout session');
+      }
+
+      logger.debug('[STRIPE] Checkout session created successfully');
+      
+      window.open(data.url, '_blank');
+      
+      return data;
+    } catch (error: any) {
+      logger.error('[STRIPE] Exception creating checkout session:', error);
       throw error;
     }
   };
 
-  const createCustomerPortalSession = async () => {
-    if (!user || !subscription.customer_id) {
-      throw new Error('Customer ID required');
+  const createPortalSession = async () => {
+    if (!STRIPE_SANDBOX) {
+      logger.warn('[STRIPE] Stripe sandbox mode is disabled - portal not available');
+      throw new Error('Stripe integration is not enabled in this environment');
+    }
+
+    if (!user?.id) {
+      throw new Error('User must be authenticated to access billing portal');
     }
 
     try {
+      logger.info('[STRIPE] Creating portal session for user:', user.id);
+      
       const { data, error } = await supabase.functions.invoke('customer-portal', {
-        body: { customerId: subscription.customer_id }
+        body: { userId: user.id }
       });
 
-      if (error) throw error;
-
-      if (data?.url) {
-        window.open(data.url, '_blank');
+      if (error) {
+        logger.error('[STRIPE] Error creating portal session:', error);
+        throw error;
       }
-    } catch (error) {
-      console.error('Portal error:', error);
+
+      if (!data?.url) {
+        logger.error('[STRIPE] No portal URL returned from function');
+        throw new Error('Failed to create portal session');
+      }
+
+      logger.debug('[STRIPE] Portal session created successfully');
+      
+      window.open(data.url, '_blank');
+      
+      return data;
+    } catch (error: any) {
+      logger.error('[STRIPE] Exception creating portal session:', error);
       throw error;
     }
   };
 
-  const checkSubscription = async () => {
-    await loadSubscription();
-  };
-
-  const refreshSubscription = () => {
-    if (user) {
-      loadSubscription();
-    }
-  };
+  // Computed values for backward compatibility
+  const isPro = subscriptionInfo.subscription_tier === 'pro' && subscriptionInfo.subscribed;
 
   return {
-    ...subscription,
-    subscription_end: subscription.subscription_expires_at,
-    subscribed: subscription.subscription_tier === 'pro',
-    loading,
-    error,
-    isPro: subscription.subscription_tier === 'pro',
+    ...subscriptionInfo,
+    isPro,
     createCheckoutSession,
-    createCustomerPortalSession,
-    checkSubscription,
-    refreshSubscription,
+    createPortalSession,
+    // Aliases for backward compatibility
+    createCustomerPortalSession: createPortalSession,
+    checkSubscription: fetchSubscriptionInfo,
+    checkProAccess: () => checkProAccess(subscriptionInfo),
   };
 };

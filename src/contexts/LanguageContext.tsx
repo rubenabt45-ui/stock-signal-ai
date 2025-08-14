@@ -1,114 +1,166 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import i18n from '@/i18n/config';
-import { useAuth } from '@/contexts/auth/auth.provider';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
-
-export interface Language {
-  code: string;
-  name: string;
-}
+import { useAuth } from './AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import i18n from '@/i18n/config';
+import { createContextGuard } from '@/utils/providerGuards';
+import { logger } from '@/utils/logger';
 
 interface LanguageContextType {
   currentLanguage: string;
-  language: string;
-  changeLanguage: (lang: string) => Promise<void>;
-  setLanguage: (lang: string) => void;
-  availableLanguages: Language[];
-  loading: boolean;
+  changeLanguage: (language: string) => Promise<void>;
+  availableLanguages: { code: string; name: string; }[];
 }
 
-const availableLanguages: Language[] = [
+const AVAILABLE_LANGUAGES = [
   { code: 'en', name: 'English' },
-  { code: 'es', name: 'Español' },
+  { code: 'es', name: 'Español' }
 ];
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export const useLanguage = () => {
+const languageGuard = createContextGuard('LanguageProvider', 'useLanguage');
+
+export const useLanguage = (): LanguageContextType => {
   const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
-  return context;
+  return languageGuard(context);
 };
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<string>('en');
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { toast } = useToast();
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
 
-  // Load user's preferred language from profile or localStorage
+  // Initialize language from localStorage, user profile, or browser
   useEffect(() => {
-    const loadLanguage = async () => {
-      if (user) {
-        try {
-          const { data, error } = await supabase
-            .from('user_profiles')
-            .select('preferred_language')
-            .eq('id', user.id)
-            .single();
+    const initializeLanguage = async () => {
+      try {
+        let targetLanguage = 'en';
 
-          if (error) {
-            console.error('Error loading user language preference:', error);
-          } else if (data?.preferred_language) {
-            const savedLang = data.preferred_language;
-            setLanguageState(savedLang);
-            i18n.changeLanguage(savedLang);
-            setLoading(false);
-            return;
+        // 1. Try localStorage first
+        const storedLanguage = localStorage.getItem('tiq_lang');
+        if (storedLanguage && AVAILABLE_LANGUAGES.some(lang => lang.code === storedLanguage)) {
+          targetLanguage = storedLanguage;
+        }
+
+        // 2. If user is authenticated, try to get preference from database
+        if (user?.id) {
+          try {
+            const { data: profile } = await supabase
+              .from('user_profiles')
+              .select('language')
+              .eq('id', user.id)
+              .single();
+
+            if (profile?.language && AVAILABLE_LANGUAGES.some(lang => lang.code === profile.language)) {
+              targetLanguage = profile.language;
+              // Update localStorage to match user preference
+              localStorage.setItem('tiq_lang', profile.language);
+            }
+          } catch (dbError) {
+            logger.warn('Could not fetch user language preference:', dbError);
           }
-        } catch (error) {
-          console.error('Error:', error);
+        }
+
+        // 3. Apply the language using the singleton instance
+        if (i18n.language !== targetLanguage) {
+          logger.debug('[i18n] Initializing language to:', targetLanguage);
+          await i18n.changeLanguage(targetLanguage);
+        }
+        setCurrentLanguage(targetLanguage);
+        
+      } catch (error) {
+        logger.error('Language initialization error:', error);
+        // Fallback to English
+        setCurrentLanguage('en');
+        try {
+          await i18n.changeLanguage('en');
+        } catch (fallbackError) {
+          logger.error('Failed to set fallback language:', fallbackError);
         }
       }
-
-      // Fallback to localStorage or browser language
-      const savedLang = localStorage.getItem('language') || navigator.language.split('-')[0];
-      const supportedLang = ['en', 'es'].includes(savedLang) ? savedLang : 'en';
-      setLanguageState(supportedLang);
-      i18n.changeLanguage(supportedLang);
-      setLoading(false);
     };
 
-    loadLanguage();
-  }, [user]);
+    // Only initialize if i18n is ready
+    if (i18n.isInitialized) {
+      initializeLanguage();
+    }
+  }, [user?.id]);
 
-  const setLanguage = async (lang: string) => {
-    setLanguageState(lang);
-    i18n.changeLanguage(lang);
-    localStorage.setItem('language', lang);
+  // Listen to i18n language changes using the singleton instance
+  useEffect(() => {
+    const handleLanguageChange = (lng: string) => {
+      logger.debug('[i18n] Language changed to:', lng);
+      setCurrentLanguage(lng);
+    };
 
-    // Save to user profile if logged in
-    if (user) {
-      try {
-        const { error } = await supabase
-          .from('user_profiles')
-          .update({ preferred_language: lang })
-          .eq('id', user.id);
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, []);
 
-        if (error) {
-          console.error('Error saving language preference:', error);
+  const changeLanguage = async (language: string) => {
+    if (!AVAILABLE_LANGUAGES.some(lang => lang.code === language)) {
+      logger.error('[i18n] Unsupported language:', language);
+      return Promise.reject(new Error(`Language "${language}" is not supported`));
+    }
+
+    try {
+      logger.debug('[i18n] Changing language to:', language);
+      
+      // Use the singleton instance directly
+      await i18n.changeLanguage(language);
+      
+      // Save to localStorage
+      localStorage.setItem('tiq_lang', language);
+
+      // Save to database if user is authenticated
+      if (user?.id) {
+        try {
+          await supabase
+            .from('user_profiles')
+            .upsert({ 
+              id: user.id, 
+              language 
+            }, {
+              onConflict: 'id'
+            });
+        } catch (dbError) {
+          logger.warn('Failed to save language preference to database:', dbError);
         }
-      } catch (error) {
-        console.error('Error:', error);
       }
+
+      // Show success feedback
+      const languageName = AVAILABLE_LANGUAGES.find(l => l.code === language)?.name;
+      toast({
+        title: "🌐 Language Updated",
+        description: `Interface language changed to ${languageName}`,
+        duration: 2000,
+      });
+      
+    } catch (error) {
+      logger.error('[i18n] Language change failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast({
+        title: "Language Change Failed",
+        description: `Could not change interface language: ${errorMessage}`,
+        variant: "destructive",
+      });
+      throw error;
     }
   };
 
-  const changeLanguage = async (lang: string) => {
-    await setLanguage(lang);
+  const value = {
+    currentLanguage,
+    changeLanguage,
+    availableLanguages: AVAILABLE_LANGUAGES,
   };
 
   return (
-    <LanguageContext.Provider value={{ 
-      currentLanguage: language,
-      language, 
-      changeLanguage,
-      setLanguage, 
-      availableLanguages,
-      loading 
-    }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );

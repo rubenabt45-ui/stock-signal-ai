@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Trash2, GripVertical, LogIn, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,7 @@ import { LivePriceBadge } from "@/components/LivePriceBadge";
 import { MarketPrice } from "@/components/MarketPrice";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { useMultipleMarketData } from "@/hooks/useMarketData";
-import { useAuth } from "@/contexts/auth/auth.provider";
+import { useAuth } from "@/contexts/AuthContext";
 import { AddAlertModal } from "@/components/AddAlertModal";
 import { useUserAlerts } from "@/hooks/useUserAlerts";
 

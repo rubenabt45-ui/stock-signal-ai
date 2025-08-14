@@ -1,173 +1,264 @@
-import React, { useState } from 'react';
-import { Check, Star, TrendingUp, Brain, Zap, Shield } from 'lucide-react';
+import React from 'react';
+import { Check, X, Crown, Zap, TrendingUp, ChevronRight } from 'lucide-react';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/contexts/auth/auth.provider';
 import { useSubscription } from '@/hooks/useSubscription';
-import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
-import { LanguageSelector } from '@/components/LanguageSelector';
-import Footer from '@/components/Footer';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 const Pricing = () => {
+  const { createCheckoutSession, isPro, loading } = useSubscription();
   const { user } = useAuth();
-  const { isPro } = useSubscription();
-  const { t } = useTranslationWithFallback();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const [selectedPlan, setSelectedPlan] = useState<'free' | 'pro'>('free');
+  const handleGetStarted = () => {
+    if (user) {
+      navigate('/app');
+    } else {
+      navigate('/login');
+    }
+  };
+
+  const handleUpgrade = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      toast({
+        title: "Redirecting to checkout...",
+        description: "Please wait while we prepare your subscription.",
+      });
+      
+      await createCheckoutSession();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to start checkout process. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const features = {
     free: [
-      t('pricing.feature1.free'),
-      t('pricing.feature2.free'),
-      t('pricing.feature3.free'),
-      t('pricing.feature4.free'),
+      { name: "5 messages/day on StrategyAI", included: true },
+      { name: "Full access to Learn PDFs", included: true },
+      { name: "Economic Events", included: false, note: "Coming Soon" },
+      { name: "Real-time market updates", included: false },
+      { name: "Chat history", included: false },
+      { name: "Customer support", included: false },
     ],
     pro: [
-      t('pricing.feature1.pro'),
-      t('pricing.feature2.pro'),
-      t('pricing.feature3.pro'),
-      t('pricing.feature4.pro'),
-      t('pricing.feature5.pro'),
-      t('pricing.feature6.pro'),
-      t('pricing.feature7.pro'),
-    ],
+      { name: "Unlimited StrategyAI messages", included: true },
+      { name: "Full access to Learn PDFs", included: true },
+      { name: "Economic Events", included: true, note: "Coming Soon" },
+      { name: "Real-time market updates", included: true, note: "Future" },
+      { name: "Complete chat history", included: true },
+      { name: "Priority email support", included: true },
+    ]
   };
-
-  const togglePlan = (plan: 'free' | 'pro') => {
-    setSelectedPlan(plan);
-  };
-
-  const pricingDetails = {
-    free: {
-      title: t('pricing.freePlan'),
-      price: t('pricing.free'),
-      description: t('pricing.freePlanDescription'),
-      features: features.free,
-      buttonText: t('pricing.getStarted'),
-      badge: t('dashboard.plan.free'),
-    },
-    pro: {
-      title: t('pricing.proPlan'),
-      price: '$29/month',
-      description: t('pricing.proPlanDescription'),
-      features: features.pro,
-      buttonText: t('pricing.subscribeNow'),
-      badge: t('dashboard.plan.pro'),
-    },
-  };
-
-  const currentPlan = pricingDetails[selectedPlan];
 
   return (
-    <div className="min-h-screen bg-tradeiq-navy">
-      <div className="container mx-auto py-12 px-6">
-        {/* Header Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-white mb-4">{t('pricing.title')}</h1>
-          <p className="text-gray-400 text-lg">{t('pricing.subtitle')}</p>
-          <div className="mt-6 flex items-center justify-center space-x-4">
-            <span className="text-gray-400">{t('pricing.monthly')}</span>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                value=""
-                className="sr-only peer"
-                checked={selectedPlan === 'pro'}
-                onChange={() => togglePlan(selectedPlan === 'free' ? 'pro' : 'free')}
-              />
-              <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-tradeiq-blue rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-tradeiq-blue"></div>
-            </label>
-            <span className="text-white">{t('pricing.annual')}</span>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+      {/* Navigation */}
+      <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
+            <span className="text-xl font-bold">TradeIQ</span>
+            <Badge variant="secondary" className="text-xs">BETA</Badge>
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-6">
+            <Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
+            <Link to="/learn-preview" className="text-gray-300 hover:text-white transition-colors">Learn Preview</Link>
+            <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</Link>
+            <Link to="/app">
+              <Button variant="outline" size="sm">Platform</Button>
+            </Link>
+          </div>
+
+          <div className="md:hidden">
+            <Link to="/app">
+              <Button variant="outline" size="sm">Platform</Button>
+            </Link>
           </div>
         </div>
+      </nav>
 
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Free Plan Card */}
-          <Card className="tradeiq-card">
-            <CardHeader className="space-y-2.5">
-              <CardTitle className="text-2xl font-bold text-white">{pricingDetails.free.title}</CardTitle>
-              <CardDescription className="text-gray-400">
-                {pricingDetails.free.description}
-              </CardDescription>
+      {/* Header */}
+      <header className="border-b border-gray-800/50 bg-gray-900/30">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-3 mb-4">
+              <Crown className="h-10 w-10 text-tradeiq-blue" />
+              <div>
+                <h1 className="text-3xl font-bold text-white tracking-tight">Pricing Plans</h1>
+                <p className="text-gray-400 font-medium">Choose the plan that's right for you</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Content */}
+      <main className="container mx-auto px-4 py-12 pb-24">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-white mb-4">
+            Simple, Transparent Pricing
+          </h2>
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+            Start for free and upgrade when you're ready for unlimited access to our AI trading tools.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {/* Free Plan */}
+          <Card className="tradeiq-card relative">
+            <CardHeader className="text-center pb-8">
+              <div className="flex items-center justify-center mb-4">
+                <Zap className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">Free Plan</h3>
+              <div className="text-4xl font-bold text-white mb-2">
+                $0<span className="text-lg font-normal text-gray-400">/month</span>
+              </div>
+              <p className="text-gray-400">Perfect for getting started</p>
             </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="text-6xl font-semibold text-white">{pricingDetails.free.price}</div>
-              <ul className="grid gap-2">
-                {pricingDetails.free.features.map((feature, index) => (
-                  <li key={index} className="flex items-center text-gray-300">
-                    <Check className="h-4 w-4 mr-2 text-tradeiq-blue" />
-                    {feature}
+            
+            <CardContent>
+              <ul className="space-y-4 mb-8">
+                {features.free.map((feature, index) => (
+                  <li key={index} className="flex items-center">
+                    {feature.included ? (
+                      <Check className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
+                    ) : (
+                      <X className="h-5 w-5 text-gray-500 mr-3 flex-shrink-0" />
+                    )}
+                    <span className={`${feature.included ? 'text-white' : 'text-gray-500'}`}>
+                      {feature.name}
+                      {feature.note && (
+                        <Badge variant="outline" className="ml-2 text-xs">
+                          {feature.note}
+                        </Badge>
+                      )}
+                    </span>
                   </li>
                 ))}
               </ul>
-            </CardContent>
-            <div className="p-6">
-              <Button className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90">
-                {pricingDetails.free.buttonText}
+              
+              <Button 
+                onClick={handleGetStarted}
+                variant="outline" 
+                className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 mb-4"
+              >
+                Get Started
+                <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
-            </div>
+
+              {!user && (
+                <div className="text-center">
+                  <Link to="/app" className="text-sm text-tradeiq-blue hover:text-tradeiq-blue/80 transition-colors">
+                    Already have an account? Access the platform →
+                  </Link>
+                </div>
+              )}
+            </CardContent>
           </Card>
 
-          {/* Pro Plan Card */}
-          <Card className="tradeiq-card border-2 border-tradeiq-blue">
-            <CardHeader className="space-y-2.5">
-              <div className="absolute top-4 right-4">
-                <Badge className="bg-tradeiq-blue text-white">{pricingDetails.pro.badge}</Badge>
+          {/* Pro Plan */}
+          <Card className="tradeiq-card relative border-tradeiq-blue/50">
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+              <Badge className="bg-tradeiq-blue text-white px-4 py-1">
+                Most Popular
+              </Badge>
+            </div>
+            
+            <CardHeader className="text-center pb-8">
+              <div className="flex items-center justify-center mb-4">
+                <Crown className="h-8 w-8 text-tradeiq-blue" />
               </div>
-              <CardTitle className="text-2xl font-bold text-white">{pricingDetails.pro.title}</CardTitle>
-              <CardDescription className="text-gray-400">
-                {pricingDetails.pro.description}
-              </CardDescription>
+              <h3 className="text-2xl font-bold text-white mb-2">Pro Plan</h3>
+              <div className="text-4xl font-bold text-white mb-2">
+                $9.99<span className="text-lg font-normal text-gray-400">/month</span>
+              </div>
+              <p className="text-gray-400">For serious traders</p>
             </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="text-6xl font-semibold text-white">{pricingDetails.pro.price}</div>
-              <ul className="grid gap-2">
-                {pricingDetails.pro.features.map((feature, index) => (
-                  <li key={index} className="flex items-center text-gray-300">
-                    <Check className="h-4 w-4 mr-2 text-tradeiq-blue" />
-                    {feature}
+            
+            <CardContent>
+              <ul className="space-y-4 mb-8">
+                {features.pro.map((feature, index) => (
+                  <li key={index} className="flex items-center">
+                    <Check className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
+                    <span className="text-white">
+                      {feature.name}
+                      {feature.note && (
+                        <Badge variant="outline" className="ml-2 text-xs">
+                          {feature.note}
+                        </Badge>
+                      )}
+                    </span>
                   </li>
                 ))}
               </ul>
+              
+              {isPro ? (
+                <Button 
+                  disabled
+                  className="w-full bg-green-600 hover:bg-green-600 mb-4"
+                >
+                  Current Plan
+                </Button>
+              ) : (
+                <Button 
+                  onClick={handleUpgrade}
+                  disabled={loading}
+                  className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90 text-white mb-4"
+                >
+                  {loading ? 'Processing...' : 'Upgrade to Pro'}
+                  {!loading && <ChevronRight className="ml-2 h-4 w-4" />}
+                </Button>
+              )}
+
+              {!user && (
+                <div className="text-center">
+                  <Link to="/app" className="text-sm text-tradeiq-blue hover:text-tradeiq-blue/80 transition-colors">
+                    Already have an account? Access the platform →
+                  </Link>
+                </div>
+              )}
             </CardContent>
-            <div className="p-6">
-              <Button className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90">
-                {pricingDetails.pro.buttonText}
-              </Button>
-            </div>
           </Card>
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-16">
-          <h2 className="text-3xl font-bold text-white mb-8">{t('pricing.faqTitle')}</h2>
-          <div className="space-y-4">
-            <details className="tradeiq-card rounded-lg">
-              <summary className="px-4 py-3 text-lg font-semibold text-white cursor-pointer list-none marker:hidden">
-                {t('pricing.faq1.question')}
-              </summary>
-              <div className="px-4 py-3 text-gray-300">{t('pricing.faq1.answer')}</div>
-            </details>
-
-            <details className="tradeiq-card rounded-lg">
-              <summary className="px-4 py-3 text-lg font-semibold text-white cursor-pointer list-none marker:hidden">
-                {t('pricing.faq2.question')}
-              </summary>
-              <div className="px-4 py-3 text-gray-300">{t('pricing.faq2.answer')}</div>
-            </details>
-
-            <details className="tradeiq-card rounded-lg">
-              <summary className="px-4 py-3 text-lg font-semibold text-white cursor-pointer list-none marker:hidden">
-                {t('pricing.faq3.question')}
-              </summary>
-              <div className="px-4 py-3 text-gray-300">{t('pricing.faq3.answer')}</div>
-            </details>
+        <div className="mt-16 text-center">
+          <h3 className="text-2xl font-bold text-white mb-8">Frequently Asked Questions</h3>
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="text-left">
+              <h4 className="text-lg font-semibold text-white mb-2">Can I cancel anytime?</h4>
+              <p className="text-gray-400">Yes, you can cancel your subscription at any time. You'll continue to have access until the end of your billing period.</p>
+            </div>
+            <div className="text-left">
+              <h4 className="text-lg font-semibold text-white mb-2">What payment methods do you accept?</h4>
+              <p className="text-gray-400">We accept all major credit cards and debit cards through our secure Stripe payment processor.</p>
+            </div>
+            <div className="text-left">
+              <h4 className="text-lg font-semibold text-white mb-2">Is there a free trial?</h4>
+              <p className="text-gray-400">You can start with our free plan immediately. No credit card required to get started.</p>
+            </div>
+            <div className="text-left">
+              <h4 className="text-lg font-semibold text-white mb-2">When will Economic Events be available?</h4>
+              <p className="text-gray-400">Economic Events feature is coming soon for all users. Pro users will get early access when it launches.</p>
+            </div>
           </div>
         </div>
-      </div>
-      <Footer />
+      </main>
     </div>
   );
 };

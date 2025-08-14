@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { CategoryFilter } from "@/types/favorites";
+import { CategoryFilter } from "@/pages/Favorites";
 import { useState } from "react";
 
 interface FilterDropdownProps {

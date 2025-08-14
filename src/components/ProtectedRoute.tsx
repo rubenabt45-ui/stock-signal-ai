@@ -1,6 +1,7 @@
+
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/auth/auth.provider';
+import { useAuth } from '@/contexts/AuthContext';
 import { ChartCandlestick } from 'lucide-react';
 
 interface ProtectedRouteProps {

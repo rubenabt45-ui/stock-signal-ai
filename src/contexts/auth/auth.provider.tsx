@@ -35,9 +35,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           supabase.functions.invoke('check-subscription').catch(logger.error);
         }, 0);
       }
-    }).catch((error) => {
-      logger.error('🔐 [AUTH_FLOW] Failed to get initial session:', error);
-      dispatch({ type: 'SET_SESSION', session: null });
     });
 
     // Listen for auth changes

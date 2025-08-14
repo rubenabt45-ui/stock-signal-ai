@@ -1,124 +1,168 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/auth/auth.provider';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { createContextGuard } from '@/utils/providerGuards';
+import { logger } from '@/utils/logger';
 
-type Theme = 'dark' | 'light' | 'system';
+type Theme = 'light' | 'dark' | 'system';
 
-interface ThemeProviderProps {
-  children: React.ReactNode;
-  defaultTheme?: Theme;
-  storageKey?: string;
-}
-
-interface ThemeProviderState {
+interface ThemeContextType {
   theme: Theme;
-  actualTheme: 'dark' | 'light';
   setTheme: (theme: Theme) => void;
+  actualTheme: 'light' | 'dark';
 }
 
-const initialState: ThemeProviderState = {
-  theme: 'system',
-  actualTheme: 'dark',
-  setTheme: () => null,
-};
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+const themeGuard = createContextGuard('ThemeProvider', 'useTheme');
 
-export function ThemeProvider({
-  children,
-  defaultTheme = 'system',
-  storageKey = 'vite-ui-theme',
-  ...props
-}: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  );
-  const [actualTheme, setActualTheme] = useState<'dark' | 'light'>('dark');
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  return themeGuard(context);
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setThemeState] = useState<Theme>('dark');
+  const [actualTheme, setActualTheme] = useState<'light' | 'dark'>('dark');
   const { user } = useAuth();
+  const { toast } = useToast();
 
+  // Load theme from user_profiles on mount with proper error handling
   useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-
-    let resolvedTheme: 'dark' | 'light';
-
-    if (theme === 'system') {
-      resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    } else {
-      resolvedTheme = theme;
-    }
-
-    root.classList.add(resolvedTheme);
-    setActualTheme(resolvedTheme);
-  }, [theme]);
-
-  // Load user's preferred theme from profile
-  useEffect(() => {
-    const loadTheme = async () => {
-      if (user) {
-        try {
-          const { data, error } = await supabase
-            .from('user_profiles')
-            .select('preferred_theme')
-            .eq('id', user.id)
-            .single();
-
-          if (error) {
-            console.error('Error loading user theme preference:', error);
-          } else if (data?.preferred_theme) {
-            const savedTheme = data.preferred_theme as Theme;
-            setThemeState(savedTheme);
-            localStorage.setItem(storageKey, savedTheme);
-          }
-        } catch (error) {
-          console.error('Error:', error);
+    const loadUserTheme = async () => {
+      // Always start with default theme
+      const defaultTheme: Theme = 'dark';
+      
+      if (!user?.id) {
+        logger.debug('🎨 No user found, using default theme:', defaultTheme);
+        // Check localStorage for fallback
+        const savedTheme = localStorage.getItem('theme') as Theme;
+        if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
+          logger.debug('🎨 Using saved theme from localStorage:', savedTheme);
+          setThemeState(savedTheme);
+        } else {
+          logger.debug('🎨 Setting default theme:', defaultTheme);
+          setThemeState(defaultTheme);
         }
+        return;
+      }
+
+      try {
+        logger.debug('🎨 Loading user theme for user:', user.id);
+        
+        // Use .maybeSingle() instead of .single() to handle missing records gracefully
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('theme')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          logger.debug('🎨 Error loading user theme (non-critical):', error);
+          logger.debug('🎨 Using fallback theme:', defaultTheme);
+          setThemeState(defaultTheme);
+          localStorage.setItem('theme', defaultTheme);
+          return;
+        }
+
+        if (data?.theme && ['light', 'dark', 'system'].includes(data.theme)) {
+          logger.debug('🎨 Loaded user theme successfully:', data.theme);
+          setThemeState(data.theme as Theme);
+          localStorage.setItem('theme', data.theme);
+        } else {
+          logger.debug('🎨 No user theme found or invalid, using default:', defaultTheme);
+          setThemeState(defaultTheme);
+          localStorage.setItem('theme', defaultTheme);
+        }
+      } catch (error) {
+        logger.debug('🎨 Exception loading user theme (non-critical):', error);
+        logger.debug('🎨 Using fallback theme due to exception:', defaultTheme);
+        setThemeState(defaultTheme);
+        localStorage.setItem('theme', defaultTheme);
       }
     };
 
-    loadTheme();
-  }, [user, storageKey]);
+    loadUserTheme();
+  }, [user?.id]);
+
+  // Apply theme changes to document
+  useEffect(() => {
+    const applyTheme = () => {
+      let resolvedTheme: 'light' | 'dark' = 'dark';
+
+      if (theme === 'system') {
+        resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      } else {
+        resolvedTheme = theme;
+      }
+
+      setActualTheme(resolvedTheme);
+
+      // Apply theme class to document
+      const root = document.documentElement;
+      if (resolvedTheme === 'dark') {
+        root.classList.add('dark');
+        root.classList.remove('light');
+      } else {
+        root.classList.add('light');
+        root.classList.remove('dark');
+      }
+
+      // Save to localStorage for persistence
+      localStorage.setItem('theme', theme);
+      logger.debug('🎨 Theme applied:', resolvedTheme, '(from setting:', theme + ')');
+    };
+
+    applyTheme();
+
+    // Listen for system theme changes if theme is 'system'
+    if (theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => applyTheme();
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, [theme]);
 
   const setTheme = async (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem(storageKey, newTheme);
 
-    // Save to user profile if logged in
-    if (user) {
+    // Save to localStorage immediately
+    localStorage.setItem('theme', newTheme);
+    logger.debug('🎨 Theme changed to:', newTheme);
+
+    if (user?.id) {
       try {
+        // Try to save to database, but don't fail if it doesn't work
         const { error } = await supabase
           .from('user_profiles')
-          .update({ preferred_theme: newTheme })
-          .eq('id', user.id);
+          .upsert({ 
+            id: user.id, 
+            theme: newTheme 
+          }, {
+            onConflict: 'id'
+          });
 
         if (error) {
-          console.error('Error saving theme preference:', error);
+          logger.debug('🎨 Could not save theme to database (non-critical):', error);
+        } else {
+          logger.debug('🎨 Theme saved to database successfully');
+          toast({
+            title: "Theme updated",
+            description: `Theme changed to ${newTheme}`,
+          });
         }
-      } catch (error) {
-        console.error('Error:', error);
+      } catch (dbError) {
+        logger.debug('🎨 Database save failed (non-critical):', dbError);
       }
     }
   };
 
-  const value = {
-    theme,
-    actualTheme,
-    setTheme,
-  };
-
   return (
-    <ThemeProviderContext.Provider {...props} value={value}>
+    <ThemeContext.Provider value={{ theme, setTheme, actualTheme }}>
       {children}
-    </ThemeProviderContext.Provider>
+    </ThemeContext.Provider>
   );
 }
-
-export const useTheme = () => {
-  const context = useContext(ThemeProviderContext);
-
-  if (context === undefined)
-    throw new Error('useTheme must be used within a ThemeProvider');
-
-  return context;
-};

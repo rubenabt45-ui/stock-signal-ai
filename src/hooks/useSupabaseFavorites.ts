@@ -1,237 +1,286 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/auth/auth.provider';
+import { useAuth } from '@/contexts/AuthContext';
+import { CategoryFilter } from '@/pages/Favorites';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
-interface Favorite {
+interface FavoriteItem {
+  symbol: string;
+  name: string;
+  category: CategoryFilter;
+}
+
+interface SupabaseFavoriteItem {
   id: string;
   symbol: string;
   name: string;
   category: string;
-  position?: number;
-  created_at?: string;
+  display_order: number;
 }
 
-interface FavoriteInput {
-  symbol: string;
-  name: string;
-  category: string;
-}
+// Default favorites for new users
+const defaultFavorites: FavoriteItem[] = [
+  { symbol: 'AAPL', name: 'Apple Inc.', category: 'stocks' },
+  { symbol: 'MSFT', name: 'Microsoft Corp.', category: 'stocks' },
+  { symbol: 'GOOGL', name: 'Alphabet Inc.', category: 'stocks' },
+  { symbol: 'TSLA', name: 'Tesla Inc.', category: 'stocks' },
+  { symbol: 'BTCUSD', name: 'Bitcoin', category: 'crypto' },
+  { symbol: 'ETHUSD', name: 'Ethereum', category: 'crypto' },
+  { symbol: 'EURUSD', name: 'Euro / US Dollar', category: 'forex' },
+  { symbol: 'SPX', name: 'S&P 500 Index', category: 'indices' },
+];
 
 export const useSupabaseFavorites = () => {
-  const [favorites, setFavorites] = useState<Favorite[]>([]);
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  // Load favorites on mount and when user changes
-  useEffect(() => {
-    if (user) {
-      loadFavorites();
-    } else {
-      setFavorites([]);
-      setLoading(false);
-    }
-  }, [user]);
-
+  // Load favorites from Supabase
   const loadFavorites = async () => {
     if (!user) {
+      setFavorites([]);
       setLoading(false);
       return;
     }
 
     try {
-      const { data, error } = await supabase
+      setLoading(true);
+      setError(null);
+      
+      console.log('🔄 Loading favorites for user:', user.id);
+      
+      const { data, error: fetchError } = await supabase
         .from('user_favorites')
         .select('*')
         .eq('user_id', user.id)
-        .order('position', { ascending: true });
+        .order('display_order', { ascending: true });
 
-      if (error) {
-        console.error('Error loading favorites:', error);
-        toast({
-          title: "Error loading favorites",
-          description: "Unable to load your favorites. Please try again.",
-          variant: "destructive",
-        });
-        return;
+      if (fetchError) {
+        console.error('❌ Error fetching favorites:', fetchError);
+        throw fetchError;
       }
 
-      setFavorites(data || []);
-    } catch (error) {
-      console.error('Error loading favorites:', error);
+      console.log('✅ Favorites loaded:', data);
+
+      if (data && data.length > 0) {
+        const favoritesData = data.map(item => ({
+          symbol: item.symbol,
+          name: item.name,
+          category: item.category as CategoryFilter,
+        }));
+        setFavorites(favoritesData);
+      } else {
+        // Initialize with default favorites for new users
+        console.log('📝 No favorites found, initializing with defaults');
+        await initializeWithDefaults();
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load favorites';
+      console.error('❌ Error loading favorites:', errorMessage);
+      setError(errorMessage);
+      toast({
+        title: "Error Loading Favorites",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const addFavorite = async ({ symbol, name, category }: FavoriteInput) => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to add favorites.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Check if already favorited
-    const existing = favorites.find(fav => fav.symbol === symbol);
-    if (existing) {
-      toast({
-        title: "Already in favorites",
-        description: `${symbol} is already in your favorites.`,
-        variant: "destructive",
-      });
-      return;
-    }
+  // Initialize with default favorites
+  const initializeWithDefaults = async () => {
+    if (!user) return;
 
     try {
-      const position = favorites.length;
-      
-      const { data, error } = await supabase
-        .from('user_favorites')
-        .insert({
-          user_id: user.id,
-          symbol,
-          name,
-          category,
-          position
-        })
-        .select()
-        .single();
+      const favoritesToInsert = defaultFavorites.map((fav, index) => ({
+        user_id: user.id,
+        symbol: fav.symbol,
+        name: fav.name,
+        category: fav.category,
+        display_order: index,
+      }));
 
-      if (error) {
-        console.error('Error adding favorite:', error);
-        toast({
-          title: "Error adding favorite",
-          description: "Unable to add favorite. Please try again.",
-          variant: "destructive",
-        });
-        return;
+      const { error: insertError } = await supabase
+        .from('user_favorites')
+        .insert(favoritesToInsert);
+
+      if (insertError) {
+        throw insertError;
       }
 
-      setFavorites(prev => [...prev, data]);
-      toast({
-        title: "Added to favorites",
-        description: `${symbol} has been added to your favorites.`,
-      });
-    } catch (error) {
-      console.error('Error adding favorite:', error);
-      toast({
-        title: "Error adding favorite",
-        description: "Unable to add favorite. Please try again.",
-        variant: "destructive",
-      });
+      setFavorites(defaultFavorites);
+      console.log('✅ Default favorites initialized');
+    } catch (err) {
+      console.error('❌ Error initializing defaults:', err);
     }
   };
 
-  const removeFavorite = async (symbol: string) => {
-    if (!user) return;
+  // Add favorite
+  const addFavorite = async (item: FavoriteItem) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to add favorites",
+        variant: "destructive",
+      });
+      setTimeout(() => navigate('/login'), 1500);
+      return false;
+    }
 
-    const favoriteToRemove = favorites.find(fav => fav.symbol === symbol);
-    if (!favoriteToRemove) return;
+    // Check if already exists
+    if (favorites.some(fav => fav.symbol === item.symbol)) {
+      toast({
+        title: "Already Added",
+        description: `${item.symbol} is already in your favorites`,
+        variant: "destructive",
+      });
+      return false;
+    }
 
     try {
-      const { error } = await supabase
+      console.log('➕ Adding favorite:', item);
+      
+      const { error: insertError } = await supabase
+        .from('user_favorites')
+        .insert({
+          user_id: user.id,
+          symbol: item.symbol,
+          name: item.name,
+          category: item.category,
+          display_order: favorites.length,
+        });
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      setFavorites(prev => [...prev, item]);
+      toast({
+        title: "Added to Favorites",
+        description: `${item.symbol} has been added to your watchlist`,
+      });
+      
+      console.log('✅ Favorite added successfully');
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add favorite';
+      console.error('❌ Error adding favorite:', errorMessage);
+      toast({
+        title: "Error Adding Favorite",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  // Remove favorite
+  const removeFavorite = async (symbol: string) => {
+    if (!user) return false;
+
+    try {
+      console.log('➖ Removing favorite:', symbol);
+      
+      const { error: deleteError } = await supabase
         .from('user_favorites')
         .delete()
-        .eq('id', favoriteToRemove.id);
+        .eq('user_id', user.id)
+        .eq('symbol', symbol);
 
-      if (error) {
-        console.error('Error removing favorite:', error);
-        toast({
-          title: "Error removing favorite",
-          description: "Unable to remove favorite. Please try again.",
-          variant: "destructive",
-        });
-        return;
+      if (deleteError) {
+        throw deleteError;
       }
 
       setFavorites(prev => prev.filter(fav => fav.symbol !== symbol));
       toast({
-        title: "Removed from favorites",
-        description: `${symbol} has been removed from your favorites.`,
+        title: "Removed from Favorites",
+        description: `${symbol} has been removed from your watchlist`,
       });
-    } catch (error) {
-      console.error('Error removing favorite:', error);
+      
+      console.log('✅ Favorite removed successfully');
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to remove favorite';
+      console.error('❌ Error removing favorite:', errorMessage);
       toast({
-        title: "Error removing favorite",
-        description: "Unable to remove favorite. Please try again.",
+        title: "Error Removing Favorite",
+        description: errorMessage,
         variant: "destructive",
       });
+      return false;
     }
   };
 
+  // Reorder favorites
   const reorderFavorites = async (fromIndex: number, toIndex: number) => {
-    if (!user || fromIndex === toIndex) return;
-
-    // Optimistically update the local state
-    const newFavorites = [...favorites];
-    const [movedItem] = newFavorites.splice(fromIndex, 1);
-    newFavorites.splice(toIndex, 0, movedItem);
-    
-    // Update positions
-    const updatedFavorites = newFavorites.map((fav, index) => ({
-      ...fav,
-      position: index
-    }));
-    
-    setFavorites(updatedFavorites);
+    if (!user) return false;
 
     try {
-      // Update positions in database
-      const updates = updatedFavorites.map((fav, index) => ({
-        id: fav.id,
-        position: index
+      console.log('🔄 Reordering favorites:', { fromIndex, toIndex });
+      
+      const newFavorites = [...favorites];
+      const [removed] = newFavorites.splice(fromIndex, 1);
+      newFavorites.splice(toIndex, 0, removed);
+
+      // Update display_order for all favorites
+      const updates = newFavorites.map((fav, index) => ({
+        user_id: user.id,
+        symbol: fav.symbol,
+        display_order: index,
       }));
 
+      // Use upsert to update display orders
       for (const update of updates) {
-        const { error } = await supabase
+        const { error: updateError } = await supabase
           .from('user_favorites')
-          .update({ position: update.position })
-          .eq('id', update.id);
+          .update({ display_order: update.display_order })
+          .eq('user_id', user.id)
+          .eq('symbol', update.symbol);
 
-        if (error) {
-          console.error('Error updating favorite position:', error);
-          // Revert on error
-          loadFavorites();
-          toast({
-            title: "Error reordering favorites",
-            description: "Unable to save new order. Reverted changes.",
-            variant: "destructive",
-          });
-          return;
+        if (updateError) {
+          throw updateError;
         }
       }
 
+      setFavorites(newFavorites);
+      console.log('✅ Favorites reordered successfully');
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to reorder favorites';
+      console.error('❌ Error reordering favorites:', errorMessage);
       toast({
-        title: "Favorites reordered",
-        description: "Your favorites have been reordered successfully.",
-      });
-    } catch (error) {
-      console.error('Error reordering favorites:', error);
-      // Revert on error
-      loadFavorites();
-      toast({
-        title: "Error reordering favorites",
-        description: "Unable to save new order. Reverted changes.",
+        title: "Error Reordering",
+        description: errorMessage,
         variant: "destructive",
       });
+      return false;
     }
   };
 
+  // Check if symbol is favorite
   const isFavorite = (symbol: string) => {
-    return favorites.find(fav => fav.symbol === symbol);
+    return favorites.some(fav => fav.symbol === symbol);
   };
+
+  // Load favorites when user changes
+  useEffect(() => {
+    loadFavorites();
+  }, [user]);
 
   return {
     favorites,
     loading,
+    error,
     addFavorite,
     removeFavorite,
     reorderFavorites,
     isFavorite,
-    refreshFavorites: loadFavorites
+    refetch: loadFavorites,
   };
 };

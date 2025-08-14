@@ -297,15 +297,10 @@
     "continue": "Continuar",
     "back": "Atrás",
     "retry": "Reintentar",
-    "comingSoon": "Disponible Pronto",
+    "comingSoon": "Próximamente",
     "home": "Inicio",
     "pricing": "Precios",
-    "selectLanguage": "Seleccionar Idioma",
-    "noData": "No hay datos disponibles",
-    "tryAgain": "Intentar de nuevo",
-    "close": "Cerrar",
-    "confirm": "Confirmar",
-    "delete": "Eliminar"
+    "selectLanguage": "Seleccionar Idioma"
   },
   "navigation": {
     "home": "Inicio",
@@ -351,14 +346,7 @@
   "learn": {
     "title": "Aprender",
     "subtitle": "Domina las Habilidades de Trading",
-    "description": "Nuestra plataforma de aprendizaje integral está siendo desarrollada con contenido curado por expertos que cubre fundamentos de trading, análisis técnico y gestión de riesgo. Las lecciones interactivas y ejemplos del mundo real te ayudarán a construir confianza en tus decisiones de trading.",
-    "features": {
-      "comprehensive": "Currículo integral que cubre todos los aspectos del trading",
-      "interactive": "Lecciones interactivas con ejemplos de mercado reales",
-      "expertled": "Contenido dirigido por expertos de traders profesionales", 
-      "practical": "Ejercicios prácticos para aplicar tu conocimiento"
-    },
-    "availability": "Plataforma de aprendizaje completa lanzando Q2 2024"
+    "comingSoon": "Próximamente"
   },
   "settings": {
     "title": "Configuración",
@@ -416,12 +404,7 @@
     }
   },
   "tradingChat": {
-    "welcome": "¡Bienvenido a StrategyAI! Sube un gráfico o pregúntame sobre estrategias de trading, análisis de mercado o cualquier pregunta relacionada con trading.",
-    "placeholder": "Pregunta sobre estrategias de trading, sube un gráfico, o solicita análisis de mercado...",
-    "uploading": "Subiendo gráfico...",
-    "analyzing": "Analizando...",
-    "error": "Lo siento, encontré un error. Por favor intenta de nuevo.",
-    "retry": "Reintentar Análisis"
+    "welcome": "¡Bienvenido a StrategyAI! Sube un gráfico o pregúntame sobre estrategias de trading, análisis de mercado o cualquier pregunta relacionada con trading."
   },
   "placeholders": {
     "enterEmail": "Ingresa tu email",
@@ -434,43 +417,18 @@
   },
   "pricing": {
     "getStarted": "Comenzar",
-    "upgradeToPro": "Actualizar a Pro",
-    "free": {
-      "title": "Gratis",
-      "price": "$0",
-      "features": [
-        "Análisis básico de IA",
-        "Acceso limitado a gráficos",
-        "Soporte de la comunidad"
-      ]
-    },
-    "pro": {
-      "title": "Pro",
-      "price": "$29",
-      "features": [
-        "Insights avanzados de IA",
-        "Gráficos ilimitados",
-        "Soporte prioritario",
-        "Patrones avanzados"
-      ]
-    }
+    "upgradeToPro": "Actualizar a Pro"
   },
   "economicEvents": {
     "title": "Eventos Económicos",
     "subtitle": "Eventos macroeconómicos de alto impacto",
-    "description": "Mantente informado sobre eventos que mueven el mercado con nuestro calendario económico integral. Rastrea reportes de ganancias, anuncios de la Reserva Federal, lanzamientos del PIB y otros indicadores clave que impactan las decisiones de trading.",
-    "features": {
-      "realtime": "Actualizaciones de eventos en tiempo real y notificaciones",
-      "filtered": "Filtrar por nivel de impacto y clase de activo",
-      "historical": "Datos históricos y análisis de tendencias",
-      "alerts": "Alertas personalizadas para eventos importantes"
-    },
-    "availability": "Calendario económico lanzando a principios de 2024"
+    "comingSoon": "Próximamente",
+    "description": "Estamos construyendo un calendario económico integral con eventos de alto impacto, reportes de ganancias y anuncios que mueven el mercado."
   },
   "marketUpdates": {
     "title": "Actualizaciones del Mercado en Tiempo Real",
     "subtitle": "Mantente adelante del mercado con datos en tiempo real, alertas e insights impulsados por IA",
-    "description": "Obtén acceso instantáneo a movimientos de mercado, noticias importantes e insights generados por IA. Nuestros algoritmos avanzados monitorean los mercados globales 24/7 para identificar oportunidades y riesgos.",
+    "comingSoon": "Próximamente",
     "liveData": {
       "title": "Datos de Mercado en Vivo",
       "description": "Feeds de precios en tiempo real y movimientos de mercado en todos los principales intercambios"
@@ -478,14 +436,7 @@
     "smartAlerts": {
       "title": "Alertas Inteligentes",
       "description": "Notificaciones impulsadas por IA para oportunidades de mercado y gestión de riesgo"
-    },
-    "features": {
-      "monitoring": "Monitoreo de mercado 24/7 en intercambios globales",
-      "analysis": "Análisis de sentimiento y técnico impulsado por IA",
-      "alerts": "Alertas inteligentes para oportunidades de trading",
-      "news": "Integración de noticias en tiempo real y análisis de impacto"
-    },
-    "availability": "Actualizaciones en tiempo real disponibles con suscripción Pro"
+    }
   },
   "footer": {
     "platform": "Plataforma",
