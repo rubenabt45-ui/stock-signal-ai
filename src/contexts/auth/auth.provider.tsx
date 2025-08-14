@@ -5,7 +5,7 @@ import { createContextGuard } from '@/utils/providerGuards';
 import { logger } from '@/utils/logger';
 import { AuthState, authReducer, initialAuthState } from './auth.state';
 import { AuthActions, createAuthActions } from './auth.actions';
-import { IS_DEVELOPMENT } from '@/config/env';
+import { IS_DEVELOPMENT, SUPABASE_URL } from '@/config/env';
 
 interface AuthContextType extends AuthState, AuthActions {}
 
@@ -26,7 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logger.info('🔐 [AUTH_FLOW] AuthProvider: Initializing auth state');
     
     // Skip auth initialization if using placeholder Supabase config
-    const isPlaceholderConfig = supabase.supabaseUrl?.includes('placeholder');
+    const isPlaceholderConfig = SUPABASE_URL?.includes('placeholder');
     
     if (isPlaceholderConfig && IS_DEVELOPMENT) {
       logger.warn('🔐 [AUTH_FLOW] Using placeholder Supabase config - skipping auth initialization');
