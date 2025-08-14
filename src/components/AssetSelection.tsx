@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, TrendingUp, DollarSign, Activity, BarChart3, Zap, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,8 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CategoryFilter } from '@/types/favorites';
 
 interface AssetSelectionProps {
-  onSymbolSelect: (symbol: string) => void;
-  selectedSymbol?: string;
+  onAssetSelect: (symbol: string) => void;
+  selectedAsset?: string;
 }
 
 const categories = [
@@ -30,7 +29,7 @@ const popularAssets = {
   etf: ['SPY', 'QQQ', 'IWM', 'VTI', 'ARKK', 'GLD', 'SLV', 'TLT'],
 };
 
-export const AssetSelection: React.FC<AssetSelectionProps> = ({ onSymbolSelect, selectedSymbol }) => {
+export const AssetSelection: React.FC<AssetSelectionProps> = ({ onAssetSelect, selectedAsset }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('stocks');
   const [filteredAssets, setFilteredAssets] = useState<string[]>([]);
@@ -49,7 +48,7 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({ onSymbolSelect, 
   }, [searchTerm, selectedCategory]);
 
   const handleSymbolClick = (symbol: string) => {
-    onSymbolSelect(symbol);
+    onAssetSelect(symbol);
   };
 
   return (

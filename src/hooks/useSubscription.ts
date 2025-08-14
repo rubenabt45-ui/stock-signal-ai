@@ -56,21 +56,23 @@ export const useSubscription = () => {
         return;
       }
     
-      const isPro = checkProAccess({ ...profile, loading: false } as SubscriptionInfo);
-      
-      const subscriptionTier: 'free' | 'pro' = profile?.subscription_tier === 'pro' ? 'pro' : 'free';
-      
-      setSubscriptionInfo({
-        subscribed: isPro,
-        subscription_tier: subscriptionTier,
+      // Create a proper SubscriptionInfo object with all required properties
+      const subscriptionData: SubscriptionInfo = {
+        loading: false,
+        subscription_tier: profile?.subscription_tier === 'pro' ? 'pro' : 'free',
         subscription_status: profile?.subscription_status || 'inactive',
         subscription_end: profile?.subscription_expires_at || null,
-        loading: false,
-      });
+        subscribed: false, // Will be set by checkProAccess
+      };
+
+      const isPro = checkProAccess(subscriptionData);
+      subscriptionData.subscribed = isPro;
+      
+      setSubscriptionInfo(subscriptionData);
 
       logger.debug('[SUBSCRIPTION] Subscription info updated:', {
         subscribed: isPro,
-        tier: subscriptionTier,
+        tier: subscriptionData.subscription_tier,
         status: profile?.subscription_status,
         end: profile?.subscription_expires_at
       });
