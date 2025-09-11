@@ -49,6 +49,33 @@ serve(async (req) => {
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
     if (customers.data.length === 0) {
+      logStep("No customer found, checking for existing PRO status");
+      
+      // Check if user already has PRO access (founder/manual override)
+      const { data: existingProfile } = await supabaseClient
+        .from("user_profiles")
+        .select("subscription_tier, is_pro, subscription_expires_at")
+        .eq('id', user.id)
+        .single();
+      
+      // If user has active PRO access, don't override it
+      if (existingProfile?.is_pro && existingProfile?.subscription_tier === 'pro') {
+        const expiry = existingProfile.subscription_expires_at ? new Date(existingProfile.subscription_expires_at) : null;
+        const isExpired = expiry ? expiry < new Date() : false;
+        
+        if (!isExpired) {
+          logStep("Preserving existing PRO access for founder");
+          return new Response(JSON.stringify({ 
+            subscribed: true, 
+            subscription_tier: "pro",
+            subscription_end: existingProfile.subscription_expires_at 
+          }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        }
+      }
+      
       logStep("No customer found, updating unsubscribed state");
       await supabaseClient.from("subscribers").upsert({
         email: user.email,
