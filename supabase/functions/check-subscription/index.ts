@@ -135,7 +135,27 @@ serve(async (req) => {
       }
       logStep("Determined subscription tier", { priceId, amount, subscriptionTier });
     } else {
-      logStep("No active subscription found");
+      logStep("No active subscription found, checking for existing PRO status");
+      
+      // Check if user already has PRO access (founder/manual override)
+      const { data: existingProfile } = await supabaseClient
+        .from("user_profiles")
+        .select("subscription_tier, is_pro, subscription_expires_at")
+        .eq('id', user.id)
+        .single();
+      
+      // If user has active PRO access, preserve it
+      if (existingProfile?.is_pro && existingProfile?.subscription_tier === 'pro') {
+        const expiry = existingProfile.subscription_expires_at ? new Date(existingProfile.subscription_expires_at) : null;
+        const isExpired = expiry ? expiry < new Date() : false;
+        
+        if (!isExpired) {
+          logStep("Preserving existing PRO access for founder");
+          subscriptionTier = "pro";
+          subscriptionEnd = existingProfile.subscription_expires_at;
+          hasActiveSub = true; // Treat as active subscription
+        }
+      }
     }
 
     // Update both tables
