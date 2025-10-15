@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { User } from '@supabase/supabase-js';
 import { useTranslation } from 'react-i18next';
+import { User } from '@/contexts/auth/auth.state';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

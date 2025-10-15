@@ -1,4 +1,15 @@
-import { User, Session } from '@supabase/supabase-js';
+// Mock types for auth state
+export interface User {
+  id: string;
+  email: string;
+  [key: string]: any;
+}
+
+export interface Session {
+  user: User;
+  access_token: string;
+  [key: string]: any;
+}
 
 export interface AuthState {
   user: User | null;
