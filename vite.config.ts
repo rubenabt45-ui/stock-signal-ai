@@ -65,7 +65,7 @@ export default defineConfig(({ mode }) => ({
           ],
           
           // Data/state management
-          'data-vendor': ['@tanstack/react-query', '@supabase/supabase-js'],
+          'data-vendor': ['@tanstack/react-query'],
           
           // i18n - separate internationalization
           'i18n-vendor': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
@@ -102,7 +102,6 @@ export default defineConfig(({ mode }) => ({
       'react',
       'react-dom',
       'react-router-dom',
-      '@supabase/supabase-js',
       '@tanstack/react-query'
     ],
     exclude: [
