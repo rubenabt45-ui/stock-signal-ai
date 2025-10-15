@@ -1,4 +1,3 @@
-
 import { User, Session } from '@supabase/supabase-js';
 
 export interface AuthState {
@@ -14,7 +13,7 @@ export const initialAuthState: AuthState = {
 };
 
 export type AuthAction =
-  | { type: 'SET_SESSION'; session: Session | null }
+  | { type: 'SET_SESSION'; session: any }
   | { type: 'SET_LOADING'; loading: boolean }
   | { type: 'RESET' };
 

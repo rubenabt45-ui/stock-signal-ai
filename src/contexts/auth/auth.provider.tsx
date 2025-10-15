@@ -1,6 +1,5 @@
-
 import React, { createContext, useContext, useEffect, useReducer } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { fakeClient } from '@/lib/fakeClient';
 import { createContextGuard } from '@/utils/providerGuards';
 import { logger } from '@/utils/logger';
 import { AuthState, authReducer, initialAuthState } from './auth.state';
@@ -25,32 +24,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logger.info('🔐 [AUTH_FLOW] AuthProvider: Initializing auth state');
     
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    fakeClient.auth.getSession().then(({ data }) => {
+      const session = data?.session;
       logger.info('🔐 [AUTH_FLOW] Initial session check:', session ? 'authenticated' : 'not authenticated');
       dispatch({ type: 'SET_SESSION', session });
-      
-      // Check subscription status on login
-      if (session?.user) {
-        setTimeout(() => {
-          supabase.functions.invoke('check-subscription').catch(logger.error);
-        }, 0);
-      }
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = fakeClient.auth.onAuthStateChange(async (event, session) => {
       logger.info('🔐 [AUTH_FLOW] Auth state changed:', event, session ? 'authenticated' : 'not authenticated');
-      
       dispatch({ type: 'SET_SESSION', session });
-      
-      // Check subscription status on auth state change
-      if (session?.user) {
-        setTimeout(() => {
-          supabase.functions.invoke('check-subscription').catch(logger.error);
-        }, 0);
-      }
     });
 
     return () => subscription.unsubscribe();
