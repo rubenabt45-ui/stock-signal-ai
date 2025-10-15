@@ -67,8 +67,8 @@ export const FakeAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     signIn: async (email: string, password: string) => {
       const result = await fakeClient.auth.signIn(email, password);
       if (!result.error) {
-        setUser(result.session?.user || null);
-        setSession(result.session);
+        setUser(result.data?.session?.user || null);
+        setSession(result.data?.session || null);
         setUserProfile(getCurrentMockUser());
       }
       return result;

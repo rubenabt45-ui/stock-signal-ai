@@ -11,6 +11,84 @@ const log = (...args: any[]) => {
   }
 };
 
+// Chainable query builder
+class MockQueryBuilder {
+  private _table: string;
+  private _data: any;
+  
+  constructor(table: string) {
+    this._table = table;
+  }
+  
+  select(_columns: string = '*') {
+    return this;
+  }
+  
+  insert(data: any) {
+    this._data = data;
+    return this;
+  }
+  
+  update(data: any) {
+    this._data = data;
+    return this;
+  }
+  
+  upsert(data: any, _options?: any) {
+    this._data = data;
+    return this;
+  }
+  
+  delete() {
+    return this;
+  }
+  
+  eq(_column: string, _value: any) {
+    return this;
+  }
+  
+  single() {
+    return this;
+  }
+  
+  maybeSingle() {
+    return this;
+  }
+  
+  order(_column: string, _options?: any) {
+    return this;
+  }
+  
+  limit(_count: number) {
+    return this;
+  }
+  
+  async then(resolve: (value: any) => void) {
+    await simulateLatency();
+    
+    const table = this._table;
+    log('Query:', table);
+    
+    // Return appropriate data based on table
+    if (table === 'user_profiles' || table === 'profiles') {
+      resolve({ data: getCurrentMockUser(), error: null });
+    } else if (table === 'watchlist_items' || table === 'user_favorites') {
+      resolve({
+        data: mockTickers.slice(0, 3).map((t, i) => ({
+          id: `fav-${i}`,
+          symbol: t.symbol,
+          display_name: t.name,
+          asset_type: 'stock',
+          user_id: getCurrentMockUser().id,
+        })),
+        error: null
+      });
+    } else {
+      resolve({ data: this._data || [], error: null });
+    }
+  }
+}
+
 export const fakeClient = {
   // Auth methods
   auth: {
@@ -31,6 +109,16 @@ export const fakeClient = {
       };
     },
     
+    async getUser() {
+      await simulateLatency();
+      const isLoggedIn = localStorage.getItem('mock_logged_in') === 'true';
+      if (!isLoggedIn) {
+        return { data: { user: null }, error: null };
+      }
+      const user = getCurrentMockUser();
+      return { data: { user: { id: user.id, email: user.email } }, error: null };
+    },
+    
     async signIn(email: string, _password: string) {
       await simulateLatency();
       log('Sign in:', email);
@@ -43,14 +131,34 @@ export const fakeClient = {
       return { error: null, data: { session: { user: { id: user.id, email: user.email } } } };
     },
     
-    async signUp(email: string, _password: string, _fullName?: string) {
+    async signInWithPassword(credentials: { email: string; password: string }) {
+      return this.signIn(credentials.email, credentials.password);
+    },
+    
+    async signUp(emailOrOptions: string | { email: string; password: string; options?: any }, _password?: string, options?: any) {
       await simulateLatency();
+      
+      let email: string;
+      let password: string;
+      let opts: any;
+      
+      if (typeof emailOrOptions === 'object') {
+        email = emailOrOptions.email;
+        password = emailOrOptions.password;
+        opts = emailOrOptions.options;
+      } else {
+        email = emailOrOptions;
+        password = _password || '';
+        opts = options;
+      }
+      
       log('Sign up:', email);
       
       localStorage.setItem('mock_logged_in', 'true');
       localStorage.setItem('mock_user_id', 'demo-user');
       
-      return { error: null, data: { user: { id: 'demo-user', email } } };
+      const user = { id: 'demo-user', email, email_confirmed_at: null };
+      return { error: null, data: { user, session: null } };
     },
     
     async signOut() {
@@ -69,6 +177,12 @@ export const fakeClient = {
       return { error: null, data: {} };
     },
     
+    async resetPasswordForEmail(_email: string, _options?: any) {
+      await simulateLatency();
+      log('Reset password for email');
+      return { error: null, data: {} };
+    },
+    
     async updatePassword(_password: string) {
       await simulateLatency();
       log('Update password');
@@ -79,6 +193,43 @@ export const fakeClient = {
       await simulateLatency();
       log('Update user');
       return { data: { user: getCurrentMockUser() }, error: null };
+    },
+    
+    async setSession(tokenOrOptions: string | { access_token: string; refresh_token: string }, refresh_token?: string) {
+      await simulateLatency();
+      log('Set session (fake)');
+      
+      let access_token: string;
+      let refresh: string | undefined;
+      
+      if (typeof tokenOrOptions === 'object') {
+        access_token = tokenOrOptions.access_token;
+        refresh = tokenOrOptions.refresh_token;
+      } else {
+        access_token = tokenOrOptions;
+        refresh = refresh_token;
+      }
+      
+      const session = { access_token, refresh_token: refresh, user: getCurrentMockUser() };
+      return { data: { session, user: getCurrentMockUser() }, error: null };
+    },
+    
+    async verifyOtp(_params: any) {
+      await simulateLatency();
+      log('Verify OTP (fake)');
+      return { data: { session: null }, error: null };
+    },
+    
+    async resend(_params: any) {
+      await simulateLatency();
+      log('Resend (fake)');
+      return { error: null, data: {} };
+    },
+    
+    async signInWithOAuth(_params: any) {
+      await simulateLatency();
+      log('Sign in with OAuth (fake)');
+      return { error: null, data: {} };
     },
 
     onAuthStateChange(callback: (event: string, session: any) => void) {
@@ -130,91 +281,9 @@ export const fakeClient = {
     },
   },
   
-  // Mock database methods  
-  from(_table: string) {
-    return {
-      async select(_columns: string = '*') {
-        await simulateLatency();
-        log('Select from', _table);
-        
-        if (_table === 'user_profiles' || _table === 'profiles') {
-          return { data: [getCurrentMockUser()], error: null };
-        }
-        if (_table === 'watchlist_items' || _table === 'user_favorites') {
-          return { 
-            data: mockTickers.slice(0, 3).map((t, i) => ({
-              id: `fav-${i}`,
-              symbol: t.symbol,
-              display_name: t.name,
-              asset_type: 'stock',
-              user_id: getCurrentMockUser().id,
-            })), 
-            error: null 
-          };
-        }
-        return { data: [], error: null };
-      },
-      
-      insert(_data: any) {
-        return {
-          async select() {
-            await simulateLatency();
-            log('Insert into', _table, _data);
-            return { data: _data, error: null };
-          },
-        };
-      },
-      
-      update(_data: any) {
-        return {
-          eq: (_column: string, _value: any) => ({
-            async select() {
-              await simulateLatency();
-              log('Update', _table, _data);
-              return { data: _data, error: null };
-            },
-          }),
-        };
-      },
-      
-      upsert(_data: any) {
-        return {
-          async select() {
-            await simulateLatency();
-            log('Upsert into', _table, _data);
-            return { data: _data, error: null };
-          },
-        };
-      },
-      
-      delete() {
-        return {
-          eq: (_column: string, _value: any) => ({
-            async select() {
-              await simulateLatency();
-              log('Delete from', _table);
-              return { error: null };
-            },
-          }),
-        };
-      },
-      
-      eq: (_column: string, _value: any) => ({
-        async select() {
-          await simulateLatency();
-          return { data: [], error: null };
-        },
-        single: async () => {
-          await simulateLatency();
-          return { data: null, error: null };
-        },
-      }),
-      
-      async single() {
-        await simulateLatency();
-        return { data: getCurrentMockUser(), error: null };
-      },
-    };
+  // Mock database with chainable methods
+  from(table: string) {
+    return new MockQueryBuilder(table);
   },
   
   // Storage methods (no-op)
@@ -238,7 +307,7 @@ export const fakeClient = {
     },
   },
   
-  // Functions (no-op)
+  // Functions
   functions: {
     async invoke(name: string, options?: any) {
       await simulateLatency();
@@ -253,6 +322,26 @@ export const fakeClient = {
               subscription_tier: user.subscription_tier,
               subscription_status: user.subscription_status,
               subscription_end: user.subscription_expires_at,
+            },
+            error: null,
+          };
+        case 'create-checkout-session':
+          return {
+            data: { url: 'https://checkout.stripe.com/mock', sessionId: 'mock_session_id' },
+            error: null,
+          };
+        case 'customer-portal':
+          return {
+            data: { url: 'https://billing.stripe.com/mock' },
+            error: null,
+          };
+        case 'get-checkout-session':
+          return {
+            data: { 
+              id: 'mock_session_id',
+              status: 'complete',
+              amount_total: 2900,
+              payment_status: 'paid'
             },
             error: null,
           };
