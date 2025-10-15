@@ -1,13 +1,15 @@
 
 import React from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { FRONTEND_ONLY } from "@/config/runtime";
+import { FakeAuthProvider } from "@/providers/FakeAuthProvider";
+import { FeaturesProvider } from "@/providers/FeaturesProvider";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { RealTimePriceProvider } from "@/components/RealTimePriceProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,19 +27,19 @@ interface AppProvidersProps {
 export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ThemeProvider>
-          <LanguageProvider>
-            <RealTimePriceProvider>
+      <FakeAuthProvider>
+        <FeaturesProvider>
+          <ThemeProvider>
+            <LanguageProvider>
               <TooltipProvider>
                 <Toaster />
                 <Sonner />
                 {children}
               </TooltipProvider>
-            </RealTimePriceProvider>
-          </LanguageProvider>
-        </ThemeProvider>
-      </AuthProvider>
+            </LanguageProvider>
+          </ThemeProvider>
+        </FeaturesProvider>
+      </FakeAuthProvider>
     </QueryClientProvider>
   );
 };
