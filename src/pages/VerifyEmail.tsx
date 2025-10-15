@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, RefreshCw, Mail, AlertTriangle, Clock } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client-fake';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { PageWrapper } from '@/components/PageWrapper';

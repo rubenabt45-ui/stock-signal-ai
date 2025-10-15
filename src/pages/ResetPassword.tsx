@@ -9,7 +9,7 @@ import { TrendingUp, CheckCircle, XCircle, Eye, EyeOff, AlertTriangle, Loader } 
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client-fake';
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 import BackToHomeButton from '@/components/BackToHomeButton';
 

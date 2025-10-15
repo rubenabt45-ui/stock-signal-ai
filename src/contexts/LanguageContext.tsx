@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client-fake';
 import { useAuth } from './auth/auth.provider';
 import { useToast } from '@/hooks/use-toast';
 import i18n from '@/i18n/config';

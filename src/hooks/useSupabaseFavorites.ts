@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client-fake';
 import { useAuth } from '@/contexts/auth/auth.provider';
 import { CategoryFilter, FavoriteInput, FavoriteItem } from '@/types/favorites';
 import { useToast } from '@/hooks/use-toast';

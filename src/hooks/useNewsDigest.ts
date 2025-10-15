@@ -3,7 +3,7 @@
 /*
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client-fake';
 import { useAuth } from '@/contexts/AuthContext';
 import { NewsArticle } from '@/services/newsService';
 import { useFavorites } from '@/hooks/useFavorites';
