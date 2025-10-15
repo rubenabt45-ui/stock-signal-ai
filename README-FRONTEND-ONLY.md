@@ -1,117 +1,144 @@
-# Frontend-Only Mode
+# Frontend-Only Mode (Optional)
 
-This project has been converted to **frontend-only mode** with zero backend dependencies.
+Este proyecto incluye un **sistema de datos mock** que permite ejecutarlo sin backend real.
 
-## What Changed
+⚠️ **NOTA**: Por defecto, el modo frontend-only está **DESACTIVADO** (`FRONTEND_ONLY = false`). La app usa el backend real de Supabase.
 
-### Removed
-- ❌ Supabase client, database, auth, edge functions
-- ❌ Stripe integration
-- ❌ Finnhub WebSocket connections
-- ❌ All API routes and server code
-- ❌ Environment variable dependencies (.env)
-- ❌ Real-time data fetching
-- ❌ External service webhooks
+## Cómo Activar el Modo Frontend-Only
 
-### Added
-- ✅ Mock data system (`/src/mocks/`)
-- ✅ Fake client (`/src/lib/fakeClient.ts`)
-- ✅ Fake auth provider (`/src/providers/FakeAuthProvider.tsx`)
-- ✅ Feature flags system (`/src/providers/FeaturesProvider.tsx`)
-- ✅ Runtime configuration (`/src/config/runtime.ts`)
+### Paso 1: Activar el Flag
+Edita `/src/config/runtime.ts`:
+```typescript
+export const FRONTEND_ONLY = true; // Cambiar a true
+```
 
-## Architecture
+### Paso 2: Actualizar Imports (Opcional)
+Si quieres usar el sistema completo de auth mock, actualiza estos archivos:
 
-### Mock Data (`/src/mocks/`)
-- `userProfile.ts` - User profiles (free/pro)
-- `tickers.ts` - Stock ticker data
-- `chartSeries.ts` - Chart data with price history
-- `signals.ts` - Trading signals
-- `plans.ts` - Subscription plans
+**src/providers/AppProviders.tsx:**
+```typescript
+import { FakeAuthProvider } from "@/providers/FakeAuthProvider";
+import { FeaturesProvider } from "@/providers/FeaturesProvider";
+
+// Reemplazar AuthProvider con FakeAuthProvider
+<FakeAuthProvider>
+  <FeaturesProvider>
+    {children}
+  </FeaturesProvider>
+</FakeAuthProvider>
+```
+
+## Qué Incluye
+
+### Datos Mock (`/src/mocks/`)
+- `userProfile.ts` - 2 usuarios: Founder (PRO) y Demo (Free)
+- `tickers.ts` - 5 stocks: AAPL, GOOGL, MSFT, TSLA, AMZN
+- `chartSeries.ts` - Datos históricos de precios
+- `signals.ts` - Señales de trading (buy/sell/hold)
+- `plans.ts` - Planes Free y PRO
 
 ### Fake Client (`/src/lib/fakeClient.ts`)
-Simulates all backend operations:
-- Auth (login, signup, logout)
-- Database queries (select, insert, update, delete)
-- Edge function calls
-- Includes simulated network latency (500ms)
+Cliente simulado que imita la API de Supabase:
+- Auth: login, signup, logout
+- Database: select, insert, update, delete
+- Functions: invoke (check-subscription)
+- Storage: upload, remove, getPublicUrl (no-op)
+- Latencia simulada de 500ms
 
 ### Fake Auth (`/src/providers/FakeAuthProvider.tsx`)
-- Stores auth state in localStorage
-- Provides `useAuth()` hook (compatible with original)
-- Supports multiple mock users
+- Usa localStorage para persistir sesión
+- Hook `useFakeAuth()` compatible con `useAuth()`
+- Soporta múltiples usuarios mock
 
-### Features System (`/src/providers/FeaturesProvider.tsx`)
-- Controls PRO feature access
-- `useFeatures()` hook provides `isPro`, `hasFeature()`
-- Automatically gates PRO features
+### Features Provider (`/src/providers/FeaturesProvider.tsx`)
+- Control de acceso PRO
+- Hook `useFeatures()` con `isPro`, `hasFeature()`
 
-## Usage
+## Uso
 
-### Enable/Disable Frontend-Only Mode
-Edit `/src/config/runtime.ts`:
+### Usuarios Mock
+En localStorage:
+- `mock_logged_in`: 'true' | 'false'
+- `mock_user_id`: 'founder' | 'demo-user'
+
+**Usuario Founder (PRO):**
+- Email: `ruben_abt@hotmail.com`
+- Acceso: PRO ilimitado
+- ID: `570ebb74-74dd-424e-8191-3c7689c38ed2`
+
+**Usuario Demo (Free):**
+- Email: `demo@example.com`
+- Acceso: Free (50 msgs/día)
+- ID: `demo-user-123`
+
+### Upgrade a PRO
+En modo frontend-only, cualquier click en "Activate PRO" o "Upgrade" ejecuta:
 ```typescript
-export const FRONTEND_ONLY = true; // Set to false to re-enable backend
+fakeMarketClient.upgradeToPro()
 ```
+Esto actualiza el plan del usuario actual a PRO instantáneamente.
 
-### Mock Users
-Available users (set in localStorage):
-- `founder` - PRO user (Rubén, ruben_abt@hotmail.com)
-- `demo-user` - Free user (demo@example.com)
+## Limitaciones del Modo Frontend-Only
 
-### Login
-Any email/password works. Use `ruben_abt@hotmail.com` to get PRO access.
+❌ **No incluye encadenamiento completo de Supabase**
+- Los métodos `.from().select().eq().single()` pueden fallar con TypeScript
+- Solo implementa casos de uso básicos
+- No soporta queries complejas
 
-### Upgrade to PRO
-Click "Activate PRO" anywhere in the app - it instantly toggles your mock user to PRO tier.
+❌ **Componentes que pueden requerir ajustes:**
+- `NotificationsSection.tsx`
+- `ProfileSection.tsx` 
+- `LanguageContext.tsx`
+- `ThemeContext.tsx`
+- Hooks que usan queries complejas
 
-### Simulated Latency
-All fake client operations have 500ms delay to simulate real network requests.
+✅ **Funciona bien para:**
+- Demos visuales
+- Testing de UI
+- Desarrollo offline
+- Prototipos sin backend
 
-## Testing
+## Volver al Backend Real
 
-The app now works completely offline:
-```bash
-npm run dev
-# or
-npm run build && npm run preview
-```
+1. Cambia `FRONTEND_ONLY = false` en `/src/config/runtime.ts`
+2. Asegúrate de tener `.env` configurado
+3. Restaura `AuthProvider` en `AppProviders.tsx` si lo cambiaste
 
-No `.env` file needed. No external services required.
+## Archivos Creados
 
-## Files Modified
+### Core
+- `/src/config/runtime.ts` - Flag FRONTEND_ONLY
+- `/src/lib/fakeClient.ts` - Cliente mock
 
-### Created
-- `/src/config/runtime.ts`
-- `/src/mocks/*.ts` (5 files)
-- `/src/lib/fakeClient.ts`
+### Mocks
+- `/src/mocks/userProfile.ts`
+- `/src/mocks/tickers.ts`
+- `/src/mocks/chartSeries.ts`
+- `/src/mocks/signals.ts`
+- `/src/mocks/plans.ts`
+
+### Providers
 - `/src/providers/FakeAuthProvider.tsx`
 - `/src/providers/FeaturesProvider.tsx`
+
+### Compatibility Layers (No usados por defecto)
 - `/src/integrations/supabase/client-fake.ts`
 - `/src/hooks/useSubscription-fake.ts`
 - `/src/contexts/AuthContext-fake.tsx`
 - `/src/services/auth.service-fake.ts`
 - `/src/utils/stripeUtils-fake.ts`
 
-### Modified
-- `/src/providers/AppProviders.tsx` - Now uses FakeAuthProvider and FeaturesProvider
-- `/src/integrations/supabase/client.ts` - Conditionally imports fake client
+## Notas
 
-### Disabled (not deleted, for rollback)
-- Edge functions (still exist but unused)
-- Supabase config (still exists but unused)
-- Original auth context (replaced with fake)
+- El sistema mock está **desactivado por defecto**
+- La app funciona normalmente con Supabase real
+- Activa solo si necesitas un demo sin backend
+- No apto para producción
 
-## Rollback
+## Desarrollo Futuro
 
-To restore backend functionality:
-1. Set `FRONTEND_ONLY = false` in `/src/config/runtime.ts`
-2. Restore `.env` file
-3. Replace fake imports with original ones
-
-## Notes
-
-- All Supabase, Stripe, and API code is **disabled but not deleted**
-- Can be re-enabled by flipping the `FRONTEND_ONLY` flag
-- Mock data is fully typed and realistic
-- Fake client API matches real Supabase client for easy transition
+Para hacer el fake client completamente compatible:
+1. Implementar patrón de query builder correcto
+2. Añadir todos los métodos de Supabase (`.gte()`, `.lte()`, `.in()`, etc.)
+3. Refactorizar componentes para ser agnósticos del cliente
+4. Considerar usar MSW (Mock Service Worker) en su lugar
