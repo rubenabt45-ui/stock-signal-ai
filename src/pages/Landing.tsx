@@ -7,38 +7,26 @@ import { Badge } from '@/components/ui/badge';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { MobileMenu } from '@/components/MobileMenu';
 import { ErrorFallback } from '@/components/ErrorFallback';
-
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
-import { 
-  TrendingUp, 
-  Brain, 
-  BarChart3, 
-  MessageCircle, 
-  Zap, 
-  Target, 
-  Clock, 
-  Shield,
-  ChevronRight,
-  Star
-} from 'lucide-react';
+import { TrendingUp, Brain, BarChart3, MessageCircle, Zap, Target, Clock, Shield, ChevronRight, Star } from 'lucide-react';
 
 // Lazy load heavy components that aren't needed immediately
 const LazyLearnPreview = lazy(() => import('./LearnPreview'));
-
 const LandingContent = () => {
   const navigate = useNavigate();
-  const { t, ready } = useTranslationWithFallback();
+  const {
+    t,
+    ready
+  } = useTranslationWithFallback();
 
   // If translations aren't ready yet, show loading state
   if (!ready) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
+    return <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-gray-300">Loading...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
 
   // 🚨 BULLETPROOF NAVIGATION HANDLERS
@@ -46,12 +34,11 @@ const LandingContent = () => {
     console.log('🚨 Login button clicked - IMMEDIATE ACTION');
     console.log('Current pathname:', window.location.pathname);
     console.log('Navigate function available:', typeof navigate);
-    
     try {
       console.log('🚀 Attempting navigate to /login');
       navigate('/login');
       console.log('✅ Navigate called successfully');
-      
+
       // Double-check navigation after small delay
       setTimeout(() => {
         if (window.location.pathname !== '/login') {
@@ -59,13 +46,11 @@ const LandingContent = () => {
           window.location.href = '/login';
         }
       }, 100);
-      
     } catch (err) {
       console.error('❌ Navigate failed immediately, using fallback:', err);
       window.location.href = '/login';
     }
   };
-
   const handleSignUp = () => {
     console.log('🚨 Sign Up button clicked');
     try {
@@ -89,7 +74,6 @@ const LandingContent = () => {
       window.location.href = '/learn-preview';
     }
   };
-
   const handlePricingClick = () => {
     try {
       navigate('/pricing');
@@ -97,7 +81,6 @@ const LandingContent = () => {
       window.location.href = '/pricing';
     }
   };
-
   const handleAppClick = () => {
     try {
       navigate('/app');
@@ -105,9 +88,7 @@ const LandingContent = () => {
       window.location.href = '/app';
     }
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+  return <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
       {/* Navigation */}
       <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50 relative">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between relative z-10">
@@ -128,34 +109,26 @@ const LandingContent = () => {
               
               {/* Desktop Login Button */}
               <Link to="/login" className="relative z-10">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer relative z-10 min-h-[44px]"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleLogin();
-                  }}
-                  style={{ pointerEvents: 'auto' }}
-                >
+                <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer relative z-10 min-h-[44px]" onClick={e => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleLogin();
+              }} style={{
+                pointerEvents: 'auto'
+              }}>
                   {t('landing.navbar.login')}
                 </Button>
               </Link>
               
               {/* Desktop Sign Up Button */}
               <Link to="/signup" className="relative z-10">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer relative z-10 min-h-[44px]"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleSignUp();
-                  }}
-                  style={{ pointerEvents: 'auto' }}
-                >
+                <Button variant="outline" size="sm" className="border-gray-600 hover:border-white hover:bg-white/10 transition-all duration-300 focus:ring-2 focus:ring-white/20 hover:scale-105 cursor-pointer relative z-10 min-h-[44px]" onClick={e => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSignUp();
+              }} style={{
+                pointerEvents: 'auto'
+              }}>
                   {t('landing.navbar.signUp')}
                 </Button>
               </Link>
@@ -164,12 +137,7 @@ const LandingContent = () => {
 
           {/* Mobile Navigation */}
           <div className="md:hidden flex items-center space-x-2">
-            <MobileMenu
-              onLogin={handleLogin}
-              onSignUp={handleSignUp}
-              onLearnPreview={handleLearnPreviewClick}
-              onPricing={handlePricingClick}
-            />
+            <MobileMenu onLogin={handleLogin} onSignUp={handleSignUp} onLearnPreview={handleLearnPreviewClick} onPricing={handlePricingClick} />
           </div>
         </div>
       </nav>
@@ -184,20 +152,8 @@ const LandingContent = () => {
             {t('landing.hero.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-12 px-4">
-            <Button 
-              size="lg" 
-              className="w-full sm:w-auto px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg hover:scale-105 transform transition-all duration-300 shadow-lg hover:shadow-xl min-h-[48px] sm:min-h-[56px]"
-              onClick={handleSignUp}
-            >
-              {t('landing.hero.joinBeta')}
-              <ChevronRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="w-full sm:w-auto px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg hover:bg-white/10 hover:border-white/30 transition-all duration-300 min-h-[48px] sm:min-h-[56px] border-gray-600"
-              onClick={handleSignUp}
-            >
+            
+            <Button variant="outline" size="lg" className="w-full sm:w-auto px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg hover:bg-white/10 hover:border-white/30 transition-all duration-300 min-h-[48px] sm:min-h-[56px] border-gray-600" onClick={handleSignUp}>
               {t('landing.hero.watchDemo')}
             </Button>
           </div>
@@ -401,11 +357,7 @@ const LandingContent = () => {
           </div>
 
           <div className="text-center px-4">
-            <Button 
-              size="lg" 
-              className="w-full sm:w-auto px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg hover:scale-105 transform transition-all duration-300 min-h-[48px] sm:min-h-[56px]"
-              onClick={handleLearnPreviewClick}
-            >
+            <Button size="lg" className="w-full sm:w-auto px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg hover:scale-105 transform transition-all duration-300 min-h-[48px] sm:min-h-[56px]" onClick={handleLearnPreviewClick}>
               Explore Learn Section
               <ChevronRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
@@ -426,21 +378,10 @@ const LandingContent = () => {
               <CardContent className="p-4 sm:p-6 lg:p-8">
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                     <Input 
-                      placeholder="Your Name" 
-                      className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 sm:h-14 text-base"
-                    />
-                    <Input 
-                      type="email" 
-                      placeholder="Your Email" 
-                      className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 sm:h-14 text-base"
-                    />
+                     <Input placeholder="Your Name" className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 sm:h-14 text-base" />
+                    <Input type="email" placeholder="Your Email" className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 sm:h-14 text-base" />
                   </div>
-                  <Button 
-                    size="lg" 
-                    className="w-full py-4 sm:py-6 text-base sm:text-lg hover:scale-105 transform transition-all duration-300 min-h-[48px] sm:min-h-[56px]"
-                    onClick={handleSignUp}
-                   >
+                  <Button size="lg" className="w-full py-4 sm:py-6 text-base sm:text-lg hover:scale-105 transform transition-all duration-300 min-h-[48px] sm:min-h-[56px]" onClick={handleSignUp}>
                     Request Early Access
                   </Button>
                   <p className="text-xs sm:text-sm text-gray-400">
@@ -470,22 +411,13 @@ const LandingContent = () => {
             <div>
               <h4 className="font-semibold mb-3 sm:mb-4 text-white">Platform</h4>
               <div className="space-y-2">
-                <button 
-                  onClick={handleAppClick}
-                  className="block text-gray-400 hover:text-white text-sm transition-colors text-left min-h-[44px] flex items-center"
-                >
+                <button onClick={handleAppClick} className="block text-gray-400 hover:text-white text-sm transition-colors text-left min-h-[44px] flex items-center">
                   Trading Dashboard
                 </button>
-                <button 
-                  onClick={handleLearnPreviewClick}
-                  className="block text-gray-400 hover:text-white text-sm transition-colors text-left min-h-[44px] flex items-center"
-                >
+                <button onClick={handleLearnPreviewClick} className="block text-gray-400 hover:text-white text-sm transition-colors text-left min-h-[44px] flex items-center">
                   Learn Preview
                 </button>
-                <button 
-                  onClick={handlePricingClick}
-                  className="block text-gray-400 hover:text-white text-sm transition-colors text-left min-h-[44px] flex items-center"
-                >
+                <button onClick={handlePricingClick} className="block text-gray-400 hover:text-white text-sm transition-colors text-left min-h-[44px] flex items-center">
                   Pricing
                 </button>
               </div>
@@ -525,12 +457,7 @@ const LandingContent = () => {
           <div className="border-t border-gray-800 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center">
             <p className="text-xs sm:text-sm text-gray-400 px-2">
               TradeIQ Pro is the premium version of TradeIQ. For more resources, visit{' '}
-              <a 
-                href="https://www.tradeiqpro.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-tradeiq-blue hover:underline"
-              >
+              <a href="https://www.tradeiqpro.com" target="_blank" rel="noopener noreferrer" className="text-tradeiq-blue hover:underline">
                 www.tradeiqpro.com
               </a>
             </p>
@@ -541,24 +468,18 @@ const LandingContent = () => {
         </div>
       </footer>
       
-    </div>
-  );
+    </div>;
 };
 
 // Wrapper component with error boundary
 const Landing = () => {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
+  return <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-gray-300">Loading...</p>
         </div>
-      </div>
-    }>
+      </div>}>
       <LandingContent />
-    </Suspense>
-  );
+    </Suspense>;
 };
-
 export default Landing;
