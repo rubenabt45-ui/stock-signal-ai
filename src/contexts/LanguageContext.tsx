@@ -19,19 +19,27 @@ const AVAILABLE_LANGUAGES = [
   { code: 'es', name: 'Español' }
 ];
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+// Provide default values to prevent undefined context errors during initial render
+const defaultLanguageContext: LanguageContextType = {
+  currentLanguage: 'en',
+  changeLanguage: async () => {},
+  availableLanguages: AVAILABLE_LANGUAGES,
+};
 
-const languageGuard = createContextGuard('LanguageProvider', 'useLanguage');
+const LanguageContext = createContext<LanguageContextType>(defaultLanguageContext);
 
 export const useLanguage = (): LanguageContextType => {
   const context = useContext(LanguageContext);
-  return languageGuard(context);
+  return context;
 };
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
+  const auth = useAuth();
   const { toast } = useToast();
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
+  
+  // Safely access user only when auth is ready
+  const user = auth?.user;
 
   // Initialize language from localStorage, user profile, or browser
   useEffect(() => {

@@ -87,14 +87,22 @@ const FooterContent = () => {
     </footer>;
 };
 const Footer = () => {
-  return <ErrorBoundary componentName="Footer" fallback={<footer className="border-t border-border bg-background/50 backdrop-blur-sm py-8 px-4">
+  return (
+    <ErrorBoundary 
+      componentName="Footer" 
+      fallback={
+        <footer className="border-t border-border bg-background/50 backdrop-blur-sm py-8 px-4">
           <div className="container mx-auto text-center">
             <p className="text-sm text-muted-foreground">
               © 2024 TradeIQ Pro. All rights reserved.
             </p>
           </div>
-        </footer>}>
-      
-    </ErrorBoundary>;
+        </footer>
+      }
+    >
+      <FooterContent />
+    </ErrorBoundary>
+  );
 };
+
 export default Footer;
