@@ -233,7 +233,6 @@ const Dashboard = () => {
                       <div className={`p-2 ${action.bgColor} rounded-lg`}>
                         <action.icon className={`h-6 w-6 ${action.color}`} />
                       </div>
-                      {action.badge}
                     </div>
                     <CardTitle className="text-white text-lg">{action.title}</CardTitle>
                   </CardHeader>
