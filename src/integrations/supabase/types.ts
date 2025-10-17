@@ -14,35 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
-      news_alert_settings: {
+      chat_history: {
         Row: {
-          alert_types: string[] | null
           created_at: string
-          enabled: boolean | null
-          frequency: string | null
           id: string
-          symbol: string
-          updated_at: string
+          message: string
+          response: string
+          session_id: string | null
           user_id: string
         }
         Insert: {
-          alert_types?: string[] | null
           created_at?: string
-          enabled?: boolean | null
-          frequency?: string | null
           id?: string
-          symbol: string
-          updated_at?: string
+          message: string
+          response: string
+          session_id?: string | null
           user_id: string
         }
         Update: {
-          alert_types?: string[] | null
           created_at?: string
-          enabled?: boolean | null
-          frequency?: string | null
           id?: string
-          symbol?: string
-          updated_at?: string
+          message?: string
+          response?: string
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          context: string | null
+          created_at: string
+          deleted_at: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          context?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          role: string
+          user_id?: string
+        }
+        Update: {
+          content?: string
+          context?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          role?: string
           user_id?: string
         }
         Relationships: []
@@ -51,215 +75,104 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string | null
-          current_period_end: string | null
           email: string | null
           full_name: string | null
-          plan_tier: string | null
-          subscription_status: string | null
+          id: string
           updated_at: string | null
-          user_id: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string | null
-          current_period_end?: string | null
           email?: string | null
           full_name?: string | null
-          plan_tier?: string | null
-          subscription_status?: string | null
+          id?: string
           updated_at?: string | null
-          user_id: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string | null
-          current_period_end?: string | null
           email?: string | null
           full_name?: string | null
-          plan_tier?: string | null
-          subscription_status?: string | null
+          id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_rate_limits: {
+        Row: {
+          created_at: string
+          id: string
+          request_count: number
+          updated_at: string
+          user_id: string
+          window_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          request_count?: number
+          updated_at?: string
+          user_id: string
+          window_start?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          request_count?: number
+          updated_at?: string
+          user_id?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          plan: string | null
+          preferred_context: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          plan?: string | null
+          preferred_context?: string | null
+          user_id?: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          plan?: string | null
+          preferred_context?: string | null
           user_id?: string
         }
         Relationships: []
       }
-      subscribers: {
+      watchlist_items: {
         Row: {
-          created_at: string
-          email: string
+          asset_type: string
+          created_at: string | null
+          display_name: string | null
           id: string
-          stripe_customer_id: string | null
-          subscribed: boolean
-          subscription_end: string | null
-          subscription_tier: string | null
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          stripe_customer_id?: string | null
-          subscribed?: boolean
-          subscription_end?: string | null
-          subscription_tier?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-          stripe_customer_id?: string | null
-          subscribed?: boolean
-          subscription_end?: string | null
-          subscription_tier?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      user_alerts: {
-        Row: {
-          alert_type: string
-          created_at: string
-          id: string
-          is_active: boolean | null
           symbol: string
-          threshold: number
-          updated_at: string
           user_id: string
         }
         Insert: {
-          alert_type: string
-          created_at?: string
+          asset_type: string
+          created_at?: string | null
+          display_name?: string | null
           id?: string
-          is_active?: boolean | null
           symbol: string
-          threshold: number
-          updated_at?: string
-          user_id: string
+          user_id?: string
         }
         Update: {
-          alert_type?: string
-          created_at?: string
+          asset_type?: string
+          created_at?: string | null
+          display_name?: string | null
           id?: string
-          is_active?: boolean | null
           symbol?: string
-          threshold?: number
-          updated_at?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      user_favorites: {
-        Row: {
-          category: string
-          created_at: string
-          display_order: number | null
-          id: string
-          name: string
-          symbol: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          category: string
-          created_at?: string
-          display_order?: number | null
-          id?: string
-          name: string
-          symbol: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          category?: string
-          created_at?: string
-          display_order?: number | null
-          id?: string
-          name?: string
-          symbol?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_profiles: {
-        Row: {
-          alerts_enabled: boolean | null
-          avatar_url: string | null
-          created_at: string
-          daily_message_count: number | null
-          daily_message_reset: string | null
-          email_alerts_enabled: boolean | null
-          full_name: string | null
-          id: string
-          is_pro: boolean
-          language: string | null
-          last_free_analysis_at: string | null
-          preferred_language: string | null
-          preferred_theme: string | null
-          refresh_interval: string | null
-          sound_enabled: boolean | null
-          stripe_customer_id: string | null
-          subscription_end: string | null
-          subscription_expires_at: string | null
-          subscription_status: string | null
-          subscription_tier: string | null
-          theme: string | null
-          updated_at: string
-          username: string | null
-        }
-        Insert: {
-          alerts_enabled?: boolean | null
-          avatar_url?: string | null
-          created_at?: string
-          daily_message_count?: number | null
-          daily_message_reset?: string | null
-          email_alerts_enabled?: boolean | null
-          full_name?: string | null
-          id: string
-          is_pro?: boolean
-          language?: string | null
-          last_free_analysis_at?: string | null
-          preferred_language?: string | null
-          preferred_theme?: string | null
-          refresh_interval?: string | null
-          sound_enabled?: boolean | null
-          stripe_customer_id?: string | null
-          subscription_end?: string | null
-          subscription_expires_at?: string | null
-          subscription_status?: string | null
-          subscription_tier?: string | null
-          theme?: string | null
-          updated_at?: string
-          username?: string | null
-        }
-        Update: {
-          alerts_enabled?: boolean | null
-          avatar_url?: string | null
-          created_at?: string
-          daily_message_count?: number | null
-          daily_message_reset?: string | null
-          email_alerts_enabled?: boolean | null
-          full_name?: string | null
-          id?: string
-          is_pro?: boolean
-          language?: string | null
-          last_free_analysis_at?: string | null
-          preferred_language?: string | null
-          preferred_theme?: string | null
-          refresh_interval?: string | null
-          sound_enabled?: boolean | null
-          stripe_customer_id?: string | null
-          subscription_end?: string | null
-          subscription_expires_at?: string | null
-          subscription_status?: string | null
-          subscription_tier?: string | null
-          theme?: string | null
-          updated_at?: string
-          username?: string | null
         }
         Relationships: []
       }
