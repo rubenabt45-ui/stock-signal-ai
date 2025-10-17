@@ -65,12 +65,16 @@ const Signup = () => {
       console.error('🔐 [SIGNUP] Signup failed:', error);
       let errorMessage = error.message;
       
+      // Better error handling with specific cases
       if (error.message.includes("User already registered")) {
         errorMessage = "An account with this email already exists. Please try logging in instead.";
-      } else if (error.message.includes("Invalid email")) {
+      } else if (error.message.includes("Invalid email") || error.message.includes("invalid email")) {
         errorMessage = "Please enter a valid email address.";
-      } else if (error.message.includes("Password")) {
-        errorMessage = "Password must be at least 8 characters long.";
+      } else if (error.message.includes("Password should be at least")) {
+        errorMessage = error.message; // Show Supabase's exact password requirement
+      } else if (error.message.toLowerCase().includes("password")) {
+        // For other password errors, show the actual error message
+        errorMessage = error.message;
       }
       
       toast({
