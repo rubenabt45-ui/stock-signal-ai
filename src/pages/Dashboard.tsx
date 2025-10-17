@@ -56,7 +56,7 @@ const Dashboard = () => {
       title: "Upgrade to Pro",
       description: "Unlock unlimited AI analysis and advanced features",
       icon: Crown,
-      link: "/pricing",
+      link: "/app/strategy-ai",
       color: "text-yellow-400",
       bgColor: "bg-yellow-500/20",
       badge: "Upgrade"
@@ -314,7 +314,7 @@ const Dashboard = () => {
                         {action.badge === t('learn.comingSoon') || action.badge === "Future" 
                           ? action.badge 
                           : action.badge === 'Upgrade'
-                          ? 'See Plans'
+                          ? 'Get Started'
                           : t('pricing.getStarted')
                         }
                         {!action.badge?.includes('Soon') && !action.badge?.includes('Future') && (
