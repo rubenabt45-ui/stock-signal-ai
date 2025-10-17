@@ -98,6 +98,72 @@ export type Database = {
         }
         Relationships: []
       }
+      user_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          symbol: string
+          threshold: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          symbol: string
+          threshold: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          symbol?: string
+          threshold?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_favorites: {
+        Row: {
+          category: string
+          created_at: string
+          display_order: number | null
+          id: string
+          name: string
+          symbol: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          name: string
+          symbol: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          name?: string
+          symbol?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           alerts_enabled: boolean | null
@@ -110,6 +176,9 @@ export type Database = {
           preferred_theme: string | null
           refresh_interval: number | null
           sound_enabled: boolean | null
+          subscription_expires_at: string | null
+          subscription_status: string | null
+          subscription_tier: string | null
           updated_at: string
           user_id: string
         }
@@ -124,6 +193,9 @@ export type Database = {
           preferred_theme?: string | null
           refresh_interval?: number | null
           sound_enabled?: boolean | null
+          subscription_expires_at?: string | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
           updated_at?: string
           user_id: string
         }
@@ -138,6 +210,9 @@ export type Database = {
           preferred_theme?: string | null
           refresh_interval?: number | null
           sound_enabled?: boolean | null
+          subscription_expires_at?: string | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
           updated_at?: string
           user_id?: string
         }
