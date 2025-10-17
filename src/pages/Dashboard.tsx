@@ -30,7 +30,7 @@ const Dashboard = () => {
     bgColor: "bg-blue-500/20",
     badge: "Demo"
   }, {
-    title: "Free Learning Center",
+    title: "Try Learn Center",
     description: "Access essential trading guides and educational resources",
     icon: BookOpen,
     link: "/app/learn",
