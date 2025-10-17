@@ -171,49 +171,50 @@ const TradingChat: React.FC = () => {
         </div>}
 
       {/* Messages */}
-      <div className="flex-1 overflow-hidden">
-        <div className="max-w-4xl mx-auto h-full flex flex-col">
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.length === 0 && <Card className="tradeiq-card">
-                <CardContent className="p-6 text-center">
-                  <Brain className="h-12 w-12 text-tradeiq-blue mx-auto mb-4" />
-                  <h3 className="text-white text-lg font-semibold mb-2">
-                    Welcome to StrategyAI!
-                  </h3>
-                  <p className="text-gray-400 mb-4">
-                    Ask me anything about trading, market analysis, or specific stocks.
-                  </p>
-                  {!isPro && <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
-                      <p className="text-tradeiq-blue text-sm font-medium">
-                        ✨ Free Plan: {maxAnalysisPerDay} analyses per day
-                      </p>
-                      <p className="text-gray-400 text-xs mt-1">
-                        Upgrade to Pro for unlimited analyses and advanced features
-                      </p>
-                    </div>}
-                </CardContent>
-              </Card>}
+      <div className="flex-1 overflow-y-auto pb-32 md:pb-24">
+        <div className="max-w-4xl mx-auto p-4 space-y-4">
+          {messages.length === 0 && <Card className="tradeiq-card">
+              <CardContent className="p-6 text-center">
+                <Brain className="h-12 w-12 text-tradeiq-blue mx-auto mb-4" />
+                <h3 className="text-white text-lg font-semibold mb-2">
+                  Welcome to StrategyAI!
+                </h3>
+                <p className="text-gray-400 mb-4">
+                  Ask me anything about trading, market analysis, or specific stocks.
+                </p>
+                {!isPro && <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+                    <p className="text-tradeiq-blue text-sm font-medium">
+                      ✨ Free Plan: {maxAnalysisPerDay} analyses per day
+                    </p>
+                    <p className="text-gray-400 text-xs mt-1">
+                      Upgrade to Pro for unlimited analyses and advanced features
+                    </p>
+                  </div>}
+              </CardContent>
+            </Card>}
 
-            {messages.map(message => <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] rounded-lg p-4 ${message.sender === 'user' ? 'bg-tradeiq-blue text-white' : 'tradeiq-card'}`}>
-                  <div className="flex items-start space-x-2">
-                    {message.sender === 'ai' && <Bot className="h-5 w-5 text-tradeiq-blue mt-0.5 flex-shrink-0" />}
-                    {message.sender === 'user' && <User className="h-5 w-5 text-white mt-0.5 flex-shrink-0" />}
-                    <div className="flex-1">
-                      <p className="whitespace-pre-wrap">{message.content}</p>
-                      {message.isStreaming && <Loader2 className="h-4 w-4 animate-spin text-tradeiq-blue mt-2" />}
-                    </div>
-                  </div>
-                  <div className="text-xs opacity-70 mt-2">
-                    {message.timestamp.toLocaleTimeString()}
+          {messages.map(message => <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[80%] rounded-lg p-4 ${message.sender === 'user' ? 'bg-tradeiq-blue text-white' : 'tradeiq-card'}`}>
+                <div className="flex items-start space-x-2">
+                  {message.sender === 'ai' && <Bot className="h-5 w-5 text-tradeiq-blue mt-0.5 flex-shrink-0" />}
+                  {message.sender === 'user' && <User className="h-5 w-5 text-white mt-0.5 flex-shrink-0" />}
+                  <div className="flex-1">
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    {message.isStreaming && <Loader2 className="h-4 w-4 animate-spin text-tradeiq-blue mt-2" />}
                   </div>
                 </div>
-              </div>)}
-            <div ref={messagesEndRef} />
-          </div>
+                <div className="text-xs opacity-70 mt-2">
+                  {message.timestamp.toLocaleTimeString()}
+                </div>
+              </div>
+            </div>)}
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
 
-          {/* Input Area */}
-          <div className="p-4 bg-black/90 backdrop-blur-xl border-t border-gray-800/50">
+      {/* Input Area - Fixed at bottom */}
+      <div className="fixed bottom-20 left-0 right-0 p-4 bg-black/90 backdrop-blur-xl border-t border-gray-800/50 z-40">
+        <div className="max-w-4xl mx-auto">
             {!isPro && !canUseAnalysis ? <Card className="bg-orange-900/20 border-orange-500/30">
                 <CardContent className="p-4 text-center">
                   <Lock className="h-8 w-8 text-orange-400 mx-auto mb-2" />
@@ -232,7 +233,6 @@ const TradingChat: React.FC = () => {
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </Button>
               </div>}
-          </div>
         </div>
       </div>
 
