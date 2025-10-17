@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Brain, Book, Settings } from "lucide-react";
+import { Brain, Book, Settings, Newspaper } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
 const BottomNavigation = () => {
@@ -22,6 +22,11 @@ const BottomNavigation = () => {
       path: "/app/learn",
       icon: Book,
       label: t('navigation.learn'),
+    },
+    {
+      path: "/app/news",
+      icon: Newspaper,
+      label: "News",
     },
     {
       path: "/app/settings",
