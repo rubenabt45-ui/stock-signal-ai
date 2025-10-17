@@ -182,29 +182,6 @@ const MarketUpdates = () => {
           </Card>
         </div>
 
-        {/* CTA Section */}
-        <Card className="tradeiq-card border-tradeiq-blue/50">
-          <CardContent className="p-8 text-center">
-            <h3 className="text-2xl font-bold text-white mb-4">Want Early Access?</h3>
-            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-              Be among the first to experience real-time market updates when this feature launches. 
-              Pro members get priority access to all new features.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/pricing">
-                <Button size="lg" className="px-8 py-3">
-                  Upgrade to Pro
-                </Button>
-              </Link>
-              <Link to="/app/strategy-ai">
-                <Button variant="outline" size="lg" className="px-8 py-3">
-                  Try StrategyAI Instead
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Disclaimer */}
         <div className="mt-8 p-4 bg-gray-800/30 rounded-lg">
           <p className="text-xs text-gray-400 text-center">
