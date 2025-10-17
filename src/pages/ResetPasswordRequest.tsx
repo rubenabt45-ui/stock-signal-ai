@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, Mail, ArrowLeft, CheckCircle } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/providers/FakeAuthProvider';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import BackToHomeButton from '@/components/BackToHomeButton';

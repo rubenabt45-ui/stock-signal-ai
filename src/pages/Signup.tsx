@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/providers/FakeAuthProvider";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import BackToHomeButton from "@/components/BackToHomeButton";

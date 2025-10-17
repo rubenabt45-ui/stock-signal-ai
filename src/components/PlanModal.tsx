@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/providers/FakeAuthProvider';
 import { supabase } from '@/integrations/supabase/client-fake';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';

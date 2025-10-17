@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, CheckCircle, XCircle, Eye, EyeOff, AlertTriangle, Loader } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/providers/FakeAuthProvider';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { supabase } from '@/integrations/supabase/client-fake';

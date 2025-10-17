@@ -11,7 +11,7 @@ import { Bell, Edit3, Trash2, Plus, Volume2, Mail, Settings } from 'lucide-react
 import { useUserAlerts, UserAlert } from '@/hooks/useUserAlerts';
 import { AddAlertModal } from '@/components/AddAlertModal';
 import { supabase } from '@/integrations/supabase/client-fake';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/providers/FakeAuthProvider';
 import { useToast } from '@/hooks/use-toast';
 
 export const NotificationsSection = () => {
