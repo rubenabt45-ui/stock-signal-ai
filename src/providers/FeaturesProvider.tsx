@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from 'react';
-import { useFakeAuth } from './FakeAuthProvider';
+import { useAuth } from './AuthProvider';
 
 interface FeaturesContextType {
   isPro: boolean;
@@ -19,9 +19,10 @@ export const useFeatures = () => {
 };
 
 export const FeaturesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { userProfile } = useFakeAuth();
+  const { user } = useAuth();
 
-  const isPro = userProfile?.is_pro || false;
+  // TODO: Load user profile from Supabase to check isPro status
+  const isPro = false; // For now, all users are free tier
 
   const proFeatures = [
     'advanced-analysis',
@@ -41,8 +42,8 @@ export const FeaturesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const value: FeaturesContextType = {
     isPro,
     hasFeature,
-    dailyMessageCount: userProfile?.daily_message_count || 0,
-    dailyMessageLimit: userProfile?.daily_message_limit || 50,
+    dailyMessageCount: 0, // TODO: Load from Supabase
+    dailyMessageLimit: 50,
   };
 
   return <FeaturesContext.Provider value={value}>{children}</FeaturesContext.Provider>;

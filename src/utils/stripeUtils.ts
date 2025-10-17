@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client-fake';
+import { supabase } from '@/integrations/supabase/client';
 import { STRIPE_SANDBOX } from '@/config/env';
 
 // Helper function to check if user has Pro access

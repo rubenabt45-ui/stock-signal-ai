@@ -24,7 +24,7 @@ import {
   Target
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/auth/auth.provider';
+import { useAuth } from '@/providers/AuthProvider';
 import { useSubscription } from '@/hooks/useSubscription';
 
 const Dashboard = () => {

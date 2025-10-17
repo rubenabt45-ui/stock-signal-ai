@@ -10,8 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Bell, Edit3, Trash2, Plus, Volume2, Mail, Settings } from 'lucide-react';
 import { useUserAlerts, UserAlert } from '@/hooks/useUserAlerts';
 import { AddAlertModal } from '@/components/AddAlertModal';
-import { supabase } from '@/integrations/supabase/client-fake';
-import { useAuth } from '@/providers/FakeAuthProvider';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
 
 export const NotificationsSection = () => {

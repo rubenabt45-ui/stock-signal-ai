@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/auth/auth.provider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { PageWrapper } from '@/components/PageWrapper';
 import PlanModal from "@/components/PlanModal";
-import { supabase } from "@/integrations/supabase/client-fake";
+import { supabase } from "@/integrations/supabase/client";
 import { SettingsHeader } from "@/components/settings/SettingsHeader";
 import { SettingsSections } from "@/components/settings/SettingsSections";
 

@@ -11,7 +11,7 @@ import { AddSymbolModal } from "@/components/AddSymbolModal";
 import { FilterDropdown } from "@/components/FilterDropdown";
 import { MarketOverview } from "@/components/MarketOverview";
 import { useFavorites } from "@/hooks/useFavorites";
-import { useAuth } from "@/contexts/auth/auth.provider";
+import { useAuth } from "@/providers/AuthProvider";
 import { ChartCandlestick } from "lucide-react";
 import { CategoryFilter, FavoriteInput } from "@/types/favorites";
 import tradeiqLogo from '@/assets/tradeiq-logo.png';

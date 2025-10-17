@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from './auth/auth.provider';
-import { supabase } from '@/integrations/supabase/client-fake';
+import { useAuth } from '@/providers/AuthProvider';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { createContextGuard } from '@/utils/providerGuards';
 import { logger } from '@/utils/logger';

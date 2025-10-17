@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/contexts/auth/auth.provider';
+import { useAuth } from '@/providers/AuthProvider';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useDailyMessages } from '@/hooks/useDailyMessages';
 import { UpgradeModal } from '@/components/UpgradeModal';

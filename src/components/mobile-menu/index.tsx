@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, Brain } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/auth/auth.provider';
+import { useAuth } from '@/providers/AuthProvider';
 import { cn } from '@/lib/utils';
 
 // Reduced logging for production

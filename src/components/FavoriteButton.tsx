@@ -4,7 +4,7 @@ import { Heart, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { useFavorites } from '@/hooks/useFavorites';
-import { useAuth } from '@/contexts/auth/auth.provider';
+import { useAuth } from '@/providers/AuthProvider';
 import { CategoryFilter } from '@/types/favorites';
 
 interface FavoriteButtonProps {

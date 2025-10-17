@@ -4,7 +4,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useSubscription } from '@/hooks/useSubscription';
-import { useAuth } from '@/providers/FakeAuthProvider';
+import { useAuth } from '@/providers/AuthProvider';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import tradeiqLogo from '@/assets/tradeiq-logo.png';

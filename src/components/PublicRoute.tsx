@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/providers/FakeAuthProvider';
+import { useAuth } from '@/providers/AuthProvider';
 import { ChartCandlestick } from 'lucide-react';
 
 interface PublicRouteProps {

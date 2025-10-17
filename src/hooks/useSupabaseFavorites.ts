@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client-fake';
-import { useAuth } from '@/contexts/auth/auth.provider';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/providers/AuthProvider';
 import { CategoryFilter, FavoriteInput, FavoriteItem } from '@/types/favorites';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';

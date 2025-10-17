@@ -2,7 +2,7 @@ import { Settings, Bell, Palette, Shield, Download, LogOut } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useAuth } from "@/providers/FakeAuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 

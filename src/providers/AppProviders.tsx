@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { FRONTEND_ONLY } from "@/config/runtime";
-import { FakeAuthProvider } from "@/providers/FakeAuthProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 import { FeaturesProvider } from "@/providers/FeaturesProvider";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -27,7 +26,7 @@ interface AppProvidersProps {
 export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <FakeAuthProvider>
+      <AuthProvider>
         <FeaturesProvider>
           <ThemeProvider>
             <LanguageProvider>
@@ -39,7 +38,7 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
             </LanguageProvider>
           </ThemeProvider>
         </FeaturesProvider>
-      </FakeAuthProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };

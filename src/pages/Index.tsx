@@ -12,7 +12,7 @@ import { TrendingUp, Sparkles, Heart, BarChart3, ChevronRight, CandlestickChart,
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MotionWrapper, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrapper";
-import { useAuth } from "@/contexts/auth/auth.provider";
+import { useAuth } from "@/providers/AuthProvider";
 import tradeiqLogo from '@/assets/tradeiq-logo.png';
 
 const Index = () => {

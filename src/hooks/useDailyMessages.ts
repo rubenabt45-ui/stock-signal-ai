@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client-fake';
-import { useAuth } from '@/contexts/auth/auth.provider';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/providers/AuthProvider';
 import { useSubscription } from '@/hooks/useSubscription';
 import { logger } from '@/utils/logger';
 
