@@ -38,7 +38,7 @@ const Dashboard = () => {
     bgColor: "bg-green-500/20",
     badge: "Free"
   }, {
-    title: "ChartAI",
+    title: "Trading Chart",
     description: "Advanced charting with AI-powered technical analysis",
     icon: BarChart3,
     link: "/app/chartia",
@@ -46,7 +46,7 @@ const Dashboard = () => {
     bgColor: "bg-purple-500/20",
     badge: "Demo"
   }, {
-    title: "NewsAI",
+    title: "News",
     description: "Unlock unlimited AI analysis and advanced features",
     icon: Crown,
     link: "/app/market-updates",
