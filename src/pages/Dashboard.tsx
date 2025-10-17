@@ -22,8 +22,8 @@ const Dashboard = () => {
 
   // Different quick actions for free vs pro users
   const freeUserActions = [{
-    title: "Try StrategyAI",
-    description: "Experience AI-powered trading analysis with sample data",
+    title: "Try Trading Chat",
+    description: "Experience AI-powered trading analysis in real time using sample market data.",
     icon: Brain,
     link: "/app/strategy-ai",
     color: "text-blue-400",
