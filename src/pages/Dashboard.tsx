@@ -242,8 +242,8 @@ const Dashboard = () => {
                       {action.description}
                     </CardDescription>
                     <Link to={action.link}>
-                      <Button variant={action.badge === 'Upgrade' ? 'premium' : 'outline'} size="sm" className="w-full" disabled={action.badge === t('learn.comingSoon') || action.badge === "Future"}>
-                        {action.badge === t('learn.comingSoon') || action.badge === "Future" ? action.badge : action.badge === 'Upgrade' ? 'See Plans' : t('pricing.getStarted')}
+                      <Button variant="outline" size="sm" className="w-full" disabled={action.badge === t('learn.comingSoon') || action.badge === "Future"}>
+                        {action.badge === t('learn.comingSoon') || action.badge === "Future" ? action.badge : action.badge === 'Upgrade' ? 'Get Started' : t('pricing.getStarted')}
                         {!action.badge?.includes('Soon') && !action.badge?.includes('Future') && <ChevronRight className="ml-2 h-4 w-4" />}
                       </Button>
                     </Link>
