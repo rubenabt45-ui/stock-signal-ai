@@ -1,4 +1,3 @@
-
 import { Book, PlayCircle, FileText, TrendingUp, Shield, Brain, Crown, Lock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,102 +8,89 @@ import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '@/hooks/useSubscription';
 
 // Free educational resources - always available
-const freeResources = [
-  {
-    id: 1,
-    title: "Pre-Trade Checklist",
-    description: "Avoid emotional decisions and improve your trade execution with this step-by-step checklist.",
-    pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view?usp=drive_link",
-    icon: FileText,
-    category: "Free"
-  },
-  {
-    id: 2,
-    title: "Visual Dictionary",
-    description: "Master essential trading terms with this visual guide to key concepts like support, resistance, RRR, and more.",
-    pdfUrl: "https://drive.google.com/file/d/1pq6HbxjebVUmEivUpZLM1MXk1XLncynW/view?usp=drive_link",
-    icon: Book,
-    category: "Free"
-  },
-  {
-    id: 3,
-    title: "Top 5 Trading Mistakes",
-    description: "Discover the most common pitfalls traders face and how to avoid them to become more consistent.",
-    pdfUrl: "https://drive.google.com/file/d/1vRQqtBzMx45ranZv7eR6Iu-PU_Gm5_1I/view?usp=drive_link",
-    icon: Shield,
-    category: "Free"
-  }
-];
+const freeResources = [{
+  id: 1,
+  title: "Pre-Trade Checklist",
+  description: "Avoid emotional decisions and improve your trade execution with this step-by-step checklist.",
+  pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view?usp=drive_link",
+  icon: FileText,
+  category: "Free"
+}, {
+  id: 2,
+  title: "Visual Dictionary",
+  description: "Master essential trading terms with this visual guide to key concepts like support, resistance, RRR, and more.",
+  pdfUrl: "https://drive.google.com/file/d/1pq6HbxjebVUmEivUpZLM1MXk1XLncynW/view?usp=drive_link",
+  icon: Book,
+  category: "Free"
+}, {
+  id: 3,
+  title: "Top 5 Trading Mistakes",
+  description: "Discover the most common pitfalls traders face and how to avoid them to become more consistent.",
+  pdfUrl: "https://drive.google.com/file/d/1vRQqtBzMx45ranZv7eR6Iu-PU_Gm5_1I/view?usp=drive_link",
+  icon: Shield,
+  category: "Free"
+}];
 
 // Educational articles for free users
-const educationalArticles = [
-  {
-    title: "Intro to Technical Analysis",
-    description: "Learn the fundamentals of chart reading and market analysis",
-    icon: TrendingUp,
-    content: "Technical analysis is the study of price action and volume patterns to predict future market movements...",
-    category: "Free"
-  },
-  {
-    title: "How to Read Candlestick Charts",
-    description: "Understanding the most important chart type for traders",
-    icon: PlayCircle,
-    content: "Candlestick charts show four key price points: open, high, low, and close for each time period...",
-    category: "Free"
-  },
-  {
-    title: "Risk Management 101",
-    description: "Essential principles for protecting your trading capital",
-    icon: Shield,
-    content: "Risk management is the foundation of successful trading. Learn about position sizing, stop losses...",
-    category: "Free"
-  }
-];
+const educationalArticles = [{
+  title: "Intro to Technical Analysis",
+  description: "Learn the fundamentals of chart reading and market analysis",
+  icon: TrendingUp,
+  content: "Technical analysis is the study of price action and volume patterns to predict future market movements...",
+  category: "Free"
+}, {
+  title: "How to Read Candlestick Charts",
+  description: "Understanding the most important chart type for traders",
+  icon: PlayCircle,
+  content: "Candlestick charts show four key price points: open, high, low, and close for each time period...",
+  category: "Free"
+}, {
+  title: "Risk Management 101",
+  description: "Essential principles for protecting your trading capital",
+  icon: Shield,
+  content: "Risk management is the foundation of successful trading. Learn about position sizing, stop losses...",
+  category: "Free"
+}];
 
 // Pro-only resources
-const proResources = [
-  {
-    id: 4,
-    title: "Advanced Chart Patterns",
-    description: "Master complex patterns like head & shoulders, triangles, and harmonic patterns",
-    icon: TrendingUp,
-    category: "Pro",
-    isPro: true
-  },
-  {
-    id: 5,
-    title: "Options Trading Strategies",
-    description: "Comprehensive guide to options strategies for income and hedging",
-    icon: Brain,
-    category: "Pro",
-    isPro: true
-  },
-  {
-    id: 6,
-    title: "Top Prompts for StrategyAI",
-    description: "Best prompt examples to unlock the full potential of StrategyAI",
-    pdfUrl: "https://drive.google.com/uc?export=download&id=1FLs2YI_6U1-aY9e80PCe1nPMw_tn4nL8",
-    icon: Brain,
-    category: "Pro",
-    isPro: true
-  }
-];
-
+const proResources = [{
+  id: 4,
+  title: "Advanced Chart Patterns",
+  description: "Master complex patterns like head & shoulders, triangles, and harmonic patterns",
+  icon: TrendingUp,
+  category: "Pro",
+  isPro: true
+}, {
+  id: 5,
+  title: "Options Trading Strategies",
+  description: "Comprehensive guide to options strategies for income and hedging",
+  icon: Brain,
+  category: "Pro",
+  isPro: true
+}, {
+  id: 6,
+  title: "Top Prompts for StrategyAI",
+  description: "Best prompt examples to unlock the full potential of StrategyAI",
+  pdfUrl: "https://drive.google.com/uc?export=download&id=1FLs2YI_6U1-aY9e80PCe1nPMw_tn4nL8",
+  icon: Brain,
+  category: "Pro",
+  isPro: true
+}];
 const Learn = () => {
-  const { t } = useTranslationWithFallback();
+  const {
+    t
+  } = useTranslationWithFallback();
   const navigate = useNavigate();
-  const { isPro } = useSubscription();
-
+  const {
+    isPro
+  } = useSubscription();
   const handleGoToTradingChat = () => {
     navigate('/app/strategy-ai');
   };
-
   const handleUpgrade = () => {
     navigate('/pricing');
   };
-
-  return (
-    <PageWrapper pageName="Learn">
+  return <PageWrapper pageName="Learn">
       <div className="min-h-screen bg-tradeiq-navy">
         {/* Header */}
         <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
@@ -119,14 +105,10 @@ const Learn = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Badge variant={isPro ? "default" : "secondary"} className="px-3 py-1">
-                  {isPro ? (
-                    <>
+                  {isPro ? <>
                       <Crown className="h-3 w-3 mr-1 text-yellow-500" />
                       Pro Plan
-                    </>
-                  ) : (
-                    "Free Plan"
-                  )}
+                    </> : "Free Plan"}
                 </Badge>
               </div>
             </div>
@@ -142,10 +124,7 @@ const Learn = () => {
                 Level Up Your Trading Skills
               </h2>
               <p className="text-gray-300 text-lg mb-6">
-                {isPro 
-                  ? "Access complete trading education and advanced resources."
-                  : "Start with essential trading fundamentals. Upgrade for advanced strategies."
-                }
+                {isPro ? "Access complete trading education and advanced resources." : "Start with essential trading fundamentals. Upgrade for advanced strategies."}
               </p>
               <div className="flex justify-center space-x-6 text-sm">
                 <div className="text-center">
@@ -169,9 +148,8 @@ const Learn = () => {
             <h3 className="text-xl font-bold text-white mb-6">Essential Trading Education</h3>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {educationalArticles.map((article, index) => {
-                const IconComponent = article.icon;
-                return (
-                  <Card key={index} className="tradeiq-card hover:border-tradeiq-blue/50 transition-colors">
+              const IconComponent = article.icon;
+              return <Card key={index} className="tradeiq-card hover:border-tradeiq-blue/50 transition-colors">
                     <CardHeader>
                       <div className="flex items-center space-x-3">
                         <div className="p-2 bg-tradeiq-blue/20 rounded-lg">
@@ -189,17 +167,13 @@ const Learn = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <Button 
-                        className="tradeiq-button-primary w-full"
-                        onClick={() => {/* Could open a modal with article content */}}
-                      >
+                      <Button className="tradeiq-button-primary w-full" onClick={() => {/* Could open a modal with article content */}}>
                         <Book className="h-4 w-4 mr-2" />
                         Read Article
                       </Button>
                     </CardContent>
-                  </Card>
-                );
-              })}
+                  </Card>;
+            })}
             </div>
           </section>
 
@@ -207,10 +181,9 @@ const Learn = () => {
           <section>
             <h3 className="text-xl font-bold text-white mb-6">Free Trading Resources</h3>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {freeResources.map((resource) => {
-                const IconComponent = resource.icon;
-                return (
-                  <Card key={resource.id} className="tradeiq-card hover:border-tradeiq-blue/50 transition-colors">
+              {freeResources.map(resource => {
+              const IconComponent = resource.icon;
+              return <Card key={resource.id} className="tradeiq-card hover:border-tradeiq-blue/50 transition-colors">
                     <CardHeader>
                       <div className="flex items-center space-x-3">
                         <div className="p-2 bg-tradeiq-blue/20 rounded-lg">
@@ -228,17 +201,13 @@ const Learn = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <Button 
-                        className="tradeiq-button-primary w-full"
-                        onClick={() => window.open(resource.pdfUrl, '_blank')}
-                      >
+                      <Button className="tradeiq-button-primary w-full" onClick={() => window.open(resource.pdfUrl, '_blank')}>
                         <FileText className="h-4 w-4 mr-2" />
                         Download PDF
                       </Button>
                     </CardContent>
-                  </Card>
-                );
-              })}
+                  </Card>;
+            })}
             </div>
           </section>
 
@@ -249,42 +218,26 @@ const Learn = () => {
                 <Crown className="h-6 w-6 text-yellow-500" />
                 <h3 className="text-xl font-bold text-white">Advanced Pro Resources</h3>
               </div>
-              {!isPro && (
-                <Button 
-                  onClick={handleUpgrade}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-black"
-                >
+              {!isPro && <Button onClick={handleUpgrade} className="bg-yellow-500 hover:bg-yellow-600 text-black">
                   Unlock Pro
-                </Button>
-              )}
+                </Button>}
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {proResources.map((resource, index) => {
-                const IconComponent = resource.icon;
-                const isLocked = !isPro;
-                
-                return (
-                  <Card key={index} className={`tradeiq-card transition-colors ${
-                    isLocked 
-                      ? 'opacity-75 border-yellow-500/20' 
-                      : 'hover:border-yellow-500/50 border-yellow-500/20'
-                  }`}>
+              const IconComponent = resource.icon;
+              const isLocked = !isPro;
+              return <Card key={index} className={`tradeiq-card transition-colors ${isLocked ? 'opacity-75 border-yellow-500/20' : 'hover:border-yellow-500/50 border-yellow-500/20'}`}>
                     <CardHeader>
                       <div className="flex items-center space-x-3">
                         <div className={`p-2 ${isLocked ? 'bg-gray-700' : 'bg-yellow-500/20'} rounded-lg relative`}>
                           <IconComponent className={`h-6 w-6 ${isLocked ? 'text-gray-400' : 'text-yellow-500'}`} />
-                          {isLocked && (
-                            <Lock className="h-3 w-3 text-gray-400 absolute -top-1 -right-1 bg-gray-800 rounded-full p-0.5" />
-                          )}
+                          {isLocked && <Lock className="h-3 w-3 text-gray-400 absolute -top-1 -right-1 bg-gray-800 rounded-full p-0.5" />}
                         </div>
                         <div>
                           <CardTitle className={`text-lg ${isLocked ? 'text-gray-300' : 'text-white'}`}>
                             {resource.title}
                           </CardTitle>
-                          <Badge 
-                            variant="outline" 
-                            className="text-xs mt-1 text-yellow-400 border-yellow-500/30"
-                          >
+                          <Badge variant="outline" className="text-xs mt-1 text-yellow-400 border-yellow-500/30">
                             Pro Only
                           </Badge>
                         </div>
@@ -294,33 +247,21 @@ const Learn = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      {isLocked ? (
-                        <Button 
-                          className="w-full bg-yellow-500 hover:bg-yellow-600 text-black"
-                          onClick={handleUpgrade}
-                        >
+                      {isLocked ? <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black" onClick={handleUpgrade}>
                           <Crown className="h-4 w-4 mr-2" />
                           Upgrade to Access
-                        </Button>
-                      ) : (
-                        <Button 
-                          className="w-full bg-yellow-500 hover:bg-yellow-600 text-black"
-                          onClick={() => resource.pdfUrl && window.open(resource.pdfUrl, '_blank')}
-                        >
+                        </Button> : <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black" onClick={() => resource.pdfUrl && window.open(resource.pdfUrl, '_blank')}>
                           <FileText className="h-4 w-4 mr-2" />
                           {resource.pdfUrl ? 'Download PDF' : 'Read Guide'}
-                        </Button>
-                      )}
+                        </Button>}
                     </CardContent>
-                  </Card>
-                );
-              })}
+                  </Card>;
+            })}
             </div>
           </section>
 
           {/* Upgrade Call to Action for Free Users */}
-          {!isPro && (
-            <Card className="tradeiq-card border-yellow-500/20 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
+          {!isPro && <Card className="tradeiq-card border-yellow-500/20 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
               <CardContent className="p-6 text-center">
                 <Crown className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-white mb-2">Ready for Advanced Training?</h3>
@@ -328,28 +269,17 @@ const Learn = () => {
                   Unlock advanced strategies, exclusive resources, and unlimited StrategyAI analysis.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button 
-                    className="bg-yellow-500 hover:bg-yellow-600 text-black"
-                    onClick={handleUpgrade}
-                  >
+                  <Button className="bg-yellow-500 hover:bg-yellow-600 text-black" onClick={handleUpgrade}>
                     <Crown className="h-4 w-4 mr-2" />
                     See Pro Plans
                   </Button>
-                  <Button 
-                    variant="outline"
-                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                    onClick={handleGoToTradingChat}
-                  >
-                    Try StrategyAI Demo
-                  </Button>
+                  
                 </div>
               </CardContent>
-            </Card>
-          )}
+            </Card>}
 
           {/* Call to Action for Pro Users */}
-          {isPro && (
-            <Card className="tradeiq-card border-green-500/20 bg-green-500/5">
+          {isPro && <Card className="tradeiq-card border-green-500/20 bg-green-500/5">
               <CardContent className="p-6 text-center">
                 <h3 className="text-lg font-bold text-white mb-2">Ready to Start Trading?</h3>
                 <p className="text-gray-400 mb-4">
@@ -359,8 +289,7 @@ const Learn = () => {
                   Go to StrategyAI
                 </Button>
               </CardContent>
-            </Card>
-          )}
+            </Card>}
 
           {/* Investment Disclaimer */}
           <Card className="tradeiq-card border-yellow-500/20 bg-yellow-500/5">
@@ -374,8 +303,6 @@ const Learn = () => {
           </Card>
         </main>
       </div>
-    </PageWrapper>
-  );
+    </PageWrapper>;
 };
-
 export default Learn;
