@@ -22,28 +22,36 @@ const News = () => {
   return (
     <PageWrapper pageName="News">
       <div className="min-h-screen bg-tradeiq-navy pb-20">
-        <div className="container mx-auto px-4 py-6 max-w-6xl">
-          {/* Header */}
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex items-start gap-3">
-              <div className="w-12 h-12 rounded-lg bg-tradeiq-blue/20 flex items-center justify-center flex-shrink-0">
-                <Newspaper className="h-6 w-6 text-tradeiq-blue" />
+        {/* Header */}
+        <header className="bg-black/90 backdrop-blur-xl border-b border-gray-800/50 sticky top-0 z-50 shadow-lg">
+          <div className="container mx-auto px-6 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Newspaper className="h-10 w-10 text-tradeiq-blue" />
+                <div>
+                  <h1 className="text-2xl font-bold text-white">News</h1>
+                  <p className="text-sm text-gray-400">Real-time financial news</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-white mb-1">AI Market News for AAPL</h1>
-                <p className="text-gray-400 text-sm">Real-time financial news powered by Marketaux API</p>
+              <div className="flex items-center space-x-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  className="gap-2 border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  <span className="hidden sm:inline">Refresh</span>
+                </Button>
+                <div className="text-white font-medium">
+                  Free Plan
+                </div>
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-              className="gap-2"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Refresh
-            </Button>
           </div>
+        </header>
+
+        <div className="container mx-auto px-4 py-6 max-w-6xl">
 
           {/* Asset Categories */}
           <div className="mb-6">
