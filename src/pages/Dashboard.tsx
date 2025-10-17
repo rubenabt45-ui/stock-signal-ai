@@ -35,22 +35,22 @@ const Dashboard = () => {
   // Different quick actions for free vs pro users
   const freeUserActions = [
     {
+      title: "Try ChartIA",
+      description: "Experience AI-powered chart analysis with real-time data",
+      icon: Brain,
+      link: "/app/chartia",
+      color: "text-blue-400",
+      bgColor: "bg-blue-500/20",
+      badge: "Free"
+    },
+    {
       title: "Try StrategyAI Demo",
       description: "Experience AI-powered trading analysis with sample data",
       icon: Brain,
       link: "/app/strategy-ai",
-      color: "text-blue-400",
-      bgColor: "bg-blue-500/20",
+      color: "text-purple-400",
+      bgColor: "bg-purple-500/20",
       badge: "Demo"
-    },
-    {
-      title: "Free Learning Center",
-      description: "Access essential trading guides and educational resources",
-      icon: BookOpen,
-      link: "/app/learn",
-      color: "text-green-400",
-      bgColor: "bg-green-500/20",
-      badge: "Free"
     },
     {
       title: "Upgrade to Pro",
