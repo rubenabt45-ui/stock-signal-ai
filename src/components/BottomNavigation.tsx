@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Brain, Book, Settings, Newspaper } from "lucide-react";
+import { Brain, Book, Settings, Newspaper, LayoutDashboard } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import chartIcon from "@/assets/chart-icon.png";
 
@@ -9,6 +9,11 @@ const BottomNavigation = () => {
   const { t } = useTranslation();
 
   const navItems = [
+    {
+      path: "/app/dashboard",
+      icon: LayoutDashboard,
+      label: "Dashboard",
+    },
     {
       path: "/app/strategy-ai",
       icon: Brain,
