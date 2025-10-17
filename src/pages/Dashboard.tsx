@@ -38,7 +38,7 @@ const Dashboard = () => {
     bgColor: "bg-green-500/20",
     badge: "Free"
   }, {
-    title: "Upgrade to Pro",
+    title: "Try NewsAI",
     description: "Unlock unlimited AI analysis and advanced features",
     icon: Crown,
     link: "/pricing",
