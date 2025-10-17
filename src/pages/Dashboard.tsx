@@ -250,7 +250,7 @@ const Dashboard = () => {
                   <CardContent>
                     <Link to={action.link}>
                       <Button variant="outline" size="lg" className="w-full text-base" disabled={action.badge === t('learn.comingSoon') || action.badge === "Future"}>
-                        {action.badge === 'Upgrade' ? 'Get Started' : 'Comenzar'}
+                        Get Started
                         <ChevronRight className="ml-2 h-5 w-5" />
                       </Button>
                     </Link>
