@@ -366,33 +366,7 @@ const LandingContent = () => {
       </section>
 
       {/* Early Access Form */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-gray-900/50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">Join the Beta</h2>
-            <p className="text-lg sm:text-xl text-gray-300 mb-6 sm:mb-8 px-2">
-              Be among the first to experience the future of trading analysis
-            </p>
-            
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardContent className="p-4 sm:p-6 lg:p-8">
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                     <Input placeholder="Your Name" className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 sm:h-14 text-base" />
-                    <Input type="email" placeholder="Your Email" className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 sm:h-14 text-base" />
-                  </div>
-                  <Button size="lg" className="w-full py-4 sm:py-6 text-base sm:text-lg hover:scale-105 transform transition-all duration-300 min-h-[48px] sm:min-h-[56px]" onClick={handleSignUp}>
-                    Request Early Access
-                  </Button>
-                  <p className="text-xs sm:text-sm text-gray-400">
-                    No spam. Unsubscribe at any time.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Footer */}
       <footer className="border-t border-gray-800/50 bg-black/20 backdrop-blur-sm py-8 sm:py-12">
