@@ -2,7 +2,6 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ProtectedFeature } from "@/components/ProtectedFeature";
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { PageWrapper } from '@/components/PageWrapper';
 import { 
@@ -21,8 +20,7 @@ const MarketUpdates = () => {
 
   return (
     <PageWrapper pageName="MarketUpdates">
-      <ProtectedFeature feature="market-updates">
-        <div className="min-h-screen bg-tradeiq-navy p-6">
+      <div className="min-h-screen bg-tradeiq-navy p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -217,7 +215,6 @@ const MarketUpdates = () => {
           </div>
         </div>
       </div>
-      </ProtectedFeature>
     </PageWrapper>
   );
 };
