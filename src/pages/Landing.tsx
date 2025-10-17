@@ -92,15 +92,11 @@ const LandingContent = () => {
       {/* Navigation */}
       <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50 relative">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between relative z-10">
-          <div className="flex items-center space-x-2">
-            <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-tradeiq-blue" />
-            <span className="text-lg sm:text-xl font-bold">TradeIQ</span>
-            
-          </div>
+          
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">{t('landing.navbar.home')}</Link>
+            
             <Link to="/learn-preview" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">{t('landing.navbar.learnPreview')}</Link>
             <Link to="/pricing" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/20 rounded px-2 py-1">{t('landing.navbar.pricing')}</Link>
             <div className="flex items-center space-x-2">
