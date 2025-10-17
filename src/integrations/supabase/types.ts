@@ -98,6 +98,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_profiles: {
+        Row: {
+          alerts_enabled: boolean | null
+          created_at: string
+          daily_message_count: number | null
+          daily_message_reset: string | null
+          email_alerts_enabled: boolean | null
+          id: string
+          preferred_language: string | null
+          preferred_theme: string | null
+          refresh_interval: number | null
+          sound_enabled: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alerts_enabled?: boolean | null
+          created_at?: string
+          daily_message_count?: number | null
+          daily_message_reset?: string | null
+          email_alerts_enabled?: boolean | null
+          id?: string
+          preferred_language?: string | null
+          preferred_theme?: string | null
+          refresh_interval?: number | null
+          sound_enabled?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alerts_enabled?: boolean | null
+          created_at?: string
+          daily_message_count?: number | null
+          daily_message_reset?: string | null
+          email_alerts_enabled?: boolean | null
+          id?: string
+          preferred_language?: string | null
+          preferred_theme?: string | null
+          refresh_interval?: number | null
+          sound_enabled?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_rate_limits: {
         Row: {
           created_at: string
