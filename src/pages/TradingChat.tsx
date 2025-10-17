@@ -151,49 +151,54 @@ const TradingChat: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-tradeiq-navy flex flex-col">
       {/* Header */}
-      <div className="bg-gray-800 border-b border-gray-700 p-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Brain className="h-8 w-8 text-blue-400" />
-            <div>
-              <h1 className="text-2xl font-bold text-white">StrategyAI</h1>
-              <p className="text-gray-400 text-sm">Your AI Trading Assistant</p>
+      <header className="bg-black/90 backdrop-blur-xl border-b border-gray-800/50 sticky top-0 z-50 shadow-lg">
+        <div className="container mx-auto px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Brain className="h-10 w-10 text-tradeiq-blue" />
+              <div>
+                <h1 className="text-2xl font-bold text-white">StrategyAI</h1>
+                <p className="text-sm text-gray-400">Your AI Trading Assistant</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              {!isPro && (
+                <Button 
+                  onClick={() => setShowUpgradeModal(true)}
+                  variant="outline"
+                  className="gap-2 border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800"
+                >
+                  <Crown className="h-4 w-4" />
+                  <span className="hidden sm:inline">Upgrade</span>
+                </Button>
+              )}
+              <div className="text-white font-medium">
+                {isPro ? 'Pro Plan' : 'Free Plan'}
+              </div>
             </div>
           </div>
-          
-          {!isPro && (
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <div className="flex items-center space-x-2">
-                  <Clock className="h-4 w-4 text-yellow-400" />
-                  <span className="text-sm font-medium text-white">
-                    {remainingAnalysis} of {maxAnalysisPerDay} analyses remaining
-                  </span>
-                </div>
-                <p className="text-xs text-gray-400">Resets daily at midnight</p>
-              </div>
-              <Button 
-                onClick={() => setShowUpgradeModal(true)}
-                className="bg-orange-600 hover:bg-orange-700 text-white"
-              >
-                <Crown className="h-4 w-4 mr-2" />
-                Upgrade
-              </Button>
+        </div>
+      </header>
+
+      {/* Usage Info for Free Users */}
+      {!isPro && (
+        <div className="container mx-auto px-6 pt-4">
+          {remainingAnalysis <= 1 && remainingAnalysis > 0 ? (
+            <Alert className="border-yellow-500/30 bg-yellow-900/10">
+              <AlertTriangle className="h-4 w-4 text-yellow-400" />
+              <AlertDescription className="text-yellow-300">
+                You have {remainingAnalysis} analysis remaining today. Upgrade to Pro for unlimited access.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <div className="flex items-center justify-center space-x-2 text-gray-400 text-sm">
+              <Clock className="h-4 w-4" />
+              <span>{remainingAnalysis} of {maxAnalysisPerDay} analyses remaining today</span>
             </div>
           )}
         </div>
-      </div>
-
-      {/* Usage Warning for Free Users */}
-      {!isPro && remainingAnalysis <= 1 && remainingAnalysis > 0 && (
-        <Alert className="m-4 border-yellow-500/30 bg-yellow-900/10">
-          <AlertTriangle className="h-4 w-4 text-yellow-400" />
-          <AlertDescription className="text-yellow-300">
-            You have {remainingAnalysis} analysis remaining today. Upgrade to Pro for unlimited access.
-          </AlertDescription>
-        </Alert>
       )}
 
       {/* Messages */}
@@ -201,9 +206,9 @@ const TradingChat: React.FC = () => {
         <div className="max-w-4xl mx-auto h-full flex flex-col">
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.length === 0 && (
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="tradeiq-card">
                 <CardContent className="p-6 text-center">
-                  <Brain className="h-12 w-12 text-blue-400 mx-auto mb-4" />
+                  <Brain className="h-12 w-12 text-tradeiq-blue mx-auto mb-4" />
                   <h3 className="text-white text-lg font-semibold mb-2">
                     Welcome to StrategyAI!
                   </h3>
@@ -211,8 +216,8 @@ const TradingChat: React.FC = () => {
                     Ask me anything about trading, market analysis, or specific stocks.
                   </p>
                   {!isPro && (
-                    <div className="bg-gray-700/50 rounded-lg p-3">
-                      <p className="text-yellow-400 text-sm">
+                    <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+                      <p className="text-tradeiq-blue text-sm font-medium">
                         ✨ Free Plan: {maxAnalysisPerDay} analyses per day
                       </p>
                       <p className="text-gray-400 text-xs mt-1">
@@ -232,21 +237,21 @@ const TradingChat: React.FC = () => {
                 <div
                   className={`max-w-[80%] rounded-lg p-4 ${
                     message.sender === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-800 text-gray-100 border border-gray-700'
+                      ? 'bg-tradeiq-blue text-white'
+                      : 'tradeiq-card'
                   }`}
                 >
                   <div className="flex items-start space-x-2">
                     {message.sender === 'ai' && (
-                      <Bot className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                      <Bot className="h-5 w-5 text-tradeiq-blue mt-0.5 flex-shrink-0" />
                     )}
                     {message.sender === 'user' && (
-                      <User className="h-5 w-5 text-blue-100 mt-0.5 flex-shrink-0" />
+                      <User className="h-5 w-5 text-white mt-0.5 flex-shrink-0" />
                     )}
                     <div className="flex-1">
                       <p className="whitespace-pre-wrap">{message.content}</p>
                       {message.isStreaming && (
-                        <Loader2 className="h-4 w-4 animate-spin text-blue-400 mt-2" />
+                        <Loader2 className="h-4 w-4 animate-spin text-tradeiq-blue mt-2" />
                       )}
                     </div>
                   </div>
@@ -260,7 +265,7 @@ const TradingChat: React.FC = () => {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-gray-800 border-t border-gray-700">
+          <div className="p-4 bg-black/90 backdrop-blur-xl border-t border-gray-800/50">
             {!isPro && !canUseAnalysis ? (
               <Card className="bg-orange-900/20 border-orange-500/30">
                 <CardContent className="p-4 text-center">
@@ -271,7 +276,7 @@ const TradingChat: React.FC = () => {
                   </p>
                   <Button 
                     onClick={() => setShowUpgradeModal(true)}
-                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                    className="bg-tradeiq-blue hover:bg-tradeiq-blue/90 text-white"
                   >
                     <Crown className="h-4 w-4 mr-2" />
                     Upgrade to Pro
@@ -295,7 +300,7 @@ const TradingChat: React.FC = () => {
                 <Button
                   onClick={handleSendMessage}
                   disabled={isLoading || !input.trim()}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-tradeiq-blue hover:bg-tradeiq-blue/90 text-white"
                 >
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
