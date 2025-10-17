@@ -30,7 +30,7 @@ const BottomNavigation = () => {
       label: "Chart",
     },
     {
-      path: "/blog",
+      path: "/app/news",
       icon: Newspaper,
       label: "News",
     },
