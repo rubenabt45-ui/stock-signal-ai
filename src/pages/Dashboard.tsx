@@ -234,8 +234,8 @@ const Dashboard = () => {
             <h2 className="text-2xl font-bold text-white mb-6">
               {isPro ? t('dashboard.quickActions') : 'Get Started'}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              {quickActions.slice(0, 3).map((action, index) => <Card key={index} className="tradeiq-card hover:border-tradeiq-blue/50 transition-all duration-300">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {quickActions.map((action, index) => <Card key={index} className="tradeiq-card hover:border-tradeiq-blue/50 transition-all duration-300">
                   <CardHeader className="space-y-6">
                     <div className={`w-12 h-12 ${action.bgColor} rounded-lg flex items-center justify-center`}>
                       <action.icon className={`h-6 w-6 ${action.color}`} />
@@ -250,36 +250,13 @@ const Dashboard = () => {
                   <CardContent>
                     <Link to={action.link}>
                       <Button variant="outline" size="lg" className="w-full text-base" disabled={action.badge === t('learn.comingSoon') || action.badge === "Future"}>
-                        Comenzar
+                        {action.badge === 'Upgrade' ? 'Get Started' : 'Comenzar'}
                         <ChevronRight className="ml-2 h-5 w-5" />
                       </Button>
                     </Link>
                   </CardContent>
                 </Card>)}
             </div>
-            {quickActions.length > 3 && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {quickActions.slice(3).map((action, index) => <Card key={index + 3} className="tradeiq-card hover:border-tradeiq-blue/50 transition-all duration-300">
-                    <CardHeader className="space-y-6">
-                      <div className={`w-12 h-12 ${action.bgColor} rounded-lg flex items-center justify-center`}>
-                        <action.icon className={`h-6 w-6 ${action.color}`} />
-                      </div>
-                      <div className="space-y-2">
-                        <CardTitle className="text-white text-xl font-semibold">{action.title}</CardTitle>
-                        <CardDescription className="text-gray-400 text-sm">
-                          {action.description}
-                        </CardDescription>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <Link to={action.link}>
-                        <Button variant="outline" size="lg" className="w-full text-base" disabled={action.badge === t('learn.comingSoon') || action.badge === "Future"}>
-                          {action.badge === 'Upgrade' ? 'Get Started' : 'Comenzar'}
-                          <ChevronRight className="ml-2 h-5 w-5" />
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>)}
-              </div>}
           </div>
 
           {/* Content Grid - Different for Free vs Pro Users */}
