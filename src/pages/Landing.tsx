@@ -370,75 +370,7 @@ const LandingContent = () => {
 
       {/* Footer */}
       <footer className="border-t border-gray-800/50 bg-black/20 backdrop-blur-sm py-8 sm:py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            <div className="sm:col-span-2 lg:col-span-1">
-              <div className="mb-3 sm:mb-4">
-                <img src={tradeiqLogo} alt="TradeIQ Logo" className="h-8" />
-              </div>
-              <p className="text-gray-400 text-sm">
-                AI-powered trading analysis platform for the modern trader.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-3 sm:mb-4 text-white">Platform</h4>
-              <div className="space-y-2">
-                <button onClick={handleAppClick} className="block text-gray-400 hover:text-white text-sm transition-colors text-left min-h-[44px] flex items-center">
-                  Trading Dashboard
-                </button>
-                <button onClick={handleLearnPreviewClick} className="block text-gray-400 hover:text-white text-sm transition-colors text-left min-h-[44px] flex items-center">
-                  Learn Preview
-                </button>
-                <button onClick={handlePricingClick} className="block text-gray-400 hover:text-white text-sm transition-colors text-left min-h-[44px] flex items-center">
-                  Pricing
-                </button>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-3 sm:mb-4 text-white">Company</h4>
-              <div className="space-y-2">
-                <a href="#" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
-                  About
-                </a>
-                <a href="#" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
-                  Blog
-                </a>
-                <a href="#" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
-                  Careers
-                </a>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-3 sm:mb-4 text-white">Legal</h4>
-              <div className="space-y-2">
-                <a href="#" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
-                  Privacy Policy
-                </a>
-                <a href="#" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
-                  Terms of Service
-                </a>
-                <a href="#" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
-                  Cookie Policy
-                </a>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-800 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center">
-            <p className="text-xs sm:text-sm text-gray-400 px-2">
-              TradeIQ Pro is the premium version of TradeIQ. For more resources, visit{' '}
-              <a href="https://www.tradeiqpro.com" target="_blank" rel="noopener noreferrer" className="text-tradeiq-blue hover:underline">
-                www.tradeiqpro.com
-              </a>
-            </p>
-            <p className="text-xs sm:text-sm text-gray-500 mt-2">
-              © 2024 TradeIQ. All rights reserved.
-            </p>
-          </div>
-        </div>
+        
       </footer>
       
     </div>;
