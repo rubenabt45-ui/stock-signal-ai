@@ -145,7 +145,7 @@ const LandingContent = () => {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 sm:py-16 lg:py-20 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-tradeiq-blue to-white bg-clip-text text-transparent leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-tradeiq-blue to-white bg-clip-text text-transparent leading-relaxed py-2">
             {t('landing.hero.title')}
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-6 sm:mb-8 leading-relaxed px-2">
