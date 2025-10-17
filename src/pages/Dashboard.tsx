@@ -13,9 +13,10 @@ const Dashboard = () => {
   const {
     user
   } = useAuth();
-  const {
-    isPro
-  } = useSubscription();
+  // const {
+  //   isPro
+  // } = useSubscription();
+  const isPro = false; // Temporarily disabled - can be re-enabled later
   const {
     t
   } = useTranslationWithFallback();
