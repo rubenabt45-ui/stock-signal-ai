@@ -44,7 +44,7 @@ const Dashboard = () => {
       badge: "Free"
     },
     {
-      title: "Try StrategyAI Demo",
+      title: "Try StrategyAI",
       description: "Experience AI-powered trading analysis with sample data",
       icon: Brain,
       link: "/app/strategy-ai",
