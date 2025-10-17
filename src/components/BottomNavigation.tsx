@@ -2,6 +2,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Brain, Book, Settings, Newspaper } from "lucide-react";
 import { useTranslation } from 'react-i18next';
+import chartIcon from "@/assets/chart-icon.png";
 
 const BottomNavigation = () => {
   const location = useLocation();
@@ -52,7 +53,11 @@ const BottomNavigation = () => {
                   : "text-gray-400 hover:text-gray-300"
               }`}
             >
-              <item.icon className="h-4 w-4 sm:h-5 sm:w-5" />
+              {item.path === "/app/chartia" ? (
+                <img src={chartIcon} alt="Chart" className={`h-4 w-4 sm:h-5 sm:w-5 ${isActive ? "brightness-125" : "opacity-60"}`} />
+              ) : (
+                <item.icon className="h-4 w-4 sm:h-5 sm:w-5" />
+              )}
               <span className="text-xs font-medium text-center leading-tight">{item.label}</span>
             </Link>
           );
