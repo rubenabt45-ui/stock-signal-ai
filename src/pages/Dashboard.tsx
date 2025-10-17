@@ -344,40 +344,6 @@ const Dashboard = () => {
             </Card>
           </div>
 
-          {/* Free User Upgrade Reminder */}
-          {!isPro && <Card className="tradeiq-card border-blue-500/30 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
-              <CardContent className="p-6 text-center">
-                <Crown className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-white mb-2">Ready to Level Up?</h3>
-                <p className="text-gray-400 mb-6">
-                  Get unlimited StrategyAI analysis, advanced learning resources, and priority support.
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-blue-400">∞</div>
-                    <div className="text-xs text-gray-500">AI Analysis</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-green-400">24/7</div>
-                    <div className="text-xs text-gray-500">Support</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-purple-400">6+</div>
-                    <div className="text-xs text-gray-500">Pro Guides</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-yellow-400">$19</div>
-                    <div className="text-xs text-gray-500">Per Month</div>
-                  </div>
-                </div>
-                <Link to="/pricing">
-                  <Button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8">
-                    See All Pro Features
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>}
         </div>
       </div>
     </PageWrapper>;
