@@ -16,7 +16,7 @@ const BottomNavigation = () => {
     {
       path: "/app/strategy-ai",
       icon: Brain,
-      label: "Trading Chat",
+      label: "Chat",
     },
     {
       path: "/app/learn",
