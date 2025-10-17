@@ -9,11 +9,6 @@ const BottomNavigation = () => {
 
   const navItems = [
     {
-      path: "/app/chartia",
-      icon: Brain,
-      label: "Chart",
-    },
-    {
       path: "/app/strategy-ai",
       icon: Brain,
       label: "Chat",
@@ -22,6 +17,11 @@ const BottomNavigation = () => {
       path: "/app/learn",
       icon: Book,
       label: t('navigation.learn'),
+    },
+    {
+      path: "/app/chartia",
+      icon: Brain,
+      label: "Chart",
     },
     {
       path: "/app/news",
