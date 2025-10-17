@@ -18,7 +18,7 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
       const currentPath = window.location.pathname;
       if (currentPath === '/login' || currentPath === '/signup' || currentPath === '/forgot-password') {
         console.log('🔓 PublicRoute: Redirecting authenticated user from auth page:', currentPath);
-        navigate('/app');
+        navigate('/app/dashboard');
       }
     }
   }, [user, loading, navigate]);
