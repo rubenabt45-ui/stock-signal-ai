@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,166 +5,129 @@ import { Badge } from '@/components/ui/badge';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { PageWrapper } from '@/components/PageWrapper';
-import { 
-  TrendingUp, 
-  Brain, 
-  Calendar, 
-  BarChart3, 
-  MessageCircle, 
-  BookOpen,
-  ChevronRight,
-  Activity,
-  Clock,
-  Star,
-  Crown,
-  Lock,
-  Gift,
-  Zap,
-  Target
-} from 'lucide-react';
+import { TrendingUp, Brain, Calendar, BarChart3, MessageCircle, BookOpen, ChevronRight, Activity, Clock, Star, Crown, Lock, Gift, Zap, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import { useSubscription } from '@/hooks/useSubscription';
-
 const Dashboard = () => {
-  const { user } = useAuth();
-  const { isPro } = useSubscription();
-  const { t } = useTranslationWithFallback();
+  const {
+    user
+  } = useAuth();
+  const {
+    isPro
+  } = useSubscription();
+  const {
+    t
+  } = useTranslationWithFallback();
 
   // Different quick actions for free vs pro users
-  const freeUserActions = [
-    {
-      title: "Try ChartIA",
-      description: "Experience AI-powered chart analysis with real-time data",
-      icon: Brain,
-      link: "/app/chartia",
-      color: "text-blue-400",
-      bgColor: "bg-blue-500/20",
-      badge: "Free"
-    },
-    {
-      title: "Try StrategyAI",
-      description: "Experience AI-powered trading analysis with sample data",
-      icon: Brain,
-      link: "/app/strategy-ai",
-      color: "text-purple-400",
-      bgColor: "bg-purple-500/20",
-      badge: "Demo"
-    },
-    {
-      title: "Upgrade to Pro",
-      description: "Unlock unlimited AI analysis and advanced features",
-      icon: Crown,
-      link: "/pricing",
-      color: "text-yellow-400",
-      bgColor: "bg-yellow-500/20",
-      badge: "Upgrade"
-    }
-  ];
-
-  const proUserActions = [
-    {
-      title: t('dashboard.strategyAI.title'),
-      description: t('dashboard.strategyAI.description'),
-      icon: Brain,
-      link: "/app/strategy-ai",
-      color: "text-blue-400",
-      bgColor: "bg-blue-500/20"
-    },
-    {
-      title: t('dashboard.learn.title'),
-      description: t('dashboard.learn.description'),
-      icon: BookOpen,
-      link: "/app/learn",
-      color: "text-green-400",
-      bgColor: "bg-green-500/20"
-    },
-    {
-      title: t('dashboard.events.title'),
-      description: t('dashboard.events.description'),
-      icon: Calendar,
-      link: "/app/events",
-      color: "text-purple-400",
-      bgColor: "bg-purple-500/20",
-      badge: t('learn.comingSoon')
-    },
-    {
-      title: t('dashboard.marketUpdates.title'),
-      description: t('dashboard.marketUpdates.description'),
-      icon: BarChart3,
-      link: "/app/market-updates",
-      color: "text-orange-400",
-      bgColor: "bg-orange-500/20",
-      badge: "Future"
-    }
-  ];
-
+  const freeUserActions = [{
+    title: "Try StrategyAI Demo",
+    description: "Experience AI-powered trading analysis with sample data",
+    icon: Brain,
+    link: "/app/strategy-ai",
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/20",
+    badge: "Demo"
+  }, {
+    title: "Free Learning Center",
+    description: "Access essential trading guides and educational resources",
+    icon: BookOpen,
+    link: "/app/learn",
+    color: "text-green-400",
+    bgColor: "bg-green-500/20",
+    badge: "Free"
+  }, {
+    title: "Upgrade to Pro",
+    description: "Unlock unlimited AI analysis and advanced features",
+    icon: Crown,
+    link: "/pricing",
+    color: "text-yellow-400",
+    bgColor: "bg-yellow-500/20",
+    badge: "Upgrade"
+  }];
+  const proUserActions = [{
+    title: t('dashboard.strategyAI.title'),
+    description: t('dashboard.strategyAI.description'),
+    icon: Brain,
+    link: "/app/strategy-ai",
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/20"
+  }, {
+    title: t('dashboard.learn.title'),
+    description: t('dashboard.learn.description'),
+    icon: BookOpen,
+    link: "/app/learn",
+    color: "text-green-400",
+    bgColor: "bg-green-500/20"
+  }, {
+    title: t('dashboard.events.title'),
+    description: t('dashboard.events.description'),
+    icon: Calendar,
+    link: "/app/events",
+    color: "text-purple-400",
+    bgColor: "bg-purple-500/20",
+    badge: t('learn.comingSoon')
+  }, {
+    title: t('dashboard.marketUpdates.title'),
+    description: t('dashboard.marketUpdates.description'),
+    icon: BarChart3,
+    link: "/app/market-updates",
+    color: "text-orange-400",
+    bgColor: "bg-orange-500/20",
+    badge: "Future"
+  }];
   const quickActions = isPro ? proUserActions : freeUserActions;
 
   // Educational tips for free users
-  const educationalTips = [
-    {
-      title: "Start with Risk Management",
-      description: "Never risk more than 1-2% of your account on a single trade",
-      icon: Target,
-      color: "text-green-400"
-    },
-    {
-      title: "Learn Chart Patterns",
-      description: "Master support, resistance, and trend lines before advanced patterns",
-      icon: TrendingUp,
-      color: "text-blue-400"
-    },
-    {
-      title: "Practice with Demo Accounts",
-      description: "Build confidence with paper trading before using real money",
-      icon: Zap,
-      color: "text-purple-400"
-    }
-  ];
-
-  const recentActivity = isPro ? [
-    {
-      title: "StrategyAI Analysis",
-      description: "Analyzed AAPL chart patterns",
-      time: "2 hours ago",
-      icon: MessageCircle
-    },
-    {
-      title: "Pro Guide Downloaded",
-      description: "Advanced Options Strategies",
-      time: "1 day ago",
-      icon: BookOpen
-    },
-    {
-      title: "Market Alert",
-      description: "SPY reached support level",
-      time: "3 days ago",
-      icon: TrendingUp
-    }
-  ] : [
-    {
-      title: "Demo Analysis Viewed",
-      description: "Explored StrategyAI sample analysis",
-      time: "1 hour ago",
-      icon: Brain
-    },
-    {
-      title: "Guide Downloaded",
-      description: "Pre-Trade Checklist PDF",
-      time: "2 days ago",
-      icon: BookOpen
-    },
-    {
-      title: "Account Created",
-      description: "Welcome to TradeIQ!",
-      time: "3 days ago",
-      icon: Gift
-    }
-  ];
-
-  return (
-    <PageWrapper pageName="Dashboard">
+  const educationalTips = [{
+    title: "Start with Risk Management",
+    description: "Never risk more than 1-2% of your account on a single trade",
+    icon: Target,
+    color: "text-green-400"
+  }, {
+    title: "Learn Chart Patterns",
+    description: "Master support, resistance, and trend lines before advanced patterns",
+    icon: TrendingUp,
+    color: "text-blue-400"
+  }, {
+    title: "Practice with Demo Accounts",
+    description: "Build confidence with paper trading before using real money",
+    icon: Zap,
+    color: "text-purple-400"
+  }];
+  const recentActivity = isPro ? [{
+    title: "StrategyAI Analysis",
+    description: "Analyzed AAPL chart patterns",
+    time: "2 hours ago",
+    icon: MessageCircle
+  }, {
+    title: "Pro Guide Downloaded",
+    description: "Advanced Options Strategies",
+    time: "1 day ago",
+    icon: BookOpen
+  }, {
+    title: "Market Alert",
+    description: "SPY reached support level",
+    time: "3 days ago",
+    icon: TrendingUp
+  }] : [{
+    title: "Demo Analysis Viewed",
+    description: "Explored StrategyAI sample analysis",
+    time: "1 hour ago",
+    icon: Brain
+  }, {
+    title: "Guide Downloaded",
+    description: "Pre-Trade Checklist PDF",
+    time: "2 days ago",
+    icon: BookOpen
+  }, {
+    title: "Account Created",
+    description: "Welcome to TradeIQ!",
+    time: "3 days ago",
+    icon: Gift
+  }];
+  return <PageWrapper pageName="Dashboard">
       <div className="min-h-screen bg-tradeiq-navy p-6">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Welcome Section */}
@@ -175,30 +137,22 @@ const Dashboard = () => {
                 {t('dashboard.welcomeBack')}{user?.email ? `, ${user.email.split('@')[0]}` : ''}
               </h1>
               <p className="text-gray-400">
-                {isPro 
-                  ? "Access all premium features and unlimited AI analysis"
-                  : "Start your trading journey with free educational resources"
-                }
+                {isPro ? "Access all premium features and unlimited AI analysis" : "Start your trading journey with free educational resources"}
               </p>
             </div>
             <div className="flex items-center space-x-2">
               <LanguageSelector variant="app" />
               <Badge variant={isPro ? "default" : "secondary"} className="px-3 py-1">
-                {isPro ? (
-                  <>
+                {isPro ? <>
                     <Crown className="h-3 w-3 mr-1 text-yellow-500" />
                     Pro Plan
-                  </>
-                ) : (
-                  "Free Plan"
-                )}
+                  </> : "Free Plan"}
               </Badge>
             </div>
           </div>
 
           {/* Plan Status Card for Free Users */}
-          {!isPro && (
-            <Card className="tradeiq-card border-yellow-500/30 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
+          {!isPro && <Card className="tradeiq-card border-yellow-500/30 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
@@ -220,8 +174,7 @@ const Dashboard = () => {
                   </Link>
                 </div>
               </CardContent>
-            </Card>
-          )}
+            </Card>}
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -274,29 +227,13 @@ const Dashboard = () => {
               {isPro ? t('dashboard.quickActions') : 'Get Started'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {quickActions.map((action, index) => (
-                <Card key={index} className="tradeiq-card hover:border-tradeiq-blue/50 transition-all duration-300 hover:transform hover:scale-105">
+              {quickActions.map((action, index) => <Card key={index} className="tradeiq-card hover:border-tradeiq-blue/50 transition-all duration-300 hover:transform hover:scale-105">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div className={`p-2 ${action.bgColor} rounded-lg`}>
                         <action.icon className={`h-6 w-6 ${action.color}`} />
                       </div>
-                      {action.badge && (
-                        <Badge 
-                          variant={action.badge === 'Upgrade' ? 'default' : 'outline'} 
-                          className={`text-xs ${
-                            action.badge === 'Upgrade' 
-                              ? 'bg-yellow-500 text-black' 
-                              : action.badge === 'Demo'
-                              ? 'text-blue-400 border-blue-400'
-                              : action.badge === 'Free'
-                              ? 'text-green-400 border-green-400'
-                              : ''
-                          }`}
-                        >
-                          {action.badge}
-                        </Badge>
-                      )}
+                      {action.badge}
                     </div>
                     <CardTitle className="text-white text-lg">{action.title}</CardTitle>
                   </CardHeader>
@@ -305,26 +242,13 @@ const Dashboard = () => {
                       {action.description}
                     </CardDescription>
                     <Link to={action.link}>
-                      <Button 
-                        variant={action.badge === 'Upgrade' ? 'premium' : 'outline'}
-                        size="sm" 
-                        className="w-full"
-                        disabled={action.badge === t('learn.comingSoon') || action.badge === "Future"}
-                      >
-                        {action.badge === t('learn.comingSoon') || action.badge === "Future" 
-                          ? action.badge 
-                          : action.badge === 'Upgrade'
-                          ? 'Get Started'
-                          : t('pricing.getStarted')
-                        }
-                        {!action.badge?.includes('Soon') && !action.badge?.includes('Future') && (
-                          <ChevronRight className="ml-2 h-4 w-4" />
-                        )}
+                      <Button variant={action.badge === 'Upgrade' ? 'premium' : 'outline'} size="sm" className="w-full" disabled={action.badge === t('learn.comingSoon') || action.badge === "Future"}>
+                        {action.badge === t('learn.comingSoon') || action.badge === "Future" ? action.badge : action.badge === 'Upgrade' ? 'See Plans' : t('pricing.getStarted')}
+                        {!action.badge?.includes('Soon') && !action.badge?.includes('Future') && <ChevronRight className="ml-2 h-4 w-4" />}
                       </Button>
                     </Link>
                   </CardContent>
-                </Card>
-              ))}
+                </Card>)}
             </div>
           </div>
 
@@ -343,8 +267,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentActivity.map((activity, index) => (
-                    <div key={index} className="flex items-start space-x-3 p-3 bg-gray-800/30 rounded-lg">
+                  {recentActivity.map((activity, index) => <div key={index} className="flex items-start space-x-3 p-3 bg-gray-800/30 rounded-lg">
                       <div className="p-1 bg-tradeiq-blue/20 rounded">
                         <activity.icon className="h-4 w-4 text-tradeiq-blue" />
                       </div>
@@ -353,8 +276,7 @@ const Dashboard = () => {
                         <p className="text-gray-400 text-xs">{activity.description}</p>
                         <p className="text-gray-500 text-xs mt-1">{activity.time}</p>
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
               </CardContent>
             </Card>
@@ -363,28 +285,20 @@ const Dashboard = () => {
             <Card className="tradeiq-card">
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
-                  {isPro ? (
-                    <>
+                  {isPro ? <>
                       <Star className="h-5 w-5 mr-2" />
                       Pro Features Active
-                    </>
-                  ) : (
-                    <>
+                    </> : <>
                       <BookOpen className="h-5 w-5 mr-2" />
                       Trading Tips
-                    </>
-                  )}
+                    </>}
                 </CardTitle>
                 <CardDescription className="text-gray-400">
-                  {isPro 
-                    ? 'You have access to all premium features' 
-                    : 'Essential tips to get started with trading'
-                  }
+                  {isPro ? 'You have access to all premium features' : 'Essential tips to get started with trading'}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {isPro ? (
-                  <div className="space-y-3">
+                {isPro ? <div className="space-y-3">
                     <div className="flex items-center text-green-400 text-sm">
                       <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
                       Unlimited StrategyAI messages
@@ -401,11 +315,8 @@ const Dashboard = () => {
                       <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
                       Advanced learning resources
                     </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {educationalTips.map((tip, index) => (
-                      <div key={index} className="flex items-start space-x-3">
+                  </div> : <div className="space-y-4">
+                    {educationalTips.map((tip, index) => <div key={index} className="flex items-start space-x-3">
                         <div className="p-1 bg-gray-700 rounded">
                           <tip.icon className={`h-4 w-4 ${tip.color}`} />
                         </div>
@@ -413,23 +324,20 @@ const Dashboard = () => {
                           <p className="text-white text-sm font-medium">{tip.title}</p>
                           <p className="text-gray-400 text-xs">{tip.description}</p>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                     <Link to="/pricing">
                       <Button className="w-full bg-tradeiq-blue hover:bg-tradeiq-blue/90 mt-4">
                         Unlock Pro Features
                         <ChevronRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
-                  </div>
-                )}
+                  </div>}
               </CardContent>
             </Card>
           </div>
 
           {/* Free User Upgrade Reminder */}
-          {!isPro && (
-            <Card className="tradeiq-card border-blue-500/30 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+          {!isPro && <Card className="tradeiq-card border-blue-500/30 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
               <CardContent className="p-6 text-center">
                 <Crown className="h-12 w-12 text-blue-500 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-white mb-2">Ready to Level Up?</h3>
@@ -461,12 +369,9 @@ const Dashboard = () => {
                   </Button>
                 </Link>
               </CardContent>
-            </Card>
-          )}
+            </Card>}
         </div>
       </div>
-    </PageWrapper>
-  );
+    </PageWrapper>;
 };
-
 export default Dashboard;
