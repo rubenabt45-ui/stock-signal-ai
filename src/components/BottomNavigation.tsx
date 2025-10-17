@@ -11,12 +11,12 @@ const BottomNavigation = () => {
     {
       path: "/app/chartia",
       icon: Brain,
-      label: "ChartIA",
+      label: "Chart",
     },
     {
       path: "/app/strategy-ai",
       icon: Brain,
-      label: "StrategyAI",
+      label: "Trading Chat",
     },
     {
       path: "/app/learn",
