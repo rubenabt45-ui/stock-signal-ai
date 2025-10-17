@@ -22,7 +22,7 @@ const Dashboard = () => {
 
   // Different quick actions for free vs pro users
   const freeUserActions = [{
-    title: "Try StrategyAI Demo",
+    title: "Try StrategyAI",
     description: "Experience AI-powered trading analysis with sample data",
     icon: Brain,
     link: "/app/strategy-ai",
@@ -37,6 +37,14 @@ const Dashboard = () => {
     color: "text-green-400",
     bgColor: "bg-green-500/20",
     badge: "Free"
+  }, {
+    title: "Try ChartAI",
+    description: "Advanced charting with AI-powered technical analysis",
+    icon: BarChart3,
+    link: "/app/chart-ai",
+    color: "text-purple-400",
+    bgColor: "bg-purple-500/20",
+    badge: "Demo"
   }, {
     title: "Try NewsAI",
     description: "Unlock unlimited AI analysis and advanced features",
