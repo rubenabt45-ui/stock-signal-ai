@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { AssetSelection } from "@/components/AssetSelection";
@@ -14,10 +13,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MotionWrapper, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrapper";
 import { useAuth } from "@/providers/AuthProvider";
 import tradeiqLogo from '@/assets/tradeiq-logo.png';
-
 const Index = () => {
   const [selectedAsset, setSelectedAsset] = useState<string>("AAPL");
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
 
   // Get related symbols for market overview
   const getRelatedSymbols = (symbol: string) => {
@@ -28,24 +28,20 @@ const Index = () => {
       'TSLA': ['NASDAQ:TSLA', 'NASDAQ:RIVN', 'NASDAQ:LCID', 'NYSE:F', 'NYSE:GM'],
       'NVDA': ['NASDAQ:NVDA', 'NASDAQ:AMD', 'NASDAQ:INTC', 'NASDAQ:QCOM', 'NASDAQ:AVGO'],
       'AMZN': ['NASDAQ:AMZN', 'NASDAQ:AAPL', 'NASDAQ:MSFT', 'NASDAQ:GOOGL', 'NASDAQ:META'],
-      'META': ['NASDAQ:META', 'NASDAQ:GOOGL', 'NASDAQ:SNAP', 'NYSE:TWTR', 'NASDAQ:PINS'],
+      'META': ['NASDAQ:META', 'NASDAQ:GOOGL', 'NASDAQ:SNAP', 'NYSE:TWTR', 'NASDAQ:PINS']
     };
-
     const baseSymbol = symbol.replace('NASDAQ:', '').replace('NYSE:', '');
     const relatedSymbols = relatedMap[baseSymbol] || [`NASDAQ:${baseSymbol}`, 'NASDAQ:AAPL', 'NASDAQ:MSFT', 'NASDAQ:GOOGL', 'NASDAQ:AMZN'];
-    
     console.log(`🔗 Related symbols for ${symbol}:`, relatedSymbols);
     return relatedSymbols;
   };
-
-  return (
-    <div className="min-h-screen bg-tradeiq-navy pb-20">
+  return <div className="min-h-screen bg-tradeiq-navy pb-20">
       {/* Header */}
       <header className="bg-black/90 backdrop-blur-xl border-b border-gray-800/50 sticky top-0 z-50 shadow-lg">
         <MotionWrapper animation="slide" className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <img src={tradeiqLogo} alt="TradeIQ Logo" className="h-12" />
+              
               <div>
                 <p className="text-gray-400 font-medium">Professional Chart Analysis</p>
               </div>
@@ -57,8 +53,7 @@ const Index = () => {
                   <span className="hidden sm:inline">Favorites</span>
                 </Button>
               </Link>
-              {!user ? (
-                <>
+              {!user ? <>
                   <Link to="/login">
                     <Button variant="outline" className="gap-2 border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800">
                       <span>Login</span>
@@ -69,15 +64,12 @@ const Index = () => {
                       <span>Sign Up</span>
                     </Button>
                   </Link>
-                </>
-              ) : (
-                <Link to="/settings">
+                </> : <Link to="/settings">
                   <Button variant="outline" className="gap-2 border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800">
                     <User className="h-4 w-4" />
                     <span className="hidden sm:inline">Account</span>
                   </Button>
-                </Link>
-              )}
+                </Link>}
               <div className="flex items-center space-x-3 bg-tradeiq-blue/20 px-4 py-2 rounded-xl border border-tradeiq-blue/30">
                 <Sparkles className="h-5 w-5 text-tradeiq-blue" />
                 <span className="text-white font-medium hidden sm:block">AI-Powered</span>
@@ -109,10 +101,7 @@ const Index = () => {
                 <h3 className="text-xl font-bold text-white mb-2">Select Asset</h3>
                 <p className="text-gray-400">Choose a financial instrument to analyze</p>
               </div>
-              <AssetSelection 
-                selectedAsset={selectedAsset} 
-                onAssetSelect={setSelectedAsset} 
-              />
+              <AssetSelection selectedAsset={selectedAsset} onAssetSelect={setSelectedAsset} />
             </div>
           </StaggerItem>
 
@@ -127,10 +116,7 @@ const Index = () => {
                 <p className="text-gray-400">Real-time price movements and technical indicators</p>
               </div>
               <div className="bg-gray-900/50 rounded-2xl p-2 border border-gray-800">
-                <LiveChart 
-                  asset={selectedAsset} 
-                  key={selectedAsset}
-                />
+                <LiveChart asset={selectedAsset} key={selectedAsset} />
               </div>
             </div>
           </StaggerItem>
@@ -147,12 +133,7 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
-                  <MarketOverview 
-                    symbols={getRelatedSymbols(selectedAsset)}
-                    height={450}
-                    className="w-full"
-                    key={`market-overview-${selectedAsset}`}
-                  />
+                  <MarketOverview symbols={getRelatedSymbols(selectedAsset)} height={450} className="w-full" key={`market-overview-${selectedAsset}`} />
                 </div>
               </CardContent>
             </Card>
@@ -180,8 +161,6 @@ const Index = () => {
           </StaggerItem>
         </StaggerContainer>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
