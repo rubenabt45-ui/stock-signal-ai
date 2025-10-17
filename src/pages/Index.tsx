@@ -41,7 +41,7 @@ const Index = () => {
         <MotionWrapper animation="slide" className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <CandlestickChart className="h-10 w-10 text-tradeiq-blue" />
+              <BarChart3 className="h-10 w-10 text-tradeiq-blue" />
               <div>
                 <h1 className="text-2xl font-bold text-white">Chart</h1>
                 <p className="text-sm text-gray-400">Master Trading Skills</p>
