@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AppProviders } from "@/providers/AppProviders";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PublicRoute from "@/components/PublicRoute";
@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 const Landing = lazy(() => import("./pages/Landing"));
 const LearnPreview = lazy(() => import("./pages/LearnPreview"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const ChartIA = lazy(() => import("./pages/Index"));
 const Favorites = lazy(() => import("./pages/Favorites"));
 const TradingChat = lazy(() => import("./pages/TradingChat"));
 const Learn = lazy(() => import("./pages/Learn"));
@@ -107,6 +108,16 @@ const App = () => {
               
               {/* PROTECTED APP ROUTES */}
               <Route path="/app" element={
+                <ProtectedRoute>
+                  <Navigate to="/app/chartia" replace />
+                </ProtectedRoute>
+              } />
+              <Route path="/app/chartia" element={
+                <ProtectedRoute>
+                  <ChartIA />
+                </ProtectedRoute>
+              } />
+              <Route path="/app/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
