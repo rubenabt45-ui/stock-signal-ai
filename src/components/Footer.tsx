@@ -12,9 +12,9 @@ const FooterContent = () => {
   const footerLinks = [{
     category: t('footer.platform'),
     links: [{
-      name: t('footer.dashboard'),
-      path: '/app',
-      ariaLabel: 'Navigate to Trading Dashboard'
+      name: t('footer.home'),
+      path: '/',
+      ariaLabel: 'Navigate to Home'
     }, {
       name: t('footer.learnPreview'),
       path: '/learn-preview',

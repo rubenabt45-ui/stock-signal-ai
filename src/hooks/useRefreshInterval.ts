@@ -18,7 +18,7 @@ export const useRefreshInterval = () => {
         const { data, error } = await supabase
           .from('user_profiles')
           .select('refresh_interval')
-          .eq('id', user.id)
+          .eq('user_id', user.id)
           .single();
 
         if (error) {
@@ -27,7 +27,10 @@ export const useRefreshInterval = () => {
         }
 
         if (data?.refresh_interval) {
-          setRefreshIntervalState(data.refresh_interval);
+          // Convert number to string format (30 -> "30sec", 60 -> "1min", etc.)
+          const seconds = data.refresh_interval;
+          const intervalString = seconds >= 60 ? `${seconds / 60}min` : `${seconds}sec`;
+          setRefreshIntervalState(intervalString);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -42,10 +45,15 @@ export const useRefreshInterval = () => {
 
     if (user?.id) {
       try {
+        // Convert string format to seconds (e.g., "1min" -> 60, "30sec" -> 30)
+        const seconds = newInterval.includes('min') 
+          ? parseInt(newInterval) * 60 
+          : parseInt(newInterval);
+
         const { error } = await supabase
           .from('user_profiles')
-          .update({ refresh_interval: newInterval })
-          .eq('id', user.id);
+          .update({ refresh_interval: seconds })
+          .eq('user_id', user.id);
 
         if (error) {
           console.error('Error updating refresh interval:', error);

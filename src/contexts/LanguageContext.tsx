@@ -131,10 +131,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           await supabase
             .from('user_profiles')
             .upsert({ 
-              id: user.id, 
+              user_id: user.id, 
               preferred_language: language 
             }, {
-              onConflict: 'id'
+              onConflict: 'user_id'
             });
         } catch (dbError) {
           logger.warn('Failed to save language preference to database:', dbError);

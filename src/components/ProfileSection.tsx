@@ -95,7 +95,7 @@ export const ProfileSection = ({ user, userProfile, onProfileUpdate }: ProfileSe
 
       // Update user profile with new avatar URL
       const { data, error } = await supabase
-        .from('user_profiles')
+        .from('profiles')
         .update({ avatar_url: publicUrl })
         .eq('id', user.id)
         .select()
@@ -141,7 +141,7 @@ export const ProfileSection = ({ user, userProfile, onProfileUpdate }: ProfileSe
       };
 
       const { data, error } = await supabase
-        .from('user_profiles')
+        .from('profiles')
         .upsert(updates)
         .select()
         .single();

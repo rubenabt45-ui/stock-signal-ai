@@ -139,10 +139,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         const { error } = await supabase
           .from('user_profiles')
           .upsert({ 
-            id: user.id, 
+            user_id: user.id, 
             preferred_theme: newTheme 
           }, {
-            onConflict: 'id'
+            onConflict: 'user_id'
           });
 
         if (error) {
