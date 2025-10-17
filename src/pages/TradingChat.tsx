@@ -213,7 +213,7 @@ const TradingChat: React.FC = () => {
       </div>
 
       {/* Input Area - Fixed at bottom */}
-      <div className="fixed bottom-20 left-0 right-0 p-4 bg-black/90 backdrop-blur-xl border-t border-gray-800/50 z-40">
+      <div className="fixed bottom-20 left-0 right-0 p-4 bg-black/90 backdrop-blur-xl border-t border-gray-800/50 z-40 py-[25px]">
         <div className="max-w-4xl mx-auto">
             {!isPro && !canUseAnalysis ? <Card className="bg-orange-900/20 border-orange-500/30">
                 <CardContent className="p-4 text-center">
