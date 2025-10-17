@@ -22,7 +22,7 @@ const Dashboard = () => {
 
   // Different quick actions for free vs pro users
   const freeUserActions = [{
-    title: "Try Trading Chat",
+    title: "Trading Chat",
     description: "Experience AI-powered trading analysis in real time using sample market data.",
     icon: Brain,
     link: "/app/strategy-ai",
@@ -30,7 +30,7 @@ const Dashboard = () => {
     bgColor: "bg-blue-500/20",
     badge: "Demo"
   }, {
-    title: "Try Learn Center",
+    title: "Learn Center",
     description: "Access essential trading guides and educational resources",
     icon: BookOpen,
     link: "/app/learn",
@@ -38,7 +38,7 @@ const Dashboard = () => {
     bgColor: "bg-green-500/20",
     badge: "Free"
   }, {
-    title: "Try ChartAI",
+    title: "ChartAI",
     description: "Advanced charting with AI-powered technical analysis",
     icon: BarChart3,
     link: "/app/chartia",
@@ -46,7 +46,7 @@ const Dashboard = () => {
     bgColor: "bg-purple-500/20",
     badge: "Demo"
   }, {
-    title: "Try NewsAI",
+    title: "NewsAI",
     description: "Unlock unlimited AI analysis and advanced features",
     icon: Crown,
     link: "/app/market-updates",
