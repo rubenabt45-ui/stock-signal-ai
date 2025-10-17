@@ -156,17 +156,6 @@ const App = () => {
           
           {/* CONDITIONAL FOOTER AND NAVIGATION */}
           <Routes>
-            {/* Footer for public pages */}
-            <Route path="/" element={<Footer />} />
-            <Route path="/learn-preview" element={<Footer />} />
-            <Route path="/pricing" element={<Footer />} />
-            <Route path="/privacy-policy" element={<Footer />} />
-            <Route path="/terms-of-service" element={<Footer />} />
-            <Route path="/cookie-policy" element={<Footer />} />
-            <Route path="/about" element={<Footer />} />
-            <Route path="/blog" element={<Footer />} />
-            <Route path="/careers" element={<Footer />} />
-            
             {/* Footer and bottom nav for app routes with conditional logic */}
             <Route path="/app/*" element={<AppFooterWrapper />} />
           </Routes>
