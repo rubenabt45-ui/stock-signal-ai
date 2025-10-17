@@ -9,6 +9,7 @@ import { MobileMenu } from '@/components/MobileMenu';
 import { ErrorFallback } from '@/components/ErrorFallback';
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { TrendingUp, Brain, BarChart3, MessageCircle, Zap, Target, Clock, Shield, ChevronRight, Star } from 'lucide-react';
+import tradeiqLogo from '@/assets/tradeiq-logo.png';
 
 // Lazy load heavy components that aren't needed immediately
 const LazyLearnPreview = lazy(() => import('./LearnPreview'));
@@ -92,7 +93,10 @@ const LandingContent = () => {
       {/* Navigation */}
       <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50 relative">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between relative z-10">
-          
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <img src={tradeiqLogo} alt="TradeIQ Logo" className="h-8 sm:h-10" />
+          </Link>
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
@@ -395,9 +399,8 @@ const LandingContent = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <div className="sm:col-span-2 lg:col-span-1">
-              <div className="flex items-center space-x-2 mb-3 sm:mb-4">
-                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-tradeiq-blue" />
-                <span className="text-base sm:text-lg font-bold">TradeIQ</span>
+              <div className="mb-3 sm:mb-4">
+                <img src={tradeiqLogo} alt="TradeIQ Logo" className="h-8" />
               </div>
               <p className="text-gray-400 text-sm">
                 AI-powered trading analysis platform for the modern trader.

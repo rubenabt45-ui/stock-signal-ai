@@ -14,6 +14,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useAuth } from "@/contexts/auth/auth.provider";
 import { ChartCandlestick } from "lucide-react";
 import { CategoryFilter, FavoriteInput } from "@/types/favorites";
+import tradeiqLogo from '@/assets/tradeiq-logo.png';
 
 const Favorites = () => {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -74,11 +75,8 @@ const Favorites = () => {
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <ChartCandlestick className="h-8 w-8 text-tradeiq-blue" />
-                <div>
-                  <h1 className="text-2xl font-bold text-white tracking-tight">TradeIQ</h1>
-                  <p className="text-sm text-gray-400 font-medium">Favorites</p>
-                </div>
+                <img src={tradeiqLogo} alt="TradeIQ Logo" className="h-10" />
+                <p className="text-sm text-gray-400 font-medium">Favorites</p>
               </div>
               <div className="flex items-center space-x-2">
                 <Link to="/">

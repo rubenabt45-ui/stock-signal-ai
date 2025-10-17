@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MotionWrapper, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrapper";
 import { useAuth } from "@/contexts/auth/auth.provider";
+import tradeiqLogo from '@/assets/tradeiq-logo.png';
 
 const Index = () => {
   const [selectedAsset, setSelectedAsset] = useState<string>("AAPL");
@@ -44,11 +45,8 @@ const Index = () => {
         <MotionWrapper animation="slide" className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-primary rounded-2xl shadow-lg">
-                <CandlestickChart className="h-8 w-8 text-white" />
-              </div>
+              <img src={tradeiqLogo} alt="TradeIQ Logo" className="h-12" />
               <div>
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight font-display">TradeIQ</h1>
                 <p className="text-slate-600 font-medium">Professional Chart Analysis</p>
               </div>
             </div>

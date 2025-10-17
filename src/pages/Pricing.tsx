@@ -7,6 +7,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useAuth } from '@/providers/FakeAuthProvider';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import tradeiqLogo from '@/assets/tradeiq-logo.png';
 
 const Pricing = () => {
   const { createCheckoutSession, isPro, loading } = useSubscription();
@@ -68,9 +69,8 @@ const Pricing = () => {
       {/* Navigation */}
       <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <TrendingUp className="h-8 w-8 text-tradeiq-blue" />
-            <span className="text-xl font-bold">TradeIQ</span>
+          <div className="flex items-center space-x-3">
+            <img src={tradeiqLogo} alt="TradeIQ Logo" className="h-8" />
             <Badge variant="secondary" className="text-xs">BETA</Badge>
           </div>
           
