@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { PageWrapper } from '@/components/PageWrapper';
-import { TrendingUp, Brain, Calendar, BarChart3, MessageCircle, BookOpen, ChevronRight, Activity, Clock, Star, Crown, Lock, Gift, Zap, Target } from 'lucide-react';
+import { TrendingUp, Brain, Calendar, BarChart3, MessageCircle, BookOpen, ChevronRight, Activity, Clock, Star, Crown, Lock, Gift, Zap, Target, Newspaper } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -49,7 +49,7 @@ const Dashboard = () => {
   }, {
     title: "News",
     description: "Unlock unlimited AI analysis and advanced features",
-    icon: Crown,
+    icon: Newspaper,
     link: "/app/market-updates",
     color: "text-yellow-400",
     bgColor: "bg-yellow-500/20",
