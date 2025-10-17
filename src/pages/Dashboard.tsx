@@ -56,7 +56,7 @@ const Dashboard = () => {
       title: "Upgrade to Pro",
       description: "Unlock unlimited AI analysis and advanced features",
       icon: Crown,
-      link: "/app/strategy-ai",
+      link: "/app/chartia",
       color: "text-yellow-400",
       bgColor: "bg-yellow-500/20",
       badge: "Upgrade"
