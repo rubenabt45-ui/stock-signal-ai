@@ -6,6 +6,7 @@ import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
 import { PageWrapper } from '@/components/PageWrapper';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '@/hooks/useSubscription';
+import { MotionWrapper, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrapper";
 
 // Free educational resources - always available
 const freeResources = [{
@@ -94,7 +95,7 @@ const Learn = () => {
       <div className="min-h-screen bg-tradeiq-navy">
         {/* Header */}
         <header className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4">
+          <MotionWrapper animation="slide" className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <Book className="h-8 w-8 text-tradeiq-blue" />
@@ -112,13 +113,15 @@ const Learn = () => {
                 </Badge>
               </div>
             </div>
-          </div>
+          </MotionWrapper>
         </header>
 
         {/* Content */}
-        <main className="container mx-auto px-4 py-6 pb-24 space-y-8">
-          {/* Hero Section */}
-          <Card className="tradeiq-card bg-gradient-to-r from-tradeiq-blue/20 to-purple-600/20 border-tradeiq-blue/30">
+        <main className="container mx-auto px-4 py-6 pb-24">
+          <StaggerContainer>
+            {/* Hero Section */}
+            <StaggerItem>
+              <Card className="tradeiq-card bg-gradient-to-r from-tradeiq-blue/20 to-purple-600/20 border-tradeiq-blue/30 mb-8">
             <CardContent className="p-8 text-center">
               <h2 className="text-3xl font-bold text-white mb-4">
                 Level Up Your Trading Skills
@@ -140,12 +143,14 @@ const Learn = () => {
                   <div className="text-gray-400">Knowledge</div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </StaggerItem>
 
           {/* Free Educational Articles */}
-          <section>
-            <h3 className="text-xl font-bold text-white mb-6">Essential Trading Education</h3>
+          <StaggerItem>
+            <section className="mb-8">
+              <h3 className="text-xl font-bold text-white mb-6">Essential Trading Education</h3>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {educationalArticles.map((article, index) => {
               const IconComponent = article.icon;
@@ -173,13 +178,15 @@ const Learn = () => {
                       </Button>
                     </CardContent>
                   </Card>;
-            })}
-            </div>
-          </section>
+              })}
+              </div>
+            </section>
+          </StaggerItem>
 
           {/* Free PDF Resources */}
-          <section>
-            <h3 className="text-xl font-bold text-white mb-6">Free Trading Resources</h3>
+          <StaggerItem>
+            <section className="mb-8">
+              <h3 className="text-xl font-bold text-white mb-6">Free Trading Resources</h3>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {freeResources.map(resource => {
               const IconComponent = resource.icon;
@@ -207,13 +214,15 @@ const Learn = () => {
                       </Button>
                     </CardContent>
                   </Card>;
-            })}
-            </div>
-          </section>
+              })}
+              </div>
+            </section>
+          </StaggerItem>
 
           {/* Pro Resources */}
-          <section>
-            <div className="flex items-center justify-between mb-6">
+          <StaggerItem>
+            <section className="mb-8">
+              <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
                 <Crown className="h-6 w-6 text-yellow-500" />
                 <h3 className="text-xl font-bold text-white">Advanced Pro Resources</h3>
@@ -256,12 +265,14 @@ const Learn = () => {
                         </Button>}
                     </CardContent>
                   </Card>;
-            })}
-            </div>
-          </section>
+              })}
+              </div>
+            </section>
+          </StaggerItem>
 
           {/* Upgrade Call to Action for Free Users */}
-          {!isPro && <Card className="tradeiq-card border-yellow-500/20 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
+          {!isPro && <StaggerItem>
+              <Card className="tradeiq-card border-yellow-500/20 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 mb-8">
               <CardContent className="p-6 text-center">
                 <Crown className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-white mb-2">Ready for Advanced Training?</h3>
@@ -274,12 +285,14 @@ const Learn = () => {
                     See Pro Plans
                   </Button>
                   
-                </div>
-              </CardContent>
-            </Card>}
+                  </div>
+                </CardContent>
+              </Card>
+            </StaggerItem>}
 
           {/* Call to Action for Pro Users */}
-          {isPro && <Card className="tradeiq-card border-green-500/20 bg-green-500/5">
+          {isPro && <StaggerItem>
+              <Card className="tradeiq-card border-green-500/20 bg-green-500/5 mb-8">
               <CardContent className="p-6 text-center">
                 <h3 className="text-lg font-bold text-white mb-2">Ready to Start Trading?</h3>
                 <p className="text-gray-400 mb-4">
@@ -287,20 +300,24 @@ const Learn = () => {
                 </p>
                 <Button className="tradeiq-button-primary" onClick={handleGoToTradingChat}>
                   Go to StrategyAI
-                </Button>
-              </CardContent>
-            </Card>}
+                  </Button>
+                </CardContent>
+              </Card>
+            </StaggerItem>}
 
           {/* Investment Disclaimer */}
-          <Card className="tradeiq-card border-yellow-500/20 bg-yellow-500/5">
+          <StaggerItem>
+            <Card className="tradeiq-card border-yellow-500/20 bg-yellow-500/5">
             <CardContent className="p-4">
               <p className="text-xs text-gray-400 text-center leading-relaxed">
                 <strong className="text-yellow-400">Disclaimer:</strong> TradeIQ provides educational content and market analysis tools. 
                 None of the information provided should be considered financial advice or a recommendation to invest. 
                 Always do your own research and consult with a financial advisor before making investment decisions.
-              </p>
-            </CardContent>
-          </Card>
+                </p>
+              </CardContent>
+            </Card>
+          </StaggerItem>
+        </StaggerContainer>
         </main>
       </div>
     </PageWrapper>;
