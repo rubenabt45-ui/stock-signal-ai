@@ -21,7 +21,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    // Graceful fallback to avoid runtime crashes when provider isn't mounted yet
+    console.warn('[Auth] useAuth called outside AuthProvider. Using fallback context.');
+    return {
+      user: null,
+      session: null,
+      loading: true,
+      signIn: authService.signIn,
+      signUp: authService.signUp,
+      signOut: authService.signOut,
+      resetPassword: authService.resetPassword,
+      updatePassword: authService.updatePassword,
+      resendConfirmation: authService.resendConfirmation,
+      signInWithOAuth: authService.signInWithOAuth,
+    } as AuthContextType;
   }
   return context;
 };
@@ -32,17 +45,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Listen for auth changes FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    // Then get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
