@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock, TrendingUp, AlertCircle, Globe, RefreshCw, Newspaper } from 'lucide-react';
+import { MotionWrapper, StaggerContainer, StaggerItem } from '@/components/ui/motion-wrapper';
 
 const News = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Stocks');
@@ -24,7 +25,7 @@ const News = () => {
       <div className="min-h-screen bg-tradeiq-navy pb-20">
         {/* Header */}
         <header className="bg-black/90 backdrop-blur-xl border-b border-gray-800/50 sticky top-0 z-50 shadow-lg">
-          <div className="container mx-auto px-6 py-6">
+          <MotionWrapper animation="slide" className="container mx-auto px-6 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Newspaper className="h-10 w-10 text-tradeiq-blue" />
@@ -48,15 +49,17 @@ const News = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </MotionWrapper>
         </header>
 
         <div className="container mx-auto px-4 py-6 max-w-6xl">
+          <StaggerContainer>
 
           {/* Asset Categories */}
-          <div className="mb-6">
-            <h3 className="text-white font-semibold mb-3">Asset Categories</h3>
-            <div className="flex flex-wrap gap-2">
+          <StaggerItem>
+            <div className="mb-6">
+              <h3 className="text-white font-semibold mb-3">Asset Categories</h3>
+              <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
                 <Button
                   key={category}
@@ -70,8 +73,10 @@ const News = () => {
               ))}
             </div>
           </div>
+        </StaggerItem>
 
-          {/* Market Sentiment */}
+        {/* Market Sentiment */}
+        <StaggerItem>
           <div className="mb-6">
             <h3 className="text-white font-semibold mb-3">Market Sentiment</h3>
             <div className="flex flex-wrap gap-2">
@@ -88,8 +93,10 @@ const News = () => {
               ))}
             </div>
           </div>
+        </StaggerItem>
 
-          {/* News Types */}
+        {/* News Types */}
+        <StaggerItem>
           <div className="mb-8">
             <h3 className="text-white font-semibold mb-3">News Types</h3>
             <div className="flex flex-wrap gap-2">
@@ -106,8 +113,10 @@ const News = () => {
               ))}
             </div>
           </div>
+        </StaggerItem>
 
-          {/* Latest Financial News Section */}
+        {/* Latest Financial News Section */}
+        <StaggerItem>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-bold text-white">Latest Financial News</h2>
             <div className="flex items-center gap-2 text-green-400 text-sm">
@@ -137,6 +146,8 @@ const News = () => {
               </Button>
             </CardContent>
           </Card>
+        </StaggerItem>
+      </StaggerContainer>
         </div>
       </div>
     </PageWrapper>
