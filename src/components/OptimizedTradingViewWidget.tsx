@@ -78,24 +78,37 @@ export const OptimizedTradingViewWidget = ({
 
         console.log(`📈 Creating TradingView widget for ${symbol}`);
 
-        // Create widget with error handling
+        // Create widget with advanced configuration
         const widget = new window.TradingView.widget({
           autosize: true,
           symbol: symbol,
-          interval: "D",
+          interval: "240", // 4-hour timeframe
           timezone: "Etc/UTC",
           theme: "dark",
           style: "1",
           locale: "en",
           toolbar_bg: "#1a1a1a",
           enable_publishing: false,
+          withdateranges: true,
+          hide_side_toolbar: false,
+          allow_symbol_change: true,
+          watchlist: [
+            "BINANCE:BTCUSDT",
+            "BINANCE:ETHUSDT"
+          ],
+          details: true,
+          hotlist: true,
+          calendar: true,
+          studies: [
+            "STD;SAM"
+          ],
+          show_popup_button: true,
+          popup_width: "1000",
+          popup_height: "650",
           hide_top_toolbar: false,
           hide_legend: false,
           save_image: false,
           container_id: containerId,
-          studies: [
-            "Volume@tv-basicstudies"
-          ],
           onChartReady: () => {
             if (isMounted) {
               console.log(`✅ Chart ready for ${symbol}`);
