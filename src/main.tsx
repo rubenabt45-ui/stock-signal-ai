@@ -1,9 +1,9 @@
-
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
 import { measurePerformance, setupPreconnections } from "./utils/performance";
+import { AppProviders } from "@/providers/AppProviders";
 
 // Set up preconnections and performance monitoring
 setupPreconnections();
@@ -25,7 +25,9 @@ if (!rootElement) {
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <App />
+    <AppProviders>
+      <App />
+    </AppProviders>
   </React.StrictMode>
 );
 

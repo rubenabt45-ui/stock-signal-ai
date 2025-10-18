@@ -1,6 +1,5 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { AppProviders } from "@/providers/AppProviders";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PublicRoute from "@/components/PublicRoute";
 import BottomNavigation from "@/components/BottomNavigation";
@@ -59,11 +58,10 @@ const AppFooterWrapper = () => {
 
 const App = () => {
   return (
-    <AppProviders>
-      <BrowserRouter>
-        <div className="min-h-screen bg-tradeiq-navy">
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
+    <BrowserRouter>
+      <div className="min-h-screen bg-tradeiq-navy">
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
               {/* PUBLIC LANDING PAGES */}
               <Route path="/" element={<Landing />} />
               <Route path="/learn-preview" element={<LearnPreview />} />
@@ -178,7 +176,6 @@ const App = () => {
           </Routes>
         </div>
       </BrowserRouter>
-    </AppProviders>
   );
 };
 
