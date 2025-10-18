@@ -24,28 +24,20 @@ const Dashboard = () => {
 
   // Different quick actions for free vs pro users
   const freeUserActions = [{
-    title: "Trading Chat",
-    description: "Experience AI-powered trading analysis in real time using sample market data.",
-    icon: Brain,
-    link: "/app/strategy-ai",
-    color: "text-blue-400",
-    bgColor: "bg-blue-500/20",
-    badge: "Demo"
-  }, {
-    title: "Learn Center",
-    description: "Access essential trading guides and educational resources",
-    icon: BookOpen,
-    link: "/app/learn",
-    color: "text-green-400",
-    bgColor: "bg-green-500/20",
-    badge: "Free"
-  }, {
     title: "Trading Chart",
     description: "Advanced charting with AI-powered technical analysis",
     icon: BarChart3,
     link: "/app/chartia",
     color: "text-purple-400",
     bgColor: "bg-purple-500/20",
+    badge: "Demo"
+  }, {
+    title: "Trading Chat",
+    description: "Experience AI-powered trading analysis in real time using sample market data.",
+    icon: Brain,
+    link: "/app/strategy-ai",
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/20",
     badge: "Demo"
   }, {
     title: "News",
@@ -55,6 +47,14 @@ const Dashboard = () => {
     color: "text-yellow-400",
     bgColor: "bg-yellow-500/20",
     badge: "Upgrade"
+  }, {
+    title: "Learn Center",
+    description: "Access essential trading guides and educational resources",
+    icon: BookOpen,
+    link: "/app/learn",
+    color: "text-green-400",
+    bgColor: "bg-green-500/20",
+    badge: "Free"
   }];
   const proUserActions = [{
     title: t('dashboard.strategyAI.title'),
