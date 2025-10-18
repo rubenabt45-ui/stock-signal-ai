@@ -9,6 +9,7 @@ import { TrendingUp, Brain, Calendar, BarChart3, MessageCircle, BookOpen, Chevro
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import { useSubscription } from '@/hooks/useSubscription';
+import { MotionWrapper, StaggerContainer, StaggerItem } from '@/components/ui/motion-wrapper';
 const Dashboard = () => {
   const {
     user
@@ -138,30 +139,34 @@ const Dashboard = () => {
   }];
   return <PageWrapper pageName="Dashboard">
       <div className="min-h-screen bg-tradeiq-navy p-6">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Welcome Section */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2">
-                {t('dashboard.welcomeBack')}{user?.email ? `, ${user.email.split('@')[0]}` : ''}
-              </h1>
-              <p className="text-gray-400">
-                {isPro ? "Access all premium features and unlimited AI analysis" : "Start your trading journey with free educational resources"}
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <LanguageSelector variant="app" />
-              <Badge variant={isPro ? "default" : "secondary"} className="px-3 py-1">
-                {isPro ? <>
-                    <Crown className="h-3 w-3 mr-1 text-yellow-500" />
-                    Pro Plan
-                  </> : "Free Plan"}
-              </Badge>
-            </div>
-          </div>
+        <div className="max-w-7xl mx-auto">
+          <StaggerContainer>
+            {/* Welcome Section */}
+            <StaggerItem>
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-2">
+                    {t('dashboard.welcomeBack')}{user?.email ? `, ${user.email.split('@')[0]}` : ''}
+                  </h1>
+                  <p className="text-gray-400">
+                    {isPro ? "Access all premium features and unlimited AI analysis" : "Start your trading journey with free educational resources"}
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <LanguageSelector variant="app" />
+                  <Badge variant={isPro ? "default" : "secondary"} className="px-3 py-1">
+                    {isPro ? <>
+                        <Crown className="h-3 w-3 mr-1 text-yellow-500" />
+                        Pro Plan
+                      </> : "Free Plan"}
+                  </Badge>
+                </div>
+              </div>
+            </StaggerItem>
 
           {/* Plan Status Card for Free Users */}
-          {!isPro && <Card className="tradeiq-card border-yellow-500/30 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
+          {!isPro && <StaggerItem>
+              <Card className="tradeiq-card border-yellow-500/30 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 mb-8">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
@@ -183,10 +188,12 @@ const Dashboard = () => {
                   </Link>
                 </div>
               </CardContent>
-            </Card>}
+            </Card>
+          </StaggerItem>}
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <StaggerItem>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card className="tradeiq-card">
               <CardContent className="p-6">
                 <div className="flex items-center">
@@ -226,15 +233,17 @@ const Dashboard = () => {
                     <p className="text-gray-400 text-sm">{t('dashboard.analysisSpeed')}</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+                </CardContent>
+              </Card>
+            </div>
+          </StaggerItem>
 
           {/* Quick Actions */}
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-6">
-              {isPro ? t('dashboard.quickActions') : 'Get Started'}
-            </h2>
+          <StaggerItem>
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-white mb-6">
+                {isPro ? t('dashboard.quickActions') : 'Get Started'}
+              </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {quickActions.map((action, index) => <Card key={index} className="tradeiq-card hover:border-tradeiq-blue/50 transition-all duration-300">
                   <CardHeader className="space-y-6">
@@ -257,11 +266,13 @@ const Dashboard = () => {
                     </Link>
                   </CardContent>
                 </Card>)}
+              </div>
             </div>
-          </div>
+          </StaggerItem>
 
           {/* Content Grid - Different for Free vs Pro Users */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <StaggerItem>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Recent Activity */}
             <Card className="tradeiq-card">
               <CardHeader>
@@ -340,10 +351,11 @@ const Dashboard = () => {
                       </Button>
                     </Link>
                   </div>}
-              </CardContent>
-            </Card>
-          </div>
-
+                </CardContent>
+              </Card>
+            </div>
+          </StaggerItem>
+        </StaggerContainer>
         </div>
       </div>
     </PageWrapper>;
