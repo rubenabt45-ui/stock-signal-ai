@@ -96,10 +96,6 @@ const Index = () => {
             </div>
           </StaggerItem>
 
-          {/* Market Overview Section */}
-          <StaggerItem className="mb-8">
-            
-          </StaggerItem>
 
           {/* Analysis Grid */}
           <StaggerItem>
