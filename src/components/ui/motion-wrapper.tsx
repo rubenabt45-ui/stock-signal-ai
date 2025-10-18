@@ -15,9 +15,9 @@ const animations = {
     exit: { opacity: 0, y: -20 },
   },
   slide: {
-    initial: { opacity: 0, x: -50 },
+    initial: { opacity: 0, x: -30 },
     animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: 50 },
+    exit: { opacity: 0, x: 30 },
   },
   scale: {
     initial: { opacity: 0, scale: 0.95 },
@@ -46,7 +46,7 @@ export const MotionWrapper = ({
       animate={selectedAnimation.animate}
       exit={selectedAnimation.exit}
       transition={{ 
-        duration: 0.5, 
+        duration: 0.6, 
         delay, 
         ease: [0.4, 0, 0.2, 1] 
       }}
@@ -81,7 +81,7 @@ export const StaggerItem = ({ children, className }: { children: ReactNode; clas
       hidden: { opacity: 0, y: 20 },
       visible: { opacity: 1, y: 0 },
     }}
-    transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+    transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
   >
     {children}
   </motion.div>
