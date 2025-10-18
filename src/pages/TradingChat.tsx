@@ -12,6 +12,7 @@ import { UpgradeModal } from '@/components/UpgradeModal';
 import { analyzeMarketQuery } from '@/services/aiService';
 import { logger } from '@/utils/logger';
 import { useNavigate } from 'react-router-dom';
+import { MotionWrapper, StaggerContainer, StaggerItem } from '@/components/ui/motion-wrapper';
 interface Message {
   id: string;
   content: string;
@@ -135,7 +136,7 @@ const TradingChat: React.FC = () => {
   return <div className="min-h-screen bg-tradeiq-navy flex flex-col">
       {/* Header */}
       <header className="bg-black/90 backdrop-blur-xl border-b border-gray-800/50 sticky top-0 z-50 shadow-lg">
-        <div className="container mx-auto px-6 py-6">
+        <MotionWrapper animation="slide" className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Brain className="h-10 w-10 text-tradeiq-blue" />
@@ -154,11 +155,11 @@ const TradingChat: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </MotionWrapper>
       </header>
 
       {/* Usage Info for Free Users */}
-      {!isPro && <div className="container mx-auto px-6 pt-4">
+      {!isPro && <MotionWrapper animation="fade" delay={0.1} className="container mx-auto px-6 pt-4">
           {remainingAnalysis <= 1 && remainingAnalysis > 0 ? <Alert className="border-yellow-500/30 bg-yellow-900/10">
               <AlertTriangle className="h-4 w-4 text-yellow-400" />
               <AlertDescription className="text-yellow-300">
@@ -168,30 +169,32 @@ const TradingChat: React.FC = () => {
               <Clock className="h-4 w-4" />
               <span>{remainingAnalysis} of {maxAnalysisPerDay} analyses remaining today</span>
             </div>}
-        </div>}
+        </MotionWrapper>}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto pb-32 md:pb-24">
         <div className="max-w-4xl mx-auto p-4 space-y-4">
-          {messages.length === 0 && <Card className="tradeiq-card">
-              <CardContent className="p-6 text-center">
-                <Brain className="h-12 w-12 text-tradeiq-blue mx-auto mb-4" />
-                <h3 className="text-white text-lg font-semibold mb-2">
-                  Welcome to StrategyAI!
-                </h3>
-                <p className="text-gray-400 mb-4">
-                  Ask me anything about trading, market analysis, or specific stocks.
-                </p>
-                {!isPro && <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
-                    <p className="text-tradeiq-blue text-sm font-medium">
-                      ✨ Free Plan: {maxAnalysisPerDay} analyses per day
-                    </p>
-                    <p className="text-gray-400 text-xs mt-1">
-                      Upgrade to Pro for unlimited analyses and advanced features
-                    </p>
-                  </div>}
-              </CardContent>
-            </Card>}
+          {messages.length === 0 && <MotionWrapper animation="scale" delay={0.2}>
+              <Card className="tradeiq-card">
+                <CardContent className="p-6 text-center">
+                  <Brain className="h-12 w-12 text-tradeiq-blue mx-auto mb-4" />
+                  <h3 className="text-white text-lg font-semibold mb-2">
+                    Welcome to StrategyAI!
+                  </h3>
+                  <p className="text-gray-400 mb-4">
+                    Ask me anything about trading, market analysis, or specific stocks.
+                  </p>
+                  {!isPro && <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+                      <p className="text-tradeiq-blue text-sm font-medium">
+                        ✨ Free Plan: {maxAnalysisPerDay} analyses per day
+                      </p>
+                      <p className="text-gray-400 text-xs mt-1">
+                        Upgrade to Pro for unlimited analyses and advanced features
+                      </p>
+                    </div>}
+                </CardContent>
+              </Card>
+            </MotionWrapper>}
 
           {messages.map(message => <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[80%] rounded-lg p-4 ${message.sender === 'user' ? 'bg-tradeiq-blue text-white' : 'tradeiq-card'}`}>
