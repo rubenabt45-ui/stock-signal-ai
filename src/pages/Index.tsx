@@ -97,20 +97,20 @@ const Index = () => {
           </StaggerItem>
 
 
-          {/* Analysis Grid */}
+          {/* Analysis Grid - 2x2 Layout */}
           <StaggerItem>
-            <div className="grid gap-8 lg:grid-cols-2">
-              <div className="space-y-8">
-                <MotionWrapper delay={0.1}>
-                  <PatternDetection asset={selectedAsset} />
-                </MotionWrapper>
-                <MotionWrapper delay={0.2}>
-                  <TrendAnalysis asset={selectedAsset} />
-                </MotionWrapper>
-                <MotionWrapper delay={0.3}>
-                  <VolatilityAnalysis asset={selectedAsset} />
-                </MotionWrapper>
-              </div>
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+              <MotionWrapper delay={0.1}>
+                <PatternDetection asset={selectedAsset} />
+              </MotionWrapper>
+              
+              <MotionWrapper delay={0.2}>
+                <TrendAnalysis asset={selectedAsset} />
+              </MotionWrapper>
+              
+              <MotionWrapper delay={0.3}>
+                <VolatilityAnalysis asset={selectedAsset} />
+              </MotionWrapper>
               
               <MotionWrapper delay={0.4}>
                 <AISuggestions asset={selectedAsset} />
