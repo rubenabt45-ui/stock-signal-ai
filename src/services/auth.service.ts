@@ -187,7 +187,7 @@ export const authService = {
   },
 
   async signInWithOAuth(provider: 'google' | 'github'): Promise<AuthResponse> {
-    const redirectUrl = 'https://tradeiqpro.com/app';
+    const redirectUrl = `${window.location.origin}/app/dashboard`;
     
     logger.info('🔐 [AUTH_FLOW] OAuth sign in with provider:', provider);
     logger.debug('🔐 [AUTH_FLOW] OAuth redirect URL:', redirectUrl);
