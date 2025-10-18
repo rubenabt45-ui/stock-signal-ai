@@ -16,24 +16,24 @@ const BottomNavigation = () => {
       label: "Dashboard",
     },
     {
-      path: "/app/strategy-ai",
-      icon: Brain,
-      label: "Chat",
-    },
-    {
-      path: "/app/learn",
-      icon: Book,
-      label: t('navigation.learn'),
-    },
-    {
       path: "/app/chartia",
       icon: "chart",
       label: "Chart",
     },
     {
+      path: "/app/strategy-ai",
+      icon: Brain,
+      label: "Chat",
+    },
+    {
       path: "/app/news",
       icon: Newspaper,
       label: "News",
+    },
+    {
+      path: "/app/learn",
+      icon: Book,
+      label: t('navigation.learn'),
     },
     {
       path: "/app/settings",
