@@ -97,29 +97,29 @@ const Index = () => {
           </StaggerItem>
 
 
-          {/* Analysis Grid - 2x2 Layout with Equal Heights */}
+          {/* Analysis Grid - 2x2 Layout with Fixed Equal Heights */}
           <StaggerItem>
-            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 lg:grid-rows-2">
-              <MotionWrapper delay={0.1} className="h-full">
-                <div className="h-full">
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 auto-rows-fr">
+              <MotionWrapper delay={0.1}>
+                <div className="min-h-[450px] h-full flex flex-col">
                   <PatternDetection asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
-              <MotionWrapper delay={0.2} className="h-full">
-                <div className="h-full">
+              <MotionWrapper delay={0.2}>
+                <div className="min-h-[450px] h-full flex flex-col">
                   <TrendAnalysis asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
-              <MotionWrapper delay={0.3} className="h-full">
-                <div className="h-full">
+              <MotionWrapper delay={0.3}>
+                <div className="min-h-[450px] h-full flex flex-col">
                   <VolatilityAnalysis asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
-              <MotionWrapper delay={0.4} className="h-full">
-                <div className="h-full">
+              <MotionWrapper delay={0.4}>
+                <div className="min-h-[450px] h-full flex flex-col">
                   <AISuggestions asset={selectedAsset} />
                 </div>
               </MotionWrapper>

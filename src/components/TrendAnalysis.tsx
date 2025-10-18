@@ -46,7 +46,7 @@ export const TrendAnalysis = ({ asset }: TrendAnalysisProps) => {
 
   if (isLoading) {
     return (
-      <Card className="tradeiq-card p-6 rounded-2xl">
+      <Card className="tradeiq-card p-6 rounded-2xl h-full">
         <div className="flex items-center space-x-3 mb-6">
           <TrendingUp className="h-6 w-6 text-green-400" />
           <h3 className="text-xl font-bold text-white">Trend Analysis</h3>
@@ -62,7 +62,7 @@ export const TrendAnalysis = ({ asset }: TrendAnalysisProps) => {
 
   if (!trendData) {
     return (
-      <Card className="tradeiq-card p-6 rounded-2xl">
+      <Card className="tradeiq-card p-6 rounded-2xl h-full">
         <div className="flex items-center space-x-3 mb-6">
           <TrendingUp className="h-6 w-6 text-green-400" />
           <h3 className="text-xl font-bold text-white">Trend Analysis</h3>
@@ -75,7 +75,7 @@ export const TrendAnalysis = ({ asset }: TrendAnalysisProps) => {
   }
 
   return (
-    <Card className="tradeiq-card p-6 rounded-2xl">
+    <Card className="tradeiq-card p-6 rounded-2xl h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <TrendingUp className="h-6 w-6 text-green-400" />

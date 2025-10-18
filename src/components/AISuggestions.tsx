@@ -59,7 +59,7 @@ export const AISuggestions = ({ asset }: AISuggestionsProps) => {
 
   if (isLoading) {
     return (
-      <Card className="tradeiq-card p-6 rounded-2xl">
+      <Card className="tradeiq-card p-6 rounded-2xl h-full">
         <div className="flex items-center space-x-3 mb-6">
           <Brain className="h-6 w-6 text-blue-400" />
           <h3 className="text-xl font-bold text-white">AI Suggestions</h3>
@@ -73,7 +73,7 @@ export const AISuggestions = ({ asset }: AISuggestionsProps) => {
   }
 
   return (
-    <Card className="tradeiq-card p-6 rounded-2xl">
+    <Card className="tradeiq-card p-6 rounded-2xl h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <Brain className="h-6 w-6 text-blue-400" />
