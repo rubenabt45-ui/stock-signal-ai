@@ -1,7 +1,7 @@
 
 import { Card } from "@/components/ui/card";
 import { BarChart3, Activity } from "lucide-react";
-import { OptimizedTradingViewWidget } from "@/components/OptimizedTradingViewWidget";
+import { TradingViewWidget } from "@/components/TradingViewWidget";
 import { useEffect, useState, useRef } from "react";
 
 interface LiveChartProps {
@@ -73,12 +73,12 @@ export const LiveChart = ({ asset }: LiveChartProps) => {
         </div>
         
         <div className="w-full" ref={chartContainerRef}>
-          <OptimizedTradingViewWidget 
+          <TradingViewWidget 
             symbol={asset} 
-            className="w-full"
-            height="600px"
-            onReady={handleChartReady}
-            onError={handleChartError}
+            interval="240"
+            timezone="Etc/UTC"
+            theme="dark"
+            locale="en"
           />
         </div>
       </Card>
