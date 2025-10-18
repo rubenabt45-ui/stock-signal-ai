@@ -7,6 +7,7 @@ import { TrendAnalysis } from "@/components/TrendAnalysis";
 import { VolatilityAnalysis } from "@/components/VolatilityAnalysis";
 import { AISuggestions } from "@/components/AISuggestions";
 import { SharpRatio } from "@/components/SharpRatio";
+import { SeasonalTrendsDividends } from "@/components/SeasonalTrendsDividends";
 import { MarketOverview } from "@/components/MarketOverview";
 import { TrendingUp, Sparkles, Heart, BarChart3, ChevronRight, CandlestickChart, Star, Brain, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -128,6 +129,12 @@ const Index = () => {
               <MotionWrapper delay={0.5}>
                 <div className="min-h-[450px] h-full flex flex-col">
                   <SharpRatio asset={selectedAsset} />
+                </div>
+              </MotionWrapper>
+              
+              <MotionWrapper delay={0.6}>
+                <div className="min-h-[450px] h-full flex flex-col">
+                  <SeasonalTrendsDividends asset={selectedAsset} />
                 </div>
               </MotionWrapper>
             </div>
