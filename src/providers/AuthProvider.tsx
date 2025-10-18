@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { authService } from '@/services/auth.service';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { User, Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { authService } from "@/services/auth.service";
 
 export interface AuthContextType {
   user: User | null;
@@ -13,7 +13,7 @@ export interface AuthContextType {
   resetPassword: (email: string) => Promise<{ error: any }>;
   updatePassword: (password: string) => Promise<{ error: any }>;
   resendConfirmation: (email: string) => Promise<{ error: any }>;
-  signInWithOAuth: (provider: 'google' | 'github') => Promise<{ error: any }>;
+  signInWithOAuth: (provider: "google" | "github") => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,20 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    // Graceful fallback to avoid runtime crashes when provider isn't mounted yet
-    console.warn('[Auth] useAuth called outside AuthProvider. Using fallback context.');
-    return {
-      user: null,
-      session: null,
-      loading: true,
-      signIn: authService.signIn,
-      signUp: authService.signUp,
-      signOut: authService.signOut,
-      resetPassword: authService.resetPassword,
-      updatePassword: authService.updatePassword,
-      resendConfirmation: authService.resendConfirmation,
-      signInWithOAuth: authService.signInWithOAuth,
-    } as AuthContextType;
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 };
@@ -45,15 +32,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Listen for auth changes FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // Then get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
