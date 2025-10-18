@@ -149,8 +149,8 @@ const Learn = () => {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {educationalArticles.map((article, index) => {
               const IconComponent = article.icon;
-              return <Card key={index} className="tradeiq-card hover:border-tradeiq-blue/50 transition-colors">
-                    <CardHeader>
+              return <Card key={index} className="tradeiq-card hover:border-tradeiq-blue/50 transition-colors flex flex-col h-full">
+                    <CardHeader className="flex-grow">
                       <div className="flex items-center space-x-3">
                         <div className="p-2 bg-tradeiq-blue/20 rounded-lg">
                           <IconComponent className="h-6 w-6 text-tradeiq-blue" />
@@ -166,7 +166,7 @@ const Learn = () => {
                         {article.description}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="mt-auto">
                       <Button className="tradeiq-button-primary w-full" onClick={() => {/* Could open a modal with article content */}}>
                         <Book className="h-4 w-4 mr-2" />
                         Read Article
@@ -183,8 +183,8 @@ const Learn = () => {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {freeResources.map(resource => {
               const IconComponent = resource.icon;
-              return <Card key={resource.id} className="tradeiq-card hover:border-tradeiq-blue/50 transition-colors">
-                    <CardHeader>
+              return <Card key={resource.id} className="tradeiq-card hover:border-tradeiq-blue/50 transition-colors flex flex-col h-full">
+                    <CardHeader className="flex-grow">
                       <div className="flex items-center space-x-3">
                         <div className="p-2 bg-tradeiq-blue/20 rounded-lg">
                           <IconComponent className="h-6 w-6 text-tradeiq-blue" />
@@ -200,7 +200,7 @@ const Learn = () => {
                         {resource.description}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="mt-auto">
                       <Button className="tradeiq-button-primary w-full" onClick={() => window.open(resource.pdfUrl, '_blank')}>
                         <FileText className="h-4 w-4 mr-2" />
                         Download PDF
@@ -226,8 +226,8 @@ const Learn = () => {
               {proResources.map((resource, index) => {
               const IconComponent = resource.icon;
               const isLocked = !isPro;
-              return <Card key={index} className={`tradeiq-card transition-colors ${isLocked ? 'opacity-75 border-yellow-500/20' : 'hover:border-yellow-500/50 border-yellow-500/20'}`}>
-                    <CardHeader>
+              return <Card key={index} className={`tradeiq-card transition-colors flex flex-col h-full ${isLocked ? 'opacity-75 border-yellow-500/20' : 'hover:border-yellow-500/50 border-yellow-500/20'}`}>
+                    <CardHeader className="flex-grow">
                       <div className="flex items-center space-x-3">
                         <div className={`p-2 ${isLocked ? 'bg-gray-700' : 'bg-yellow-500/20'} rounded-lg relative`}>
                           <IconComponent className={`h-6 w-6 ${isLocked ? 'text-gray-400' : 'text-yellow-500'}`} />
@@ -246,7 +246,7 @@ const Learn = () => {
                         {resource.description}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="mt-auto">
                       {isLocked ? <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black" onClick={handleUpgrade}>
                           <Crown className="h-4 w-4 mr-2" />
                           Upgrade to Access
