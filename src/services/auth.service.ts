@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client-fake";
 import { logger } from "@/utils/logger";
 
 export interface AuthResponse {
