@@ -133,7 +133,7 @@
   },
   "auth": {
     "login": {
-      "title": "Welcome Back",
+      "title": "Log in",
       "subtitle": "Sign in to your TradeIQ account",
       "email": "Email",
       "password": "Password",

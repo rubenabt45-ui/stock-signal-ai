@@ -133,7 +133,7 @@
   },
   "auth": {
     "login": {
-      "title": "Bienvenido de Vuelta",
+      "title": "Iniciar Sesión",
       "subtitle": "Inicia sesión en tu cuenta de TradeIQ",
       "email": "Email",
       "password": "Contraseña",
