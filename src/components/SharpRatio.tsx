@@ -1,40 +1,74 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, AlertTriangle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { TrendingUp } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface SharpRatioProps {
   asset: string;
 }
 
+declare global {
+  interface Window {
+    TradingView: any;
+  }
+}
+
 export const SharpRatio = ({ asset }: SharpRatioProps) => {
-  const [ratio, setRatio] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
+  const widgetRef = useRef<any>(null);
 
   useEffect(() => {
-    const calculateSharpRatio = () => {
-      setLoading(true);
-      
-      // Simulate calculation with realistic values
-      // Sharpe Ratio typically ranges from -3 to 3, with >1 being good, >2 being very good
-      const mockRatio = (Math.random() * 4) - 1; // Range from -1 to 3
-      
-      setTimeout(() => {
-        setRatio(mockRatio);
+    setLoading(true);
+    
+    // Clean up previous widget
+    if (widgetRef.current) {
+      widgetRef.current = null;
+    }
+    
+    if (containerRef.current) {
+      containerRef.current.innerHTML = '';
+    }
+
+    // Load TradingView script if not already loaded
+    const initWidget = () => {
+      if (containerRef.current && window.TradingView) {
+        const symbol = asset.includes(':') ? asset : `NASDAQ:${asset}`;
+        
+        widgetRef.current = new window.TradingView.MiniChart({
+          container_id: containerRef.current.id,
+          symbol: symbol,
+          locale: "en",
+          width: "100%",
+          height: "300",
+          dateRange: "12M",
+          colorTheme: "dark",
+          trendLineColor: "#F7931A",
+          underLineColor: "rgba(247, 147, 26, 0.3)",
+          isTransparent: true,
+          autosize: false,
+          largeChartUrl: ""
+        });
+        
         setLoading(false);
-      }, 800);
+      }
     };
 
-    calculateSharpRatio();
+    if (!window.TradingView) {
+      const script = document.createElement('script');
+      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-chart.js';
+      script.async = true;
+      script.onload = initWidget;
+      document.head.appendChild(script);
+    } else {
+      initWidget();
+    }
+
+    return () => {
+      if (containerRef.current) {
+        containerRef.current.innerHTML = '';
+      }
+    };
   }, [asset]);
-
-  const getRatioQuality = (value: number) => {
-    if (value > 2) return { label: "Excelente", color: "text-green-400", bg: "bg-green-500/10" };
-    if (value > 1) return { label: "Bueno", color: "text-blue-400", bg: "bg-blue-500/10" };
-    if (value > 0) return { label: "Aceptable", color: "text-yellow-400", bg: "bg-yellow-500/10" };
-    return { label: "Bajo", color: "text-red-400", bg: "bg-red-500/10" };
-  };
-
-  const quality = ratio !== null ? getRatioQuality(ratio) : null;
 
   return (
     <Card className="h-full flex flex-col bg-gray-900/50 border-gray-800 hover:border-gray-700 transition-all">
@@ -47,62 +81,45 @@ export const SharpRatio = ({ asset }: SharpRatioProps) => {
           Retorno ajustado por riesgo
         </p>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col justify-between">
+      <CardContent className="flex-1 flex flex-col">
         {loading ? (
           <div className="space-y-4 animate-pulse">
-            <div className="h-20 bg-gray-800/50 rounded-lg"></div>
+            <div className="h-[300px] bg-gray-800/50 rounded-lg"></div>
             <div className="h-16 bg-gray-800/50 rounded-lg"></div>
-            <div className="h-12 bg-gray-800/50 rounded-lg"></div>
           </div>
         ) : (
-          <div className="space-y-6">
-            {/* Ratio Display */}
-            <div className={`${quality?.bg} rounded-xl p-6 text-center border border-gray-800`}>
-              <div className="text-4xl font-bold text-white mb-2">
-                {ratio?.toFixed(2)}
-              </div>
-              <div className={`text-sm font-medium ${quality?.color}`}>
-                {quality?.label}
-              </div>
+          <div className="space-y-4">
+            {/* TradingView Chart */}
+            <div className="bg-gray-900/80 rounded-lg overflow-hidden border border-gray-800">
+              <div 
+                id={`sharpe-ratio-chart-${asset}`}
+                ref={containerRef}
+                style={{ minHeight: '300px' }}
+              />
             </div>
 
-            {/* Interpretation */}
-            <div className="space-y-3">
-              <div className="flex items-start gap-3 p-3 bg-gray-800/30 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-tradeiq-blue flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm text-gray-300">
-                    {ratio && ratio > 1 
-                      ? "El activo muestra un retorno favorable ajustado por riesgo."
-                      : ratio && ratio > 0
-                      ? "El activo tiene retorno positivo pero con volatilidad considerable."
-                      : "El activo muestra bajo retorno en relación al riesgo asumido."}
-                  </p>
-                </div>
-              </div>
-
-              {/* Reference Scale */}
-              <div className="p-4 bg-gray-800/20 rounded-lg border border-gray-800">
-                <p className="text-xs text-gray-400 mb-3 font-medium">Escala de Referencia:</p>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">&gt; 2.0</span>
-                    <span className="text-green-400">Excelente</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">1.0 - 2.0</span>
-                    <span className="text-blue-400">Bueno</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">0 - 1.0</span>
-                    <span className="text-yellow-400">Aceptable</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">&lt; 0</span>
-                    <span className="text-red-400">Bajo</span>
-                  </div>
-                </div>
-              </div>
+            {/* Explanation */}
+            <div className="space-y-2 p-4 bg-gray-800/30 rounded-lg border border-gray-800">
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400 mt-1">•</span>
+                  <span>
+                    <strong className="text-white">Sharpe &gt; 1</strong> → Very good (the reward compensates for the risk).
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-yellow-400 mt-1">•</span>
+                  <span>
+                    <strong className="text-white">Sharpe 0 to 1</strong> → Positive, but moderate (there is profit, although not outstanding).
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-red-400 mt-1">•</span>
+                  <span>
+                    <strong className="text-white">Sharpe &lt; 0</strong> → Bad, means the risk does not compensate, a risk-free bond is better.
+                  </span>
+                </li>
+              </ul>
             </div>
           </div>
         )}
