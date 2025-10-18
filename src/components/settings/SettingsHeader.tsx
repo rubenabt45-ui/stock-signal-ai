@@ -2,13 +2,14 @@
 import { Settings } from "lucide-react";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useTranslationWithFallback } from '@/hooks/useTranslationWithFallback';
+import { MotionWrapper } from "@/components/ui/motion-wrapper";
 
 export const SettingsHeader = () => {
   const { t } = useTranslationWithFallback();
 
   return (
     <header className="bg-black/90 backdrop-blur-xl border-b border-gray-800/50 sticky top-0 z-50 shadow-lg">
-      <div className="container mx-auto px-6 py-6">
+      <MotionWrapper animation="slide" className="container mx-auto px-6 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Settings className="h-10 w-10 text-tradeiq-blue" />
@@ -24,7 +25,7 @@ export const SettingsHeader = () => {
             </div>
           </div>
         </div>
-      </div>
+      </MotionWrapper>
     </header>
   );
 };

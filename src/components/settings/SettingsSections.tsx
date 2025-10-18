@@ -10,6 +10,7 @@ import { SupportSection } from "@/components/SupportSection";
 import { LegalSection } from "@/components/LegalSection";
 import { LogoutSection } from "@/components/LogoutSection";
 import { ProFeaturesSection } from "./ProFeaturesSection";
+import { StaggerContainer, StaggerItem } from "@/components/ui/motion-wrapper";
 
 interface SettingsSectionsProps {
   user: any;
@@ -27,67 +28,91 @@ export const SettingsSections: React.FC<SettingsSectionsProps> = ({
   error
 }) => {
   return (
-    <main className="container mx-auto px-4 py-6 pb-24 space-y-6">
-      {/* Error Banner */}
-      {error && (
-        <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
-          <div className="text-red-400 text-sm">
-            <strong>Warning:</strong> {error}. Some features may not work properly.
-          </div>
-        </div>
-      )}
+    <main className="container mx-auto px-4 py-6 pb-24">
+      <StaggerContainer>
+        {/* Error Banner */}
+        {error && (
+          <StaggerItem>
+            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 mb-6">
+              <div className="text-red-400 text-sm">
+                <strong>Warning:</strong> {error}. Some features may not work properly.
+              </div>
+            </div>
+          </StaggerItem>
+        )}
 
-      {/* Profile Section */}
-      <ErrorBoundary componentName="Profile Section">
-        <ProfileSection 
-          user={user} 
-          userProfile={userProfile} 
-          onProfileUpdate={onProfileUpdate}
-        />
-      </ErrorBoundary>
+        {/* Profile Section */}
+        <StaggerItem>
+          <ErrorBoundary componentName="Profile Section">
+            <ProfileSection 
+              user={user} 
+              userProfile={userProfile} 
+              onProfileUpdate={onProfileUpdate}
+            />
+          </ErrorBoundary>
+        </StaggerItem>
 
-      {/* Subscription Dashboard */}
-      <ErrorBoundary componentName="Subscription Dashboard">
-        <SubscriptionDashboard />
-      </ErrorBoundary>
+        {/* Subscription Dashboard */}
+        <StaggerItem>
+          <ErrorBoundary componentName="Subscription Dashboard">
+            <SubscriptionDashboard />
+          </ErrorBoundary>
+        </StaggerItem>
 
-      {/* Notifications Section */}
-      <ErrorBoundary componentName="Notifications Section">
-        <NotificationsSection />
-      </ErrorBoundary>
+        {/* Notifications Section */}
+        <StaggerItem>
+          <ErrorBoundary componentName="Notifications Section">
+            <NotificationsSection />
+          </ErrorBoundary>
+        </StaggerItem>
 
-      {/* Preferences Section */}
-      <ErrorBoundary componentName="Preferences Section">
-        <PreferencesSection />
-      </ErrorBoundary>
+        {/* Preferences Section */}
+        <StaggerItem>
+          <ErrorBoundary componentName="Preferences Section">
+            <PreferencesSection />
+          </ErrorBoundary>
+        </StaggerItem>
 
-      {/* Security Section */}
-      <ErrorBoundary componentName="Security Section">
-        <SecuritySection />
-      </ErrorBoundary>
+        {/* Security Section */}
+        <StaggerItem>
+          <ErrorBoundary componentName="Security Section">
+            <SecuritySection />
+          </ErrorBoundary>
+        </StaggerItem>
 
-      {/* Pro Features Section */}
-      <ProFeaturesSection isPro={isPro} />
+        {/* Pro Features Section */}
+        <StaggerItem>
+          <ProFeaturesSection isPro={isPro} />
+        </StaggerItem>
 
-      {/* Integrations Section */}
-      <ErrorBoundary componentName="Integrations Section">
-        <IntegrationsSection />
-      </ErrorBoundary>
+        {/* Integrations Section */}
+        <StaggerItem>
+          <ErrorBoundary componentName="Integrations Section">
+            <IntegrationsSection />
+          </ErrorBoundary>
+        </StaggerItem>
 
-      {/* Support Section */}
-      <ErrorBoundary componentName="Support Section">
-        <SupportSection />
-      </ErrorBoundary>
+        {/* Support Section */}
+        <StaggerItem>
+          <ErrorBoundary componentName="Support Section">
+            <SupportSection />
+          </ErrorBoundary>
+        </StaggerItem>
 
-      {/* Legal Section */}
-      <ErrorBoundary componentName="Legal Section">
-        <LegalSection />
-      </ErrorBoundary>
+        {/* Legal Section */}
+        <StaggerItem>
+          <ErrorBoundary componentName="Legal Section">
+            <LegalSection />
+          </ErrorBoundary>
+        </StaggerItem>
 
-      {/* Logout Section */}
-      <ErrorBoundary componentName="Logout Section">
-        <LogoutSection />
-      </ErrorBoundary>
+        {/* Logout Section */}
+        <StaggerItem>
+          <ErrorBoundary componentName="Logout Section">
+            <LogoutSection />
+          </ErrorBoundary>
+        </StaggerItem>
+      </StaggerContainer>
     </main>
   );
 };
