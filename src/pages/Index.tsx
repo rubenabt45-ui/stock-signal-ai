@@ -6,6 +6,7 @@ import { PatternDetection } from "@/components/PatternDetection";
 import { TrendAnalysis } from "@/components/TrendAnalysis";
 import { VolatilityAnalysis } from "@/components/VolatilityAnalysis";
 import { AISuggestions } from "@/components/AISuggestions";
+import { SharpRatio } from "@/components/SharpRatio";
 import { MarketOverview } from "@/components/MarketOverview";
 import { TrendingUp, Sparkles, Heart, BarChart3, ChevronRight, CandlestickChart, Star, Brain, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -97,9 +98,9 @@ const Index = () => {
           </StaggerItem>
 
 
-          {/* Analysis Grid - 2x2 Layout with Fixed Equal Heights */}
+          {/* Analysis Grid - 2x3 Layout with Fixed Equal Heights */}
           <StaggerItem>
-            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 auto-rows-fr">
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 auto-rows-fr">
               <MotionWrapper delay={0.1}>
                 <div className="min-h-[450px] h-full flex flex-col">
                   <PatternDetection asset={selectedAsset} />
@@ -121,6 +122,12 @@ const Index = () => {
               <MotionWrapper delay={0.4}>
                 <div className="min-h-[450px] h-full flex flex-col">
                   <AISuggestions asset={selectedAsset} />
+                </div>
+              </MotionWrapper>
+              
+              <MotionWrapper delay={0.5}>
+                <div className="min-h-[450px] h-full flex flex-col">
+                  <SharpRatio asset={selectedAsset} />
                 </div>
               </MotionWrapper>
             </div>
