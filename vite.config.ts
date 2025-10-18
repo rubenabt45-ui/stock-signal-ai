@@ -102,11 +102,8 @@ export default defineConfig(({ mode }) => ({
       'react',
       'react-dom',
       'react-router-dom',
-      '@tanstack/react-query'
-    ],
-    exclude: [
-      // Exclude heavy libraries that should be loaded on demand
-      'recharts'
+      '@tanstack/react-query',
+      'lodash-es'
     ]
   }
 }));
