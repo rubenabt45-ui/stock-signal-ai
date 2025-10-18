@@ -98,20 +98,7 @@ const Index = () => {
 
           {/* Market Overview Section */}
           <StaggerItem className="mb-8">
-            <Card className="tradeiq-card">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-3 text-white">
-                  <BarChart3 className="h-6 w-6 text-tradeiq-blue" />
-                  <span>Market Overview</span>
-                </CardTitle>
-                <p className="text-gray-400">Related instruments and market correlations</p>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
-                  <MarketOverview symbols={getRelatedSymbols(selectedAsset)} height={450} className="w-full" key={`market-overview-${selectedAsset}`} />
-                </div>
-              </CardContent>
-            </Card>
+            
           </StaggerItem>
 
           {/* Analysis Grid */}
