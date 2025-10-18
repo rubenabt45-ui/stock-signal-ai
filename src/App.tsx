@@ -110,7 +110,7 @@ const App = () => {
               {/* PROTECTED APP ROUTES */}
               <Route path="/app" element={
                 <ProtectedRoute>
-                  <Navigate to="/app/chartia" replace />
+                  <Navigate to="/app/dashboard" replace />
                 </ProtectedRoute>
               } />
               <Route path="/app/chartia" element={
