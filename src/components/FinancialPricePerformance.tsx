@@ -51,7 +51,7 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
               <Info className="h-3 w-3 text-gray-500" />
             </div>
             <ResponsiveContainer width="100%" height={420}>
-              <ComposedChart data={financialData}>
+              <ComposedChart data={financialData} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis 
                   dataKey="year" 
@@ -61,16 +61,18 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
                 <YAxis 
                   yAxisId="left"
                   stroke="hsl(var(--muted-foreground))"
-                  style={{ fontSize: '13px', fontWeight: '500' }}
+                  style={{ fontSize: '12px', fontWeight: '500' }}
                   domain={[200, 400]}
+                  width={50}
                   label={{ value: 'B', angle: 0, position: 'top', offset: 10, style: { fill: 'hsl(var(--muted-foreground))', fontSize: '14px', fontWeight: 'bold' } }}
                 />
                 <YAxis 
                   yAxisId="right"
                   orientation="right"
                   stroke="hsl(var(--muted-foreground))"
-                  style={{ fontSize: '13px', fontWeight: '500' }}
+                  style={{ fontSize: '12px', fontWeight: '500' }}
                   domain={[19, 27]}
+                  width={50}
                   label={{ value: '%', angle: 0, position: 'top', offset: 10, style: { fill: 'hsl(var(--muted-foreground))', fontSize: '14px', fontWeight: 'bold' } }}
                 />
                 <Tooltip
