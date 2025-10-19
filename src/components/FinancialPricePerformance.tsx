@@ -50,7 +50,7 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
               <h4 className="text-sm font-semibold text-white">Performance</h4>
               <Info className="h-3 w-3 text-gray-500" />
             </div>
-            <ResponsiveContainer width="100%" height={500}>
+            <ResponsiveContainer width="100%" height={420}>
               <ComposedChart data={financialData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis 
@@ -84,7 +84,7 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
                   }}
                 />
                 <Legend 
-                  wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }}
+                  wrapperStyle={{ fontSize: '11px', paddingTop: '5px' }}
                   formatter={(value) => {
                     if (value === 'revenue') return 'Revenue';
                     if (value === 'netRevenue') return 'Net Revenue';
