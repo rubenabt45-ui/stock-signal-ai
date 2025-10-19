@@ -38,12 +38,25 @@ export const NotificationsSection = () => {
         const { data, error } = await supabase
           .from('user_profiles')
           .select('alerts_enabled, sound_enabled, email_alerts_enabled')
-          .eq('id', user.id)
-          .single();
+          .eq('user_id', user.id)
+          .maybeSingle();
 
         if (error) {
           console.error('Error loading preferences:', error);
-        } else if (data) {
+        } else if (!data) {
+          // Create profile with defaults if it doesn't exist
+          const { data: newProfile, error: insertError } = await supabase
+            .from('user_profiles')
+            .insert({ user_id: user.id })
+            .select('alerts_enabled, sound_enabled, email_alerts_enabled')
+            .single();
+          
+          if (!insertError && newProfile) {
+            setAlertsEnabled(newProfile.alerts_enabled ?? true);
+            setSoundEnabled(newProfile.sound_enabled ?? true);
+            setEmailAlertsEnabled(newProfile.email_alerts_enabled ?? false);
+          }
+        } else {
           setAlertsEnabled(data.alerts_enabled ?? true);
           setSoundEnabled(data.sound_enabled ?? true);
           setEmailAlertsEnabled(data.email_alerts_enabled ?? false);
@@ -64,7 +77,7 @@ export const NotificationsSection = () => {
       const { error } = await supabase
         .from('user_profiles')
         .update({ [field]: value })
-        .eq('id', user.id);
+        .eq('user_id', user.id);
 
       if (error) {
         console.error('Error updating preference:', error);

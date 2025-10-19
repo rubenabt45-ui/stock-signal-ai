@@ -59,8 +59,8 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             const { data: profile } = await supabase
               .from('user_profiles')
               .select('preferred_language')
-              .eq('id', user.id)
-              .single();
+              .eq('user_id', user.id)
+              .maybeSingle();
 
             if (profile?.preferred_language && AVAILABLE_LANGUAGES.some(lang => lang.code === profile.preferred_language)) {
               targetLanguage = profile.preferred_language;

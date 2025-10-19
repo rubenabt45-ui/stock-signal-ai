@@ -29,12 +29,26 @@ const Settings = () => {
         const { data, error } = await supabase
           .from('user_profiles')
           .select('*')
-          .eq('id', user.id)
-          .single();
+          .eq('user_id', user.id)
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching user profile:', error);
           setError('Failed to load profile data');
+        } else if (!data) {
+          // Create profile if it doesn't exist
+          const { data: newProfile, error: insertError } = await supabase
+            .from('user_profiles')
+            .insert({ user_id: user.id })
+            .select()
+            .single();
+          
+          if (insertError) {
+            console.error('Error creating user profile:', insertError);
+            setError('Failed to create profile');
+          } else {
+            setUserProfile(newProfile);
+          }
         } else {
           setUserProfile(data);
         }

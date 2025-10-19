@@ -42,8 +42,8 @@ export const useDailyMessages = () => {
       const { data: profile, error } = await supabase
         .from('user_profiles')
         .select('daily_message_count, daily_message_reset')
-        .eq('id', user.id)
-        .single();
+        .eq('user_id', user.id)
+        .maybeSingle();
 
       if (error) {
         logger.error('[DAILY_USAGE] Error fetching usage:', error);
@@ -67,7 +67,7 @@ export const useDailyMessages = () => {
             daily_message_count: 0,
             daily_message_reset: new Date().toISOString().split('T')[0]
           })
-          .eq('id', user.id);
+          .eq('user_id', user.id);
 
         if (!updateError) {
           finalCount = 0;
@@ -108,8 +108,8 @@ export const useDailyMessages = () => {
       const { data: profile } = await supabase
         .from('user_profiles')
         .select('daily_message_count')
-        .eq('id', user.id)
-        .single();
+        .eq('user_id', user.id)
+        .maybeSingle();
 
       const newCount = (profile?.daily_message_count || 0) + 1;
 
@@ -119,7 +119,7 @@ export const useDailyMessages = () => {
           daily_message_count: newCount,
           daily_message_reset: new Date().toISOString().split('T')[0]
         })
-        .eq('id', user.id);
+        .eq('user_id', user.id);
 
       if (error) {
         logger.error('[DAILY_USAGE] Error recording usage:', error);
