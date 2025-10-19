@@ -42,7 +42,7 @@ export const SettingsSections: React.FC<SettingsSectionsProps> = ({
         )}
 
         {/* Profile Section */}
-        <StaggerItem>
+        <StaggerItem className="mb-6">
           <ErrorBoundary componentName="Profile Section">
             <ProfileSection 
               user={user} 
@@ -53,54 +53,54 @@ export const SettingsSections: React.FC<SettingsSectionsProps> = ({
         </StaggerItem>
 
         {/* Subscription Dashboard */}
-        <StaggerItem>
+        <StaggerItem className="mb-6">
           <ErrorBoundary componentName="Subscription Dashboard">
             <SubscriptionDashboard />
           </ErrorBoundary>
         </StaggerItem>
 
         {/* Notifications Section */}
-        <StaggerItem>
+        <StaggerItem className="mb-6">
           <ErrorBoundary componentName="Notifications Section">
             <NotificationsSection />
           </ErrorBoundary>
         </StaggerItem>
 
         {/* Preferences Section */}
-        <StaggerItem>
+        <StaggerItem className="mb-6">
           <ErrorBoundary componentName="Preferences Section">
             <PreferencesSection />
           </ErrorBoundary>
         </StaggerItem>
 
         {/* Security Section */}
-        <StaggerItem>
+        <StaggerItem className="mb-6">
           <ErrorBoundary componentName="Security Section">
             <SecuritySection />
           </ErrorBoundary>
         </StaggerItem>
 
         {/* Pro Features Section */}
-        <StaggerItem>
+        <StaggerItem className="mb-6">
           <ProFeaturesSection isPro={isPro} />
         </StaggerItem>
 
         {/* Integrations Section */}
-        <StaggerItem>
+        <StaggerItem className="mb-6">
           <ErrorBoundary componentName="Integrations Section">
             <IntegrationsSection />
           </ErrorBoundary>
         </StaggerItem>
 
         {/* Support Section */}
-        <StaggerItem>
+        <StaggerItem className="mb-6">
           <ErrorBoundary componentName="Support Section">
             <SupportSection />
           </ErrorBoundary>
         </StaggerItem>
 
         {/* Legal Section */}
-        <StaggerItem>
+        <StaggerItem className="mb-6">
           <ErrorBoundary componentName="Legal Section">
             <LegalSection />
           </ErrorBoundary>
