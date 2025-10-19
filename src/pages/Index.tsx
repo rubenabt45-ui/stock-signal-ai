@@ -85,20 +85,8 @@ const Index = () => {
 
           {/* Live Chart */}
           <StaggerItem className="mb-8">
-            <div className="tradeiq-card p-6">
-              <div className="mb-6">
-                <div className="flex items-center space-x-3 mb-2">
-                  <TrendingUp className="h-6 w-6 text-tradeiq-blue" />
-                  <h3 className="text-xl font-bold text-white">Live Chart Analysis</h3>
-                </div>
-                <p className="text-gray-400">Real-time price movements and technical indicators</p>
-              </div>
-              <div className="bg-gray-900/50 rounded-2xl p-2 border border-gray-800">
-                <LiveChart asset={selectedAsset} key={selectedAsset} />
-              </div>
-            </div>
+            <LiveChart asset={selectedAsset} key={selectedAsset} />
           </StaggerItem>
-
 
           {/* Analysis Grid - 2x3 Layout with Fixed Equal Heights */}
           <StaggerItem>

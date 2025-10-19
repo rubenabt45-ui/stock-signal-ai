@@ -50,38 +50,14 @@ export const LiveChart = ({ asset }: LiveChartProps) => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Professional TradingView Chart - Full Width */}
-      <Card className="tradeiq-card p-6 rounded-2xl">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-3">
-            <BarChart3 className="h-6 w-6 text-tradeiq-blue" />
-            <div>
-              <h3 className="text-xl font-bold text-white">{asset} Professional Chart</h3>
-              <p className="text-sm text-gray-400">Real-time trading analysis powered by TradingView</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <div className={`w-2 h-2 rounded-full ${isChartReady ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`}></div>
-              <span className={`text-sm font-medium ${isChartReady ? 'text-green-500' : 'text-yellow-500'}`}>
-                {isChartReady ? 'Live' : 'Loading...'}
-              </span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="w-full" ref={chartContainerRef}>
-          <TradingViewWidget 
-            symbol={asset} 
-            interval="240"
-            timezone="Etc/UTC"
-            theme="dark"
-            locale="en"
-          />
-        </div>
-      </Card>
+    <div className="w-full" ref={chartContainerRef}>
+      <TradingViewWidget 
+        symbol={asset} 
+        interval="240"
+        timezone="Etc/UTC"
+        theme="dark"
+        locale="en"
+      />
     </div>
   );
 };
