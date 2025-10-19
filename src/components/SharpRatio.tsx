@@ -71,58 +71,49 @@ export const SharpRatio = ({ asset }: SharpRatioProps) => {
   }, [asset]);
 
   return (
-    <Card className="h-full flex flex-col bg-gray-900/50 border-gray-800 hover:border-gray-700 transition-all">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-tradeiq-blue" />
-          Sharpe Ratio
-        </CardTitle>
-        <p className="text-sm text-gray-400 mt-1">
-          Retorno ajustado por riesgo
-        </p>
+    <Card className="tradeiq-card flex flex-col h-full">
+      <CardHeader>
+        <CardTitle className="text-white">Sharpe Ratio</CardTitle>
+        <p className="text-sm text-gray-400">Risk-adjusted return measurement</p>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col">
-        {loading ? (
-          <div className="space-y-4 animate-pulse">
-            <div className="h-[300px] bg-gray-800/50 rounded-lg"></div>
-            <div className="h-16 bg-gray-800/50 rounded-lg"></div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {/* TradingView Chart */}
-            <div className="bg-gray-900/80 rounded-lg overflow-hidden border border-gray-800">
+      <CardContent className="flex-1">
+        <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800 h-full flex flex-col">
+          {loading ? (
+            <div className="space-y-4 animate-pulse flex-1">
+              <div className="h-[250px] bg-gray-800/50 rounded-lg"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-800/50 rounded w-full"></div>
+                <div className="h-4 bg-gray-800/50 rounded w-3/4"></div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col h-full">
+              {/* TradingView Chart */}
               <div 
                 id={`sharpe-ratio-chart-${asset}`}
                 ref={containerRef}
-                style={{ minHeight: '300px' }}
+                style={{ minHeight: '250px', flex: 1 }}
+                className="mb-4"
               />
-            </div>
 
-            {/* Explanation */}
-            <div className="space-y-2 p-4 bg-gray-800/30 rounded-lg border border-gray-800">
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-400 mt-1">•</span>
-                  <span>
-                    <strong className="text-white">Sharpe &gt; 1</strong> → Very good (the reward compensates for the risk).
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-yellow-400 mt-1">•</span>
-                  <span>
-                    <strong className="text-white">Sharpe 0 to 1</strong> → Positive, but moderate (there is profit, although not outstanding).
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-400 mt-1">•</span>
-                  <span>
-                    <strong className="text-white">Sharpe &lt; 0</strong> → Bad, means the risk does not compensate, a risk-free bond is better.
-                  </span>
-                </li>
-              </ul>
+              {/* Explanation */}
+              <div className="pt-4 border-t border-gray-800">
+                <h4 className="text-sm font-semibold text-white mb-3">Understanding Sharpe Ratio</h4>
+                <div className="space-y-2 text-xs text-gray-400">
+                  <p>
+                    <span className="text-tradeiq-success font-medium">&gt; 1.0:</span> Good risk-adjusted returns
+                  </p>
+                  <p>
+                    <span className="text-tradeiq-warning font-medium">&gt; 2.0:</span> Very good performance
+                  </p>
+                  <p>
+                    <span className="text-tradeiq-blue font-medium">&gt; 3.0:</span> Excellent returns for the risk taken
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </CardContent>
     </Card>
   );
