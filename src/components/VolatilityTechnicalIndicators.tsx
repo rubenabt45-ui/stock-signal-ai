@@ -15,11 +15,11 @@ export const VolatilityTechnicalIndicators = ({ asset }: VolatilityTechnicalIndi
   const calculateSignal = (changePercent: number | null) => {
     if (changePercent === null) return { value: 50, label: "Neutral", color: "#64748b" };
     
-    if (changePercent >= 3) return { value: 90, label: "Fuerte compra", color: "#10b981" };
-    if (changePercent >= 1.5) return { value: 70, label: "Compra", color: "#22c55e" };
+    if (changePercent >= 3) return { value: 90, label: "Strong buy", color: "#10b981" };
+    if (changePercent >= 1.5) return { value: 70, label: "Buy", color: "#22c55e" };
     if (changePercent > -1.5) return { value: 50, label: "Neutral", color: "#64748b" };
-    if (changePercent > -3) return { value: 30, label: "Venta", color: "#f97316" };
-    return { value: 10, label: "Fuerte venta", color: "#ef4444" };
+    if (changePercent > -3) return { value: 30, label: "Sell", color: "#f97316" };
+    return { value: 10, label: "Strong sell", color: "#ef4444" };
   };
 
   const signal = calculateSignal(change);
@@ -44,11 +44,11 @@ export const VolatilityTechnicalIndicators = ({ asset }: VolatilityTechnicalIndi
 
   // Gauge chart data
   const gaugeData = [
-    { name: "Fuerte venta", value: 20, color: "#ef4444" },
-    { name: "Venta", value: 20, color: "#f97316" },
+    { name: "Strong sell", value: 20, color: "#ef4444" },
+    { name: "Sell", value: 20, color: "#f97316" },
     { name: "Neutral", value: 20, color: "#64748b" },
-    { name: "Compra", value: 20, color: "#22c55e" },
-    { name: "Fuerte compra", value: 20, color: "#10b981" }
+    { name: "Buy", value: 20, color: "#22c55e" },
+    { name: "Strong buy", value: 20, color: "#10b981" }
   ];
 
   // Needle angle calculation (0-180 degrees)
@@ -101,7 +101,7 @@ export const VolatilityTechnicalIndicators = ({ asset }: VolatilityTechnicalIndi
         <div className="space-y-4">
           {/* Gauge Chart */}
           <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50">
-            <h4 className="text-sm font-semibold text-white mb-2 text-center">Datos técnicos</h4>
+            <h4 className="text-sm font-semibold text-white mb-2 text-center">Technical Gauge</h4>
             
             <div className="relative" style={{ height: '160px' }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -153,26 +153,26 @@ export const VolatilityTechnicalIndicators = ({ asset }: VolatilityTechnicalIndi
 
               {/* Labels on gauge */}
               <div className="absolute bottom-[10%] left-[8%] text-[10px] text-gray-500">
-                Fuerte<br/>venta
+                Strong<br/>sell
               </div>
               <div className="absolute top-[25%] left-[18%] text-[10px] text-gray-500">
-                Venta
+                Sell
               </div>
               <div className="absolute top-[12%] left-1/2 transform -translate-x-1/2 text-[10px] text-gray-500">
                 Neutral
               </div>
               <div className="absolute top-[25%] right-[18%] text-[10px] text-gray-500">
-                Compra
+                Buy
               </div>
               <div className="absolute bottom-[10%] right-[8%] text-[10px] text-gray-500 text-right">
-                Fuerte<br/>compra
+                Strong<br/>buy
               </div>
             </div>
           </div>
 
           {/* Volatility Curve */}
           <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50">
-            <h4 className="text-sm font-semibold text-white mb-3">Curva de volatilidad (31 días)</h4>
+            <h4 className="text-sm font-semibold text-white mb-3">Volatility Curve (31 days)</h4>
             <ResponsiveContainer width="100%" height={140}>
               <LineChart data={volatilityData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -196,7 +196,7 @@ export const VolatilityTechnicalIndicators = ({ asset }: VolatilityTechnicalIndi
                     borderRadius: '8px',
                     fontSize: '11px'
                   }}
-                  formatter={(value: number) => [`${value.toFixed(2)}%`, 'Volatilidad']}
+                  formatter={(value: number) => [`${value.toFixed(2)}%`, 'Volatility']}
                 />
                 <Line 
                   type="monotone" 
