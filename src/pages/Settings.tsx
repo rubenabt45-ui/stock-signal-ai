@@ -13,6 +13,7 @@ const Settings = () => {
   const { t } = useTranslationWithFallback();
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,16 +27,18 @@ const Settings = () => {
 
       try {
         setError(null);
-        const { data, error } = await supabase
+        
+        // Load user_profiles for settings data
+        const { data: userProfileData, error: userProfileError } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('user_id', user.id)
           .maybeSingle();
 
-        if (error) {
-          console.error('Error fetching user profile:', error);
+        if (userProfileError) {
+          console.error('Error fetching user profile:', userProfileError);
           setError('Failed to load profile data');
-        } else if (!data) {
+        } else if (!userProfileData) {
           // Create profile if it doesn't exist
           const { data: newProfile, error: insertError } = await supabase
             .from('user_profiles')
@@ -50,7 +53,18 @@ const Settings = () => {
             setUserProfile(newProfile);
           }
         } else {
-          setUserProfile(data);
+          setUserProfile(userProfileData);
+        }
+
+        // Load profiles for avatar and name data
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (!profileError) {
+          setProfileData(profileData);
         }
       } catch (error) {
         console.error('Unexpected error:', error);
@@ -64,7 +78,7 @@ const Settings = () => {
   }, [user]);
 
   const handleProfileUpdate = (updatedProfile: any) => {
-    setUserProfile(updatedProfile);
+    setProfileData(updatedProfile);
   };
 
   const isPro = userProfile?.is_pro || false;
@@ -99,7 +113,7 @@ const Settings = () => {
         <SettingsHeader />
         <SettingsSections
           user={user}
-          userProfile={userProfile}
+          userProfile={profileData}
           onProfileUpdate={handleProfileUpdate}
           isPro={isPro}
           error={error}

@@ -93,11 +93,14 @@ export const ProfileSection = ({ user, userProfile, onProfileUpdate }: ProfileSe
         .from('avatars')
         .getPublicUrl(fileName);
 
-      // Update user profile with new avatar URL
+      // Update or insert user profile with new avatar URL
       const { data, error } = await supabase
         .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', user.id)
+        .upsert({ 
+          id: user.id,
+          avatar_url: publicUrl,
+          email: user.email 
+        })
         .select()
         .single();
 
@@ -137,6 +140,7 @@ export const ProfileSection = ({ user, userProfile, onProfileUpdate }: ProfileSe
         id: user.id,
         full_name: fullName.trim(),
         username: username.trim() || null,
+        email: user.email,
         updated_at: new Date().toISOString(),
       };
 
