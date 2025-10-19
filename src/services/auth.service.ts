@@ -23,7 +23,8 @@ export const authService = {
   },
 
   async signUp(email: string, password: string, fullName?: string): Promise<AuthResponse> {
-    const redirectUrl = "https://tradeiqpro.com/verify-email";
+    const origin = typeof window !== 'undefined' ? window.location.origin : "https://tradeiqpro.com";
+    const redirectUrl = `${origin}/verify-email`;
 
     logger.info("🔐 [EMAIL_VERIFICATION] Starting signup process");
     logger.info("🔐 [EMAIL_VERIFICATION] Email:", email);
@@ -70,7 +71,8 @@ export const authService = {
   },
 
   async resendConfirmation(email: string): Promise<AuthResponse> {
-    const redirectUrl = "https://tradeiqpro.com/verify-email";
+    const origin = typeof window !== 'undefined' ? window.location.origin : "https://tradeiqpro.com";
+    const redirectUrl = `${origin}/verify-email`;
 
     logger.info("🔐 [EMAIL_VERIFICATION] Resending confirmation email");
     logger.debug("🔐 [EMAIL_VERIFICATION] Email:", email);
@@ -123,7 +125,8 @@ export const authService = {
   },
 
   async resetPassword(email: string): Promise<AuthResponse> {
-    const redirectUrl = "https://tradeiqpro.com/reset-password";
+    const origin = typeof window !== 'undefined' ? window.location.origin : "https://tradeiqpro.com";
+    const redirectUrl = `${origin}/reset-password`;
 
     logger.info("🔐 [AUTH_FLOW] Password reset request for:", email);
     logger.debug("🔐 [AUTH_FLOW] Reset redirect URL:", redirectUrl);
@@ -186,7 +189,8 @@ export const authService = {
   },
 
   async signInWithOAuth(provider: "google" | "github"): Promise<AuthResponse> {
-    const redirectUrl = "https://tradeiqpro.com/app";
+    const origin = typeof window !== 'undefined' ? window.location.origin : "https://tradeiqpro.com";
+    const redirectUrl = `${origin}/app`;
 
     logger.info("🔐 [AUTH_FLOW] OAuth sign in with provider:", provider);
     logger.debug("🔐 [AUTH_FLOW] OAuth redirect URL:", redirectUrl);
