@@ -9,6 +9,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 interface AssetSelectionProps {
   onAssetSelect: (symbol: string) => void;
   selectedAsset?: string;
+  className?: string;
 }
 const categories = [{
   key: 'stocks' as const,
