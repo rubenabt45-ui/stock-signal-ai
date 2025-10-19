@@ -50,7 +50,7 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
               <h4 className="text-sm font-semibold text-white">Performance</h4>
               <Info className="h-3 w-3 text-gray-500" />
             </div>
-            <ResponsiveContainer width="100%" height={420}>
+            <ResponsiveContainer width="100%" height={320}>
               <ComposedChart data={financialData} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis 
@@ -101,14 +101,14 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
                   dataKey="revenue" 
                   fill="hsl(var(--tradeiq-blue))" 
                   radius={[4, 4, 0, 0]}
-                  maxBarSize={60}
+                  maxBarSize={48}
                 />
                 <Bar 
                   yAxisId="left"
                   dataKey="netRevenue" 
                   fill="hsl(var(--tradeiq-success))" 
                   radius={[4, 4, 0, 0]}
-                  maxBarSize={60}
+                  maxBarSize={48}
                 />
                 <Line 
                   yAxisId="right"
