@@ -81,23 +81,21 @@ export const CompanyProfile = ({ asset }: CompanyProfileProps) => {
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-3xl font-bold text-white mb-2">{symbolKey}</div>
-            <CardTitle className="text-white flex items-center gap-2">
-              Profile
-            </CardTitle>
+            <div className="text-2xl font-bold text-white mb-1">{symbolKey}</div>
+            <CardTitle className="text-white">Profile</CardTitle>
           </div>
           <Info className="h-4 w-4 text-gray-400" />
         </div>
       </CardHeader>
-      <CardContent className="flex-1 space-y-4">
+      <CardContent className="flex-1 space-y-2.5">
         {/* Website */}
-        <div className="flex items-center justify-between py-2 border-b border-gray-800">
-          <span className="text-sm text-gray-400">Website</span>
+        <div className="flex items-center justify-between py-1.5 border-b border-gray-800/50">
+          <span className="text-xs text-gray-500">Website</span>
           <a 
             href={`https://${profile.website}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-tradeiq-blue hover:text-tradeiq-blue/80 flex items-center gap-1 transition-colors"
+            className="text-xs text-tradeiq-blue hover:text-tradeiq-blue/80 flex items-center gap-1 transition-colors"
           >
             {profile.website}
             <ExternalLink className="h-3 w-3" />
@@ -105,16 +103,16 @@ export const CompanyProfile = ({ asset }: CompanyProfileProps) => {
         </div>
 
         {/* Employees */}
-        <div className="flex items-center justify-between py-2 border-b border-gray-800">
-          <span className="text-sm text-gray-400">Employees (FY)</span>
-          <span className="text-sm text-white font-medium">{profile.employees}</span>
+        <div className="flex items-center justify-between py-1.5 border-b border-gray-800/50">
+          <span className="text-xs text-gray-500">Employees (FY)</span>
+          <span className="text-xs text-white font-medium">{profile.employees}</span>
         </div>
 
         {/* ISIN */}
-        <div className="flex items-center justify-between py-2 border-b border-gray-800">
-          <span className="text-sm text-gray-400">ISIN</span>
+        <div className="flex items-center justify-between py-1.5 border-b border-gray-800/50">
+          <span className="text-xs text-gray-500">ISIN</span>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-white font-mono">{profile.isin}</span>
+            <span className="text-xs text-white font-mono">{profile.isin}</span>
             <button
               onClick={() => handleCopy(profile.isin, 'ISIN')}
               className="text-gray-400 hover:text-white transition-colors"
@@ -126,10 +124,10 @@ export const CompanyProfile = ({ asset }: CompanyProfileProps) => {
         </div>
 
         {/* FIGI */}
-        <div className="flex items-center justify-between py-2 border-b border-gray-800">
-          <span className="text-sm text-gray-400">FIGI</span>
+        <div className="flex items-center justify-between py-1.5 border-b border-gray-800/50">
+          <span className="text-xs text-gray-500">FIGI</span>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-white font-mono">{profile.figi}</span>
+            <span className="text-xs text-white font-mono">{profile.figi}</span>
             <button
               onClick={() => handleCopy(profile.figi, 'FIGI')}
               className="text-gray-400 hover:text-white transition-colors"
@@ -142,7 +140,7 @@ export const CompanyProfile = ({ asset }: CompanyProfileProps) => {
 
         {/* Description */}
         <div className="pt-2">
-          <p className="text-xs text-gray-400 leading-relaxed">
+          <p className="text-xs text-gray-500 leading-relaxed">
             {profile.description}
           </p>
         </div>

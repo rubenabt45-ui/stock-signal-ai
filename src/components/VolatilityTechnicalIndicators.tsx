@@ -83,14 +83,14 @@ export const VolatilityTechnicalIndicators = ({ asset }: VolatilityTechnicalIndi
           Volatility & Technical Indicators
           <Info className="h-4 w-4 text-gray-400" />
         </CardTitle>
-        <p className="text-sm text-gray-400">
+        <p className="text-xs text-gray-400 mt-1">
           Real-time technical analysis signals
         </p>
       </CardHeader>
       <CardContent className="flex-1">
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Gauge Chart */}
-          <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
+          <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50">
             <h4 className="text-sm font-semibold text-white mb-2 text-center">Datos técnicos</h4>
             
             <div className="relative" style={{ height: '200px' }}>
@@ -161,7 +161,7 @@ export const VolatilityTechnicalIndicators = ({ asset }: VolatilityTechnicalIndi
           </div>
 
           {/* Technical Indicators Table */}
-          <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+          <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50">
             <h4 className="text-sm font-semibold text-white mb-3">Indicadores Técnicos</h4>
             <div className="space-y-2">
               {technicalIndicators.map((indicator, index) => (

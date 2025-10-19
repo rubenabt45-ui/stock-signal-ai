@@ -30,18 +30,22 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
   return (
     <Card className="tradeiq-card flex flex-col h-full">
       <CardHeader>
-        <CardTitle className="text-white flex items-center gap-2">
-          Financial & Price Performance
-          <Info className="h-4 w-4 text-gray-400" />
-        </CardTitle>
-        <p className="text-sm text-gray-400">
-          Historical financials and return performance metrics
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-white flex items-center gap-2">
+              Financial & Price Performance
+              <Info className="h-4 w-4 text-gray-400" />
+            </CardTitle>
+            <p className="text-xs text-gray-400 mt-1">
+              Historical financials and return performance metrics
+            </p>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
           {/* Financial Chart */}
-          <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+          <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50">
             <div className="flex items-center gap-2 mb-4">
               <h4 className="text-sm font-semibold text-white">Performance</h4>
               <Info className="h-3 w-3 text-gray-500" />
@@ -115,24 +119,24 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
           </div>
 
           {/* Performance Returns */}
-          <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
-            <h4 className="text-sm font-semibold text-white mb-4">Returns</h4>
-            <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-3">
+          <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50">
+            <h4 className="text-sm font-semibold text-white mb-3">Returns</h4>
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-2">
                 {performanceData.map((perf) => (
                   <div
                     key={perf.period}
-                    className="bg-tradeiq-success/10 border border-tradeiq-success/30 rounded-lg p-3 text-center"
+                    className="bg-tradeiq-success/10 border border-tradeiq-success/30 rounded-md p-2.5 text-center"
                   >
-                    <div className="text-xl font-bold text-tradeiq-success">
+                    <div className="text-lg font-bold text-tradeiq-success">
                       {perf.return > 0 ? '+' : ''}{perf.return}%
                     </div>
-                    <div className="text-xs text-gray-400 mt-1">{perf.period}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{perf.period}</div>
                   </div>
                 ))}
               </div>
               
-              <div className="pt-4 border-t border-gray-800">
+              <div className="pt-3 border-t border-gray-800/50">
                 <p className="text-xs text-gray-500 leading-relaxed">
                   Each percentage indicates how much the {asset} stock price has risen or fallen 
                   during that specific time period. Positive returns (green) show price appreciation.

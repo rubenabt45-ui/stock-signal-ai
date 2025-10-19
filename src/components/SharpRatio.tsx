@@ -74,10 +74,10 @@ export const SharpRatio = ({ asset }: SharpRatioProps) => {
     <Card className="tradeiq-card flex flex-col h-full">
       <CardHeader>
         <CardTitle className="text-white">Sharpe Ratio</CardTitle>
-        <p className="text-sm text-gray-400">Risk-adjusted return measurement</p>
+        <p className="text-xs text-gray-400 mt-1">Risk-adjusted return measurement</p>
       </CardHeader>
       <CardContent className="flex-1">
-        <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800 h-full flex flex-col">
+        <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50 h-full flex flex-col">
           {loading ? (
             <div className="space-y-4 animate-pulse flex-1">
               <div className="h-[250px] bg-gray-800/50 rounded-lg"></div>
@@ -97,9 +97,9 @@ export const SharpRatio = ({ asset }: SharpRatioProps) => {
               />
 
               {/* Explanation */}
-              <div className="pt-4 border-t border-gray-800">
-                <h4 className="text-sm font-semibold text-white mb-3">Understanding Sharpe Ratio</h4>
-                <div className="space-y-2 text-xs text-gray-400">
+              <div className="pt-3 border-t border-gray-800/50">
+                <h4 className="text-sm font-semibold text-white mb-2">Understanding Sharpe Ratio</h4>
+                <div className="space-y-1.5 text-xs text-gray-400">
                   <p>
                     <span className="text-tradeiq-success font-medium">&gt; 1.0:</span> Good risk-adjusted returns
                   </p>

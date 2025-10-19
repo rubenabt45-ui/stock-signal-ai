@@ -51,44 +51,48 @@ export const PatternDetection = ({ asset }: PatternDetectionProps) => {
 
   if (isLoading) {
     return (
-      <Card className="tradeiq-card p-6 rounded-2xl h-full">
-        <div className="flex items-center space-x-3 mb-6">
-          <Target className="h-6 w-6 text-purple-400" />
-          <h3 className="text-xl font-bold text-white">Pattern Detection</h3>
-        </div>
-        <div className="animate-pulse space-y-4">
-          <div className="h-16 bg-gray-700/30 rounded-xl"></div>
-          <div className="h-16 bg-gray-700/30 rounded-xl"></div>
+      <Card className="tradeiq-card flex flex-col h-full">
+        <div className="p-5">
+          <div className="flex items-center space-x-3 mb-2">
+            <Target className="h-5 w-5 text-purple-400" />
+            <h3 className="text-lg font-semibold text-white">Pattern Detection</h3>
+          </div>
+          <div className="animate-pulse space-y-3 mt-4">
+            <div className="h-14 bg-gray-700/30 rounded-lg"></div>
+            <div className="h-14 bg-gray-700/30 rounded-lg"></div>
+          </div>
         </div>
       </Card>
     );
   }
 
   return (
-    <Card className="tradeiq-card p-6 rounded-2xl h-full flex flex-col">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <Target className="h-6 w-6 text-purple-400" />
-          <h3 className="text-xl font-bold text-white">Pattern Detection</h3>
+    <Card className="tradeiq-card flex flex-col h-full">
+      <div className="p-5 pb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Target className="h-5 w-5 text-purple-400" />
+            <h3 className="text-lg font-semibold text-white">Pattern Detection</h3>
+          </div>
+          <Badge variant="outline" className="text-xs text-tradeiq-blue border-tradeiq-blue/30">
+            TradingView
+          </Badge>
         </div>
-        <Badge variant="outline" className="text-xs text-tradeiq-blue border-tradeiq-blue/30">
-          TradingView Data
-        </Badge>
       </div>
 
-      <div className="space-y-4">
+      <div className="px-5 pb-5 space-y-3">
         {detectedPatterns.map((pattern, index) => (
-          <div key={index} className="p-4 bg-black/20 rounded-xl border border-gray-800/50">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-3">
+          <div key={index} className="p-3 bg-gray-900/40 rounded-lg border border-gray-800/50">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center space-x-2">
                 {pattern.confidence > 70 ? (
-                  <CheckCircle className="h-5 w-5 text-tradeiq-success" />
+                  <CheckCircle className="h-4 w-4 text-tradeiq-success" />
                 ) : (
-                  <AlertTriangle className="h-5 w-5 text-tradeiq-warning" />
+                  <AlertTriangle className="h-4 w-4 text-tradeiq-warning" />
                 )}
-                <span className="text-white font-semibold">{pattern.name}</span>
+                <span className="text-white font-medium text-sm">{pattern.name}</span>
               </div>
-              <Badge variant="outline" className={`border-gray-600 font-bold ${
+              <Badge variant="outline" className={`border-gray-600 font-medium text-xs ${
                 pattern.type === 'bullish' ? 'text-tradeiq-success border-tradeiq-success/30' : 
                 pattern.type === 'bearish' ? 'text-tradeiq-danger border-tradeiq-danger/30' :
                 'text-gray-400 border-gray-400/30'
@@ -97,20 +101,20 @@ export const PatternDetection = ({ asset }: PatternDetectionProps) => {
               </Badge>
             </div>
             
-            <p className="text-sm text-gray-400 mb-3">{pattern.description}</p>
+            <p className="text-xs text-gray-500 mb-2">{pattern.description}</p>
             
             <div className="flex items-center justify-between">
-              <span className="text-gray-400 text-sm">Confidence</span>
-              <div className="flex items-center space-x-3">
-                <div className="w-20 bg-gray-800 rounded-full h-2">
+              <span className="text-gray-500 text-xs">Confidence</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-16 bg-gray-800 rounded-full h-1.5">
                   <div 
-                    className={`h-2 rounded-full transition-all duration-500 ${
+                    className={`h-1.5 rounded-full transition-all duration-500 ${
                       pattern.confidence > 70 ? 'bg-tradeiq-success' : 'bg-tradeiq-warning'
                     }`}
                     style={{ width: `${pattern.confidence}%` }}
                   ></div>
                 </div>
-                <span className="text-white font-bold text-sm">{pattern.confidence.toFixed(0)}%</span>
+                <span className="text-white font-semibold text-xs">{pattern.confidence.toFixed(0)}%</span>
               </div>
             </div>
             

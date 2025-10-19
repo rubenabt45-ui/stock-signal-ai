@@ -40,14 +40,14 @@ export const SeasonalTrendsDividends = ({ asset }: SeasonalTrendsDividendsProps)
     <Card className="tradeiq-card flex flex-col h-full">
       <CardHeader>
         <CardTitle className="text-white">Seasonal Trends & Dividend Performance</CardTitle>
-        <p className="text-sm text-gray-400">
+        <p className="text-xs text-gray-400 mt-1">
           Year-over-year seasonal patterns and dividend distribution
         </p>
       </CardHeader>
       <CardContent className="flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
           {/* Seasonal Trends Chart */}
-          <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+          <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50">
             <h4 className="text-sm font-semibold text-white mb-4">Seasonal Trends</h4>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={seasonalData}>
@@ -108,7 +108,7 @@ export const SeasonalTrendsDividends = ({ asset }: SeasonalTrendsDividendsProps)
           </div>
 
           {/* Dividend Performance */}
-          <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+          <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50">
             <h4 className="text-sm font-semibold text-white mb-4">Dividends</h4>
             <div className="flex flex-col items-center justify-center h-[250px]">
               <ResponsiveContainer width="100%" height={180}>
