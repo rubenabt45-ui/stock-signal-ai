@@ -126,12 +126,12 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
                 {performanceData.map((perf) => (
                   <div
                     key={perf.period}
-                    className="bg-tradeiq-success/10 border border-tradeiq-success/30 rounded-md px-2 py-2.5 text-center min-h-[65px] flex flex-col justify-center items-center"
+                    className="bg-tradeiq-success/10 border border-tradeiq-success/30 rounded-md px-2 py-3 text-center min-h-[65px] flex flex-col justify-center items-center"
                   >
-                    <div className="text-[13px] font-bold text-tradeiq-success leading-tight whitespace-nowrap">
+                    <div className="text-xs font-bold text-tradeiq-success leading-tight whitespace-nowrap">
                       {perf.return > 0 ? '+' : ''}{perf.return}%
                     </div>
-                    <div className="text-[11px] text-gray-500 mt-1.5 font-medium">{perf.period}</div>
+                    <div className="text-[10px] text-gray-500 mt-1.5 font-medium">{perf.period}</div>
                   </div>
                 ))}
               </div>
