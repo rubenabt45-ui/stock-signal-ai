@@ -1,11 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, TrendingUp, DollarSign, Activity, BarChart3, Zap, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, TrendingUp, DollarSign, Activity, BarChart3, Zap, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { CategoryFilter } from '@/types/favorites';
 
 interface AssetSelectionProps {
@@ -89,48 +88,31 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({ onAssetSelect, s
         })}
       </div>
 
-      {/* Assets Carousel */}
-      <div className="relative px-12">
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          className="w-full"
-        >
-          <CarouselContent className="-ml-2 md:-ml-4">
-            {filteredAssets.map((symbol) => (
-              <CarouselItem key={symbol} className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4">
-                <Card
-                  className={`cursor-pointer transition-all hover:scale-105 ${
-                    selectedAsset === symbol 
-                      ? 'ring-2 ring-tradeiq-blue bg-tradeiq-blue/10' 
-                      : 'tradeiq-card hover:bg-gray-800/80'
-                  }`}
-                  onClick={() => handleSymbolClick(symbol)}
-                >
-                  <CardContent className="p-3 text-center">
-                    <div className="font-semibold text-white text-sm mb-1">
-                      {symbol}
-                    </div>
-                    <Badge 
-                      variant="secondary" 
-                      className="text-xs bg-gray-700 text-gray-300"
-                    >
-                      {selectedCategory}
-                    </Badge>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-gray-800 border-gray-600 hover:bg-gray-700 text-white">
-            <ChevronLeft className="h-4 w-4" />
-          </CarouselPrevious>
-          <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-gray-800 border-gray-600 hover:bg-gray-700 text-white">
-            <ChevronRight className="h-4 w-4" />
-          </CarouselNext>
-        </Carousel>
+      {/* Assets Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        {filteredAssets.map((symbol) => (
+          <Card
+            key={symbol}
+            className={`cursor-pointer transition-all hover:scale-105 ${
+              selectedAsset === symbol 
+                ? 'ring-2 ring-tradeiq-blue bg-tradeiq-blue/10' 
+                : 'tradeiq-card hover:bg-gray-800/80'
+            }`}
+            onClick={() => handleSymbolClick(symbol)}
+          >
+            <CardContent className="p-3 text-center">
+              <div className="font-semibold text-white text-sm mb-1">
+                {symbol}
+              </div>
+              <Badge 
+                variant="secondary" 
+                className="text-xs bg-gray-700 text-gray-300"
+              >
+                {selectedCategory}
+              </Badge>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {filteredAssets.length === 0 && searchTerm && (

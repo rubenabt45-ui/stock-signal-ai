@@ -55,8 +55,8 @@ const BottomNavigation = () => {
               to={item.path}
               className={`flex flex-col items-center space-y-1 px-2 sm:px-3 py-2 rounded-lg transition-colors min-h-[60px] min-w-[60px] flex-1 max-w-[80px] ${
                 isActive
-                  ? "bg-tradeiq-blue/10"
-                  : "hover:bg-gray-800/50"
+                  ? "text-tradeiq-blue bg-tradeiq-blue/10"
+                  : "text-gray-400 hover:text-gray-300"
               }`}
             >
               {item.icon === "dashboard" ? (
@@ -66,7 +66,7 @@ const BottomNavigation = () => {
                   className="h-4 w-4 sm:h-5 sm:w-5"
                   style={{
                     filter: isActive 
-                      ? 'brightness(0) saturate(100%) invert(56%) sepia(90%) saturate(1658%) hue-rotate(188deg) brightness(100%) contrast(101%)'
+                      ? 'brightness(0) saturate(100%) invert(55%) sepia(95%) saturate(2426%) hue-rotate(188deg) brightness(103%) contrast(101%)'
                       : 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                   }}
                 />
@@ -77,26 +77,14 @@ const BottomNavigation = () => {
                   className="h-4 w-4 sm:h-5 sm:w-5"
                   style={{
                     filter: isActive 
-                      ? 'brightness(0) saturate(100%) invert(56%) sepia(90%) saturate(1658%) hue-rotate(188deg) brightness(100%) contrast(101%)'
+                      ? 'brightness(0) saturate(100%) invert(55%) sepia(95%) saturate(2426%) hue-rotate(188deg) brightness(103%) contrast(101%)'
                       : 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                   }}
                 />
               ) : (
-                <item.icon 
-                  className="h-4 w-4 sm:h-5 sm:w-5" 
-                  style={{
-                    color: isActive ? 'hsl(217 91% 60%)' : undefined
-                  }}
-                />
+                <item.icon className="h-4 w-4 sm:h-5 sm:w-5" />
               )}
-              <span 
-                className="text-xs font-medium text-center leading-tight"
-                style={{
-                  color: isActive ? 'hsl(217 91% 60%)' : undefined
-                }}
-              >
-                {item.label}
-              </span>
+              <span className="text-xs font-medium text-center leading-tight">{item.label}</span>
             </Link>
           );
         })}
