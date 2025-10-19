@@ -123,25 +123,25 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
           </div>
 
           {/* Performance Returns - Now below the chart */}
-          <div className="bg-gray-900/40 rounded-lg p-5 border border-gray-800/50">
-            <h4 className="text-base font-semibold text-white mb-4">Returns</h4>
-            <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-3">
+          <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50 mt-3">
+            <h4 className="text-sm font-semibold text-white mb-3">Returns</h4>
+            <div className="space-y-3">
+              <div className="grid grid-cols-6 gap-2">
                 {performanceData.map((perf) => (
                   <div
                     key={perf.period}
-                    className="bg-tradeiq-success/10 border border-tradeiq-success/30 rounded-lg px-3 py-4 text-center min-h-[80px] flex flex-col justify-center items-center hover:bg-tradeiq-success/20 transition-all"
+                    className="bg-tradeiq-success/10 border border-tradeiq-success/30 rounded-lg px-2 py-2.5 text-center min-h-[60px] flex flex-col justify-center items-center hover:bg-tradeiq-success/20 transition-all"
                   >
-                    <div className="text-base font-bold text-tradeiq-success leading-tight whitespace-nowrap">
+                    <div className="text-sm font-bold text-tradeiq-success leading-tight whitespace-nowrap">
                       {perf.return > 0 ? '+' : ''}{perf.return}%
                     </div>
-                    <div className="text-xs text-gray-400 mt-2 font-medium">{perf.period}</div>
+                    <div className="text-[10px] text-gray-400 mt-1.5 font-medium">{perf.period}</div>
                   </div>
                 ))}
               </div>
               
-              <div className="pt-3 border-t border-gray-800/50">
-                <p className="text-sm text-gray-400 leading-relaxed">
+              <div className="pt-2 border-t border-gray-800/50">
+                <p className="text-xs text-gray-400 leading-relaxed">
                   Each percentage indicates how much the {asset} stock price has risen or fallen 
                   during that specific time period. Positive returns (green) show price appreciation.
                 </p>
