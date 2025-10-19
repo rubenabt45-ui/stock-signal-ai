@@ -87,13 +87,13 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({
       </div>
 
       {/* Assets Carousel */}
-      <div className="relative px-4 md:px-[5px] py-[4px]">
+      <div className="relative px-4 md:px-[5px] py-3">
         <Carousel opts={{
         align: "start",
         loop: true
       }} className="w-full">
-          <CarouselContent className="-ml-3 md:-ml-4">
-            {filteredAssets.map(symbol => <CarouselItem key={symbol} className="pl-3 md:pl-4 basis-2/5 sm:basis-1/3 md:basis-1/5 lg:basis-1/6">
+          <CarouselContent className="-ml-3 md:-ml-4 overflow-visible">
+            {filteredAssets.map(symbol => <CarouselItem key={symbol} className="pl-3 md:pl-4 basis-2/5 sm:basis-1/3 md:basis-1/5 lg:basis-1/6 py-2">
                 <Card className={`cursor-pointer transition-all hover:scale-105 ${selectedAsset === symbol ? 'ring-2 ring-tradeiq-blue bg-tradeiq-blue/10' : 'tradeiq-card hover:bg-gray-800/80'}`} onClick={() => handleSymbolClick(symbol)}>
                   <CardContent className="p-2 md:p-3 text-center py-[10px] px-[10px] my-0 mx-0">
                     <div className="font-semibold text-white text-xs md:text-sm mb-1">
