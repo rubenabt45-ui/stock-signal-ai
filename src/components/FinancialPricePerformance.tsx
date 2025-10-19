@@ -50,7 +50,7 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
               <h4 className="text-sm font-semibold text-white">Performance</h4>
               <Info className="h-3 w-3 text-gray-500" />
             </div>
-            <ResponsiveContainer width="100%" height={280}>
+            <ResponsiveContainer width="100%" height={320}>
               <ComposedChart data={financialData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis 
