@@ -96,7 +96,7 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({ onAssetSelect, s
       </div>
 
       {/* Assets Carousel */}
-      <div className="relative px-12">
+      <div className="relative px-3 md:px-6">
         <Carousel
           opts={{
             align: "start",
@@ -104,9 +104,9 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({ onAssetSelect, s
           }}
           className="w-full"
         >
-          <CarouselContent className="-ml-2 md:-ml-4">
+          <CarouselContent className="px-4 md:px-6">
             {filteredAssets.map((symbol) => (
-              <CarouselItem key={symbol} className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4">
+              <CarouselItem key={symbol} className="px-2 md:px-4 basis-1/2 sm:basis-1/3 md:basis-1/4">
                 <Card
                   className={`cursor-pointer transition-all hover:scale-105 ${
                     selectedAsset === symbol 
@@ -130,8 +130,8 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({ onAssetSelect, s
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="absolute -left-4 bg-gray-800 border-gray-600 hover:bg-gray-700" />
-          <CarouselNext className="absolute -right-4 bg-gray-800 border-gray-600 hover:bg-gray-700" />
+          <CarouselPrevious className="absolute left-2 md:left-3 bg-gray-800 border-gray-600 hover:bg-gray-700 z-10" />
+          <CarouselNext className="absolute right-2 md:right-3 bg-gray-800 border-gray-600 hover:bg-gray-700 z-10" />
         </Carousel>
       </div>
 
