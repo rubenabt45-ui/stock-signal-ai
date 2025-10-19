@@ -24,11 +24,9 @@ if (!rootElement) {
 }
 
 ReactDOM.createRoot(rootElement).render(
-  <React.StrictMode>
-    <AppProviders>
-      <App />
-    </AppProviders>
-  </React.StrictMode>
+  <AppProviders>
+    <App />
+  </AppProviders>
 );
 
 // Remove loader after React renders
