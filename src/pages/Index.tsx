@@ -81,7 +81,7 @@ const Index = () => {
                 <h3 className="text-xl font-bold text-white mb-2">Select Asset</h3>
                 <p className="text-gray-400">Choose a financial instrument to analyze</p>
               </div>
-              <AssetSelection selectedAsset={selectedAsset} onAssetSelect={setSelectedAsset} />
+              <AssetSelection selectedAsset={selectedAsset} onAssetSelect={setSelectedAsset} className="mx-px py-[19px]" />
             </div>
           </StaggerItem>
 
