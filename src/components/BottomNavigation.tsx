@@ -66,7 +66,7 @@ const BottomNavigation = () => {
                   className="h-4 w-4 sm:h-5 sm:w-5"
                   style={{
                     filter: isActive 
-                      ? 'brightness(0) saturate(100%) invert(55%) sepia(95%) saturate(2426%) hue-rotate(188deg) brightness(103%) contrast(101%)'
+                      ? 'brightness(0) saturate(100%) invert(56%) sepia(82%) saturate(1567%) hue-rotate(188deg) brightness(98%) contrast(101%)'
                       : 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                   }}
                 />
@@ -77,7 +77,7 @@ const BottomNavigation = () => {
                   className="h-4 w-4 sm:h-5 sm:w-5"
                   style={{
                     filter: isActive 
-                      ? 'brightness(0) saturate(100%) invert(55%) sepia(95%) saturate(2426%) hue-rotate(188deg) brightness(103%) contrast(101%)'
+                      ? 'brightness(0) saturate(100%) invert(56%) sepia(82%) saturate(1567%) hue-rotate(188deg) brightness(98%) contrast(101%)'
                       : 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                   }}
                 />
