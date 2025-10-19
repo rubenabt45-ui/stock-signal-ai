@@ -62,6 +62,7 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
                   yAxisId="left"
                   stroke="hsl(var(--muted-foreground))"
                   style={{ fontSize: '13px', fontWeight: '500' }}
+                  domain={[200, 400]}
                   label={{ value: 'B', angle: 0, position: 'top', offset: 10, style: { fill: 'hsl(var(--muted-foreground))', fontSize: '14px', fontWeight: 'bold' } }}
                 />
                 <YAxis 
@@ -69,6 +70,7 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
                   orientation="right"
                   stroke="hsl(var(--muted-foreground))"
                   style={{ fontSize: '13px', fontWeight: '500' }}
+                  domain={[19, 27]}
                   label={{ value: '%', angle: 0, position: 'top', offset: 10, style: { fill: 'hsl(var(--muted-foreground))', fontSize: '14px', fontWeight: 'bold' } }}
                 />
                 <Tooltip
