@@ -13,10 +13,10 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5",
         outline:
-          "border-2 border-slate-200 bg-white text-slate-900 rounded-xl shadow-md hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg hover:-translate-y-0.5",
+          "border-2 border-slate-200 bg-white text-slate-900 rounded-xl shadow-md hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg hover:-translate-y-0.5 dark:border-gray-600 dark:bg-gray-800/50 dark:text-white dark:hover:bg-gray-700",
         secondary:
           "bg-slate-100 text-slate-900 rounded-xl shadow-md hover:bg-slate-200 hover:shadow-lg hover:-translate-y-0.5",
-        ghost: "text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-xl",
+        ghost: "text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-xl dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white",
         link: "text-primary underline-offset-4 hover:underline",
         premium: "bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-800 hover:-translate-y-0.5",
       },

@@ -154,7 +154,7 @@ If any provision of this agreement is held to be unenforceable or invalid, such 
           <Button
             variant="outline"
             onClick={() => setOpenModal('terms')}
-            className="w-full justify-start border-gray-600 text-white hover:bg-gray-800"
+            className="w-full justify-start !border-gray-600 !bg-gray-800/50 !text-white hover:!bg-gray-700"
           >
             <FileText className="h-4 w-4 mr-2" />
             Terms and Conditions
@@ -163,7 +163,7 @@ If any provision of this agreement is held to be unenforceable or invalid, such 
           <Button
             variant="outline"
             onClick={() => setOpenModal('privacy')}
-            className="w-full justify-start border-gray-600 text-white hover:bg-gray-800"
+            className="w-full justify-start !border-gray-600 !bg-gray-800/50 !text-white hover:!bg-gray-700"
           >
             <Shield className="h-4 w-4 mr-2" />
             Privacy Policy
@@ -172,7 +172,7 @@ If any provision of this agreement is held to be unenforceable or invalid, such 
           <Button
             variant="outline"
             onClick={() => setOpenModal('license')}
-            className="w-full justify-start border-gray-600 text-white hover:bg-gray-800"
+            className="w-full justify-start !border-gray-600 !bg-gray-800/50 !text-white hover:!bg-gray-700"
           >
             <Award className="h-4 w-4 mr-2" />
             License Agreement

@@ -86,7 +86,7 @@ export const LogoutSection = () => {
               <Button
                 onClick={handleCancelLogout}
                 variant="outline"
-                className="flex-1 border-gray-600 text-white hover:bg-gray-800"
+                className="flex-1 !border-gray-600 !bg-gray-800/50 !text-white hover:!bg-gray-700"
                 disabled={isLoading}
               >
                 Cancel

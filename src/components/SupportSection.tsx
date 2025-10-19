@@ -65,7 +65,7 @@ Thank you for your assistance!
             <Button
               onClick={handleReportBug}
               variant="outline"
-              className="w-full border-gray-600 text-white hover:bg-gray-800"
+              className="w-full !border-gray-600 !bg-gray-800/50 !text-white hover:!bg-gray-700"
             >
               <Bug className="h-4 w-4 mr-2" />
               Report a Bug
