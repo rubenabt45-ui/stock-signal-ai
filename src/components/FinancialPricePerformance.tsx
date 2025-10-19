@@ -128,7 +128,7 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
                     key={perf.period}
                     className="bg-tradeiq-success/10 border border-tradeiq-success/30 rounded-md p-2.5 text-center"
                   >
-                    <div className="text-lg font-bold text-tradeiq-success">
+                    <div className="text-base font-bold text-tradeiq-success">
                       {perf.return > 0 ? '+' : ''}{perf.return}%
                     </div>
                     <div className="text-xs text-gray-500 mt-0.5">{perf.period}</div>
