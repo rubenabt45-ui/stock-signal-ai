@@ -56,20 +56,20 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
                 <XAxis 
                   dataKey="year" 
                   stroke="hsl(var(--muted-foreground))"
-                  style={{ fontSize: '12px' }}
+                  style={{ fontSize: '13px', fontWeight: '500' }}
                 />
                 <YAxis 
                   yAxisId="left"
                   stroke="hsl(var(--muted-foreground))"
-                  style={{ fontSize: '12px' }}
-                  label={{ value: 'B', angle: 0, position: 'top', offset: 10, style: { fill: 'hsl(var(--muted-foreground))' } }}
+                  style={{ fontSize: '13px', fontWeight: '500' }}
+                  label={{ value: 'B', angle: 0, position: 'top', offset: 10, style: { fill: 'hsl(var(--muted-foreground))', fontSize: '14px', fontWeight: 'bold' } }}
                 />
                 <YAxis 
                   yAxisId="right"
                   orientation="right"
                   stroke="hsl(var(--muted-foreground))"
-                  style={{ fontSize: '12px' }}
-                  label={{ value: '%', angle: 0, position: 'top', offset: 10, style: { fill: 'hsl(var(--muted-foreground))' } }}
+                  style={{ fontSize: '13px', fontWeight: '500' }}
+                  label={{ value: '%', angle: 0, position: 'top', offset: 10, style: { fill: 'hsl(var(--muted-foreground))', fontSize: '14px', fontWeight: 'bold' } }}
                 />
                 <Tooltip
                   contentStyle={{
@@ -97,22 +97,22 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
                   dataKey="revenue" 
                   fill="hsl(var(--tradeiq-blue))" 
                   radius={[4, 4, 0, 0]}
-                  maxBarSize={40}
+                  maxBarSize={60}
                 />
                 <Bar 
                   yAxisId="left"
                   dataKey="netRevenue" 
                   fill="hsl(var(--tradeiq-success))" 
                   radius={[4, 4, 0, 0]}
-                  maxBarSize={40}
+                  maxBarSize={60}
                 />
                 <Line 
                   yAxisId="right"
                   type="monotone" 
                   dataKey="netMargin" 
                   stroke="#fb923c" 
-                  strokeWidth={2}
-                  dot={{ fill: '#fb923c', r: 4 }}
+                  strokeWidth={3}
+                  dot={{ fill: '#fb923c', r: 5 }}
                 />
               </ComposedChart>
             </ResponsiveContainer>
