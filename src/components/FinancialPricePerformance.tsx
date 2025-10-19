@@ -42,15 +42,15 @@ export const FinancialPricePerformance = ({ asset }: FinancialPricePerformancePr
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+      <CardContent className="flex-1 overflow-y-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Financial Chart */}
           <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50">
             <div className="flex items-center gap-2 mb-4">
               <h4 className="text-sm font-semibold text-white">Performance</h4>
               <Info className="h-3 w-3 text-gray-500" />
             </div>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={280}>
               <ComposedChart data={financialData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis 

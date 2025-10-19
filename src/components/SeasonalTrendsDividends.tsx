@@ -44,12 +44,12 @@ export const SeasonalTrendsDividends = ({ asset }: SeasonalTrendsDividendsProps)
           Year-over-year seasonal patterns and dividend distribution
         </p>
       </CardHeader>
-      <CardContent className="flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+      <CardContent className="flex-1 overflow-y-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Seasonal Trends Chart */}
           <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50">
             <h4 className="text-sm font-semibold text-white mb-4">Seasonal Trends</h4>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={280}>
               <LineChart data={seasonalData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis 
@@ -110,8 +110,8 @@ export const SeasonalTrendsDividends = ({ asset }: SeasonalTrendsDividendsProps)
           {/* Dividend Performance */}
           <div className="bg-gray-900/40 rounded-lg p-4 border border-gray-800/50">
             <h4 className="text-sm font-semibold text-white mb-4">Dividends</h4>
-            <div className="flex flex-col items-center justify-center h-[250px]">
-              <ResponsiveContainer width="100%" height={180}>
+            <div className="flex flex-col items-center justify-center">
+              <ResponsiveContainer width="100%" height={160}>
                 <PieChart>
                   <Pie
                     data={dividendData}
@@ -135,36 +135,36 @@ export const SeasonalTrendsDividends = ({ asset }: SeasonalTrendsDividendsProps)
                   />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="text-center -mt-2">
-                <p className="text-2xl font-bold text-tradeiq-success">{dividendYield}%</p>
+              <div className="text-center">
+                <p className="text-xl font-bold text-tradeiq-success">{dividendYield}%</p>
                 <p className="text-xs text-gray-500">Dividend Payout Ratio (TTM)</p>
               </div>
             </div>
-            <div className="mt-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Retained Earnings</span>
+            <div className="mt-3 space-y-1.5 text-xs">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">Retained Earnings</span>
                 <span className="text-gray-400">●</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-tradeiq-success">Dividend Payout Ratio (TTM)</span>
                 <span className="text-tradeiq-success">●</span>
               </div>
-              <div className="h-px bg-gray-800 my-3"></div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Dividend Yield TTM</span>
+              <div className="h-px bg-gray-800/50 my-2"></div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">Dividend Yield TTM</span>
                 <span className="text-white font-semibold">{dividendDetails.yieldTTM}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Last Payment</span>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">Last Payment</span>
                 <span className="text-white font-semibold">{dividendDetails.lastPayment}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Ex-Dividend Date</span>
-                <span className="text-white font-semibold">{dividendDetails.exDividendDate}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">Ex-Dividend Date</span>
+                <span className="text-white font-semibold text-xs">{dividendDetails.exDividendDate}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Payment Date</span>
-                <span className="text-white font-semibold">{dividendDetails.paymentDate}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">Payment Date</span>
+                <span className="text-white font-semibold text-xs">{dividendDetails.paymentDate}</span>
               </div>
             </div>
           </div>
