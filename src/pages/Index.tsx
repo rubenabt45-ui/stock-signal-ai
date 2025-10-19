@@ -94,49 +94,49 @@ const Index = () => {
           <StaggerItem>
             <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
               <MotionWrapper delay={0.1}>
-                <div className="h-[480px] flex flex-col">
+                <div className="h-[600px] flex flex-col">
                   <SharpRatio asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
               <MotionWrapper delay={0.2}>
-                <div className="h-[480px] flex flex-col">
+                <div className="h-[600px] flex flex-col">
                   <TrendAnalysis asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
               <MotionWrapper delay={0.3}>
-                <div className="h-[480px] flex flex-col">
+                <div className="h-[600px] flex flex-col">
                   <FinancialPricePerformance asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
               <MotionWrapper delay={0.4}>
-                <div className="h-[480px] flex flex-col">
+                <div className="h-[600px] flex flex-col">
                   <SeasonalTrendsDividends asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
               <MotionWrapper delay={0.5}>
-                <div className="h-[480px] flex flex-col">
+                <div className="h-[600px] flex flex-col">
                   <VolatilityTechnicalIndicators asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
               <MotionWrapper delay={0.6}>
-                <div className="h-[480px] flex flex-col">
+                <div className="h-[600px] flex flex-col">
                   <PatternDetection asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
               <MotionWrapper delay={0.7}>
-                <div className="h-[480px] flex flex-col">
+                <div className="h-[600px] flex flex-col">
                   <AISuggestions asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
               <MotionWrapper delay={0.8}>
-                <div className="h-[480px] flex flex-col">
+                <div className="h-[600px] flex flex-col">
                   <CompanyProfile asset={selectedAsset} />
                 </div>
               </MotionWrapper>
