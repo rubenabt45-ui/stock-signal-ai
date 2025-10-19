@@ -94,7 +94,7 @@ const Index = () => {
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 auto-rows-fr">
               <MotionWrapper delay={0.1}>
                 <div className="min-h-[450px] h-full flex flex-col">
-                  <PatternDetection asset={selectedAsset} />
+                  <SharpRatio asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
@@ -106,37 +106,31 @@ const Index = () => {
               
               <MotionWrapper delay={0.3}>
                 <div className="min-h-[450px] h-full flex flex-col">
-                  <VolatilityAnalysis asset={selectedAsset} />
+                  <FinancialPricePerformance asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
               <MotionWrapper delay={0.4}>
                 <div className="min-h-[450px] h-full flex flex-col">
-                  <AISuggestions asset={selectedAsset} />
+                  <SeasonalTrendsDividends asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
               <MotionWrapper delay={0.5}>
                 <div className="min-h-[450px] h-full flex flex-col">
-                  <SharpRatio asset={selectedAsset} />
+                  <VolatilityTechnicalIndicators asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
               <MotionWrapper delay={0.6}>
                 <div className="min-h-[450px] h-full flex flex-col">
-                  <SeasonalTrendsDividends asset={selectedAsset} />
+                  <PatternDetection asset={selectedAsset} />
                 </div>
               </MotionWrapper>
               
               <MotionWrapper delay={0.7}>
                 <div className="min-h-[450px] h-full flex flex-col">
-                  <FinancialPricePerformance asset={selectedAsset} />
-                </div>
-              </MotionWrapper>
-              
-              <MotionWrapper delay={0.8}>
-                <div className="min-h-[450px] h-full flex flex-col">
-                  <VolatilityTechnicalIndicators asset={selectedAsset} />
+                  <AISuggestions asset={selectedAsset} />
                 </div>
               </MotionWrapper>
             </div>
