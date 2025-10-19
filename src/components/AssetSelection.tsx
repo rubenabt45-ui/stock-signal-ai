@@ -96,7 +96,7 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({ onAssetSelect, s
       </div>
 
       {/* Assets Carousel */}
-      <div className="relative px-3 md:px-6">
+      <div className="relative px-4 md:px-8">
         <Carousel
           opts={{
             align: "start",
@@ -104,9 +104,9 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({ onAssetSelect, s
           }}
           className="w-full"
         >
-          <CarouselContent className="px-4 md:px-6">
+          <CarouselContent className="-ml-3 md:-ml-4">
             {filteredAssets.map((symbol) => (
-              <CarouselItem key={symbol} className="px-2 md:px-4 basis-1/2 sm:basis-1/3 md:basis-1/4">
+              <CarouselItem key={symbol} className="pl-3 md:pl-4 basis-2/5 sm:basis-1/3 md:basis-1/5 lg:basis-1/6">
                 <Card
                   className={`cursor-pointer transition-all hover:scale-105 ${
                     selectedAsset === symbol 
@@ -115,8 +115,8 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({ onAssetSelect, s
                   }`}
                   onClick={() => handleSymbolClick(symbol)}
                 >
-                  <CardContent className="p-3 text-center">
-                    <div className="font-semibold text-white text-sm mb-1">
+                  <CardContent className="p-2 md:p-3 text-center">
+                    <div className="font-semibold text-white text-xs md:text-sm mb-1">
                       {symbol}
                     </div>
                     <Badge 
@@ -130,8 +130,8 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({ onAssetSelect, s
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="absolute left-2 md:left-3 bg-gray-800 border-gray-600 hover:bg-gray-700 z-10" />
-          <CarouselNext className="absolute right-2 md:right-3 bg-gray-800 border-gray-600 hover:bg-gray-700 z-10" />
+          <CarouselPrevious className="absolute left-2 md:left-3 bg-gray-800 border-gray-600 hover:bg-gray-700 z-10 h-8 w-8" />
+          <CarouselNext className="absolute right-2 md:right-3 bg-gray-800 border-gray-600 hover:bg-gray-700 z-10 h-8 w-8" />
         </Carousel>
       </div>
 
