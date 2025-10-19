@@ -6,6 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { CategoryFilter } from '@/types/favorites';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface AssetSelectionProps {
   onAssetSelect: (symbol: string) => void;
@@ -88,31 +95,44 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({ onAssetSelect, s
         })}
       </div>
 
-      {/* Assets Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-        {filteredAssets.map((symbol) => (
-          <Card
-            key={symbol}
-            className={`cursor-pointer transition-all hover:scale-105 ${
-              selectedAsset === symbol 
-                ? 'ring-2 ring-tradeiq-blue bg-tradeiq-blue/10' 
-                : 'tradeiq-card hover:bg-gray-800/80'
-            }`}
-            onClick={() => handleSymbolClick(symbol)}
-          >
-            <CardContent className="p-3 text-center">
-              <div className="font-semibold text-white text-sm mb-1">
-                {symbol}
-              </div>
-              <Badge 
-                variant="secondary" 
-                className="text-xs bg-gray-700 text-gray-300"
-              >
-                {selectedCategory}
-              </Badge>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Assets Carousel */}
+      <div className="relative px-12">
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {filteredAssets.map((symbol) => (
+              <CarouselItem key={symbol} className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4">
+                <Card
+                  className={`cursor-pointer transition-all hover:scale-105 ${
+                    selectedAsset === symbol 
+                      ? 'ring-2 ring-tradeiq-blue bg-tradeiq-blue/10' 
+                      : 'tradeiq-card hover:bg-gray-800/80'
+                  }`}
+                  onClick={() => handleSymbolClick(symbol)}
+                >
+                  <CardContent className="p-3 text-center">
+                    <div className="font-semibold text-white text-sm mb-1">
+                      {symbol}
+                    </div>
+                    <Badge 
+                      variant="secondary" 
+                      className="text-xs bg-gray-700 text-gray-300"
+                    >
+                      {selectedCategory}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="absolute -left-4 bg-gray-800 border-gray-600 hover:bg-gray-700" />
+          <CarouselNext className="absolute -right-4 bg-gray-800 border-gray-600 hover:bg-gray-700" />
+        </Carousel>
       </div>
 
       {filteredAssets.length === 0 && searchTerm && (
