@@ -39,11 +39,24 @@ const ResetPassword = () => {
 
   useEffect(() => {
     const validateTokenAndSession = async () => {
-      const accessToken = searchParams.get('access_token');
-      const refreshToken = searchParams.get('refresh_token');
-      const error = searchParams.get('error');
-      const errorDescription = searchParams.get('error_description');
-      const type = searchParams.get('type');
+      // Supabase appends tokens in the URL hash (#). Support both hash and query params.
+      const getParam = (key: string) => {
+        const hash = window.location.hash?.startsWith('#') ? window.location.hash.slice(1) : '';
+        const hashParams = new URLSearchParams(hash);
+        return hashParams.get(key) || searchParams.get(key);
+      };
+
+      const accessToken = getParam('access_token');
+      const refreshToken = getParam('refresh_token');
+      const error = getParam('error');
+      const errorDescription = getParam('error_description');
+      const type = getParam('type');
+
+      // Clean sensitive tokens from the URL bar immediately
+      if (window.location.hash) {
+        const cleanUrl = window.location.origin + window.location.pathname + window.location.search;
+        window.history.replaceState({}, document.title, cleanUrl);
+      }
       
       console.log('🔐 [PASSWORD_RESET] Reset password page loaded');
       console.log('🔐 [PASSWORD_RESET] URL parameters:', { 
