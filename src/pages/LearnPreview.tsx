@@ -46,7 +46,7 @@ const LearnPreview = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 text-center">
+      <section className="container mx-auto px-4 py-20 text-center bg-gradient-to-b from-transparent via-transparent to-gray-900/30">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center space-x-3 mb-6">
             <BookOpen className="h-12 w-12 text-tradeiq-blue" />
@@ -75,7 +75,7 @@ const LearnPreview = () => {
       </section>
 
       {/* Preview Content */}
-      <section className="py-20 bg-gray-900/50">
+      <section className="py-20 bg-gradient-to-b from-gray-900/30 via-gray-900/50 to-gray-900/30">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-16">What You'll Learn</h2>
           
@@ -201,7 +201,7 @@ const LearnPreview = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20">
+      <section className="py-20 bg-gradient-to-b from-gray-900/30 via-transparent to-transparent">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-4xl font-bold mb-6">Ready to Master Trading?</h2>
