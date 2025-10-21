@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Clock, TrendingUp, AlertCircle, Globe, RefreshCw, Newspaper, Search } from 'lucide-react';
+import { Clock, TrendingUp, AlertCircle, Globe, RefreshCw, Newspaper, Search, DollarSign, Zap, Activity, BarChart3 } from 'lucide-react';
 import { MotionWrapper, StaggerContainer, StaggerItem } from '@/components/ui/motion-wrapper';
 
 const News = () => {
@@ -157,20 +157,28 @@ const News = () => {
           </MotionWrapper>
         </header>
 
-        <div className="container mx-auto px-4 py-6 max-w-6xl">
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
           <StaggerContainer>
+
+          {/* Header Section */}
+          <StaggerItem>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-white mb-2">Filter News</h2>
+              <p className="text-gray-400">Find relevant financial news for your portfolio</p>
+            </div>
+          </StaggerItem>
 
           {/* Search Bar */}
           <StaggerItem>
             <div className="mb-6">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   type="text"
-                  placeholder="Search by stock symbol, title, or source..."
+                  placeholder="Search symbols..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-tradeiq-blue"
+                  className="h-14 pl-12 pr-4 text-lg bg-gray-900/50 border-gray-700 rounded-xl text-white placeholder:text-gray-500 focus:border-tradeiq-blue focus:ring-2 focus:ring-tradeiq-blue/20"
                 />
               </div>
             </div>
@@ -178,60 +186,96 @@ const News = () => {
 
           {/* Asset Categories */}
           <StaggerItem>
-            <div className="mb-6">
-              <h3 className="text-white font-semibold mb-3">Asset Categories</h3>
-              <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(selectedCategory === category ? '' : category)}
-                  className={selectedCategory === category ? "bg-tradeiq-blue hover:bg-tradeiq-blue/90" : ""}
-                >
-                  {category}
-                </Button>
-              ))}
+            <div className="mb-8">
+              <div className="flex flex-wrap gap-3">
+              {categories.map((category) => {
+                const isSelected = selectedCategory === category;
+                const getIcon = () => {
+                  switch(category) {
+                    case 'Stocks': return <TrendingUp className="h-4 w-4" />;
+                    case 'Crypto': return <DollarSign className="h-4 w-4" />;
+                    case 'Forex': return <Globe className="h-4 w-4" />;
+                    case 'Indices': return <BarChart3 className="h-4 w-4" />;
+                    case 'Commodities': return <Zap className="h-4 w-4" />;
+                    case 'ETFs': return <Activity className="h-4 w-4" />;
+                    default: return null;
+                  }
+                };
+                
+                return (
+                  <Button
+                    key={category}
+                    variant={isSelected ? "default" : "outline"}
+                    size="lg"
+                    onClick={() => setSelectedCategory(selectedCategory === category ? '' : category)}
+                    className={`gap-2 rounded-full px-6 transition-all ${
+                      isSelected 
+                        ? "bg-tradeiq-blue hover:bg-tradeiq-blue/90 text-white border-tradeiq-blue" 
+                        : "bg-transparent border-gray-700 text-gray-300 hover:bg-gray-800 hover:border-gray-600"
+                    }`}
+                  >
+                    {getIcon()}
+                    {category}
+                  </Button>
+                );
+              })}
             </div>
           </div>
         </StaggerItem>
 
-        {/* Market Sentiment */}
-        <StaggerItem>
-          <div className="mb-6">
-            <h3 className="text-white font-semibold mb-3">Market Sentiment</h3>
-            <div className="flex flex-wrap gap-2">
-              {sentiments.map((sentiment) => (
-                <Button
-                  key={sentiment}
-                  variant={selectedSentiment === sentiment ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedSentiment(selectedSentiment === sentiment ? '' : sentiment)}
-                  className={selectedSentiment === sentiment ? "bg-tradeiq-blue hover:bg-tradeiq-blue/90" : ""}
-                >
-                  {sentiment}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </StaggerItem>
-
-        {/* News Types */}
+        {/* Filters: Market Sentiment & News Types */}
         <StaggerItem>
           <div className="mb-8">
-            <h3 className="text-white font-semibold mb-3">News Types</h3>
-            <div className="flex flex-wrap gap-2">
-              {newsTypes.map((type) => (
-                <Button
-                  key={type}
-                  variant={selectedType === type ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedType(selectedType === type ? '' : type)}
-                  className={selectedType === type ? "bg-tradeiq-blue hover:bg-tradeiq-blue/90" : ""}
-                >
-                  {type}
-                </Button>
-              ))}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Market Sentiment */}
+              <div>
+                <label className="text-sm text-gray-400 mb-3 block">Market Sentiment</label>
+                <div className="flex flex-wrap gap-2">
+                  {sentiments.map((sentiment) => {
+                    const isSelected = selectedSentiment === sentiment;
+                    return (
+                      <Button
+                        key={sentiment}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedSentiment(selectedSentiment === sentiment ? '' : sentiment)}
+                        className={`rounded-full transition-all ${
+                          isSelected 
+                            ? "bg-tradeiq-blue/20 border-tradeiq-blue text-tradeiq-blue" 
+                            : "border-gray-700 text-gray-400 hover:bg-gray-800 hover:border-gray-600"
+                        }`}
+                      >
+                        {sentiment}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              {/* News Types */}
+              <div>
+                <label className="text-sm text-gray-400 mb-3 block">News Types</label>
+                <div className="flex flex-wrap gap-2">
+                  {newsTypes.map((type) => {
+                    const isSelected = selectedType === type;
+                    return (
+                      <Button
+                        key={type}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedType(selectedType === type ? '' : type)}
+                        className={`rounded-full transition-all ${
+                          isSelected 
+                            ? "bg-tradeiq-blue/20 border-tradeiq-blue text-tradeiq-blue" 
+                            : "border-gray-700 text-gray-400 hover:bg-gray-800 hover:border-gray-600"
+                        }`}
+                      >
+                        {type}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         </StaggerItem>
