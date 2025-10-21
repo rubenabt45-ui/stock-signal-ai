@@ -160,125 +160,121 @@ const News = () => {
         <div className="container mx-auto px-4 py-8 max-w-6xl">
           <StaggerContainer>
 
-          {/* Header Section */}
-          <StaggerItem>
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-white mb-2">Filter News</h2>
-              <p className="text-gray-400">Find relevant financial news for your portfolio</p>
-            </div>
-          </StaggerItem>
+          {/* Filter Section Card */}
+          <StaggerItem className="mb-8">
+            <div className="tradeiq-card p-6">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-white mb-2">Filter News</h3>
+                <p className="text-gray-400">Find relevant financial news for your portfolio</p>
+              </div>
 
-          {/* Search Bar */}
-          <StaggerItem>
-            <div className="mb-6">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Search symbols..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-14 pl-12 pr-4 text-lg bg-gray-900/50 border-gray-700 rounded-xl text-white placeholder:text-gray-500 focus:border-tradeiq-blue focus:ring-2 focus:ring-tradeiq-blue/20"
-                />
+              {/* Search Bar */}
+              <div className="mb-6">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Search symbols..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-14 pl-12 pr-4 text-lg bg-gray-900/50 border-gray-700 rounded-xl text-white placeholder:text-gray-500 focus:border-tradeiq-blue focus:ring-2 focus:ring-tradeiq-blue/20"
+                  />
+                </div>
+              </div>
+
+              {/* Asset Categories */}
+              <div className="mb-6">
+                <div className="flex flex-wrap gap-3">
+                {categories.map((category) => {
+                  const isSelected = selectedCategory === category;
+                  const getIcon = () => {
+                    switch(category) {
+                      case 'Stocks': return <TrendingUp className="h-4 w-4" />;
+                      case 'Crypto': return <DollarSign className="h-4 w-4" />;
+                      case 'Forex': return <Globe className="h-4 w-4" />;
+                      case 'Indices': return <BarChart3 className="h-4 w-4" />;
+                      case 'Commodities': return <Zap className="h-4 w-4" />;
+                      case 'ETFs': return <Activity className="h-4 w-4" />;
+                      default: return null;
+                    }
+                  };
+                  
+                  return (
+                    <Button
+                      key={category}
+                      variant={isSelected ? "default" : "outline"}
+                      size="lg"
+                      onClick={() => setSelectedCategory(selectedCategory === category ? '' : category)}
+                      className={`gap-2 rounded-full px-6 transition-all ${
+                        isSelected 
+                          ? "bg-tradeiq-blue hover:bg-tradeiq-blue/90 text-white border-tradeiq-blue" 
+                          : "bg-transparent border-gray-700 text-gray-300 hover:bg-gray-800 hover:border-gray-600"
+                      }`}
+                    >
+                      {getIcon()}
+                      {category}
+                    </Button>
+                  );
+                })}
               </div>
             </div>
-          </StaggerItem>
 
-          {/* Asset Categories */}
-          <StaggerItem>
-            <div className="mb-8">
-              <div className="flex flex-wrap gap-3">
-              {categories.map((category) => {
-                const isSelected = selectedCategory === category;
-                const getIcon = () => {
-                  switch(category) {
-                    case 'Stocks': return <TrendingUp className="h-4 w-4" />;
-                    case 'Crypto': return <DollarSign className="h-4 w-4" />;
-                    case 'Forex': return <Globe className="h-4 w-4" />;
-                    case 'Indices': return <BarChart3 className="h-4 w-4" />;
-                    case 'Commodities': return <Zap className="h-4 w-4" />;
-                    case 'ETFs': return <Activity className="h-4 w-4" />;
-                    default: return null;
-                  }
-                };
+            {/* Filters: Market Sentiment & News Types */}
+            <div>
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Market Sentiment */}
+                <div>
+                  <label className="text-sm text-gray-400 mb-3 block">Market Sentiment</label>
+                  <div className="flex flex-wrap gap-2">
+                    {sentiments.map((sentiment) => {
+                      const isSelected = selectedSentiment === sentiment;
+                      return (
+                        <Button
+                          key={sentiment}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedSentiment(selectedSentiment === sentiment ? '' : sentiment)}
+                          className={`rounded-full transition-all ${
+                            isSelected 
+                              ? "bg-tradeiq-blue/20 border-tradeiq-blue text-tradeiq-blue" 
+                              : "border-gray-700 text-gray-400 hover:bg-gray-800 hover:border-gray-600"
+                          }`}
+                        >
+                          {sentiment}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
                 
-                return (
-                  <Button
-                    key={category}
-                    variant={isSelected ? "default" : "outline"}
-                    size="lg"
-                    onClick={() => setSelectedCategory(selectedCategory === category ? '' : category)}
-                    className={`gap-2 rounded-full px-6 transition-all ${
-                      isSelected 
-                        ? "bg-tradeiq-blue hover:bg-tradeiq-blue/90 text-white border-tradeiq-blue" 
-                        : "bg-transparent border-gray-700 text-gray-300 hover:bg-gray-800 hover:border-gray-600"
-                    }`}
-                  >
-                    {getIcon()}
-                    {category}
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
-        </StaggerItem>
-
-        {/* Filters: Market Sentiment & News Types */}
-        <StaggerItem>
-          <div className="mb-8">
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Market Sentiment */}
-              <div>
-                <label className="text-sm text-gray-400 mb-3 block">Market Sentiment</label>
-                <div className="flex flex-wrap gap-2">
-                  {sentiments.map((sentiment) => {
-                    const isSelected = selectedSentiment === sentiment;
-                    return (
-                      <Button
-                        key={sentiment}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedSentiment(selectedSentiment === sentiment ? '' : sentiment)}
-                        className={`rounded-full transition-all ${
-                          isSelected 
-                            ? "bg-tradeiq-blue/20 border-tradeiq-blue text-tradeiq-blue" 
-                            : "border-gray-700 text-gray-400 hover:bg-gray-800 hover:border-gray-600"
-                        }`}
-                      >
-                        {sentiment}
-                      </Button>
-                    );
-                  })}
-                </div>
-              </div>
-              
-              {/* News Types */}
-              <div>
-                <label className="text-sm text-gray-400 mb-3 block">News Types</label>
-                <div className="flex flex-wrap gap-2">
-                  {newsTypes.map((type) => {
-                    const isSelected = selectedType === type;
-                    return (
-                      <Button
-                        key={type}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedType(selectedType === type ? '' : type)}
-                        className={`rounded-full transition-all ${
-                          isSelected 
-                            ? "bg-tradeiq-blue/20 border-tradeiq-blue text-tradeiq-blue" 
-                            : "border-gray-700 text-gray-400 hover:bg-gray-800 hover:border-gray-600"
-                        }`}
-                      >
-                        {type}
-                      </Button>
-                    );
-                  })}
+                {/* News Types */}
+                <div>
+                  <label className="text-sm text-gray-400 mb-3 block">News Types</label>
+                  <div className="flex flex-wrap gap-2">
+                    {newsTypes.map((type) => {
+                      const isSelected = selectedType === type;
+                      return (
+                        <Button
+                          key={type}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedType(selectedType === type ? '' : type)}
+                          className={`rounded-full transition-all ${
+                            isSelected 
+                              ? "bg-tradeiq-blue/20 border-tradeiq-blue text-tradeiq-blue" 
+                              : "border-gray-700 text-gray-400 hover:bg-gray-800 hover:border-gray-600"
+                          }`}
+                        >
+                          {type}
+                        </Button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </StaggerItem>
+            </div>
+          </StaggerItem>
 
         {/* Latest Financial News Section */}
         <StaggerItem>
