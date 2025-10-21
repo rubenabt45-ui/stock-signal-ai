@@ -407,30 +407,30 @@ const LandingContent = () => {
             <div>
               <h4 className="font-semibold mb-3 sm:mb-4 text-white">Company</h4>
               <div className="space-y-2">
-                <a href="#" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
+                <Link to="/about" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
                   About
-                </a>
-                <a href="#" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
+                </Link>
+                <Link to="/blog" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
                   Blog
-                </a>
-                <a href="#" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
+                </Link>
+                <Link to="/careers" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
                   Careers
-                </a>
+                </Link>
               </div>
             </div>
             
             <div>
               <h4 className="font-semibold mb-3 sm:mb-4 text-white">Legal</h4>
               <div className="space-y-2">
-                <a href="#" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
+                <Link to="/privacy-policy" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
                   Privacy Policy
-                </a>
-                <a href="#" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
+                </Link>
+                <Link to="/terms-of-service" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
                   Terms of Service
-                </a>
-                <a href="#" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
+                </Link>
+                <Link to="/cookie-policy" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
                   Cookie Policy
-                </a>
+                </Link>
               </div>
             </div>
           </div>
