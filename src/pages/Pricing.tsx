@@ -92,7 +92,7 @@ const Pricing = () => {
       </nav>
 
       {/* Header */}
-      <header className="border-b border-gray-800/50 bg-gray-900/30">
+      <header className="border-b border-gray-800/50 bg-gradient-to-b from-transparent via-gray-900/30 to-gray-900/50">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-3 mb-4">
@@ -107,7 +107,7 @@ const Pricing = () => {
       </header>
 
       {/* Content */}
-      <main className="container mx-auto px-4 py-12 pb-24">
+      <main className="container mx-auto px-4 py-12 pb-24 bg-gradient-to-b from-gray-900/50 via-transparent to-gray-900/30">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-white mb-4">
             Simple, Transparent Pricing
@@ -237,7 +237,7 @@ const Pricing = () => {
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-16 text-center">
+        <div className="mt-16 text-center bg-gradient-to-b from-gray-900/30 via-gray-900/20 to-transparent py-8 rounded-lg">
           <h3 className="text-2xl font-bold text-white mb-8">Frequently Asked Questions</h3>
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="text-left">
