@@ -101,7 +101,7 @@ const LandingContent = () => {
               <img 
                 src={tradeiqLogo} 
                 alt="TradeIQ Logo" 
-                className="h-12 sm:h-16 md:h-14 relative z-10 drop-shadow-[0_0_20px_rgba(59,130,246,0.6)] group-hover:drop-shadow-[0_0_35px_rgba(59,130,246,1)] transition-all duration-300 group-hover:scale-110 filter brightness-110" 
+                className="h-14 sm:h-18 md:h-16 relative z-10 drop-shadow-[0_0_20px_rgba(59,130,246,0.6)] group-hover:drop-shadow-[0_0_35px_rgba(59,130,246,1)] transition-all duration-300 group-hover:scale-110 filter brightness-110" 
               />
             </div>
           </Link>
