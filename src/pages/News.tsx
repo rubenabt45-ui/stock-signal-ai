@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { PageWrapper } from '@/components/PageWrapper';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, TrendingUp, AlertCircle, Globe, RefreshCw, Newspaper } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Clock, TrendingUp, AlertCircle, Globe, RefreshCw, Newspaper, Search } from 'lucide-react';
 import { MotionWrapper, StaggerContainer, StaggerItem } from '@/components/ui/motion-wrapper';
 
 const News = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('Stocks');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedSentiment, setSelectedSentiment] = useState<string>('');
   const [selectedType, setSelectedType] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const categories = ['Stocks', 'Crypto', 'Forex', 'Indices', 'ETFs', 'Commodities'];
   const sentiments = ['Bullish', 'Bearish', 'Neutral'];
@@ -89,6 +91,40 @@ const News = () => {
     console.log('Refreshing news...');
   };
 
+  // Filter news based on selected filters and search query
+  const filteredNews = useMemo(() => {
+    return mockNews.filter(news => {
+      // Filter by category
+      if (selectedCategory && news.category !== selectedCategory) {
+        return false;
+      }
+      
+      // Filter by sentiment
+      if (selectedSentiment && news.sentiment !== selectedSentiment) {
+        return false;
+      }
+      
+      // Filter by news type
+      if (selectedType && news.category !== selectedType) {
+        return false;
+      }
+      
+      // Filter by search query (searches in title, summary, and symbol)
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = 
+          news.title.toLowerCase().includes(query) ||
+          news.summary.toLowerCase().includes(query) ||
+          news.symbol.toLowerCase().includes(query) ||
+          news.source.toLowerCase().includes(query);
+        
+        if (!matchesSearch) return false;
+      }
+      
+      return true;
+    });
+  }, [selectedCategory, selectedSentiment, selectedType, searchQuery]);
+
   return (
     <PageWrapper pageName="News">
       <div className="min-h-screen bg-tradeiq-navy pb-20">
@@ -124,6 +160,22 @@ const News = () => {
         <div className="container mx-auto px-4 py-6 max-w-6xl">
           <StaggerContainer>
 
+          {/* Search Bar */}
+          <StaggerItem>
+            <div className="mb-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search by stock symbol, title, or source..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-tradeiq-blue"
+                />
+              </div>
+            </div>
+          </StaggerItem>
+
           {/* Asset Categories */}
           <StaggerItem>
             <div className="mb-6">
@@ -134,7 +186,7 @@ const News = () => {
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedCategory(category)}
+                  onClick={() => setSelectedCategory(selectedCategory === category ? '' : category)}
                   className={selectedCategory === category ? "bg-tradeiq-blue hover:bg-tradeiq-blue/90" : ""}
                 >
                   {category}
@@ -186,17 +238,23 @@ const News = () => {
 
         {/* Latest Financial News Section */}
         <StaggerItem>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-white">Latest Financial News</h2>
+          <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-bold text-white">Latest Financial News</h2>
+              <p className="text-sm text-gray-400 mt-1">
+                Showing {filteredNews.length} {filteredNews.length === 1 ? 'article' : 'articles'}
+              </p>
+            </div>
             <div className="flex items-center gap-2 text-green-400 text-sm">
               <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
               Auto-refresh every 15min
             </div>
           </div>
 
-          {/* News Grid */}
+          {/* News Grid or Empty State */}
+          {filteredNews.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {mockNews.map((news) => (
+            {filteredNews.map((news) => (
               <StaggerItem key={news.id}>
                 <Card className="tradeiq-card hover:border-tradeiq-blue/50 transition-all cursor-pointer group h-full">
                   <CardHeader className="pb-3">
@@ -267,6 +325,33 @@ const News = () => {
               </StaggerItem>
             ))}
           </div>
+          ) : (
+            <Card className="tradeiq-card">
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <div className="w-16 h-16 rounded-lg bg-gray-800/50 flex items-center justify-center mb-4">
+                  <Newspaper className="h-8 w-8 text-gray-600" />
+                </div>
+                <h3 className="text-white text-lg font-semibold mb-2">No News Found</h3>
+                <p className="text-gray-400 text-sm mb-6 text-center max-w-md">
+                  No articles match your current filters. Try adjusting your search or filter criteria.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedCategory('');
+                    setSelectedSentiment('');
+                    setSelectedType('');
+                    setSearchQuery('');
+                  }}
+                  className="gap-2"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Clear All Filters
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </StaggerItem>
       </StaggerContainer>
         </div>
