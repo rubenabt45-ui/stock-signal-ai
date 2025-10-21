@@ -187,14 +187,14 @@ const News = () => {
                 <div className="flex flex-wrap gap-3">
                 {categories.map((category) => {
                   const isSelected = selectedCategory === category;
-                  const getIcon = () => {
+                  const getIconWithColor = () => {
                     switch(category) {
-                      case 'Stocks': return <TrendingUp className="h-4 w-4" />;
-                      case 'Crypto': return <DollarSign className="h-4 w-4" />;
-                      case 'Forex': return <Globe className="h-4 w-4" />;
-                      case 'Indices': return <BarChart3 className="h-4 w-4" />;
-                      case 'Commodities': return <Zap className="h-4 w-4" />;
-                      case 'ETFs': return <Activity className="h-4 w-4" />;
+                      case 'Stocks': return <TrendingUp className="h-4 w-4 text-green-500" />;
+                      case 'Crypto': return <DollarSign className="h-4 w-4 text-orange-500" />;
+                      case 'Forex': return <Globe className="h-4 w-4 text-blue-500" />;
+                      case 'Indices': return <BarChart3 className="h-4 w-4 text-purple-500" />;
+                      case 'Commodities': return <Zap className="h-4 w-4 text-yellow-500" />;
+                      case 'ETFs': return <Activity className="h-4 w-4 text-cyan-500" />;
                       default: return null;
                     }
                   };
@@ -211,7 +211,7 @@ const News = () => {
                           : "bg-transparent border-gray-700 text-gray-300 hover:bg-gray-800 hover:border-gray-600"
                       }`}
                     >
-                      {getIcon()}
+                      {getIconWithColor()}
                       {category}
                     </Button>
                   );
