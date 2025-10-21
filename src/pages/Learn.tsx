@@ -51,6 +51,12 @@ const educationalArticles = [{
   icon: Shield,
   content: "Risk management is the foundation of successful trading. Learn about position sizing, stop losses...",
   category: "Free"
+}, {
+  title: "Trading Psychology Basics",
+  description: "Master your emotions and develop a winning trader mindset",
+  icon: Brain,
+  content: "Trading psychology is crucial for success. Learn to control fear, greed, and maintain discipline...",
+  category: "Free"
 }];
 
 // Pro-only resources
@@ -151,7 +157,7 @@ const Learn = () => {
           <StaggerItem>
             <section className="mb-8">
               <h3 className="text-xl font-bold text-white mb-6">Essential Trading Education</h3>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2">
               {educationalArticles.map((article, index) => {
               const IconComponent = article.icon;
               return <Card key={index} className="tradeiq-card hover:border-tradeiq-blue/50 transition-colors flex flex-col h-full">
