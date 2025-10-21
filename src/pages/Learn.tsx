@@ -89,6 +89,13 @@ const proResources = [{
   icon: Brain,
   category: "Pro",
   isPro: true
+}, {
+  id: 7,
+  title: "Algorithmic Trading Fundamentals",
+  description: "Learn the basics of automated trading systems and strategy development",
+  icon: PlayCircle,
+  category: "Pro",
+  isPro: true
 }];
 const Learn = () => {
   const {
@@ -244,7 +251,7 @@ const Learn = () => {
                   Unlock Pro
                 </Button>}
             </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2">
               {proResources.map((resource, index) => {
               const IconComponent = resource.icon;
               const isLocked = !isPro;
