@@ -30,6 +30,13 @@ const freeResources = [{
   pdfUrl: "https://drive.google.com/file/d/1vRQqtBzMx45ranZv7eR6Iu-PU_Gm5_1I/view?usp=drive_link",
   icon: Shield,
   category: "Free"
+}, {
+  id: 4,
+  title: "Market Analysis Guide",
+  description: "Learn how to analyze market trends, identify opportunities, and make informed trading decisions.",
+  pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view?usp=drive_link",
+  icon: TrendingUp,
+  category: "Free"
 }];
 
 // Educational articles for free users
@@ -193,7 +200,7 @@ const Learn = () => {
           <StaggerItem>
             <section className="mb-8">
               <h3 className="text-xl font-bold text-white mb-6">Free Trading Resources</h3>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2">
               {freeResources.map(resource => {
               const IconComponent = resource.icon;
               return <Card key={resource.id} className="tradeiq-card hover:border-tradeiq-blue/50 transition-colors flex flex-col h-full">
