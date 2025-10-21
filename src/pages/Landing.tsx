@@ -96,11 +96,12 @@ const LandingContent = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center group">
             <div className="relative">
-              <div className="absolute inset-0 bg-tradeiq-blue/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-tradeiq-blue/30 to-purple-500/30 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+              <div className="absolute inset-0 bg-tradeiq-blue/10 blur-xl rounded-full"></div>
               <img 
                 src={tradeiqLogo} 
                 alt="TradeIQ Logo" 
-                className="h-10 sm:h-12 relative z-10 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)] group-hover:drop-shadow-[0_0_25px_rgba(59,130,246,0.8)] transition-all duration-300 group-hover:scale-105" 
+                className="h-12 sm:h-16 md:h-14 relative z-10 drop-shadow-[0_0_20px_rgba(59,130,246,0.6)] group-hover:drop-shadow-[0_0_35px_rgba(59,130,246,1)] transition-all duration-300 group-hover:scale-110 filter brightness-110" 
               />
             </div>
           </Link>
