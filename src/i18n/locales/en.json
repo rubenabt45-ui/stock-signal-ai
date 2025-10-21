@@ -134,7 +134,7 @@
   "auth": {
     "login": {
       "title": "Log in",
-      "subtitle": "Sign in to your TradeIQ account",
+      "subtitle": "Log in to your TradeIQ account",
       "email": "Email",
       "password": "Password",
       "submit": "Sign In",
