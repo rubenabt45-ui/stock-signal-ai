@@ -177,7 +177,7 @@ const News = () => {
                     placeholder="Search symbols..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-14 pl-12 pr-4 text-lg bg-gray-900/50 border-gray-700 rounded-xl text-white placeholder:text-gray-500 focus:border-tradeiq-blue focus:ring-2 focus:ring-tradeiq-blue/20"
+                    className="h-14 pl-12 pr-4 text-lg bg-gray-900/50 border-gray-700 rounded-3xl text-white placeholder:text-gray-500 focus:border-tradeiq-blue focus:ring-2 focus:ring-tradeiq-blue/20"
                   />
                 </div>
               </div>

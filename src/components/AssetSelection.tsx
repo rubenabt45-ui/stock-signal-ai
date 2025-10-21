@@ -72,7 +72,7 @@ export const AssetSelection: React.FC<AssetSelectionProps> = ({
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-        <Input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Search symbols..." className="pl-10 bg-gray-800 border-gray-600 text-white" />
+        <Input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Search symbols..." className="pl-10 bg-gray-800 border-gray-600 text-white rounded-3xl" />
       </div>
 
       {/* Categories */}
