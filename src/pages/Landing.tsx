@@ -94,8 +94,15 @@ const LandingContent = () => {
       <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50 relative">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between relative z-10">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <img src={tradeiqLogo} alt="TradeIQ Logo" className="h-8 sm:h-10" />
+          <Link to="/" className="flex items-center group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-tradeiq-blue/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <img 
+                src={tradeiqLogo} 
+                alt="TradeIQ Logo" 
+                className="h-10 sm:h-12 relative z-10 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)] group-hover:drop-shadow-[0_0_25px_rgba(59,130,246,0.8)] transition-all duration-300 group-hover:scale-105" 
+              />
+            </div>
           </Link>
           
           {/* Desktop Navigation */}
