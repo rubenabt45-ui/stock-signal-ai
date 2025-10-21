@@ -151,7 +151,7 @@ const LandingContent = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-12 sm:py-16 lg:py-20 text-center">
+      <section className="container mx-auto px-4 py-12 sm:py-16 lg:py-20 text-center bg-gradient-to-b from-transparent via-transparent to-gray-900/30">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-tradeiq-blue to-white bg-clip-text text-transparent leading-relaxed py-2">
             {t('landing.hero.title')}
@@ -185,7 +185,7 @@ const LandingContent = () => {
       </section>
 
       {/* What is TradeIQ */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-gray-900/50">
+      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-b from-gray-900/30 via-gray-900/50 to-gray-900/30">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">{t('landing.about.title')}</h2>
@@ -197,7 +197,7 @@ const LandingContent = () => {
       </section>
 
       {/* Core Features */}
-      <section className="py-12 sm:py-16 lg:py-20">
+      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-b from-gray-900/30 via-transparent to-gray-900/30">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">{t('landing.features.title')}</h2>
           
@@ -262,7 +262,7 @@ const LandingContent = () => {
       </section>
 
       {/* Benefits */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-gray-900/50">
+      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-b from-gray-900/30 via-gray-900/50 to-gray-900/30">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">{t('landing.benefits.title')}</h2>
           
@@ -311,7 +311,7 @@ const LandingContent = () => {
       </section>
 
       {/* Learn Section Teaser */}
-      <section className="py-12 sm:py-16 lg:py-20">
+      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-b from-gray-900/30 via-transparent to-transparent">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8 sm:mb-12 lg:mb-16">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">{t('landing.learningSection.title')}</h2>
