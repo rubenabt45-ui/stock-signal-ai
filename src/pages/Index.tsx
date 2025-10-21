@@ -76,7 +76,7 @@ const Index = () => {
 
           {/* Asset Selection */}
           <StaggerItem className="mb-8">
-            <div className="tradeiq-card p-6">
+            <div className="tradeiq-card p-6 rounded-2xl">
               <div className="mb-6">
                 <h3 className="text-xl font-bold text-white mb-2">Select Asset</h3>
                 <p className="text-gray-400">Choose a financial instrument to analyze</p>
