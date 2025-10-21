@@ -1,8 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, MapPin, Briefcase } from 'lucide-react';
+import { Briefcase, MapPin, Clock, Rocket, Users, TrendingUp, Heart, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import tradeiqLogo from '@/assets/tradeiq-logo.png';
 
 const Careers = () => {
   const { t } = useTranslation();
@@ -29,94 +32,214 @@ const Careers = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="mb-8">
-          <Link to="/">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t('common.goBack')}
-            </Button>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+      {/* Navigation */}
+      <nav className="border-b border-gray-800/50 bg-black/20 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-tradeiq-blue/30 to-purple-500/30 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+              <div className="absolute inset-0 bg-tradeiq-blue/10 blur-xl rounded-full"></div>
+              <img 
+                src={tradeiqLogo} 
+                alt="TradeIQ Logo" 
+                className="h-14 sm:h-18 md:h-16 relative z-10 drop-shadow-[0_0_20px_rgba(59,130,246,0.6)] group-hover:drop-shadow-[0_0_35px_rgba(59,130,246,1)] transition-all duration-300 group-hover:scale-110 filter brightness-110" 
+              />
+            </div>
           </Link>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            {t('footer.careers')}
-          </h1>
-          <p className="text-muted-foreground">
-            Join our team and help shape the future of AI-powered trading
-          </p>
-        </div>
-
-        <section className="mb-8">
-          <h2 className="text-2xl font-semibold text-foreground mb-4">Why Work With Us?</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">Innovation First</h3>
-              <p className="text-muted-foreground">
-                Work on cutting-edge AI technology that's revolutionizing financial markets.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">Remote Flexibility</h3>
-              <p className="text-muted-foreground">
-                Work from anywhere with flexible hours and a results-focused culture.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">Growth Opportunities</h3>
-              <p className="text-muted-foreground">
-                Continuous learning and development with opportunities to advance your career.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">Competitive Benefits</h3>
-              <p className="text-muted-foreground">
-                Comprehensive health coverage, equity participation, and performance bonuses.
-              </p>
-            </div>
+          
+          <div className="md:hidden">
+            <Badge variant="secondary" className="text-xs">BETA</Badge>
           </div>
-        </section>
+          
+          <div className="hidden md:flex items-center space-x-6">
+            <Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
+            <Link to="/learn-preview" className="text-gray-300 hover:text-white transition-colors">Learn Preview</Link>
+            <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</Link>
+            <Link to="/app">
+              <Button variant="outline" size="sm">Platform</Button>
+            </Link>
+          </div>
 
-        <section>
-          <h2 className="text-2xl font-semibold text-foreground mb-6">Open Positions</h2>
+          <div className="md:hidden">
+            <Link to="/app">
+              <Button variant="outline" size="sm">Platform</Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Header */}
+      <header className="border-b border-gray-800/50 bg-gradient-to-b from-transparent via-gray-900/30 to-gray-900/50">
+        <div className="container mx-auto px-4 py-12">
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="flex items-center justify-center space-x-3 mb-4">
+              <Briefcase className="h-12 w-12 text-tradeiq-blue" />
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-tradeiq-blue to-white bg-clip-text text-transparent">
+                {t('footer.careers')}
+              </h1>
+            </div>
+            <p className="text-gray-400 text-lg">
+              Join our team and help shape the future of AI-powered trading
+            </p>
+          </div>
+        </div>
+      </header>
+
+      {/* Content */}
+      <main className="container mx-auto px-4 py-12 pb-24 bg-gradient-to-b from-gray-900/50 via-transparent to-gray-900/30">
+        <div className="max-w-4xl mx-auto space-y-8">
+          {/* Why Work With Us */}
           <div className="space-y-6">
-            {openings.map((job, index) => (
-              <div key={index} className="border border-border rounded-lg p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-foreground mb-2 md:mb-0">
-                    {job.title}
-                  </h3>
-                  <div className="flex gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      {job.location}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Briefcase className="h-4 w-4" />
-                      {job.type}
-                    </div>
+            <h2 className="text-3xl font-bold text-center text-white">Why Work With Us?</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="bg-gray-800/50 border-gray-700 hover:border-tradeiq-blue/50 transition-all duration-300">
+                <CardHeader>
+                  <div className="flex items-center mb-2">
+                    <Rocket className="h-6 w-6 text-tradeiq-blue mr-3" />
+                    <CardTitle className="text-white text-lg">Innovation First</CardTitle>
                   </div>
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  {job.description}
-                </p>
-                <Button variant="outline" size="sm">
-                  Apply Now
-                </Button>
-              </div>
-            ))}
-          </div>
-        </section>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-300">
+                    Work on cutting-edge AI technology that's revolutionizing financial markets.
+                  </CardDescription>
+                </CardContent>
+              </Card>
 
-        <div className="text-center mt-12 p-6 bg-muted/50 rounded-lg">
-          <h3 className="font-semibold text-foreground mb-2">Don't see a perfect fit?</h3>
-          <p className="text-muted-foreground mb-4">
-            We're always looking for talented individuals. Send us your resume at careers@tradeiqpro.com
-          </p>
-          <Button variant="outline">
-            Send Resume
-          </Button>
+              <Card className="bg-gray-800/50 border-gray-700 hover:border-tradeiq-blue/50 transition-all duration-300">
+                <CardHeader>
+                  <div className="flex items-center mb-2">
+                    <MapPin className="h-6 w-6 text-tradeiq-blue mr-3" />
+                    <CardTitle className="text-white text-lg">Remote Flexibility</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-300">
+                    Work from anywhere with flexible hours and a results-focused culture.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-800/50 border-gray-700 hover:border-tradeiq-blue/50 transition-all duration-300">
+                <CardHeader>
+                  <div className="flex items-center mb-2">
+                    <TrendingUp className="h-6 w-6 text-tradeiq-blue mr-3" />
+                    <CardTitle className="text-white text-lg">Growth Opportunities</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-300">
+                    Continuous learning and development with opportunities to advance your career.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-800/50 border-gray-700 hover:border-tradeiq-blue/50 transition-all duration-300">
+                <CardHeader>
+                  <div className="flex items-center mb-2">
+                    <Heart className="h-6 w-6 text-tradeiq-blue mr-3" />
+                    <CardTitle className="text-white text-lg">Competitive Benefits</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-300">
+                    Comprehensive health coverage, equity participation, and performance bonuses.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Open Positions */}
+          <div className="space-y-6">
+            <h2 className="text-3xl font-bold text-center text-white">Open Positions</h2>
+            <div className="space-y-6">
+              {openings.map((job, index) => (
+                <Card 
+                  key={index} 
+                  className="bg-gray-800/50 border-gray-700 hover:border-tradeiq-blue/50 transition-all duration-300"
+                >
+                  <CardHeader>
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <CardTitle className="text-white text-xl">
+                        {job.title}
+                      </CardTitle>
+                      <div className="flex gap-4 text-sm text-gray-400">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-tradeiq-blue" />
+                          <span>{job.location}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-tradeiq-blue" />
+                          <span>{job.type}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-gray-300 text-base mb-4">
+                      {job.description}
+                    </CardDescription>
+                    <Button 
+                      className="bg-tradeiq-blue hover:bg-tradeiq-blue/90 text-white"
+                    >
+                      Apply Now
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Don't See a Fit */}
+          <Card className="bg-gray-800/50 border-gray-700 hover:border-tradeiq-blue/50 transition-all duration-300 text-center">
+            <CardHeader>
+              <div className="flex items-center justify-center mb-2">
+                <Mail className="h-6 w-6 text-tradeiq-blue mr-3" />
+                <CardTitle className="text-white text-2xl">Don't see a perfect fit?</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-gray-300 text-base mb-4">
+                We're always looking for talented individuals. Send us your resume at{' '}
+                <a 
+                  href="mailto:careers@tradeiqpro.com" 
+                  className="text-tradeiq-blue hover:text-tradeiq-blue/80 transition-colors underline"
+                >
+                  careers@tradeiqpro.com
+                </a>
+              </CardDescription>
+              <Button 
+                variant="outline"
+                className="border-gray-600 hover:bg-gray-800"
+              >
+                Send Resume
+              </Button>
+            </CardContent>
+          </Card>
         </div>
-      </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-800/50 bg-black/20 backdrop-blur-sm py-8">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-xs text-gray-400 mb-2">
+            TradeIQ Pro is the premium version of TradeIQ. For more resources, visit{' '}
+            <a 
+              href="https://www.tradeiqpro.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-tradeiq-blue hover:underline"
+            >
+              www.tradeiqpro.com
+            </a>
+          </p>
+          <p className="text-xs text-gray-500">
+            © 2024 TradeIQ. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };
