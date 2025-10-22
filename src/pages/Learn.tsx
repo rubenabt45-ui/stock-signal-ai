@@ -84,7 +84,7 @@ const proResources = [{
 }, {
   id: 6,
   title: "Top Prompts For Chat",
-  description: "Best prompt examples to unlock the full potential of StrategyAI",
+  description: "Best prompt examples to unlock the full potential of the Chat",
   pdfUrl: "https://drive.google.com/uc?export=download&id=1FLs2YI_6U1-aY9e80PCe1nPMw_tn4nL8",
   icon: Brain,
   category: "Pro",
