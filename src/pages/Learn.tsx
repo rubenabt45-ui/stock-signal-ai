@@ -48,7 +48,7 @@ const educationalArticles = [{
   category: "Free"
 }, {
   title: "Pre-Trade Checklist",
-  description: "Understanding the most important chart type for traders",
+  description: "What Every Smart Trader Should Ask Before Clicking \"Buy\"",
   icon: PlayCircle,
   content: "Candlestick charts show four key price points: open, high, low, and close for each time period...",
   category: "Free"
