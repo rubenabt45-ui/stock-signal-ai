@@ -53,7 +53,7 @@ const educationalArticles = [{
   content: "Candlestick charts show four key price points: open, high, low, and close for each time period...",
   category: "Free"
 }, {
-  title: "Risk Management 101",
+  title: "Key Trading Terms",
   description: "Essential principles for protecting your trading capital",
   icon: Shield,
   content: "Risk management is the foundation of successful trading. Learn about position sizing, stop losses...",
