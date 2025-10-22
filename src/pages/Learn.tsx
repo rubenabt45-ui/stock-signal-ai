@@ -12,7 +12,7 @@ import { MotionWrapper, StaggerContainer, StaggerItem } from "@/components/ui/mo
 const freeResources = [{
   id: 1,
   title: "Cracking The Code",
-  description: "Avoid emotional decisions and improve your trade execution with this step-by-step checklist.",
+  description: "Read OHLC candles to quickly spot momentum and reversals, time entries/exits, and manage risk with context.",
   pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view?usp=drive_link",
   icon: FileText,
   category: "Free"
