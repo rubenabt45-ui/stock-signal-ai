@@ -69,7 +69,7 @@ const educationalArticles = [{
 // Pro-only resources
 const proResources = [{
   id: 4,
-  title: "Advanced Chart Patterns",
+  title: "What Is Your Investment Worth?",
   description: "Master complex patterns like head & shoulders, triangles, and harmonic patterns",
   icon: TrendingUp,
   category: "Pro",
