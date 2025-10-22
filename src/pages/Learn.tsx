@@ -44,25 +44,25 @@ const educationalArticles = [{
   title: "5 Trading Mistakes",
   description: "Learn the five costly errors—chasing price, over-leveraging, moving stops, revenge trades, and skipping risk rules—and how to avoid them.",
   icon: TrendingUp,
-  content: "Technical analysis is the study of price action and volume patterns to predict future market movements...",
+  pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view?usp=drive_link",
   category: "Free"
 }, {
   title: "Pre-Trade Checklist",
   description: "What Every Smart Trader Should Ask Before Clicking \"Buy\"",
   icon: PlayCircle,
-  content: "Candlestick charts show four key price points: open, high, low, and close for each time period...",
+  pdfUrl: "https://drive.google.com/file/d/1pq6HbxjebVUmEivUpZLM1MXk1XLncynW/view?usp=drive_link",
   category: "Free"
 }, {
   title: "Key Trading Terms",
   description: "Learn the trading basics in 60s: support, resistance, stop-loss, take-profit, risk-reward, breakout, trend, and liquidity. Save this post and check it before you trade.",
   icon: Shield,
-  content: "Risk management is the foundation of successful trading. Learn about position sizing, stop losses...",
+  pdfUrl: "https://drive.google.com/file/d/1vRQqtBzMx45ranZv7eR6Iu-PU_Gm5_1I/view?usp=drive_link",
   category: "Free"
 }, {
   title: "Introduction To Investment Management",
   description: "A fast primer on the investment universe—cash, fixed income, equities, alternatives, and digital assets—plus how funds/ETFs give you access.",
   icon: Brain,
-  content: "Trading psychology is crucial for success. Learn to control fear, greed, and maintain discipline...",
+  pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view?usp=drive_link",
   category: "Free"
 }];
 
@@ -192,9 +192,9 @@ const Learn = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="mt-auto">
-                      <Button className="tradeiq-button-primary w-full" onClick={() => {/* Could open a modal with article content */}}>
-                        <Book className="h-4 w-4 mr-2" />
-                        Read Article
+                      <Button className="tradeiq-button-primary w-full" onClick={() => window.open(article.pdfUrl, '_blank')}>
+                        <PlayCircle className="h-4 w-4 mr-2" />
+                        Watch Video
                       </Button>
                     </CardContent>
                   </Card>;
