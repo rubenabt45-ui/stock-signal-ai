@@ -76,7 +76,7 @@ const proResources = [{
   isPro: true
 }, {
   id: 5,
-  title: "Options Trading Strategies",
+  title: "Demystifying Quant Investing",
   description: "Comprehensive guide to options strategies for income and hedging",
   icon: Brain,
   category: "Pro",
