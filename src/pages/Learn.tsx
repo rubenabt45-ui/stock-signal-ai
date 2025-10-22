@@ -26,7 +26,7 @@ const freeResources = [{
 }, {
   id: 3,
   title: "Return, Risk & Diversification",
-  description: "Discover the most common pitfalls traders face and how to avoid them to become more consistent.",
+  description: "In minutes, learn how to estimate expected return, read core risk metrics, and build diversified portfolios that survive volatility.",
   pdfUrl: "https://drive.google.com/file/d/1vRQqtBzMx45ranZv7eR6Iu-PU_Gm5_1I/view?usp=drive_link",
   icon: Shield,
   category: "Free"
