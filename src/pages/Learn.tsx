@@ -92,7 +92,7 @@ const proResources = [{
 }, {
   id: 7,
   title: "Quantitative Management",
-  description: "Learn the basics of automated trading systems and strategy development",
+  description: "Quant investing made simple: philosophy, asset classes, derivatives, behavioral biases—and how rules, data, and signals (RoRo, factors) drive decisions. Educational, not advice.",
   icon: PlayCircle,
   category: "Pro",
   isPro: true
