@@ -25,7 +25,7 @@ const freeResources = [{
   category: "Free"
 }, {
   id: 3,
-  title: "Top 5 Trading Mistakes",
+  title: "Return, Risk & Diversification",
   description: "Discover the most common pitfalls traders face and how to avoid them to become more consistent.",
   pdfUrl: "https://drive.google.com/file/d/1vRQqtBzMx45ranZv7eR6Iu-PU_Gm5_1I/view?usp=drive_link",
   icon: Shield,
