@@ -58,7 +58,6 @@ const educationalArticles = [{
   title: "Introduction To Investment Management",
   description: "A fast primer on the investment universe—cash, fixed income, equities, alternatives, and digital assets—plus how funds/ETFs give you access.",
   icon: Brain,
-  pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view?usp=drive_link",
   category: "Free"
 }];
 
@@ -188,7 +187,11 @@ const Learn = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="mt-auto">
-                      <Button className="tradeiq-button-primary w-full" onClick={() => window.open(article.pdfUrl, '_blank')}>
+                      <Button 
+                        className="tradeiq-button-primary w-full" 
+                        onClick={() => article.pdfUrl && window.open(article.pdfUrl, '_blank')}
+                        disabled={!article.pdfUrl}
+                      >
                         <Book className="h-4 w-4 mr-2" />
                         Read Article
                       </Button>
