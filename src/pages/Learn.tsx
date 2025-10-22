@@ -19,7 +19,7 @@ const freeResources = [{
 }, {
   id: 2,
   title: "Visual Dictionary",
-  description: "Master essential trading terms with this visual guide to key concepts like support, resistance, RRR, and more.",
+  description: "Read OHLC candles to quickly spot momentum and reversals, time entries/exits, and manage risk with context.",
   pdfUrl: "https://drive.google.com/file/d/1pq6HbxjebVUmEivUpZLM1MXk1XLncynW/view?usp=drive_link",
   icon: Book,
   category: "Free"
