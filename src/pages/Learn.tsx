@@ -46,7 +46,7 @@ const educationalArticles = [{
   title: "Pre-Trade Checklist",
   description: "What Every Smart Trader Should Ask Before Clicking \"Buy\"",
   icon: PlayCircle,
-  pdfUrl: "https://drive.google.com/file/d/1pq6HbxjebVUmEivUpZLM1MXk1XLncynW/view?usp=drive_link",
+  pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view",
   category: "Free"
 }, {
   title: "Key Trading Terms",
