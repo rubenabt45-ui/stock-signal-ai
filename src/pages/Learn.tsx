@@ -91,7 +91,7 @@ const proResources = [{
   isPro: true
 }, {
   id: 7,
-  title: "Algorithmic Trading Fundamentals",
+  title: "Quantitative Management",
   description: "Learn the basics of automated trading systems and strategy development",
   icon: PlayCircle,
   category: "Pro",
