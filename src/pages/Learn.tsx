@@ -19,7 +19,7 @@ const freeResources = [{
 }, {
   id: 2,
   title: "The Truth About Fixed Income",
-  description: "Read OHLC candles to quickly spot momentum and reversals, time entries/exits, and manage risk with context.",
+  description: "Bonds made simple: yields, duration, credit risk, and a quick checklist to build smarter fixed-income positions.",
   pdfUrl: "https://drive.google.com/file/d/1pq6HbxjebVUmEivUpZLM1MXk1XLncynW/view?usp=drive_link",
   icon: Book,
   category: "Free"
