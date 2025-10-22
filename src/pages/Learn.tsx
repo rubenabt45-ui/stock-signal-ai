@@ -41,7 +41,7 @@ const freeResources = [{
 
 // Educational articles for free users
 const educationalArticles = [{
-  title: "Intro to Technical Analysis",
+  title: "5 Trading Mistakes",
   description: "Learn the fundamentals of chart reading and market analysis",
   icon: TrendingUp,
   content: "Technical analysis is the study of price action and volume patterns to predict future market movements...",
