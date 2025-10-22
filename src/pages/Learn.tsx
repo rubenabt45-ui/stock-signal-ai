@@ -52,7 +52,7 @@ const educationalArticles = [{
   title: "Key Trading Terms",
   description: "Learn the trading basics in 60s: support, resistance, stop-loss, take-profit, risk-reward, breakout, trend, and liquidity. Save this post and check it before you trade.",
   icon: Shield,
-  pdfUrl: "https://drive.google.com/file/d/1vRQqtBzMx45ranZv7eR6Iu-PU_Gm5_1I/view?usp=drive_link",
+  pdfUrl: "https://drive.google.com/file/d/1pq6HbxjebVUmEivUpZLM1MXk1XLncynW/view",
   category: "Free"
 }, {
   title: "Introduction To Investment Management",
