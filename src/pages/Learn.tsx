@@ -70,7 +70,7 @@ const educationalArticles = [{
 const proResources = [{
   id: 4,
   title: "What Is Your Investment Worth?",
-  description: "Master complex patterns like head & shoulders, triangles, and harmonic patterns",
+  description: "Buy, sell, or hold? I'll show you a simple, step-by-step way to evaluate your investment so you can act with confidence.",
   icon: TrendingUp,
   category: "Pro",
   isPro: true
