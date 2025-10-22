@@ -193,8 +193,8 @@ const Learn = () => {
                     </CardHeader>
                     <CardContent className="mt-auto">
                       <Button className="tradeiq-button-primary w-full" onClick={() => window.open(article.pdfUrl, '_blank')}>
-                        <PlayCircle className="h-4 w-4 mr-2" />
-                        Watch Video
+                        <Book className="h-4 w-4 mr-2" />
+                        Read Article
                       </Button>
                     </CardContent>
                   </Card>;
