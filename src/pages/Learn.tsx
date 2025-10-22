@@ -77,7 +77,7 @@ const proResources = [{
 }, {
   id: 5,
   title: "Demystifying Quant Investing",
-  description: "Comprehensive guide to options strategies for income and hedging",
+  description: "How data, rules, and algorithms turn market signals into repeatable decisions—without guessing the future.",
   icon: Brain,
   category: "Pro",
   isPro: true
