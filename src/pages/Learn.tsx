@@ -40,7 +40,7 @@ const educationalArticles = [{
   title: "5 Trading Mistakes",
   description: "Learn the five costly errors—chasing price, over-leveraging, moving stops, revenge trades, and skipping risk rules—and how to avoid them.",
   icon: TrendingUp,
-  pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view?usp=drive_link",
+  pdfUrl: "https://drive.google.com/file/d/1vRQqtBzMx45ranZv7eR6Iu-PU_Gm5_1I/view",
   category: "Free"
 }, {
   title: "Pre-Trade Checklist",
