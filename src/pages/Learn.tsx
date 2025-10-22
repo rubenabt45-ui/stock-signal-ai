@@ -13,28 +13,24 @@ const freeResources = [{
   id: 1,
   title: "Cracking The Code",
   description: "Read OHLC candles to quickly spot momentum and reversals, time entries/exits, and manage risk with context.",
-  pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view?usp=drive_link",
   icon: FileText,
   category: "Free"
 }, {
   id: 2,
   title: "The Truth About Fixed Income",
   description: "Bonds made simple: yields, duration, credit risk, and a quick checklist to build smarter fixed-income positions.",
-  pdfUrl: "https://drive.google.com/file/d/1pq6HbxjebVUmEivUpZLM1MXk1XLncynW/view?usp=drive_link",
   icon: Book,
   category: "Free"
 }, {
   id: 3,
   title: "Return, Risk & Diversification",
   description: "In minutes, learn how to estimate expected return, read core risk metrics, and build diversified portfolios that survive volatility.",
-  pdfUrl: "https://drive.google.com/file/d/1vRQqtBzMx45ranZv7eR6Iu-PU_Gm5_1I/view?usp=drive_link",
   icon: Shield,
   category: "Free"
 }, {
   id: 4,
   title: "Market Analysis Guide",
   description: "Learn how to analyze market trends, identify opportunities, and make informed trading decisions.",
-  pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view?usp=drive_link",
   icon: TrendingUp,
   category: "Free"
 }];
@@ -228,7 +224,7 @@ const Learn = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="mt-auto">
-                      <Button className="tradeiq-button-primary w-full" onClick={() => window.open(resource.pdfUrl, '_blank')}>
+                      <Button className="tradeiq-button-primary w-full" disabled>
                         <PlayCircle className="h-4 w-4 mr-2" />
                         Watch Video
                       </Button>
