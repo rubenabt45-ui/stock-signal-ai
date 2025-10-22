@@ -18,7 +18,7 @@ const freeResources = [{
   category: "Free"
 }, {
   id: 2,
-  title: "Visual Dictionary",
+  title: "What Is Your Investment Worth?",
   description: "Read OHLC candles to quickly spot momentum and reversals, time entries/exits, and manage risk with context.",
   pdfUrl: "https://drive.google.com/file/d/1pq6HbxjebVUmEivUpZLM1MXk1XLncynW/view?usp=drive_link",
   icon: Book,
