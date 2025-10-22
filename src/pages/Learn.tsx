@@ -42,7 +42,7 @@ const freeResources = [{
 // Educational articles for free users
 const educationalArticles = [{
   title: "5 Trading Mistakes",
-  description: "Learn the fundamentals of chart reading and market analysis",
+  description: "Learn the five costly errors—chasing price, over-leveraging, moving stops, revenge trades, and skipping risk rules—and how to avoid them.",
   icon: TrendingUp,
   content: "Technical analysis is the study of price action and volume patterns to predict future market movements...",
   category: "Free"
