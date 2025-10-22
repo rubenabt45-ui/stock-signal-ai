@@ -11,7 +11,7 @@ import { MotionWrapper, StaggerContainer, StaggerItem } from "@/components/ui/mo
 // Free educational resources - always available
 const freeResources = [{
   id: 1,
-  title: "Pre-Trade Checklist",
+  title: "Cracking The Code",
   description: "Avoid emotional decisions and improve your trade execution with this step-by-step checklist.",
   pdfUrl: "https://drive.google.com/file/d/1MwpjU5I5JWF-q6ZfFiB4J2UdwutV3YKD/view?usp=drive_link",
   icon: FileText,
