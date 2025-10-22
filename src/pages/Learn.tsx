@@ -47,7 +47,7 @@ const educationalArticles = [{
   content: "Technical analysis is the study of price action and volume patterns to predict future market movements...",
   category: "Free"
 }, {
-  title: "How to Read Candlestick Charts",
+  title: "Pre-Trade Checklist",
   description: "Understanding the most important chart type for traders",
   icon: PlayCircle,
   content: "Candlestick charts show four key price points: open, high, low, and close for each time period...",
