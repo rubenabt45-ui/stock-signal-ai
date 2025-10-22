@@ -54,7 +54,7 @@ const educationalArticles = [{
   category: "Free"
 }, {
   title: "Key Trading Terms",
-  description: "Essential principles for protecting your trading capital",
+  description: "Learn the trading basics in 60s: support, resistance, stop-loss, take-profit, risk-reward, breakout, trend, and liquidity. Save this post and check it before you trade.",
   icon: Shield,
   content: "Risk management is the foundation of successful trading. Learn about position sizing, stop losses...",
   category: "Free"
