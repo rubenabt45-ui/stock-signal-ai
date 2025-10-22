@@ -229,7 +229,7 @@ const Learn = () => {
                     </CardHeader>
                     <CardContent className="mt-auto">
                       <Button className="tradeiq-button-primary w-full" onClick={() => window.open(resource.pdfUrl, '_blank')}>
-                        <FileText className="h-4 w-4 mr-2" />
+                        <PlayCircle className="h-4 w-4 mr-2" />
                         Watch Video
                       </Button>
                     </CardContent>
