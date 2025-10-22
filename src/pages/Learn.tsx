@@ -60,7 +60,7 @@ const educationalArticles = [{
   category: "Free"
 }, {
   title: "Introduction To Investment Management",
-  description: "Master your emotions and develop a winning trader mindset",
+  description: "A fast primer on the investment universe—cash, fixed income, equities, alternatives, and digital assets—plus how funds/ETFs give you access.",
   icon: Brain,
   content: "Trading psychology is crucial for success. Learn to control fear, greed, and maintain discipline...",
   category: "Free"
