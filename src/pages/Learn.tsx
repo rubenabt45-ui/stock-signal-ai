@@ -59,7 +59,7 @@ const educationalArticles = [{
   content: "Risk management is the foundation of successful trading. Learn about position sizing, stop losses...",
   category: "Free"
 }, {
-  title: "Trading Psychology Basics",
+  title: "Introduction To Investment Management",
   description: "Master your emotions and develop a winning trader mindset",
   icon: Brain,
   content: "Trading psychology is crucial for success. Learn to control fear, greed, and maintain discipline...",
