@@ -49,10 +49,6 @@ const FooterContent = () => {
       name: t('footer.blog'),
       path: '/blog',
       ariaLabel: 'Navigate to Blog'
-    }, {
-      name: t('footer.careers'),
-      path: '/careers',
-      ariaLabel: 'Navigate to Careers'
     }]
   }];
   return <footer className="border-t border-border bg-background/50 backdrop-blur-sm py-8 px-4">

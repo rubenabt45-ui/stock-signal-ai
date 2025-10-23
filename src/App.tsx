@@ -93,7 +93,6 @@ const TermsOfService = lazy(() => retryLazyImport(() => import("./pages/TermsOfS
 const CookiePolicy = lazy(() => retryLazyImport(() => import("./pages/CookiePolicy")));
 const About = lazy(() => retryLazyImport(() => import("./pages/About")));
 const Blog = lazy(() => retryLazyImport(() => import("./pages/Blog")));
-const Careers = lazy(() => retryLazyImport(() => import("./pages/Careers")));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -134,7 +133,6 @@ const App = () => {
               <Route path="/cookie-policy" element={<CookiePolicy />} />
               <Route path="/about" element={<About />} />
               <Route path="/blog" element={<Blog />} />
-              <Route path="/careers" element={<Careers />} />
               
               {/* AUTHENTICATION ROUTES */}
               <Route path="/login" element={
