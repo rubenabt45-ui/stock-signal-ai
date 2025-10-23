@@ -53,12 +53,20 @@ const TradingChat: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
-      behavior: 'smooth'
+      behavior: 'smooth',
+      block: 'end'
     });
   };
+  
+  // Scroll to bottom when messages change or when loading finishes
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    // Small delay to ensure DOM has updated
+    const timeoutId = setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [messages, isLoading]);
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -182,8 +190,8 @@ const TradingChat: React.FC = () => {
             </div>}
         </MotionWrapper>}
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto pb-32 md:pb-24">
+      {/* Messages Container - Scrollable */}
+      <div className="flex-1 overflow-y-auto pb-32 md:pb-24" style={{ height: 'calc(100vh - 200px)' }}>
         <div className="max-w-4xl mx-auto p-4 space-y-4">
           {messages.length === 0 && <MotionWrapper animation="scale" delay={0.2}>
               <Card className="tradeiq-card">
