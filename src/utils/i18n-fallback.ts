@@ -225,7 +225,6 @@ export const TRANSLATION_FALLBACKS: Record<string, string> = {
   'footer.company': 'Company',
   'footer.about': 'About',
   'footer.blog': 'Blog',
-  'footer.careers': 'Careers',
   'footer.description': 'AI-powered trading insights and analysis platform',
   'footer.rights': 'All rights reserved'
 };

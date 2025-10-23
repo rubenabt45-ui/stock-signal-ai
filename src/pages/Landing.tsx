@@ -413,9 +413,6 @@ const LandingContent = () => {
                 <Link to="/blog" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
                   Blog
                 </Link>
-                <Link to="/careers" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
-                  Careers
-                </Link>
               </div>
             </div>
             
