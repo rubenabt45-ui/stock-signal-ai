@@ -391,7 +391,7 @@ const LandingContent = () => {
             
             <div>
               <h4 className="font-semibold mb-3 sm:mb-4 text-white">Platform</h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <button onClick={handleAppClick} className="block text-gray-400 hover:text-white text-sm transition-colors text-left min-h-[44px] flex items-center">
                   Trading Dashboard
                 </button>
@@ -406,7 +406,7 @@ const LandingContent = () => {
             
             <div>
               <h4 className="font-semibold mb-3 sm:mb-4 text-white">Company</h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Link to="/about" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
                   About
                 </Link>
@@ -418,7 +418,7 @@ const LandingContent = () => {
             
             <div>
               <h4 className="font-semibold mb-3 sm:mb-4 text-white">Legal</h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Link to="/privacy-policy" className="block text-gray-400 hover:text-white text-sm transition-colors min-h-[44px] flex items-center">
                   Privacy Policy
                 </Link>

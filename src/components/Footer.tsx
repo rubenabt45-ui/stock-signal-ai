@@ -57,9 +57,9 @@ const FooterContent = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {footerLinks.map((section, index) => <div key={index} className="space-y-4">
               
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {section.links.map((link, linkIndex) => <li key={linkIndex}>
-                    <Link to={link.path} aria-label={link.ariaLabel} onClick={() => handleLinkClick(link.name, link.path)} className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded px-1 py-0.5">
+                    <Link to={link.path} aria-label={link.ariaLabel} onClick={() => handleLinkClick(link.name, link.path)} className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded px-1 py-0.5 inline-flex items-center min-h-[44px]">
                       {link.name}
                     </Link>
                   </li>)}
