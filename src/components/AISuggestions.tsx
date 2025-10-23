@@ -44,10 +44,9 @@ const generateAISuggestions = (price: number, change: number, asset: string) => 
       title: "Strong Bullish Momentum",
       description: `${asset} shows strong upward momentum (+${change.toFixed(2)}%). Consider entering long positions with proper risk management.`,
       details: {
-        entry: `$${(price * 1.01).toFixed(2)} - $${(price * 1.02).toFixed(2)}`,
+        entry: `$${(price * 1.01).toFixed(2)}`,
         target: `$${(price * 1.08).toFixed(2)}`,
         stopLoss: `$${(price * 0.97).toFixed(2)}`,
-        timeframe: "4H - 1D",
         riskReward: "1:2.5"
       },
       confidence: 85,
@@ -61,10 +60,9 @@ const generateAISuggestions = (price: number, change: number, asset: string) => 
       title: "Downward Pressure Detected",
       description: `${asset} experiencing significant decline (${change.toFixed(2)}%). Wait for support or consider short positions.`,
       details: {
-        entry: `$${(price * 0.99).toFixed(2)} - $${(price * 0.98).toFixed(2)}`,
+        entry: `$${(price * 0.99).toFixed(2)}`,
         target: `$${(price * 0.92).toFixed(2)}`,
         stopLoss: `$${(price * 1.03).toFixed(2)}`,
-        timeframe: "4H - 1D",
         riskReward: "1:2.3"
       },
       confidence: 82,
@@ -76,13 +74,10 @@ const generateAISuggestions = (price: number, change: number, asset: string) => 
       priority: "medium",
       action: "Wait for Breakout",
       title: "Consolidation Phase",
-      description: `${asset} trading in narrow range. Wait for clear breakout before entering positions.`,
+      description: `${asset} trading in narrow range. Wait for clear breakout before entering.`,
       details: {
         resistanceBreak: `$${(price * 1.03).toFixed(2)}`,
         supportBreak: `$${(price * 0.97).toFixed(2)}`,
-        currentRange: `$${(price * 0.98).toFixed(2)} - $${(price * 1.02).toFixed(2)}`,
-        timeframe: "1D",
-        strategy: "Breakout Trading"
       },
       confidence: 78,
       icon: <AlertTriangle className="h-5 w-5 text-tradeiq-warning" />
@@ -99,11 +94,10 @@ const generateAISuggestions = (price: number, change: number, asset: string) => 
   suggestions.push({
     type: "strategy",
     title: `Recommended: ${suitableStrategy.name}`,
-    description: `Based on current market conditions (${marketCondition}, ${volatility} volatility), ${suitableStrategy.name.toLowerCase()} may be effective.`,
+    description: `Based on current conditions (${marketCondition}, ${volatility} volatility).`,
     details: {
       risk: suitableStrategy.risk,
-      suitable: suitableStrategy.suitable,
-      timeframe: changePercent > 2 ? "Short-term (4H-1D)" : "Medium-term (1D-1W)"
+      timeframe: changePercent > 2 ? "4H-1D" : "1D-1W"
     },
     confidence: 80,
     icon: <Lightbulb className="h-5 w-5 text-yellow-400" />
@@ -111,7 +105,6 @@ const generateAISuggestions = (price: number, change: number, asset: string) => 
 
   // Risk Management Insight
   const randomTip = riskTips[Math.floor(Math.random() * riskTips.length)];
-  const suggestedRisk = (price * 0.02).toFixed(2); // 2% risk example
   
   suggestions.push({
     type: "risk",
@@ -119,9 +112,7 @@ const generateAISuggestions = (price: number, change: number, asset: string) => 
     description: randomTip,
     details: {
       maxRisk: "2% per trade",
-      positionSize: `Max $${(price * 10).toFixed(2)} exposure`,
-      stopLossDistance: "3-5% from entry",
-      riskAmount: `~$${suggestedRisk} max loss`
+      stopDistance: "3-5% from entry"
     },
     confidence: 95,
     icon: <Shield className="h-5 w-5 text-tradeiq-blue" />
@@ -138,10 +129,7 @@ const generateAISuggestions = (price: number, change: number, asset: string) => 
     details: {
       trend: marketCondition,
       strength: sentimentStrength,
-      volatility: volatility,
-      recommendation: sentiment === "Positive" ? "Look for entries on pullbacks" : 
-                     sentiment === "Negative" ? "Wait for reversal signals" :
-                     "Monitor for breakout direction"
+      volatility: volatility
     },
     confidence: 88,
     icon: <BarChart3 className="h-5 w-5 text-purple-400" />
@@ -247,47 +235,35 @@ export const AISuggestions = ({ asset }: AISuggestionsProps) => {
                 {/* Recommendation Type Details */}
                 {suggestion.type === 'recommendation' && (
                   <>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
-                        <div className="flex items-center space-x-1 mb-1">
-                          <Target className="h-3 w-3 text-tradeiq-blue" />
-                          <span className="text-[10px] text-gray-500">ENTRY ZONE</span>
-                        </div>
+                        <div className="text-[10px] text-gray-500 mb-1">ENTRY</div>
                         <div className="text-xs font-semibold text-white">
                           {suggestion.details.entry}
                         </div>
                       </div>
                       <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
-                        <div className="flex items-center space-x-1 mb-1">
-                          <Clock className="h-3 w-3 text-gray-400" />
-                          <span className="text-[10px] text-gray-500">TIMEFRAME</span>
-                        </div>
-                        <div className="text-xs font-semibold text-white">
-                          {suggestion.details.timeframe}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="bg-gray-800/20 rounded-lg p-2 border border-gray-700/50">
                         <div className="text-[10px] text-gray-500 mb-1">TARGET</div>
                         <div className="text-xs font-bold text-tradeiq-success">
                           {suggestion.details.target}
                         </div>
                       </div>
-                      <div className="bg-gray-800/20 rounded-lg p-2 border border-gray-700/50">
-                        <div className="text-[10px] text-gray-500 mb-1">STOP LOSS</div>
+                      <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
+                        <div className="text-[10px] text-gray-500 mb-1">STOP</div>
                         <div className="text-xs font-bold text-tradeiq-danger">
                           {suggestion.details.stopLoss}
                         </div>
                       </div>
-                      <div className="bg-gray-800/20 rounded-lg p-2 border border-gray-700/50">
-                        <div className="text-[10px] text-gray-500 mb-1">R:R</div>
-                        <div className="text-xs font-bold text-tradeiq-blue">
-                          {suggestion.details.riskReward}
-                        </div>
-                      </div>
                     </div>
+
+                    {suggestion.details.riskReward && (
+                      <div className="flex items-center justify-between bg-gray-800/20 rounded-lg p-2 border border-gray-700/50">
+                        <span className="text-xs text-gray-400">Risk/Reward</span>
+                        <span className="text-xs font-bold text-tradeiq-blue">
+                          {suggestion.details.riskReward}
+                        </span>
+                      </div>
+                    )}
 
                     {(suggestion.details.resistanceBreak || suggestion.details.supportBreak) && (
                       <div className="bg-gray-800/20 rounded-lg p-2 border border-gray-700/50">
@@ -300,9 +276,6 @@ export const AISuggestions = ({ asset }: AISuggestionsProps) => {
                             <span className="text-tradeiq-danger">↓ {suggestion.details.supportBreak}</span>
                           )}
                         </div>
-                        {suggestion.details.currentRange && (
-                          <div className="text-[10px] text-gray-600 mt-1">Range: {suggestion.details.currentRange}</div>
-                        )}
                       </div>
                     )}
                   </>
@@ -312,7 +285,7 @@ export const AISuggestions = ({ asset }: AISuggestionsProps) => {
                 {suggestion.type === 'strategy' && (
                   <div className="grid grid-cols-2 gap-2">
                     <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
-                      <div className="text-[10px] text-gray-500 mb-1">RISK LEVEL</div>
+                      <div className="text-[10px] text-gray-500 mb-1">RISK</div>
                       <div className={`text-xs font-semibold ${
                         suggestion.details.risk.includes("High") ? "text-tradeiq-danger" :
                         suggestion.details.risk.includes("Medium") ? "text-tradeiq-warning" :
@@ -332,60 +305,46 @@ export const AISuggestions = ({ asset }: AISuggestionsProps) => {
 
                 {/* Risk Management Details */}
                 {suggestion.type === 'risk' && (
-                  <div className="space-y-2">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
-                        <div className="flex items-center space-x-1 mb-1">
-                          <DollarSign className="h-3 w-3 text-tradeiq-warning" />
-                          <span className="text-[10px] text-gray-500">MAX RISK</span>
-                        </div>
-                        <div className="text-xs font-semibold text-tradeiq-warning">
-                          {suggestion.details.maxRisk}
-                        </div>
-                      </div>
-                      <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
-                        <div className="text-[10px] text-gray-500 mb-1">STOP DISTANCE</div>
-                        <div className="text-xs font-semibold text-white">
-                          {suggestion.details.stopLossDistance}
-                        </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
+                      <div className="text-[10px] text-gray-500 mb-1">MAX RISK</div>
+                      <div className="text-xs font-semibold text-tradeiq-warning">
+                        {suggestion.details.maxRisk}
                       </div>
                     </div>
-                    <div className="bg-gray-800/20 rounded-lg p-2 border border-gray-700/50 text-xs text-gray-400">
-                      <div className="text-[10px] text-gray-500 mb-1">RECOMMENDED</div>
-                      Position size: {suggestion.details.positionSize} • Risk: {suggestion.details.riskAmount}
+                    <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
+                      <div className="text-[10px] text-gray-500 mb-1">STOP DISTANCE</div>
+                      <div className="text-xs font-semibold text-white">
+                        {suggestion.details.stopDistance}
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {/* Sentiment Details */}
                 {suggestion.type === 'sentiment' && (
-                  <div className="bg-gray-800/20 rounded-lg p-2 border border-gray-700/50">
-                    <div className="grid grid-cols-3 gap-2 mb-2">
-                      <div>
-                        <div className="text-[10px] text-gray-500">TREND</div>
-                        <div className={`text-xs font-semibold ${
-                          suggestion.details.trend === "Bullish" ? "text-tradeiq-success" :
-                          suggestion.details.trend === "Bearish" ? "text-tradeiq-danger" :
-                          "text-gray-400"
-                        }`}>
-                          {suggestion.details.trend}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-gray-500">STRENGTH</div>
-                        <div className="text-xs font-semibold text-white">
-                          {suggestion.details.strength}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-gray-500">VOLATILITY</div>
-                        <div className="text-xs font-semibold text-tradeiq-warning">
-                          {suggestion.details.volatility}
-                        </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
+                      <div className="text-[10px] text-gray-500 mb-1">TREND</div>
+                      <div className={`text-xs font-semibold ${
+                        suggestion.details.trend === "Bullish" ? "text-tradeiq-success" :
+                        suggestion.details.trend === "Bearish" ? "text-tradeiq-danger" :
+                        "text-gray-400"
+                      }`}>
+                        {suggestion.details.trend}
                       </div>
                     </div>
-                    <div className="text-[10px] text-gray-400 pt-2 border-t border-gray-700/50">
-                      💡 {suggestion.details.recommendation}
+                    <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
+                      <div className="text-[10px] text-gray-500 mb-1">STRENGTH</div>
+                      <div className="text-xs font-semibold text-white">
+                        {suggestion.details.strength}
+                      </div>
+                    </div>
+                    <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
+                      <div className="text-[10px] text-gray-500 mb-1">VOLATILITY</div>
+                      <div className="text-xs font-semibold text-tradeiq-warning">
+                        {suggestion.details.volatility}
+                      </div>
                     </div>
                   </div>
                 )}
