@@ -51,6 +51,7 @@ const generatePatternsFromTradingView = (price: number, change: number) => {
       status: changePercent > 3 ? "Confirmed" : "Forming",
       timeframe: "4H",
       priceTarget: (price * (1 + selected.target / 100)).toFixed(2),
+      takeProfit: (price * (1 + (selected.target * 0.6) / 100)).toFixed(2), // 60% of target
       stopLoss: (price * 0.97).toFixed(2),
       breakoutLevel: (price * 1.02).toFixed(2)
     });
@@ -63,6 +64,7 @@ const generatePatternsFromTradingView = (price: number, change: number) => {
       status: changePercent > 3 ? "Confirmed" : "Forming",
       timeframe: "4H",
       priceTarget: (price * (1 + selected.target / 100)).toFixed(2),
+      takeProfit: (price * (1 + (selected.target * 0.6) / 100)).toFixed(2), // 60% of target
       stopLoss: (price * 1.03).toFixed(2),
       breakoutLevel: (price * 0.98).toFixed(2)
     });
@@ -74,6 +76,7 @@ const generatePatternsFromTradingView = (price: number, change: number) => {
       status: "Forming",
       timeframe: "1D",
       priceTarget: (price * (1 + neutral.target / 100)).toFixed(2),
+      takeProfit: (price * (1 + (neutral.target * 0.6) / 100)).toFixed(2), // 60% of target
       stopLoss: neutral.type === "bullish" ? (price * 0.97).toFixed(2) : (price * 1.03).toFixed(2),
       breakoutLevel: neutral.type === "bullish" ? (price * 1.02).toFixed(2) : (price * 0.98).toFixed(2)
     });
@@ -209,7 +212,7 @@ export const PatternDetection = ({ asset }: PatternDetectionProps) => {
             {pattern.priceTarget && (
               <div className="p-3 space-y-2">
                 {/* Price Targets Grid */}
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
                     <div className="flex items-center space-x-1 mb-1">
                       {pattern.type === "bullish" ? (
@@ -228,6 +231,19 @@ export const PatternDetection = ({ asset }: PatternDetectionProps) => {
                       {pattern.target > 0 ? '+' : ''}{pattern.target}%
                     </div>
                   </div>
+
+                  <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
+                    <div className="flex items-center space-x-1 mb-1">
+                      <CheckCircle className="h-3 w-3 text-tradeiq-blue" />
+                      <span className="text-[10px] text-gray-500">TAKE PROFIT</span>
+                    </div>
+                    <div className="text-sm font-bold text-tradeiq-blue">
+                      ${pattern.takeProfit}
+                    </div>
+                    <div className="text-[10px] text-gray-600">
+                      Partial profit
+                    </div>
+                  </div>
                   
                   <div className="bg-gray-800/30 rounded-lg p-2 border border-gray-700/50">
                     <div className="flex items-center space-x-1 mb-1">
@@ -238,7 +254,7 @@ export const PatternDetection = ({ asset }: PatternDetectionProps) => {
                       ${pattern.stopLoss}
                     </div>
                     <div className="text-[10px] text-gray-600">
-                      Risk management
+                      Risk limit
                     </div>
                   </div>
                 </div>
