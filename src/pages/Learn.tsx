@@ -30,7 +30,7 @@ const freeResources = [{
 }, {
   id: 4,
   title: "Equity, Unlocking The Stock Market",
-  description: "Learn how to analyze market trends, identify opportunities, and make informed trading decisions.",
+  description: "Own the market, don't guess it — learn how equity investing really creates wealth.",
   icon: TrendingUp,
   category: "Free"
 }];
