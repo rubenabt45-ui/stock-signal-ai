@@ -7,6 +7,7 @@ export interface ChatMessage {
   content: string;
   image?: string;
   timestamp: Date;
+  isStreaming?: boolean;
 }
 
 const STORAGE_KEY = 'strategyai_chat_history';

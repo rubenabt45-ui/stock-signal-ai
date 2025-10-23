@@ -8,15 +8,17 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/providers/AuthProvider';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useDailyMessages } from '@/hooks/useDailyMessages';
+import { useConversationHistory } from '@/hooks/useConversationHistory';
 import { UpgradeModal } from '@/components/UpgradeModal';
 import { analyzeMarketQuery } from '@/services/aiService';
 import { logger } from '@/utils/logger';
 import { useNavigate } from 'react-router-dom';
 import { MotionWrapper, StaggerContainer, StaggerItem } from '@/components/ui/motion-wrapper';
+
 interface Message {
   id: string;
   content: string;
-  sender: 'user' | 'ai';
+  type: 'user' | 'assistant';
   timestamp: Date;
   isStreaming?: boolean;
 }
@@ -36,7 +38,15 @@ const TradingChat: React.FC = () => {
     recordAnalysisUsage,
     loading: usageLoading
   } = useDailyMessages();
-  const [messages, setMessages] = useState<Message[]>([]);
+  
+  // Use conversation history hook for persistent messages
+  const {
+    messages,
+    addMessage,
+    setMessages,
+    isLoading: historyLoading
+  } = useConversationHistory();
+  
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -65,10 +75,12 @@ const TradingChat: React.FC = () => {
     const userMessage: Message = {
       id: Date.now().toString(),
       content: input.trim(),
-      sender: 'user',
+      type: 'user',
       timestamp: new Date()
     };
-    setMessages(prev => [...prev, userMessage]);
+    
+    // Add user message using the hook
+    addMessage(userMessage);
     setInput('');
     setIsLoading(true);
 
@@ -83,11 +95,14 @@ const TradingChat: React.FC = () => {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: '',
-        sender: 'ai',
+        type: 'assistant',
         timestamp: new Date(),
         isStreaming: true
       };
-      setMessages(prev => [...prev, aiMessage]);
+      
+      // Add AI message placeholder
+      addMessage(aiMessage);
+      
       const response = await analyzeMarketQuery(userMessage.content);
 
       // Simulate streaming effect
@@ -114,14 +129,14 @@ const TradingChat: React.FC = () => {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: 'Sorry, I encountered an error processing your request. Please try again.',
-        sender: 'ai',
+        type: 'assistant',
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, errorMessage]);
+      addMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, usageLoading, isPro, canUseAnalysis, recordAnalysisUsage]);
+  }, [input, isLoading, usageLoading, isPro, canUseAnalysis, recordAnalysisUsage, addMessage, setMessages]);
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -192,11 +207,11 @@ const TradingChat: React.FC = () => {
               </Card>
             </MotionWrapper>}
 
-          {messages.map(message => <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] rounded-lg p-4 ${message.sender === 'user' ? 'bg-tradeiq-blue text-white' : 'tradeiq-card'}`}>
+          {messages.map(message => <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[80%] rounded-lg p-4 ${message.type === 'user' ? 'bg-tradeiq-blue text-white' : 'tradeiq-card'}`}>
                 <div className="flex items-start space-x-2">
-                  {message.sender === 'ai' && <Bot className="h-5 w-5 text-tradeiq-blue mt-0.5 flex-shrink-0" />}
-                  {message.sender === 'user' && <User className="h-5 w-5 text-white mt-0.5 flex-shrink-0" />}
+                  {message.type === 'assistant' && <Bot className="h-5 w-5 text-tradeiq-blue mt-0.5 flex-shrink-0" />}
+                  {message.type === 'user' && <User className="h-5 w-5 text-white mt-0.5 flex-shrink-0" />}
                   <div className="flex-1">
                     <p className="whitespace-pre-wrap">{message.content}</p>
                     {message.isStreaming && <Loader2 className="h-4 w-4 animate-spin text-tradeiq-blue mt-2" />}
