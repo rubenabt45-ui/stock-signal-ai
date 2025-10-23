@@ -1,9 +1,49 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, Component, ErrorInfo, ReactNode } from "react";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PublicRoute from "@/components/PublicRoute";
 import BottomNavigation from "@/components/BottomNavigation";
 import Footer from "@/components/Footer";
+
+// Error boundary for lazy loaded routes
+class LazyLoadErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Lazy load error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-tradeiq-navy flex items-center justify-center p-4">
+          <div className="text-center space-y-4 max-w-md">
+            <h2 className="text-xl font-bold text-white">Loading Error</h2>
+            <p className="text-gray-400">Failed to load this page. This is usually a temporary issue.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-tradeiq-blue hover:bg-tradeiq-blue/80 text-white rounded-lg transition-colors"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 // Helper function to retry failed lazy imports
 const retryLazyImport = (fn: () => Promise<any>, retriesLeft = 3, interval = 1000): Promise<any> => {
@@ -82,8 +122,9 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-tradeiq-navy">
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
+        <LazyLoadErrorBoundary>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
               {/* PUBLIC LANDING PAGES */}
               <Route path="/" element={<Landing />} />
               <Route path="/learn-preview" element={<LearnPreview />} />
@@ -190,6 +231,7 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
+        </LazyLoadErrorBoundary>
           
           {/* CONDITIONAL FOOTER AND NAVIGATION */}
           <Routes>
