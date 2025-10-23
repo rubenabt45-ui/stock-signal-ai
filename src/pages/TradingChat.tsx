@@ -146,10 +146,6 @@ const TradingChat: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              {!isPro && <Button onClick={() => setShowUpgradeModal(true)} variant="outline" className="gap-2 border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800">
-                  <Crown className="h-4 w-4" />
-                  <span className="hidden sm:inline">Upgrade</span>
-                </Button>}
               <div className="text-white font-medium">
                 {isPro ? 'Pro Plan' : 'Free Plan'}
               </div>
