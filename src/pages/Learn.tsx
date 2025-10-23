@@ -29,7 +29,7 @@ const freeResources = [{
   category: "Free"
 }, {
   id: 4,
-  title: "Equity Unlocking The Stock Market",
+  title: "Equity, Unlocking The Stock Market",
   description: "Learn how to analyze market trends, identify opportunities, and make informed trading decisions.",
   icon: TrendingUp,
   category: "Free"
