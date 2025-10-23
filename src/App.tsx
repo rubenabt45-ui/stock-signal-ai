@@ -5,33 +5,55 @@ import PublicRoute from "@/components/PublicRoute";
 import BottomNavigation from "@/components/BottomNavigation";
 import Footer from "@/components/Footer";
 
-// Lazy load pages for code splitting
-const Landing = lazy(() => import("./pages/Landing"));
-const LearnPreview = lazy(() => import("./pages/LearnPreview"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const ChartIA = lazy(() => import("./pages/Index"));
-const Favorites = lazy(() => import("./pages/Favorites"));
-const TradingChat = lazy(() => import("./pages/TradingChat"));
-const Learn = lazy(() => import("./pages/Learn"));
-const MarketUpdates = lazy(() => import("./pages/MarketUpdates"));
-const News = lazy(() => import("./pages/News"));
-const Settings = lazy(() => import("./pages/Settings"));
-const Success = lazy(() => import("./pages/Success"));
-const Cancel = lazy(() => import("./pages/Cancel"));
-const Login = lazy(() => import("./pages/Login"));
-const Signup = lazy(() => import("./pages/Signup"));
-const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const ResetPasswordRequest = lazy(() => import("./pages/ResetPasswordRequest"));
-const Pricing = lazy(() => import("./pages/Pricing"));
-const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
-const TermsOfService = lazy(() => import("./pages/TermsOfService"));
-const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
-const About = lazy(() => import("./pages/About"));
-const Blog = lazy(() => import("./pages/Blog"));
-const Careers = lazy(() => import("./pages/Careers"));
+// Helper function to retry failed lazy imports
+const retryLazyImport = (fn: () => Promise<any>, retriesLeft = 3, interval = 1000): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    fn()
+      .then(resolve)
+      .catch((error) => {
+        setTimeout(() => {
+          if (retriesLeft === 1) {
+            // If this was the last retry, reload the page to clear cache
+            console.error('Failed to load module after retries, reloading page...');
+            window.location.reload();
+            reject(error);
+            return;
+          }
+
+          console.log(`Retrying import... (${retriesLeft - 1} retries left)`);
+          retryLazyImport(fn, retriesLeft - 1, interval).then(resolve, reject);
+        }, interval);
+      });
+  });
+};
+
+// Lazy load pages for code splitting with retry logic
+const Landing = lazy(() => retryLazyImport(() => import("./pages/Landing")));
+const LearnPreview = lazy(() => retryLazyImport(() => import("./pages/LearnPreview")));
+const Dashboard = lazy(() => retryLazyImport(() => import("./pages/Dashboard")));
+const ChartIA = lazy(() => retryLazyImport(() => import("./pages/Index")));
+const Favorites = lazy(() => retryLazyImport(() => import("./pages/Favorites")));
+const TradingChat = lazy(() => retryLazyImport(() => import("./pages/TradingChat")));
+const Learn = lazy(() => retryLazyImport(() => import("./pages/Learn")));
+const MarketUpdates = lazy(() => retryLazyImport(() => import("./pages/MarketUpdates")));
+const News = lazy(() => retryLazyImport(() => import("./pages/News")));
+const Settings = lazy(() => retryLazyImport(() => import("./pages/Settings")));
+const Success = lazy(() => retryLazyImport(() => import("./pages/Success")));
+const Cancel = lazy(() => retryLazyImport(() => import("./pages/Cancel")));
+const Login = lazy(() => retryLazyImport(() => import("./pages/Login")));
+const Signup = lazy(() => retryLazyImport(() => import("./pages/Signup")));
+const ForgotPassword = lazy(() => retryLazyImport(() => import("./pages/ForgotPassword")));
+const ResetPassword = lazy(() => retryLazyImport(() => import("./pages/ResetPassword")));
+const ResetPasswordRequest = lazy(() => retryLazyImport(() => import("./pages/ResetPasswordRequest")));
+const Pricing = lazy(() => retryLazyImport(() => import("./pages/Pricing")));
+const VerifyEmail = lazy(() => retryLazyImport(() => import("./pages/VerifyEmail")));
+const NotFound = lazy(() => retryLazyImport(() => import("./pages/NotFound")));
+const PrivacyPolicy = lazy(() => retryLazyImport(() => import("./pages/PrivacyPolicy")));
+const TermsOfService = lazy(() => retryLazyImport(() => import("./pages/TermsOfService")));
+const CookiePolicy = lazy(() => retryLazyImport(() => import("./pages/CookiePolicy")));
+const About = lazy(() => retryLazyImport(() => import("./pages/About")));
+const Blog = lazy(() => retryLazyImport(() => import("./pages/Blog")));
+const Careers = lazy(() => retryLazyImport(() => import("./pages/Careers")));
 
 // Loading fallback component
 const PageLoader = () => (
